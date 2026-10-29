@@ -237,7 +237,8 @@ D.forEach(function (r) {
 
 var ANA_PUAN = 10, BONUS_PUAN = 15; // harf başına puan
 var MAVI = "#1f55b8";
-var BASLANGIC_HAK = 3; // ampül ve tokmak için başlangıç hakkı
+var BASLANGIC_HAK = 3; // tokmak için başlangıç hakkı
+var BASLANGIC_IPUCU = 7; // ampül için başlangıç hakkı (şimdilik 7)
 
 // LAYOUT-BEGIN
 // Kelimeleri çapraz bulmaca gibi yerleştirir. d: 0 yatay, 1 dikey
@@ -348,7 +349,7 @@ document.head.appendChild(css);
 var root = document.createElement("div");
 root.id = "cm";
 root.innerHTML =
-  '<div class="cm-top"><button class="cm-sm" id="cmBack">🧠 BEYİN FIRTINASI</button></div><div class="cm-banner" id="cmBanner"></div>' +
+  '<div class="cm-top"><button class="cm-sm" id="cmBack">🧠 BİLGİ ARENASI</button></div><div class="cm-banner" id="cmBanner"></div>' +
   '<div class="cm-gridbox" id="cmGrid"></div><div class="cm-bonus" id="cmBonus"></div>' +
   '<div class="cm-cur" id="cmCur"></div>' +
   '<div class="cm-wrap"><div class="cm-wheel" id="cmWheel"><svg id="cmSvg"></svg>' +
@@ -420,16 +421,16 @@ function temaGeri() {
   } catch (e) {}
 }
 
-var hakIpucu = BASLANGIC_HAK, hakTokmak = BASLANGIC_HAK, hammerOn = false;
-try { lvIdx = Math.min(parseInt(localStorage.getItem("bf_cemberLv") || "0", 10) || 0, LEVELS.length - 1); } catch (e) {}
-try { puan = parseInt(localStorage.getItem("bf_cemberPuan") || "0", 10) || 0; } catch (e) {}
+var hakIpucu = BASLANGIC_IPUCU, hakTokmak = BASLANGIC_HAK, hammerOn = false;
+try { lvIdx = Math.min(parseInt(localStorage.getItem("cemberLv") || "0", 10) || 0, LEVELS.length - 1); } catch (e) {}
+try { puan = parseInt(localStorage.getItem("cemberPuan") || "0", 10) || 0; } catch (e) {}
 try {
-  var h1 = localStorage.getItem("bf_cemberHakIpucu"), h2 = localStorage.getItem("bf_cemberHakTokmak");
+  var h1 = localStorage.getItem("cemberHakIpucu"), h2 = localStorage.getItem("cemberHakTokmak");
   if (h1 !== null) hakIpucu = Math.max(0, parseInt(h1, 10) || 0);
   if (h2 !== null) hakTokmak = Math.max(0, parseInt(h2, 10) || 0);
 } catch (e) {}
 
-function puanKaydet() { try { localStorage.setItem("bf_cemberPuan", puan); } catch (e) {} }
+function puanKaydet() { try { localStorage.setItem("cemberPuan", puan); } catch (e) {} }
 var bannerT = null;
 function baslikYaz() { $("cmPuan").textContent = "⭐ " + puan; }
 function bolumGoster() {
@@ -445,7 +446,7 @@ function hakYaz() {
   var a = $("cmHintN"), b = $("cmHamN");
   a.textContent = hakIpucu > 0 ? hakIpucu : "+"; a.classList.toggle("zero", hakIpucu <= 0);
   b.textContent = hakTokmak > 0 ? hakTokmak : "+"; b.classList.toggle("zero", hakTokmak <= 0);
-  try { localStorage.setItem("bf_cemberHakIpucu", hakIpucu); localStorage.setItem("bf_cemberHakTokmak", hakTokmak); } catch (e) {}
+  try { localStorage.setItem("cemberHakIpucu", hakIpucu); localStorage.setItem("cemberHakTokmak", hakTokmak); } catch (e) {}
 }
 // İLERİDE: reklam izlenince veya satın alınca çağır -> window.cemberHakEkle("ipucu", 3)
 window.cemberHakEkle = function (tur, n) {
@@ -607,7 +608,7 @@ function end() {
         flash("🎉 Seviye tamamlandı!", "ok");
         setTimeout(function () {
           lvIdx = (lvIdx + 1) % LEVELS.length;
-          try { localStorage.setItem("bf_cemberLv", lvIdx); } catch (e) {}
+          try { localStorage.setItem("cemberLv", lvIdx); } catch (e) {}
           startLevel();
         }, 1500);
       }
