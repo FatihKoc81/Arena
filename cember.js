@@ -237,8 +237,7 @@ D.forEach(function (r) {
 
 var ANA_PUAN = 10, BONUS_PUAN = 15; // harf başına puan
 var MAVI = "#1f55b8";
-var BASLANGIC_HAK = 3; // tokmak için başlangıç hakkı
-var BASLANGIC_IPUCU = 7; // ampül için başlangıç hakkı (şimdilik 7)
+var BASLANGIC_HAK = 3; // ampül ve tokmak için başlangıç hakkı
 
 // LAYOUT-BEGIN
 // Kelimeleri çapraz bulmaca gibi yerleştirir. d: 0 yatay, 1 dikey
@@ -421,7 +420,7 @@ function temaGeri() {
   } catch (e) {}
 }
 
-var hakIpucu = BASLANGIC_IPUCU, hakTokmak = BASLANGIC_HAK, hammerOn = false;
+var hakIpucu = BASLANGIC_HAK, hakTokmak = BASLANGIC_HAK, hammerOn = false;
 try { lvIdx = Math.min(parseInt(localStorage.getItem("cemberLv") || "0", 10) || 0, LEVELS.length - 1); } catch (e) {}
 try { puan = parseInt(localStorage.getItem("cemberPuan") || "0", 10) || 0; } catch (e) {}
 try {
