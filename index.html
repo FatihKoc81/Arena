@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="only light">
+<meta name="supported-color-schemes" content="light">
+<style>:root,html,body,#cm{color-scheme:only light!important}</style>
+<script>window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();});</script>
+<title>Beyin Fırtınası</title>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#080c20">
+<link rel="icon" type="image/png" href="icon-192.png?v=3">
+<link rel="apple-touch-icon" href="icon-192.png?v=3">
+</head>
+<body>
+<h1>🧠 BEYİN FIRTINASI</h1>
+
+<main class="kart" id="ana">
+<div class="pill" id="seviye">Seviye 1</div>
+<p class="alt"><span>Bilgini test et ve stratejini konuştur,</span><span>zirvedeki büyük ödüle adım adım yaklaş!</span></p>
+<button class="btn" id="basla">🎯 Oyuna Başla</button>
+<button class="btn ikinci" id="sifirla">🔄 İlerlemeyi Sıfırla</button>
+</main>
+
+<section class="kart hidden" id="oyun">
+<div class="ust"><b id="oSeviye"></b><span id="sayac"></span></div>
+<div class="cubuk"><div id="bar"></div></div>
+<p id="soruMetni"></p>
+<div id="secenekler"></div>
+<div class="jokerler">
+<button class="jok" id="jYarim">✂️ 50:50</button>
+<button class="jok" id="jSeyirci">👥 Seyirci</button>
+<button class="jok" id="jCift">🛡️ Çift Cevap</button>
+</div>
+</section>
+
+<section class="kart hidden" id="son">
+<h2 id="sBaslik"></h2>
+<p class="alt" id="sMetin"></p>
+<button class="btn" id="sDevam"></button>
+<button class="btn ikinci" id="sMenu">Ana menü</button>
+</section>
+
+<script src="sorular.js"></script>
+<script src="sorular2.js"></script>
+<script>
+// milyonerSorulari {seviye1:[{soru,secenekler,cevap}]} -> SORULAR [[soru,[secenekler],dogruIndex]]
+var SORULAR = (function () {
+  if (typeof milyonerSorulari === "undefined") return typeof window.SORULAR !== "undefined" ? window.SORULAR : [];
+  return Object.keys(milyonerSorulari)
+    .sort((a, b) => parseInt(a.replace(/\D/g, "")) - parseInt(b.replace(/\D/g, "")))
+    .map(k => milyonerSorulari[k].map(q => {
+      const sec = q.secenekler || q.seceler || q.secenek || q.siklar || [];
+      let d = sec.findIndex(s => String(s).trim() === String(q.cevap).trim());
+      if (d < 0) d = 0;
+      return [q.soru, sec, d];
+    }));
+})();
+</script>
+<script>
+const KEY = "beyinFirtinasi";
+const $ = id => document.getElementById(id);
+let st = { seviye: 1 };
+try { st = JSON.parse(localStorage.getItem(KEY)) || st; } catch (e) {}
+const kaydet = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} };
+
+let lv, soru, kilit, jok, butonlar, ciftAktif;
+
+function ekran(id) {
+  ["ana", "oyun", "son"].forEach(e => $(e).classList.toggle("hidden", e !== id));
+}
+
+function menu() {
+  $("seviye").textContent = st.seviye > SORULAR.length ? "Tamamlandı 🏆" : "Seviye " + st.seviye;
+  ekran("ana");
+}
+
+function baslat() {
+  if (st.seviye > SORULAR.length) { st.seviye = 1; kaydet(); }
+  lv = SORULAR[st.seviye - 1];
+  soru = 0;
+  jok = { yarim: 1, seyirci: 1, cift: 1 };
+  ciftAktif = false;
+  $("oSeviye").textContent = "Seviye " + st.seviye;
+  ["jYarim", "jSeyirci", "jCift"].forEach(j => $(j).disabled = false);
+  ekran("oyun");
+  goster();
+}
+
+// Soruyu ortadan bölür: üst satır alttan uzun olmaz
+function bol(metin) {
+  const orta = Math.floor(metin.length / 2);
+  const i = metin.lastIndexOf(" ", orta);
+  if (i === -1) return metin;
+  return metin.slice(0, i) + "<br>" + metin.slice(i + 1);
+}
+
+function goster() {
+  const q = lv[soru];
+  kilit = false;
+  ciftAktif = false; // çift cevap sadece joker basılan soru için geçerli
+  $("sayac").textContent = "Soru " + (soru + 1) + "/" + lv.length;
+  $("bar").style.width = (soru / lv.length * 100) + "%";
+  $("soruMetni").innerHTML = bol(q[0]);
+  const kutu = $("secenekler");
+  kutu.innerHTML = "";
+  butonlar = q[1].map((t, i) => {
+    const b = document.createElement("button");
+    b.className = "sec";
+    b.append("ABCD"[i] + ") " + t);
+    b.onclick = () => cevapla(i);
+    kutu.append(b);
+    return b;
+  });
+}
+
+function sonraki() {
+  soru++;
+  soru >= lv.length ? bitir(true) : goster();
+}
+
+function cevapla(i) {
+  if (kilit) return;
+  const dogru = lv[soru][2];
+
+  // Çift cevap aktifken ilk yanlış cevap: yanlış şıkkı kaldır, ikinci hak ver
+  if (i !== dogru && ciftAktif) {
+    ciftAktif = false;
+    butonlar[i].disabled = true;
+    butonlar[i].classList.add("yanlis");
+    setTimeout(() => butonlar[i].classList.add("gizli"), 500);
+    return;
+  }
+
+  kilit = true;
+  butonlar[dogru].classList.add("dogru");
+  if (i === dogru) return void setTimeout(sonraki, 900);
+  butonlar[i].classList.add("yanlis");
+  setTimeout(() => bitir(false), 1300);
+}
+
+function bitir(kazandi) {
+  $("bar").style.width = "100%";
+  if (kazandi) {
+    st.seviye++;
+    kaydet();
+    const hepsi = st.seviye > SORULAR.length;
+    $("sBaslik").textContent = hepsi ? "🏆 Büyük ödül senin!" : "🎉 Seviye geçildi!";
+    $("sMetin").textContent = hepsi ? "Tüm seviyeleri tamamladın." : "Sıradaki: Seviye " + st.seviye;
+    $("sDevam").textContent = hepsi ? "Baştan oyna" : "Sonraki seviye";
+  } else {
+    // Kaybedince bir alt seviyeden devam (Seviye 1'de aynı seviye tekrarlanır)
+    const eski = st.seviye;
+    if (st.seviye > 1) st.seviye--;
+    kaydet();
+    $("sBaslik").textContent = "❌ Yanlış cevap";
+    if (eski > 1) {
+      $("sMetin").textContent = "Seviye " + eski + " tamamlanamadı. Bir alt seviyeye düştün: Seviye " + st.seviye + ".";
+      $("sDevam").textContent = "Seviye " + st.seviye + "'den devam et";
+    } else {
+      $("sMetin").textContent = "Seviye 1 tamamlanamadı. Tekrar dene!";
+      $("sDevam").textContent = "Tekrar dene";
+    }
+  }
+  ekran("son");
+}
+
+function guvenliBaslat() {
+  try {
+    if (typeof SORULAR === "undefined" || !SORULAR.length) {
+      alert("Sorular yüklenemedi. Sayfayı yenileyip tekrar dene.");
+      return;
+    }
+    baslat();
+  } catch (e) {
+    alert("Milyoner hatası: " + e.message);
+  }
+}
+document.addEventListener("click", e => {
+  if (e.target.closest("#basla") || e.target.closest("#sDevam")) guvenliBaslat();
+});
+
+$("jYarim").onclick = () => {
+  if (kilit || !jok.yarim) return;
+  jok.yarim = 0;
+  $("jYarim").disabled = true;
+  const dogru = lv[soru][2];
+  const yanlislar = [0, 1, 2, 3].filter(i => i !== dogru).sort(() => Math.random() - .5);
+  yanlislar.slice(0, 2).forEach(i => butonlar[i].classList.add("gizli"));
+};
+
+$("jSeyirci").onclick = () => {
+  if (kilit || !jok.seyirci) return;
+  jok.seyirci = 0;
+  $("jSeyirci").disabled = true;
+  const dogru = lv[soru][2];
+  const acik = [0, 1, 2, 3].filter(i => !butonlar[i].classList.contains("gizli"));
+  let kalan = 100;
+  const d = 45 + Math.floor(Math.random() * 30);
+  const yuzde = {};
+  yuzde[dogru] = d;
+  kalan -= d;
+  const digerleri = acik.filter(i => i !== dogru);
+  digerleri.forEach((i, n) => {
+    const p = n === digerleri.length - 1 ? kalan : Math.floor(Math.random() * kalan);
+    yuzde[i] = p;
+    kalan -= p;
+  });
+  acik.forEach(i => {
+    const s = document.createElement("span");
+    s.textContent = " %" + yuzde[i];
+    butonlar[i].append(s);
+  });
+};
+
+// ÇİFT CEVAP: bu soruda iki cevap hakkı verir
+$("jCift").onclick = () => {
+  if (kilit || !jok.cift) return;
+  jok.cift = 0;
+  ciftAktif = true;
+  $("jCift").disabled = true;
+};
+
+$("sMenu").onclick = menu;
+menu();
+</script>
+
+<script src="ortak.js"></script>
+<script src="passaparola.js"></script>
+<script src="kelime.js"></script>
+<script src="kelimelerim.js"></script>
+<script src="islem.js"></script>
+<script src="cember.js"></script>
+<script>
+// Sayfa kaymasın (menü, oyun, sonuç ekranları) + sol alta APK indirme / güncelleme butonu
+// Tarayıcıda "⬇ APK", uygulamanın içinde aynı yerde "⬇ Güncelle" yazar.
+(function () {
+  var APK_ADRES = "https://github.com/FatihKoc81/BeyinFirtinasi/releases/latest/download/BeyinFirtinasi.apk"; // her derlemede otomatik güncellenir
+  var apkUygulamasi = !!window.Capacitor;
+  var uygulamaIci = !!(apkUygulamasi || (window.matchMedia && matchMedia("(display-mode: standalone)").matches));
+  var stl = document.createElement("style");
+  stl.textContent =
+    ".apk-btn{position:fixed;left:10px;bottom:4px;height:40px;padding:0 14px;box-sizing:border-box;z-index:5;display:flex;align-items:center;justify-content:center;gap:5px;border:2px solid #d4a63a;border-radius:11px;background:rgba(0,0,0,.35);color:#d4a63a;font-family:Georgia,'Times New Roman',serif;font-style:italic;font-weight:700;font-size:21px;line-height:1;text-decoration:none}" +
+    ".apk-btn:active{opacity:.7}.apk-btn.gizli{display:none}" +
+    "html.menu-kilit,html.menu-kilit body{overflow:hidden!important;overscroll-behavior:none!important;height:100%!important}" +
+    "html.menu-kilit body{position:fixed!important;top:0;left:0;right:0;width:100%}" +
+    // Kısa ekranlarda (tarayıcı çubukları açıkken) oyun ekranı sığsın diye boşlukları azalt
+    "@media (max-height:800px){#oyun,#son{margin-top:8px!important;padding-top:14px!important;padding-bottom:14px!important}#oyun .sec,#son .btn{padding-top:10px!important;padding-bottom:10px!important}body>h1{margin-top:10px!important;margin-bottom:10px!important;font-size:26px!important}}" +
+    // Passaparola üst başlığı: genel temayla aynı arka plan (çubuk rengi yok)
+    "body.ppOyunda h1{background:transparent!important;border-bottom:0!important;font-size:24px!important;font-weight:800!important;letter-spacing:.5px;line-height:normal!important}" +
+    "body.ppOyunda{padding-top:calc(58px + env(safe-area-inset-top))!important}" +
+    // Kelime Oyunu: başlık Passaparola ile aynı; kart içeriğe göre kısalır (boşluklar azaltıldı)
+    "body.kkOyunda{padding-top:calc(58px + env(safe-area-inset-top))!important;padding-bottom:10px!important}" +
+    "body.kkOyunda h1{display:block!important;position:fixed!important;top:0;left:0;right:0;margin:0!important;padding:12px 0!important;padding-top:calc(12px + env(safe-area-inset-top))!important;font-size:24px!important;font-weight:800!important;letter-spacing:.5px;line-height:normal!important;text-align:center;text-shadow:0 1px 6px rgba(0,0,0,.7);background:transparent!important;border-bottom:0!important;z-index:5;cursor:pointer}" +
+    "body.kkOyunda #kk{margin-top:0!important}" +
+    "body.kkOyunda #kkHeks{margin-top:4px;margin-bottom:4px}" +
+    "body.kkOyunda #kkIpucu{margin-top:6px;margin-bottom:8px;padding:0}" +
+    // Altıgenlerin üstünde kaç harfli olduğu yazar (sayıyı CSS sayacı hesaplar)
+    "#kkHeks{counter-reset:kkh}#kkHeks .kkH{counter-increment:kkh}" +
+    "#kkHeks::after{content:counter(kkh) \" Harfli\";order:-1;flex:0 0 100%;text-align:center;color:#8e9bc4;font-size:15px;font-weight:700;margin-bottom:4px}" +
+    // BAŞLIK BOYUTU: tüm oyunlarda ana sayfadakiyle birebir aynı (en sona konur, hepsini ezer)
+    ":root:root body h1{font-size:clamp(26px,8vw,44px)!important;font-weight:700!important;letter-spacing:normal!important}" +
+    "@media (max-height:800px){:root:root body h1{font-size:26px!important}}" +
+    ":root:root body.ppOyunda h1,:root:root body.kkOyunda h1{padding:8px 0!important;padding-top:calc(8px + env(safe-area-inset-top))!important}" +
+    ":root:root body.ppOyunda,:root:root body.kkOyunda{padding-top:calc(clamp(26px,8vw,44px) * 1.2 + 16px + env(safe-area-inset-top))!important}";
+  document.head.appendChild(stl);
+  // Kelime Oyunu ekranı açıkken body'ye kkOyunda sınıfı ekle
+  var kk = document.getElementById("kk"), ko = document.getElementById("kkOyun");
+  function kkG() {
+    document.body.classList.toggle("kkOyunda", !!(kk && ko && !kk.classList.contains("hidden") && !ko.classList.contains("hidden")));
+  }
+  if (kk && ko) {
+    new MutationObserver(kkG).observe(kk, { attributes: true, attributeFilter: ["class"] });
+    new MutationObserver(kkG).observe(ko, { attributes: true, attributeFilter: ["class"] });
+  }
+  var ios = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  var a = null;
+  // APK uygulamasında "Güncelle", tarayıcıda "APK"; yüklenmiş web uygulamasında (PWA) görünmez
+  if (!ios && (apkUygulamasi || !uygulamaIci)) {
+    a = document.createElement("a");
+    a.className = "apk-btn gizli";
+    a.href = APK_ADRES;
+    a.setAttribute("download", "");
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.textContent = apkUygulamasi ? "⬇ Güncelle" : "⬇ APK";
+    document.body.appendChild(a);
+  }
+  // Passaparola oyunda başlık, ana sayfadaki yerine ölçülerek hizalanır
+  var homeTop = null, ppSet = false;
+  function ppHizala() {
+    var h1 = document.querySelector("body>h1");
+    if (!h1) return;
+    var an = document.getElementById("ana");
+    var anaGor = !!(an && !an.classList.contains("hidden"));
+    if (!document.body.classList.contains("ppOyunda")) {
+      if (ppSet) { h1.style.removeProperty("transform"); ppSet = false; }
+      if (anaGor && !document.body.classList.contains("kkOyunda")) homeTop = h1.getBoundingClientRect().top + window.scrollY;
+      return;
+    }
+    if (homeTop === null) return;
+    h1.style.removeProperty("transform");
+    // Başlık oyunda position:fixed: konumu kaydırmadan bağımsız ölçülür (scrollY eklenmez).
+    var PP_YUKARI = 14; // piksel: artır = başlık daha yukarı, azalt = daha aşağı
+    var fark = Math.round(homeTop - h1.getBoundingClientRect().top) - PP_YUKARI;
+    if (fark) h1.style.setProperty("transform", "translateY(" + fark + "px)", "important");
+    ppSet = true;
+  }
+  // Kilit kararı sadece ekran/yükseklik değişince verilir (sürekli açıp kapatma titremeye ve yazıların kaybolmasına yol açıyordu)
+  var sonAnahtar = "";
+  function guncelle() {
+    ppHizala();
+    var ana = document.getElementById("ana");
+    var gor = !!(ana && !ana.classList.contains("hidden") && getComputedStyle(ana).display !== "none");
+    if (a) a.classList.toggle("gizli", !gor);
+    var gorunen = [];
+    document.querySelectorAll(".kart").forEach(function (k) {
+      if (k.classList.contains("hidden") || getComputedStyle(k).display === "none") return;
+      gorunen.push(k.id + ":" + k.offsetHeight);
+    });
+    var anahtar = window.innerHeight + "|" + gorunen.join(",");
+    if (anahtar === sonAnahtar) return;
+    sonAnahtar = anahtar;
+    var kl = document.documentElement.classList;
+    kl.remove("menu-kilit"); // doğal yerleşimi ölç
+    var alt = 0;
+    document.querySelectorAll(".kart").forEach(function (k) {
+      if (k.classList.contains("hidden") || getComputedStyle(k).display === "none") return;
+      alt = Math.max(alt, k.getBoundingClientRect().bottom + window.scrollY);
+    });
+    // Ekrana sığıyorsa sayfa kaymasın; sığmıyorsa (çok küçük ekran) kaydırmaya izin ver
+    var pay = gor ? 56 : 12;
+    var kilit = alt > 0 && (alt + pay <= window.innerHeight + 24);
+    kl.toggle("menu-kilit", kilit);
+    if (kilit && window.scrollY) window.scrollTo(0, 0);
+  }
+  // Zıplamanın asıl sebebi: ekran açılınca hizalama 500 ms'lik zamanlayıcıyı bekliyordu.
+  // Artık body sınıfı değişir değişmez (ilk çizimden önce) hemen hizalanır.
+  new MutationObserver(ppHizala).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+  window.addEventListener("resize", guncelle);
+  window.addEventListener("scroll", function () {
+    if (document.documentElement.classList.contains("menu-kilit") && window.scrollY) window.scrollTo(0, 0);
+  });
+  document.addEventListener("touchmove", function (e) {
+    if (document.documentElement.classList.contains("menu-kilit") && !(e.target.closest && e.target.closest("input,textarea"))) e.preventDefault();
+  }, { passive: false });
+  guncelle();
+  setInterval(guncelle, 500);
+})();
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  const eskiKontrol = navigator.serviceWorker.controller;
+  let yenilendi = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (!eskiKontrol || yenilendi) return;
+    yenilendi = true;
+    location.reload();
+  });
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js", { updateViaCache: "none" })
+      .then(reg => {
+        reg.update();
+        document.addEventListener("visibilitychange", () => {
+          if (!document.hidden) reg.update();
+        });
+      })
+      .catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
