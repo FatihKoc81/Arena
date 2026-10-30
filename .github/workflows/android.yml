@@ -75,7 +75,7 @@ jobs:
           const f='android/app/src/main/AndroidManifest.xml';
           let x=fs.readFileSync(f,'utf8');
           if(!x.includes('android:screenOrientation')){
-            x=x.replace('<activity ','<activity android:screenOrientation=\"portrait\" ');
+            x=x.replace(/<activity\b/,'<activity android:screenOrientation=\"portrait\"');
             fs.writeFileSync(f,x);
           }
           console.log('Yön kilidi: portrait');"
