@@ -343,7 +343,19 @@ css.textContent =
 "#cm .cm-banner{position:absolute;top:28%;left:50%;transform:translate(-50%,-50%);background:rgba(10,24,64,.82);color:#fff;font-size:34px;font-weight:800;padding:10px 30px;border-radius:999px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:5;white-space:nowrap}" +
 "#cm .cm-banner.show{opacity:1}" +
 "#cm .cm-badge{position:absolute;top:-6px;right:-6px;min-width:22px;height:22px;border-radius:11px;background:#e53935;color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-sizing:border-box;padding:0 4px;font-family:inherit}" +
-"#cm .cm-badge.zero{background:#2e9e4a}";
+"#cm .cm-badge.zero{background:#2e9e4a}" +
+"#cm button.cm-ekstra{position:absolute;right:14px;bottom:0;width:54px;height:54px;border-radius:50%;background:#3a3f48;border:3px solid rgba(255,255,255,.55);padding:0;box-shadow:0 3px 8px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;overflow:visible}" +
+"#cm .cm-ov{position:absolute;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:20}" +
+"#cm .cm-ov.show{display:flex}" +
+"#cm .cm-dlg{width:min(92%,420px);background:linear-gradient(#fdf3d8,#fbeabc);border:2px solid #e3c04a;border-radius:20px;padding:18px 16px 16px;box-sizing:border-box;position:relative;color:#5a3a12;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.5)}" +
+"#cm .cm-dlg h3{margin:4px 0 14px;font-size:24px;font-weight:800;color:#5a3a12;letter-spacing:.3px}" +
+"#cm button.cm-dx{position:absolute;right:8px;top:6px;background:transparent;border:0;color:#9a8a70;font-size:28px;line-height:1;padding:4px 10px}" +
+"#cm .cm-box{border:2px solid #e3c04a;border-radius:14px;overflow:hidden;background:#faecc0}" +
+"#cm .cm-box .cm-bh{background:#f3de7a;color:#5a3a12;font-weight:800;font-size:15px;padding:6px 8px}" +
+"#cm .cm-box .cm-bl{min-height:150px;max-height:40vh;overflow:auto;padding:8px;display:flex;flex-wrap:wrap;gap:4px;align-content:flex-start;justify-content:center}" +
+"#cm .cm-prog{margin-top:14px;height:30px;border-radius:15px;background:#bdb88a;position:relative;overflow:hidden}" +
+"#cm .cm-prog i{position:absolute;left:0;top:0;bottom:0;background:#e0892b;border-radius:15px;width:0}" +
+"#cm .cm-prog b{position:absolute;left:0;right:0;top:0;line-height:30px;color:#fff;font-weight:800;font-size:17px;text-shadow:0 1px 3px rgba(0,0,0,.4)}";
 document.head.appendChild(css);
 
 var root = document.createElement("div");
@@ -356,7 +368,9 @@ root.innerHTML =
   '<button class="cm-shuf" id="cmShuf" aria-label="Karıştır"><svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="#9aa3b4" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h3c4 0 5 10 9 10h5"/><path d="M3 17h3c1.6 0 2.7-1.4 3.7-3"/><path d="M13.3 10C14.3 8.4 15.4 7 17 7h3"/><path d="M17 4l3 3-3 3"/><path d="M17 14l3 3-3 3"/></svg></button></div>' +
   '<button class="cm-tool cm-ham" id="cmHam" aria-label="Tokmak">🔨<span class="cm-badge" id="cmHamN"></span></button>' +
   '<button class="cm-tool cm-bulb" id="cmHint" aria-label="İpucu">💡<span class="cm-badge" id="cmHintN"></span></button>' +
-  '<div class="cm-pill cm-score" id="cmPuan"></div></div>';
+  '<button class="cm-ekstra" id="cmEks" aria-label="Ekstra kelimeler"><svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="17" width="22" height="11" rx="2" fill="#e8b865"/><g transform="rotate(-8 16 12)"><rect x="10" y="4" width="13" height="15" rx="2.5" fill="#fff"/><text x="16.5" y="15.5" text-anchor="middle" font-size="10" font-weight="800" fill="#6a4a1a" font-family="sans-serif">A</text></g></svg><span class="cm-badge zero" id="cmEksN">0</span></button>' +
+  '<div class="cm-pill cm-score" id="cmPuan"></div>' +
+  '<div class="cm-ov" id="cmOv"><div class="cm-dlg"><button class="cm-dx" id="cmOvX" aria-label="Kapat">✕</button><h3>EKSTRA KELİMELER</h3><div class="cm-box"><div class="cm-bh">Bulmacada olmayan kelimeler</div><div class="cm-bl" id="cmOvL"></div></div><div class="cm-prog"><i id="cmOvB"></i><b id="cmOvT"></b></div></div></div></div>';
 document.body.appendChild(root);
 
 var $ = function (id) { return document.getElementById(id); };
@@ -490,6 +504,7 @@ function startLevel() {
   var L = LEVELS[lvIdx];
   found = {}; foundB = {}; hintCells = {}; sel = []; drag = false;
   tokmakKapat();
+  $("cmOv").classList.remove("show");
   cur = makeLayout(L.w);
   placedMap = {};
   cur.words.forEach(function (p) { placedMap[p.w] = p; });
@@ -536,6 +551,18 @@ function drawBonus() {
   var h = '<div class="cm-bt">⭐ Bonus kelimeler (' + list.length + (bonusList.length ? "/" + bonusList.length : "") + ")</div><br>";
   list.forEach(function (w) { h += '<span class="cm-chip">' + w + "</span>"; });
   $("cmBonus").innerHTML = h;
+  var en = $("cmEksN");
+  if (en) { en.textContent = list.length; en.className = "cm-badge" + (list.length ? "" : " zero"); }
+  ekstraYaz();
+}
+
+function ekstraYaz() {
+  var list = Object.keys(foundB), tot = bonusList.length, h = "";
+  list.forEach(function (w) { h += '<span class="cm-chip">' + w + "</span>"; });
+  if (!h) h = '<span style="color:#9a8a70;font-size:14px;padding:30px 10px">Bulmacada olmayan kelimeleri bulunca burada görünür.</span>';
+  $("cmOvL").innerHTML = h;
+  $("cmOvB").style.width = (tot ? Math.round(list.length * 100 / tot) : 0) + "%";
+  $("cmOvT").textContent = list.length + "/" + tot;
 }
 
 function pos(i) {
@@ -644,6 +671,9 @@ window.addEventListener("pointercancel", end);
 $("cmShuf").onclick = function () { letters = shuffle(letters); sel = []; drawWheel(); };
 
 // Ampül: ilk kapalı harfi açar. Hak sadece gerçekten bir harf açılırsa düşer.
+$("cmEks").onclick = function () { ekstraYaz(); $("cmOv").classList.add("show"); };
+$("cmOvX").onclick = function () { $("cmOv").classList.remove("show"); };
+$("cmOv").onclick = function (e) { if (e.target === this) this.classList.remove("show"); };
 $("cmHint").onclick = function () {
   if (!cur) return;
   if (hakIpucu <= 0) { hakBitti(); return; }
