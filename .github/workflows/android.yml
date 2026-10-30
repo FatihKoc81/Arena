@@ -146,11 +146,19 @@ jobs:
         run: |
           BT=$(ls -d $ANDROID_HOME/build-tools/*/ | tail -1)
           SRC=android/app/build/outputs/apk/debug/app-debug.apk
+          # anahtarın içindeki takma adı (alias) otomatik bul
+          ALIAS=$(keytool -list -keystore ~/.android/release.keystore -storetype PKCS12 \
+            -storepass "$KEYSTORE_PASS" 2>/dev/null | grep -m1 PrivateKeyEntry | cut -d, -f1)
+          if [ -z "$ALIAS" ]; then
+            echo "HATA: anahtar açılamadı. KEYSTORE_PASS yanlış olabilir."
+            exit 1
+          fi
+          echo "Anahtar alias: $ALIAS"
           "${BT}zipalign" -f -p 4 "$SRC" aligned.apk
           "${BT}apksigner" sign \
             --ks ~/.android/release.keystore --ks-type PKCS12 \
             --ks-pass env:KEYSTORE_PASS --key-pass env:KEYSTORE_PASS \
-            --ks-key-alias beyinfirtinasi \
+            --ks-key-alias "$ALIAS" \
             --out signed.apk aligned.apk
           cp signed.apk "$SRC"
 
