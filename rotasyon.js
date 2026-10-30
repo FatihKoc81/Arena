@@ -542,7 +542,7 @@ function hakBitti(tur) {
     { t: "▶ Reklam izle  (+" + n + " " + ic + ")", c: "yesil", f: function () {
       reklamAc("odul", function (ok) {
         if (ok) { window.cemberHakEkle(tk ? "tokmak" : "ipucu", n); rkKapat(); flash("+" + n + " " + ic, "ok"); }
-        else $("cmRkM").textContent = "Reklam şu an gösterilemedi, biraz sonra tekrar dene.";
+        else $("cmRkM").textContent = "Reklam şu an gösterilemedi, biraz sonra tekrar dene." + (window.__adHata ? " [" + window.__adHata + "]" : "");
       });
     } },
     { t: "Vazgeç", c: "gri", f: rkKapat }
@@ -582,7 +582,7 @@ function kaybet() {
     { t: "▶ Reklam izle, kaldığın yerden devam et (+" + SURE_EK + " sn)", c: "yesil", f: function () {
       reklamAc("odul", function (ok) {
         if (ok) { rkKapat(); sureKalan = SURE_EK * 1000; sureSon = Date.now(); oyunBitti = false; sureYaz(); flash("⏱ +" + SURE_EK + " sn", "ok"); }
-        else $("cmRkM").textContent = "Reklam şu an gösterilemedi. Alt bölümden devam edebilirsin.";
+        else $("cmRkM").textContent = "Reklam şu an gösterilemedi. Alt bölümden devam edebilirsin." + (window.__adHata ? " [" + window.__adHata + "]" : "");
       });
     } },
     { t: alt ? "⬇ Bir alt bölümden devam et (Bölüm " + lvIdx + ")" : "🔄 Bölümü baştan başlat", c: "turuncu", f: function () {

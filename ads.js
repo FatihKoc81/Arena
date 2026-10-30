@@ -3,8 +3,7 @@
    tur: "odul" (ödüllü, izlenince bitti(true)) veya "gecis" (bölüm arası geçiş reklamı). */
 (function () {
   // ===== AYARLAR =====
-  // TEST = true iken Google'ın test reklamları gösterilir. Gerçek reklam için false yap
-  // ve aşağıya AdMob'dan aldığın reklam birimi kimliklerini yaz.
+  // TEST = true iken Google'ın test reklamları gösterilir. Gerçek reklam için false yap.
   var TEST = true;
   var ID_ODUL_TEST = "ca-app-pub-3940256099942544/5224354917";
   var ID_GECIS_TEST = "ca-app-pub-3940256099942544/1033173712";
@@ -13,61 +12,78 @@
   // ===================
 
   var C = window.Capacitor;
-  if (!C || !C.isNativePlatform || !C.isNativePlatform()) return; // tarayıcıda deneme reklamı kalsın
-  var AdMob = C.Plugins && C.Plugins.AdMob;
-  if (!AdMob) return;
+  if (!C || !C.isNativePlatform || !C.isNativePlatform()) return; // tarayıcıda sahte deneme reklamı kalır
+
+  // Eklentiyi bul: önce Capacitor.Plugins, yoksa registerPlugin ile native eklentiye bağlan
+  var AdMob = null, hata = "";
+  try { AdMob = C.Plugins && C.Plugins.AdMob; } catch (e) {}
+  if (!AdMob && typeof C.registerPlugin === "function") {
+    try { AdMob = C.registerPlugin("AdMob"); } catch (e) { hata = "registerPlugin: " + (e && e.message); }
+  }
+  window.__adHata = AdMob ? "" : ("AdMob eklentisi yok " + hata);
+
+  function hataYaz(e) {
+    var m = (e && (e.message || e.errorMessage || e.code)) || String(e);
+    window.__adHata = String(m).slice(0, 80);
+  }
 
   var hazir = null;
   function baslat() {
+    if (!AdMob) return Promise.reject(new Error("AdMob eklentisi APK içinde yok"));
     if (!hazir) {
-      hazir = AdMob.initialize({ initializeForTesting: TEST }).catch(function () { hazir = null; throw new Error("init"); });
+      hazir = AdMob.initialize({ initializeForTesting: TEST }).catch(function (e) { hazir = null; throw e; });
     }
     return hazir;
   }
-  baslat().catch(function () {});
+  baslat().catch(hataYaz);
 
-  function dinle(olaylar, temizle) {
-    // olaylar: {ad: fonksiyon}; temizle: tüm dinleyicileri kaldıran fonksiyonu döndürür
+  // olaylar: {ad: fonksiyon}; dinleyiciler kayıt olunca çözülen promise döner
+  function dinle(olaylar) {
     var tutaclar = [];
-    Object.keys(olaylar).forEach(function (ad) {
-      AdMob.addListener(ad, olaylar[ad]).then(function (h) { tutaclar.push(h); });
-    });
-    return function () { tutaclar.forEach(function (h) { try { h.remove(); } catch (e) {} }); tutaclar = []; };
+    var hepsi = Promise.all(Object.keys(olaylar).map(function (ad) {
+      return AdMob.addListener(ad, olaylar[ad]).then(function (h) { tutaclar.push(h); });
+    }));
+    return {
+      hazir: hepsi,
+      temizle: function () { tutaclar.forEach(function (h) { try { h.remove(); } catch (e) {} }); tutaclar = []; }
+    };
   }
 
   function goster(tur, bitti) {
     var odul = tur === "odul";
-    var bitisti = false, kazandi = false, kaldir = function () {}, zamanAsimi;
+    var bitisti = false, kazandi = false, dl = null, zamanAsimi;
     function son(ok) {
       if (bitisti) return;
       bitisti = true;
       clearTimeout(zamanAsimi);
-      kaldir();
+      if (dl) dl.temizle();
       bitti(ok);
     }
-    zamanAsimi = setTimeout(function () { son(false); }, 45000); // yüklenemezse takılma
+    zamanAsimi = setTimeout(function () { if (!window.__adHata) window.__adHata = "zaman aşımı"; son(false); }, 45000);
 
     baslat().then(function () {
       var olaylar = {};
       if (odul) {
         olaylar.onRewardedVideoAdReward = function () { kazandi = true; };
         olaylar.onRewardedVideoAdDismissed = function () { son(kazandi); };
-        olaylar.onRewardedVideoAdFailedToLoad = function () { son(false); };
-        olaylar.onRewardedVideoAdFailedToShow = function () { son(false); };
+        olaylar.onRewardedVideoAdFailedToLoad = function (e) { hataYaz(e); son(false); };
+        olaylar.onRewardedVideoAdFailedToShow = function (e) { hataYaz(e); son(false); };
       } else {
         olaylar.onInterstitialAdDismissed = function () { son(true); };
-        olaylar.onInterstitialAdFailedToLoad = function () { son(false); };
-        olaylar.onInterstitialAdFailedToShow = function () { son(false); };
+        olaylar.onInterstitialAdFailedToLoad = function (e) { hataYaz(e); son(false); };
+        olaylar.onInterstitialAdFailedToShow = function (e) { hataYaz(e); son(false); };
       }
-      kaldir = dinle(olaylar);
+      dl = dinle(olaylar);
       var id = odul ? (TEST ? ID_ODUL_TEST : ID_ODUL) : (TEST ? ID_GECIS_TEST : ID_GECIS);
-      var hazirla = odul ? AdMob.prepareRewardVideoAd({ adId: id }) : AdMob.prepareInterstitial({ adId: id });
-      return hazirla.then(function () {
+      return dl.hazir.then(function () {
+        return odul ? AdMob.prepareRewardVideoAd({ adId: id }) : AdMob.prepareInterstitial({ adId: id });
+      }).then(function () {
         clearTimeout(zamanAsimi); // reklam yüklendi, gösterim süresi sınırsız
         return odul ? AdMob.showRewardVideoAd() : AdMob.showInterstitial();
       });
-    }).catch(function () { son(false); });
+    }).catch(function (e) { hataYaz(e); son(false); });
   }
 
+  // APK içindeysek HER ZAMAN tanımlı: eklenti yoksa sahte reklam yerine hata görünür
   window.cemberReklam = function (tur, bitti) { goster(tur, bitti); };
 })();

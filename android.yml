@@ -52,6 +52,11 @@ jobs:
       - name: AdMob eklentisini kur
         run: npm install @capacitor-community/admob@^6 --no-audit --no-fund
 
+      - name: AdMob eklentisi Android projesinde mi kontrol et
+        run: |
+          npm ls @capacitor/core @capacitor-community/admob || true
+          grep -i admob android/capacitor.settings.gradle || { echo "HATA: AdMob eklentisi Android projesine eklenmedi"; exit 1; }
+
       - name: AdMob uygulama kimliğini ekle
         env:
           ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID || 'ca-app-pub-3940256099942544~3347511713' }}
