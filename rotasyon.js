@@ -1,5 +1,12 @@
 /* Rotasyon - Words of Wonders tarzı oyun. Butonunu ana menüye (#ana) kendisi ekler. */
 (function () {
+// Gerçek reklam (AdMob) kodu ads.js içinde; sadece APK içinde çalışır, tarayıcıda deneme reklamı kalır.
+if (!window.__adsYuklendi) {
+  window.__adsYuklendi = true;
+  var adsS = document.createElement("script");
+  adsS.src = "ads.js";
+  document.head.appendChild(adsS);
+}
 // w: ana kelimeler (bulmaca tablosunda çaprazlama yerleşir), b: bonus kelimeler (tabloda yok, bulununca bonus puan)
 // Tabloya sığmayan ana kelimeler otomatik bonus kelime olur.
 var LEVELS = [
