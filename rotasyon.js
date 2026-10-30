@@ -330,7 +330,7 @@ css.textContent =
 "#cm .cm-curp{display:inline-block;background:" + MAVI + ";color:#fff;font-weight:800;font-size:24px;letter-spacing:3px;padding:4px 22px;border-radius:999px;box-shadow:0 2px 6px rgba(0,0,0,.3)}" +
 "#cm .cm-curp.ok{background:#1fa63a}#cm .cm-curp.bonus{background:#e0892b}#cm .cm-curp.bad{background:#c0392b}#cm .cm-curp.info{background:#5a6a8a}" +
 "#cm .cm-wrap{position:relative;width:100%;display:flex;justify-content:center;flex:none;margin-bottom:18px}" +
-"#cm .cm-wheel{position:relative;border-radius:50%;background:rgba(255,255,255,.88);box-shadow:0 4px 18px rgba(0,0,0,.3);touch-action:none}" +
+"#cm .cm-wheel{position:relative;border-radius:50%;background:rgba(255,246,222,.94);box-shadow:0 4px 18px rgba(0,0,0,.3);touch-action:none}" +
 "#cm .cm-wheel svg{position:absolute;left:0;top:0;pointer-events:none}" +
 "#cm .cm-let{position:absolute;display:flex;align-items:center;justify-content:center;border-radius:50%;font-weight:800;color:#111;pointer-events:none;transform:translate(-50%,-50%)}" +
 "#cm .cm-let.cm-sel{background:" + MAVI + ";color:#fff}" +
