@@ -96,8 +96,14 @@ jobs:
         run: |
           RES=android/app/src/main/res
           BG="#00102b"
+          # ImageMagick yoksa kur; yeni sürümde komut "magick", eskisinde "convert"
+          if ! command -v magick >/dev/null && ! command -v convert >/dev/null; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq imagemagick
+          fi
+          IM=$(command -v magick || command -v convert)
           # logoyu daire olarak kırp (altın halka dahil, köşeler dışarıda)
-          convert icon-512.png -alpha set \
+          $IM icon-512.png -alpha set \
             \( -size 512x512 xc:none -fill white -draw "circle 256,256 256,18" \) \
             -compose DstIn -composite logo-round.png
           rm -f $RES/mipmap-*/ic_launcher*
@@ -108,11 +114,11 @@ jobs:
             set -- $d
             S=$2; L=$3; W=$((S*728/1000))
             mkdir -p $RES/mipmap-$1
-            convert -size ${S}x${S} xc:none \( logo-round.png -resize ${W}x${W} \) \
+            $IM -size ${S}x${S} xc:none \( logo-round.png -resize ${W}x${W} \) \
               -gravity center -composite $RES/mipmap-$1/ic_launcher_foreground.png
             # eski Android sürümleri için düz ikonlar
-            convert icon-512.png -resize ${L}x${L} $RES/mipmap-$1/ic_launcher.png
-            convert logo-round.png -resize ${L}x${L} $RES/mipmap-$1/ic_launcher_round.png
+            $IM icon-512.png -resize ${L}x${L} $RES/mipmap-$1/ic_launcher.png
+            $IM logo-round.png -resize ${L}x${L} $RES/mipmap-$1/ic_launcher_round.png
           done
           echo "<?xml version=\"1.0\" encoding=\"utf-8\"?><resources><color name=\"ic_launcher_background\">$BG</color></resources>" > $RES/values/ic_launcher_background.xml
           for n in ic_launcher ic_launcher_round; do
