@@ -19,11 +19,10 @@ jobs:
           openssl enc -aes-256-cbc -pbkdf2 -iter 200000 -salt \
             -pass env:KEYSTORE_PASS -in release.keystore -out release.keystore.enc
           rm release.keystore
-      - name: Repoya kaydet, eskisini sil
+      - name: Repoya kaydet
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git rm -f debug.keystore.b64 || true
           git add release.keystore.enc
           git commit -m "Add encrypted release keystore"
           git push
