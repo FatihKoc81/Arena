@@ -1,0 +1,119 @@
+name: Build APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Bağımlılıkları yükle
+        run: npm install
+
+      - name: Web dosyalarını hazırla
+        run: |
+          WEB=$(node -p "require('./capacitor.config.json').webDir || 'www'")
+          if [ "$WEB" != "." ]; then
+            mkdir -p "$WEB"
+            cp index.html style.css manifest.json sw.js *.js icon-*.png "$WEB"/ 2>/dev/null || true
+            cp -r assets "$WEB"/ 2>/dev/null || true
+          fi
+
+      - name: Paket adını ayır (eski uygulamayla çakışmasın)
+        run: |
+          node -e "
+          const fs=require('fs');
+          const c=JSON.parse(fs.readFileSync('capacitor.config.json','utf8'));
+          if(!c.appId.endsWith('.v2')) c.appId=c.appId+'.v2';
+          fs.writeFileSync('capacitor.config.json',JSON.stringify(c,null,2));
+          console.log('appId:',c.appId);"
+
+      - name: Android projesini hazırla
+        run: |
+          [ -d android ] || npx cap add android
+          npx cap sync android
+
+      - name: Paket adını Gradle'a uygula
+        run: |
+          ID=$(node -p "require('./capacitor.config.json').appId")
+          sed -i -E "s/applicationId \"[^\"]*\"/applicationId \"$ID\"/" android/app/build.gradle
+          grep -n applicationId android/app/build.gradle
+
+      - name: Uygulama ikonunu ayarla
+        run: |
+          RES=android/app/src/main/res
+          if ls assets/icon*.png >/dev/null 2>&1 && npx --yes @capacitor/assets generate --android; then
+            echo "İkon @capacitor/assets ile üretildi"
+          else
+            echo "İkon icon-512.png'den üretiliyor"
+            rm -rf $RES/mipmap-anydpi-v26
+            for d in "mdpi 48" "hdpi 72" "xhdpi 96" "xxhdpi 144" "xxxhdpi 192"; do
+              set -- $d
+              mkdir -p $RES/mipmap-$1
+              rm -f $RES/mipmap-$1/ic_launcher*
+              convert icon-512.png -resize $2x$2 $RES/mipmap-$1/ic_launcher.png
+              cp $RES/mipmap-$1/ic_launcher.png $RES/mipmap-$1/ic_launcher_round.png
+            done
+          fi
+
+      - name: Gizli imza anahtarını çöz
+        env:
+          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
+        run: |
+          mkdir -p ~/.android
+          openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 \
+            -pass env:KEYSTORE_PASS -in release.keystore.enc \
+            -out ~/.android/release.keystore
+
+      - name: Sürüm kodunu artır
+        run: sed -i -E "s/versionCode [0-9]+/versionCode ${{ github.run_number }}/" android/app/build.gradle
+
+      - name: APK derle
+        working-directory: android
+        run: ./gradlew assembleDebug
+
+      - name: APK'yı gizli anahtarla imzala
+        env:
+          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
+        run: |
+          BT=$(ls -d $ANDROID_HOME/build-tools/*/ | tail -1)
+          SRC=android/app/build/outputs/apk/debug/app-debug.apk
+          "${BT}zipalign" -f -p 4 "$SRC" aligned.apk
+          "${BT}apksigner" sign \
+            --ks ~/.android/release.keystore --ks-type PKCS12 \
+            --ks-pass env:KEYSTORE_PASS --key-pass env:KEYSTORE_PASS \
+            --ks-key-alias bilgiarenasi \
+            --out signed.apk aligned.apk
+          cp signed.apk "$SRC"
+
+      - name: APK adını ayarla
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk BilgiArenasi.apk
+
+      - name: APK imzasını yazdır
+        run: |
+          AS=$(ls -d $ANDROID_HOME/build-tools/*/ | tail -1)apksigner
+          $AS verify --print-certs BilgiArenasi.apk | grep -E "SHA-256" || true
+
+      - name: GitHub Release oluştur
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.run_number }}
+          name: Bilgi Arenası v${{ github.run_number }}
+          files: BilgiArenasi.apk
+          make_latest: true
