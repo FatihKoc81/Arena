@@ -5,7 +5,7 @@
   // ===== AYARLAR =====
   // TEST = true iken Google'ın test reklamları gösterilir. Gerçek reklam için false yap
   // ve aşağıya AdMob'dan aldığın reklam birimi kimliklerini yaz.
-  var TEST = false;
+  var TEST = true;
   var ID_ODUL_TEST = "ca-app-pub-3940256099942544/5224354917";
   var ID_GECIS_TEST = "ca-app-pub-3940256099942544/1033173712";
   var ID_ODUL = "ca-app-pub-8747781588851121/3796069840";  // gerçek ödüllü reklam birimi
