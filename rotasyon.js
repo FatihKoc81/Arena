@@ -239,6 +239,10 @@ var ANA_PUAN = 10, BONUS_PUAN = 15; // harf başına puan
 var MAVI = "#1f55b8";
 var HAK_IPUCU = 7, HAK_TOKMAK = 5; // başlangıç hakları: ampül 7, tokmak 5
 var HAK_SURUM = "2"; // başlangıç hakları değişince artır: kayıtlı eski haklar da yeni değere çekilir
+// ===== SÜRE + REKLAM AYARLARI =====
+var SURE_TABAN = 90, SURE_KELIME = 25, SURE_EK = 60; // bölüm süresi (sn) = TABAN + KELIME x ana kelime sayısı; reklamla devam edince +SURE_EK sn
+var REKLAM_ARALIK = 10; // kaç bölümde bir geçiş reklamı
+var ODUL_IPUCU = 3, ODUL_TOKMAK = 2; // reklam izleyince kazanılan ampül / tokmak hakkı
 
 // LAYOUT-BEGIN
 // Kelimeleri çapraz bulmaca gibi yerleştirir. d: 0 yatay, 1 dikey
@@ -355,7 +359,15 @@ css.textContent =
 "#cm .cm-box .cm-bl{min-height:150px;max-height:40vh;overflow:auto;padding:8px;display:flex;flex-wrap:wrap;gap:4px;align-content:flex-start;justify-content:center}" +
 "#cm .cm-prog{margin-top:14px;height:30px;border-radius:15px;background:#bdb88a;position:relative;overflow:hidden}" +
 "#cm .cm-prog i{position:absolute;left:0;top:0;bottom:0;background:#e0892b;border-radius:15px;width:0}" +
-"#cm .cm-prog b{position:absolute;left:0;right:0;top:0;line-height:30px;color:#fff;font-weight:800;font-size:17px;text-shadow:0 1px 3px rgba(0,0,0,.4)}";
+"#cm .cm-prog b{position:absolute;left:0;right:0;top:0;line-height:30px;color:#fff;font-weight:800;font-size:17px;text-shadow:0 1px 3px rgba(0,0,0,.4)}" +
+"#cm .cm-sure{position:absolute;left:50%;bottom:0;transform:translateX(-50%);min-width:74px;text-align:center}" +
+"#cm .cm-sure.az{background:#c0392b;border-color:#ffb3a8}" +
+"#cm .cm-dlg p{margin:0 0 12px;font-size:17px;font-weight:600;line-height:1.35}" +
+"#cm button.cm-rb{display:block;width:100%;margin:8px 0 0;border:0!important;border-radius:16px;padding:13px 10px;font-family:inherit;font-size:17px;font-weight:800;color:#fff!important;background:#3b6fd0!important;box-shadow:0 3px 0 rgba(0,0,0,.25);line-height:1.25}" +
+"#cm button.cm-rb.yesil{background:#2fb81a!important}#cm button.cm-rb.turuncu{background:#e0892b!important}" +
+"#cm button.cm-rb.gri{background:transparent!important;color:#7a6a50!important;box-shadow:none;font-size:15px;padding:8px}" +
+"#cm button.cm-rb:disabled{opacity:.5}" +
+"#cm .cm-rkm{min-height:0;margin-top:8px;font-size:14px;font-weight:700;color:#b03a2e}";
 document.head.appendChild(css);
 
 var root = document.createElement("div");
@@ -371,6 +383,10 @@ root.innerHTML =
   '<button class="cm-ekstra" id="cmEks" aria-label="Ekstra kelimeler"><svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="17" width="22" height="11" rx="2" fill="#e8b865"/><g transform="rotate(-8 16 12)"><rect x="10" y="4" width="13" height="15" rx="2.5" fill="#fff"/><text x="16.5" y="15.5" text-anchor="middle" font-size="10" font-weight="800" fill="#6a4a1a" font-family="sans-serif">A</text></g></svg><span class="cm-badge zero" id="cmEksN">0</span></button>' +
   '<div class="cm-pill cm-score" id="cmPuan"></div>' +
   '<div class="cm-ov" id="cmOv"><div class="cm-dlg"><button class="cm-dx" id="cmOvX" aria-label="Kapat">✕</button><h3>EKSTRA KELİMELER</h3><div class="cm-box"><div class="cm-bh">Bulmacada olmayan kelimeler</div><div class="cm-bl" id="cmOvL"></div></div><div class="cm-prog"><i id="cmOvB"></i><b id="cmOvT"></b></div></div></div></div>';
+root.insertAdjacentHTML('beforeend',
+  '<div class="cm-pill cm-sure" id="cmSure">⏱ 0:00</div>' +
+  '<div class="cm-ov" id="cmRk"><div class="cm-dlg"><h3 id="cmRkH"></h3><p id="cmRkP"></p><div id="cmRkB"></div><div class="cm-rkm" id="cmRkM"></div></div></div>' +
+  '<div class="cm-ov" id="cmAd"><div class="cm-dlg"><h3>📺 Reklam (deneme)</h3><p>Gerçek reklam eklenince burada oynayacak.</p><p id="cmAdT" style="font-size:44px;font-weight:800">5</p><button class="cm-rb yesil" id="cmAdK">Bekle…</button></div></div>');
 document.body.appendChild(root);
 
 var $ = function (id) { return document.getElementById(id); };
@@ -471,9 +487,106 @@ window.cemberHakEkle = function (tur, n) {
   if (tur === "tokmak") hakTokmak += n; else hakIpucu += n;
   hakYaz();
 };
-function hakBitti() {
-  // İLERİDE: burada reklam izle / satın al penceresi açılacak
-  flash("Hakkın bitti", "info");
+// ===== REKLAM + SÜRE =====
+// Gerçek reklam SDK'sını bağlamak için (APK/WebView) şunu tanımla:
+//   window.cemberReklam = function (tur, bitti) { ...reklamı göster...; bitti(true /* izlendi */ veya false /* gösterilemedi */); };
+// tur: "odul" (izleyince ödül verilir) veya "gecis" (bölüm arası reklam). Tanımlı değilse 5 sn'lik DENEME reklamı çıkar.
+var reklamAcik = false, adT = null;
+var reklamSay = 0;
+try { reklamSay = parseInt(localStorage.getItem("cemberReklamSay"), 10) || 0; } catch (e) {}
+
+function reklamAc(tur, cb) {
+  if (reklamAcik) return;
+  reklamAcik = true;
+  var son = function (ok) { if (!reklamAcik) return; reklamAcik = false; cb(ok); };
+  if (typeof window.cemberReklam === "function") {
+    try { window.cemberReklam(tur, son); } catch (e) { son(false); }
+    return;
+  }
+  var n = 5, ov = $("cmAd"), btn = $("cmAdK");
+  $("cmAdT").textContent = n;
+  btn.disabled = true; btn.textContent = "Bekle…";
+  ov.classList.add("show");
+  if (adT) clearInterval(adT);
+  adT = setInterval(function () {
+    n--; $("cmAdT").textContent = Math.max(n, 0);
+    if (n <= 0) { clearInterval(adT); adT = null; btn.disabled = false; btn.textContent = tur === "odul" ? "Ödülü al" : "Devam"; }
+  }, 1000);
+  btn.onclick = function () { if (btn.disabled) return; ov.classList.remove("show"); son(true); };
+}
+
+// Ortak seçenek penceresi
+function rkAc(baslik, metin, butonlar) {
+  $("cmRkH").textContent = baslik; $("cmRkP").textContent = metin; $("cmRkM").textContent = "";
+  var kutu = $("cmRkB"); kutu.innerHTML = "";
+  butonlar.forEach(function (b) {
+    var e = document.createElement("button");
+    e.className = "cm-rb " + b.c; e.textContent = b.t; e.onclick = b.f;
+    kutu.appendChild(e);
+  });
+  $("cmRk").classList.add("show");
+}
+function rkKapat() { $("cmRk").classList.remove("show"); }
+
+// Hak bitince: reklam izleyerek hak kazan
+function hakBitti(tur) {
+  var tk = tur === "tokmak", n = tk ? ODUL_TOKMAK : ODUL_IPUCU, ic = tk ? "🔨" : "💡";
+  rkAc("Hakkın bitti", "Kısa bir reklam izleyerek +" + n + " " + ic + " kazanabilirsin.", [
+    { t: "▶ Reklam izle  (+" + n + " " + ic + ")", c: "yesil", f: function () {
+      reklamAc("odul", function (ok) {
+        if (ok) { window.cemberHakEkle(tk ? "tokmak" : "ipucu", n); rkKapat(); flash("+" + n + " " + ic, "ok"); }
+        else $("cmRkM").textContent = "Reklam şu an gösterilemedi, biraz sonra tekrar dene.";
+      });
+    } },
+    { t: "Vazgeç", c: "gri", f: rkKapat }
+  ]);
+}
+
+// Bölüm süresi
+var sureKalan = 0, sureSon = Date.now(), oyunBitti = true;
+function sureYaz() {
+  var s = Math.ceil(sureKalan / 1000), el = $("cmSure");
+  el.textContent = "⏱ " + Math.floor(s / 60) + ":" + (s % 60 < 10 ? "0" : "") + (s % 60);
+  el.classList.toggle("az", s <= 15);
+}
+function sureBaslat() {
+  oyunBitti = false;
+  sureKalan = (SURE_TABAN + SURE_KELIME * cur.words.length) * 1000;
+  sureSon = Date.now();
+  sureYaz();
+}
+function sureAktif() {
+  return root.style.display === "flex" && $("cmGec").style.display !== "flex" && !oyunBitti && !reklamAcik &&
+    !document.hidden && !$("cmOv").classList.contains("show") && !$("cmRk").classList.contains("show");
+}
+setInterval(function () {
+  var n = Date.now(), d = n - sureSon; sureSon = n;
+  if (!sureAktif() || d > 1500) return;
+  sureKalan -= d;
+  if (sureKalan <= 0) { sureKalan = 0; sureYaz(); kaybet(); return; }
+  sureYaz();
+}, 250);
+
+// Süre dolunca: bir alt bölümden devam VEYA reklam izleyip kaldığın yerden devam
+function kaybet() {
+  oyunBitti = true; drag = false; sel = []; ptr = null; drawLine(); drawCur(); tokmakKapat();
+  var alt = lvIdx > 0;
+  rkAc("⏰ Süre doldu!", "Ne yapmak istersin?", [
+    { t: "▶ Reklam izle, kaldığın yerden devam et (+" + SURE_EK + " sn)", c: "yesil", f: function () {
+      reklamAc("odul", function (ok) {
+        if (ok) { rkKapat(); sureKalan = SURE_EK * 1000; sureSon = Date.now(); oyunBitti = false; sureYaz(); flash("⏱ +" + SURE_EK + " sn", "ok"); }
+        else $("cmRkM").textContent = "Reklam şu an gösterilemedi. Alt bölümden devam edebilirsin.";
+      });
+    } },
+    { t: alt ? "⬇ Bir alt bölümden devam et (Bölüm " + lvIdx + ")" : "🔄 Bölümü baştan başlat", c: "turuncu", f: function () {
+      rkKapat();
+      if (alt) { lvIdx--; try { localStorage.setItem("cemberLv", lvIdx); } catch (e) {} }
+      hakIpucu = Math.max(hakIpucu, HAK_IPUCU);
+      hakTokmak = Math.max(hakTokmak, HAK_TOKMAK);
+      startLevel();
+    } },
+    { t: "Ana menü", c: "gri", f: function () { rkKapat(); kapat(); } }
+  ]);
 }
 function tokmakKapat() {
   hammerOn = false;
@@ -514,6 +627,7 @@ function startLevel() {
   $("cmCur").innerHTML = "";
   boyut();
   drawWords(); drawBonus(); drawWheel();
+  sureBaslat();
 }
 
 function drawWords() {
@@ -639,6 +753,7 @@ function end() {
       flash("✅ " + w + " +" + p, "ok");
       drawWords();
       if (cur.words.every(function (x) { return found[x.w]; })) {
+        oyunBitti = true; // süre durur
         flash("🎉 Seviye tamamlandı!", "ok");
         setTimeout(function () {
           lvIdx = (lvIdx + 1) % LEVELS.length;
@@ -646,7 +761,13 @@ function end() {
           // Her yeni bölümde haklar tazelenir (ampül 7, tokmak 5). Satın alınan/kazanılan fazla hak varsa korunur.
           hakIpucu = Math.max(hakIpucu, HAK_IPUCU);
           hakTokmak = Math.max(hakTokmak, HAK_TOKMAK);
-          gecisGoster(); // Seri ekranı (günde ilk kez) -> Yolculuk ekranı -> BÖLÜM N
+          reklamSay++;
+          try { localStorage.setItem("cemberReklamSay", reklamSay); } catch (e) {}
+          if (reklamSay >= REKLAM_ARALIK) { // her 10 bölümde 1 geçiş reklamı
+            reklamSay = 0;
+            try { localStorage.setItem("cemberReklamSay", 0); } catch (e) {}
+            reklamAc("gecis", function () { gecisGoster(); });
+          } else gecisGoster(); // Seri ekranı (günde ilk kez) -> Yolculuk ekranı -> BÖLÜM N
         }, 1500);
       }
     } else if (bonusList.indexOf(w) > -1 && !foundB[w]) {
@@ -676,7 +797,7 @@ $("cmOvX").onclick = function () { $("cmOv").classList.remove("show"); };
 $("cmOv").onclick = function (e) { if (e.target === this) this.classList.remove("show"); };
 $("cmHint").onclick = function () {
   if (!cur) return;
-  if (hakIpucu <= 0) { hakBitti(); return; }
+  if (hakIpucu <= 0) { hakBitti("ipucu"); return; }
   tokmakKapat();
   for (var k = 0; k < cur.words.length; k++) {
     var p = cur.words[k];
@@ -702,7 +823,7 @@ $("cmHint").onclick = function () {
 $("cmHam").onclick = function () {
   if (!cur) return;
   if (hammerOn) { tokmakKapat(); return; }
-  if (hakTokmak <= 0) { hakBitti(); return; }
+  if (hakTokmak <= 0) { hakBitti("tokmak"); return; }
   hammerOn = true;
   $("cmGrid").classList.add("cm-hm");
   $("cmHam").classList.add("cm-act");
@@ -832,7 +953,10 @@ window.addEventListener("resize", function () {
   if (root.style.display !== "flex") return;
   baslikHizala(); boyut(); drawWheel(); drawWords();
 });
-function kapat() { tokmakKapat(); temaGeri(); gec.style.display = "none"; root.style.display = "none"; }
+function kapat() {
+  tokmakKapat(); temaGeri(); gec.style.display = "none"; root.style.display = "none";
+  rkKapat(); $("cmAd").classList.remove("show"); if (adT) { clearInterval(adT); adT = null; } reklamAcik = false; oyunBitti = true;
+}
 $("cmBack").onclick = kapat;
 document.addEventListener("anasayfa", kapat);
 
