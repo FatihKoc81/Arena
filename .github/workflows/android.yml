@@ -92,34 +92,75 @@ jobs:
           sed -i -E "s/applicationId \"[^\"]*\"/applicationId \"$ID\"/" android/app/build.gradle
           grep -n applicationId android/app/build.gradle
 
-      - name: Uygulama ikonunu ayarla
+      - name: Uygulama ikonunu ayarla (büyük logo, uyarlanabilir ikon)
         run: |
           RES=android/app/src/main/res
-          # 1) assets/ klasöründe ikon varsa @capacitor/assets ile üret
-          if ls assets/icon*.png >/dev/null 2>&1 && npx --yes @capacitor/assets generate --android; then
-            echo "İkon @capacitor/assets ile üretildi"
-          else
-            # 2) olmazsa icon-512.png'den tüm boyutları üret
-            echo "İkon icon-512.png'den üretiliyor"
-            rm -rf $RES/mipmap-anydpi-v26
-            for d in "mdpi 48" "hdpi 72" "xhdpi 96" "xxhdpi 144" "xxxhdpi 192"; do
-              set -- $d
-              mkdir -p $RES/mipmap-$1
-              rm -f $RES/mipmap-$1/ic_launcher*
-              convert icon-512.png -resize $2x$2 $RES/mipmap-$1/ic_launcher.png
-              cp $RES/mipmap-$1/ic_launcher.png $RES/mipmap-$1/ic_launcher_round.png
-            done
-          fi
+          BG="#00102b"
+          # logoyu daire olarak kırp (altın halka dahil, köşeler dışarıda)
+          convert icon-512.png -alpha set \
+            \( -size 512x512 xc:none -fill white -draw "circle 256,256 256,18" \) \
+            -compose DstIn -composite logo-round.png
+          rm -f $RES/mipmap-*/ic_launcher*
+          rm -rf $RES/mipmap-anydpi-v26
+          mkdir -p $RES/mipmap-anydpi-v26 $RES/values
+          # ön plan: logo, görünen alanı (72/108) neredeyse tam dolduracak boyda
+          for d in "mdpi 108 48" "hdpi 162 72" "xhdpi 216 96" "xxhdpi 324 144" "xxxhdpi 432 192"; do
+            set -- $d
+            S=$2; L=$3; W=$((S*728/1000))
+            mkdir -p $RES/mipmap-$1
+            convert -size ${S}x${S} xc:none \( logo-round.png -resize ${W}x${W} \) \
+              -gravity center -composite $RES/mipmap-$1/ic_launcher_foreground.png
+            # eski Android sürümleri için düz ikonlar
+            convert icon-512.png -resize ${L}x${L} $RES/mipmap-$1/ic_launcher.png
+            convert logo-round.png -resize ${L}x${L} $RES/mipmap-$1/ic_launcher_round.png
+          done
+          echo "<?xml version=\"1.0\" encoding=\"utf-8\"?><resources><color name=\"ic_launcher_background\">$BG</color></resources>" > $RES/values/ic_launcher_background.xml
+          for n in ic_launcher ic_launcher_round; do
+            echo '<?xml version="1.0" encoding="utf-8"?><adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android"><background android:drawable="@color/ic_launcher_background"/><foreground android:drawable="@mipmap/ic_launcher_foreground"/></adaptive-icon>' > $RES/mipmap-anydpi-v26/$n.xml
+          done
+          ls $RES/mipmap-xxxhdpi
 
       - name: Sürüm kodunu artır
         run: sed -i -E "s/versionCode [0-9]+/versionCode ${{ github.run_number }}/" android/app/build.gradle
+
+      - name: Gizli imza anahtarını çöz
+        env:
+          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
+        run: |
+          if [ ! -f release.keystore.enc ]; then
+            echo "HATA: release.keystore.enc yok. Önce 'Anahtar uret' iş akışını bir kez çalıştır."
+            exit 1
+          fi
+          mkdir -p ~/.android
+          openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 \
+            -pass env:KEYSTORE_PASS -in release.keystore.enc \
+            -out ~/.android/release.keystore
 
       - name: APK derle
         working-directory: android
         run: ./gradlew assembleDebug
 
+      - name: APK'yı gizli anahtarla imzala
+        env:
+          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
+        run: |
+          BT=$(ls -d $ANDROID_HOME/build-tools/*/ | tail -1)
+          SRC=android/app/build/outputs/apk/debug/app-debug.apk
+          "${BT}zipalign" -f -p 4 "$SRC" aligned.apk
+          "${BT}apksigner" sign \
+            --ks ~/.android/release.keystore --ks-type PKCS12 \
+            --ks-pass env:KEYSTORE_PASS --key-pass env:KEYSTORE_PASS \
+            --ks-key-alias beyinfirtinasi \
+            --out signed.apk aligned.apk
+          cp signed.apk "$SRC"
+
       - name: APK adını ayarla
         run: cp android/app/build/outputs/apk/debug/app-debug.apk BeyinFirtinasi.apk
+
+      - name: APK imzasını yazdır
+        run: |
+          AS=$(ls -d $ANDROID_HOME/build-tools/*/ | tail -1)apksigner
+          $AS verify --print-certs BeyinFirtinasi.apk | grep -E "SHA-256" || true
 
       - name: GitHub Release oluştur
         uses: softprops/action-gh-release@v2
