@@ -1,0 +1,36 @@
+name: Bilgi Arenasi dosyalarini kopyala
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  copy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: FatihKoc81/BilgiArenasi
+          path: kaynak
+      - name: Kopyala ve görünen adı değiştir
+        run: |
+          rsync -a \
+            --exclude '.git' --exclude '.github' --exclude 'android' \
+            --exclude 'node_modules' --exclude 'release.keystore.enc' \
+            --exclude 'debug.keystore.b64' \
+            --exclude 'capacitor.config.json' --exclude 'manifest.json' \
+            --exclude 'sw.js' --exclude 'README.md' \
+            kaynak/ ./
+          rm -rf kaynak
+          find . -type f \( -name "*.js" -o -name "*.html" -o -name "*.css" \) \
+            -not -path "./.git/*" -not -path "./.github/*" -not -path "./node_modules/*" \
+            -not -name sw.js \
+            -exec sed -i \
+              -e 's/Bilgi Arenası/Beyin Fırtınası/g' \
+              -e 's/Bilgi Arenasi/Beyin Fırtınası/g' {} +
+      - name: Kaydet
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add -A
+          git commit -m "Bilgi Arenasi dosyalari kopyalandi" || echo "Değişiklik yok"
+          git push
