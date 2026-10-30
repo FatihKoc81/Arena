@@ -68,6 +68,19 @@ jobs:
           }
           console.log('AdMob app id:',process.env.ADMOB_APP_ID);"
 
+      - name: Ekranı dikeyde sabitle
+        run: |
+          node -e "
+          const fs=require('fs');
+          const f='android/app/src/main/AndroidManifest.xml';
+          let x=fs.readFileSync(f,'utf8');
+          if(!x.includes('android:screenOrientation')){
+            x=x.replace('<activity ','<activity android:screenOrientation=\"portrait\" ');
+            fs.writeFileSync(f,x);
+          }
+          console.log('Yön kilidi: portrait');"
+          grep -n screenOrientation android/app/src/main/AndroidManifest.xml
+
       - name: AdMob eklentisi Android projesinde mi kontrol et
         run: |
           npm ls @capacitor/core @capacitor-community/admob || true
