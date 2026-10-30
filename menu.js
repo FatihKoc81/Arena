@@ -30,11 +30,11 @@
     "#ana>.alt{grid-column:1/-1;margin-bottom:6px;order:0}" +
     "#ana>.pill{display:none}" +
     "#ana>.btn.kartB{order:var(--sira);margin:0;width:auto;height:108px;padding:8px 6px;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:16px;line-height:1.25;border:2px solid rgba(255,255,255,.2);background:var(--kc)!important;color:#fff!important}" +
-    "#ana>.btn.kartB.genis{grid-column:1/-1;height:90px}" +
+    "#ana>.btn.kartB.genis{grid-column:1/-1;height:100px}" +
     "#ana>.btn.kartB .ic{width:56px;height:56px;display:block;margin-bottom:6px;flex:none}" +
-    "#ana>.btn.kartB.genis .ic{width:46px;height:46px;margin-bottom:4px}" +
+    "#ana>.btn.kartB.genis .ic{width:56px;height:56px;margin-bottom:4px}" +
     "#ana>.btn.kartB b{font-size:clamp(14px,4.2vw,16px);font-weight:700;display:block;white-space:nowrap}" +
-        "@media (max-height:700px){#ana>.btn.kartB{height:98px}#ana>.btn.kartB.genis{height:80px}#ana>.btn.kartB .ic{width:42px;height:42px}}";
+        "@media (max-height:700px){#ana>.btn.kartB{height:98px}#ana>.btn.kartB.genis{height:80px}#ana>.btn.kartB .ic,#ana>.btn.kartB.genis .ic{width:42px;height:42px}}";
   document.head.appendChild(st);
   document.body.insertAdjacentHTML("beforeend", SIMGELER);
 
