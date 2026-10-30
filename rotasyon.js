@@ -361,7 +361,7 @@ document.head.appendChild(css);
 var root = document.createElement("div");
 root.id = "cm";
 root.innerHTML =
-  '<div class="cm-top"><button class="cm-sm" id="cmBack">⚡ BEYİN FIRTINASI</button></div><div class="cm-banner" id="cmBanner"></div>' +
+  '<div class="cm-top"><button class="cm-sm" id="cmBack">' + (document.querySelector("h1") ? document.querySelector("h1").textContent : "") + '</button></div><div class="cm-banner" id="cmBanner"></div>' +
   '<div class="cm-gridbox" id="cmGrid"></div><div class="cm-bonus" id="cmBonus"></div>' +
   '<div class="cm-cur" id="cmCur"></div>' +
   '<div class="cm-wrap"><div class="cm-wheel" id="cmWheel"><svg id="cmSvg"></svg>' +
