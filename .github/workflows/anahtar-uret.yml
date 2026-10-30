@@ -1,0 +1,29 @@
+name: Anahtar uret
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  gen:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Anahtarı üret ve şifrele
+        env:
+          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
+        run: |
+          if [ -f release.keystore.enc ]; then echo "Anahtar zaten var, iptal"; exit 1; fi
+          keytool -genkeypair -storetype PKCS12 -keystore release.keystore \
+            -alias beyinfirtinasi -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass "$KEYSTORE_PASS" -keypass "$KEYSTORE_PASS" \
+            -dname "CN=Beyin Firtinasi"
+          openssl enc -aes-256-cbc -pbkdf2 -iter 200000 -salt \
+            -pass env:KEYSTORE_PASS -in release.keystore -out release.keystore.enc
+          rm release.keystore
+      - name: Repoya kaydet, eskisini sil
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git rm -f debug.keystore.b64 || true
+          git add release.keystore.enc
+          git commit -m "Add encrypted release keystore"
+          git push
