@@ -1,5 +1,8 @@
 {
-  "appId": "com.fatihkoc.bilgiarenasiapp",
-  "appName": "Bilgi Arenası",
-  "webDir": "www"
+  "appId": "com.fatihkoc.beyinfirtinasi",
+  "appName": "Beyin Fırtınası",
+  "webDir": "www",
+  "server": {
+    "url": "https://fatihkoc81.github.io/BeyinFirtinasi/"
+  }
 }

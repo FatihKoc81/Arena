@@ -1,1 +1,1 @@
-# bilgi-arenasi
+# Beyin Fırtınası

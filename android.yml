@@ -101,17 +101,17 @@ jobs:
           cp signed.apk "$SRC"
 
       - name: APK adını ayarla
-        run: cp android/app/build/outputs/apk/debug/app-debug.apk BilgiArenasi.apk
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk BeyinFirtinasi.apk
 
       - name: APK imzasını yazdır
         run: |
           AS=$(ls -d $ANDROID_HOME/build-tools/*/ | tail -1)apksigner
-          $AS verify --print-certs BilgiArenasi.apk | grep -E "SHA-256" || true
+          $AS verify --print-certs BeyinFirtinasi.apk | grep -E "SHA-256" || true
 
       - name: GitHub Release oluştur
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ github.run_number }}
-          name: Bilgi Arenası v${{ github.run_number }}
-          files: BilgiArenasi.apk
+          name: Beyin Fırtınası v${{ github.run_number }}
+          files: BeyinFirtinasi.apk
           make_latest: true
