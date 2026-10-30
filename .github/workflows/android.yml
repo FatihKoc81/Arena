@@ -49,6 +49,30 @@ jobs:
           [ -d android ] || npx cap add android
           npx cap sync android
 
+      - name: AdMob eklentisini kur
+        run: npm install @capacitor-community/admob@^6 --no-audit --no-fund
+
+      - name: AdMob eklentisi Android projesinde mi kontrol et
+        run: |
+          npm ls @capacitor/core @capacitor-community/admob || true
+          grep -i admob android/capacitor.settings.gradle || { echo "HATA: AdMob eklentisi Android projesine eklenmedi"; exit 1; }
+
+      - name: AdMob uygulama kimliğini ekle
+        env:
+          ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID || 'ca-app-pub-3940256099942544~3347511713' }}
+        run: |
+          npx cap sync android
+          sed -i -E 's/minSdkVersion = [0-9]+/minSdkVersion = 23/' android/variables.gradle || true
+          node -e "
+          const fs=require('fs');
+          const f='android/app/src/main/AndroidManifest.xml';
+          let x=fs.readFileSync(f,'utf8');
+          if(!x.includes('com.google.android.gms.ads.APPLICATION_ID')){
+            x=x.replace('</application>','    <meta-data android:name=\"com.google.android.gms.ads.APPLICATION_ID\" android:value=\"'+process.env.ADMOB_APP_ID+'\"/>\n    </application>');
+            fs.writeFileSync(f,x);
+          }
+          console.log('AdMob app id:',process.env.ADMOB_APP_ID);"
+
       - name: Paket adını Gradle'a uygula
         run: |
           ID=$(node -p "require('./capacitor.config.json').appId")
@@ -58,30 +82,27 @@ jobs:
       - name: Uygulama ikonunu ayarla
         run: |
           RES=android/app/src/main/res
+          # 1) assets/ klasöründe ikon varsa @capacitor/assets ile üret
           if ls assets/icon*.png >/dev/null 2>&1 && npx --yes @capacitor/assets generate --android; then
             echo "İkon @capacitor/assets ile üretildi"
           else
+            # 2) olmazsa icon-512.png'den tüm boyutları üret
             echo "İkon icon-512.png'den üretiliyor"
-            sudo apt-get update -qq
-            sudo apt-get install -y -qq imagemagick
             rm -rf $RES/mipmap-anydpi-v26
             for d in "mdpi 48" "hdpi 72" "xhdpi 96" "xxhdpi 144" "xxxhdpi 192"; do
               set -- $d
               mkdir -p $RES/mipmap-$1
               rm -f $RES/mipmap-$1/ic_launcher*
-              magick icon-512.png -resize $2x$2 $RES/mipmap-$1/ic_launcher.png 2>/dev/null || convert icon-512.png -resize $2x$2 $RES/mipmap-$1/ic_launcher.png
+              convert icon-512.png -resize $2x$2 $RES/mipmap-$1/ic_launcher.png
               cp $RES/mipmap-$1/ic_launcher.png $RES/mipmap-$1/ic_launcher_round.png
             done
           fi
 
-      - name: Gizli imza anahtarını çöz
-        env:
-          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
+      - name: Sabit imza anahtarını yükle
         run: |
           mkdir -p ~/.android
-          openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 \
-            -pass env:KEYSTORE_PASS -in release.keystore.enc \
-            -out ~/.android/release.keystore
+          base64 -d debug.keystore.b64 > ~/.android/debug.keystore
+          keytool -list -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey | grep -E "SHA256|Alias"
 
       - name: Sürüm kodunu artır
         run: sed -i -E "s/versionCode [0-9]+/versionCode ${{ github.run_number }}/" android/app/build.gradle
@@ -90,17 +111,16 @@ jobs:
         working-directory: android
         run: ./gradlew assembleDebug
 
-      - name: APK'yı gizli anahtarla imzala
-        env:
-          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
+      - name: APK'yı sabit anahtarla yeniden imzala
         run: |
+          # Gradle sabit anahtarı kullanmıyordu (APK farklı imzayla çıkıyordu). Burada imza zorla sabit anahtarla yapılır.
           BT=$(ls -d $ANDROID_HOME/build-tools/*/ | tail -1)
           SRC=android/app/build/outputs/apk/debug/app-debug.apk
           "${BT}zipalign" -f -p 4 "$SRC" aligned.apk
           "${BT}apksigner" sign \
-            --ks ~/.android/release.keystore --ks-type PKCS12 \
-            --ks-pass env:KEYSTORE_PASS --key-pass env:KEYSTORE_PASS \
-            --ks-key-alias beyinfirtinasi \
+            --ks ~/.android/debug.keystore --ks-type PKCS12 \
+            --ks-pass pass:android --key-pass pass:android \
+            --ks-key-alias androiddebugkey \
             --out signed.apk aligned.apk
           cp signed.apk "$SRC"
 
