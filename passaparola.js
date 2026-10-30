@@ -939,7 +939,7 @@
   const menuBtn = document.createElement("button");
   menuBtn.className = "btn ikinci oval";
   menuBtn.id = "ppAc";
-  menuBtn.innerHTML = '<span class="ppRozet">abc</span> Passaparola';
+  menuBtn.textContent = "Passaparola";
   ana.append(menuBtn);
 
   // ---------- Passaparola ekranı ----------
@@ -948,7 +948,7 @@
   sec.id = "pp";
   sec.innerHTML = `
     <div id="ppGiris">
-      <h2><span class="ppRozet b">abc</span> Passaparola</h2>
+      <h2><svg viewBox="0 0 48 48" width="44" height="44" aria-hidden="true" style="vertical-align:middle;margin-right:8px"><use href="#i-p"/></svg>Passaparola</h2>
       <p class="alt">28 harf, ${SURE} saniye. Her harfin<br>sorusunu bil, bilemezsen pas geç;<br>pas geçilenlere sonra tekrar dönersin.</p>
       <button class="btn" id="ppBasla">▶️ Başla</button>
       <button class="btn ikinci" id="ppGeri">Ana menü</button>
@@ -1004,14 +1004,12 @@
     son.classList.toggle("hidden", b !== "son");
     sec.classList.toggle("ppK", b === "oyun");
     if (b !== "oyun") sec.style.opacity = "";
-    document.querySelector("h1").style.display = b === "oyun" ? "none" : "";
   };
 
   function menuyeDon() {
     clearInterval(zaman);
     sec.classList.add("hidden");
     sec.classList.remove("ppK");
-    document.querySelector("h1").style.display = "";
     ana.classList.remove("hidden");
   }
 
@@ -1161,7 +1159,7 @@
 
   // Başlık: oyunda üstte küçük sabit çubuk (klavye açıkken de görünür), tıklayınca ana sayfa
   const stl = document.createElement("style");
-  stl.textContent = "body.ppOyunda{padding-top:calc(58px + env(safe-area-inset-top))!important;padding-bottom:0}body.ppOyunda h1{display:block!important;position:fixed!important;top:0;left:0;right:0;margin:0!important;padding:12px 0!important;padding-top:calc(12px + env(safe-area-inset-top))!important;font-size:24px!important;font-weight:800!important;letter-spacing:.5px;line-height:normal!important;text-align:center;text-shadow:0 1px 6px rgba(0,0,0,.7);background:rgba(3,3,12,.96);border-bottom:1px solid #1d2540;z-index:5;cursor:pointer}#ppSoru{text-wrap:balance;text-align:center}";
+  stl.textContent = "body.ppOyunda{padding-top:calc(58px + env(safe-area-inset-top))!important;padding-bottom:0}#ppSoru{text-wrap:balance;text-align:center}";
   document.head.append(stl);
   const hGuncelle = () => {
     const a = !sec.classList.contains("hidden") && !oyun.classList.contains("hidden");

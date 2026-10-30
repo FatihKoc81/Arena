@@ -1,6 +1,6 @@
 // ORTAK AYARLAR (tüm oyunlar için)
 // index.html'de </body> öncesine ekle: <script src="ortak.js"></script>
-// "BEYİN FIRTINASI" başlığına tıklayınca, hangi oyunda olursan ol ana sayfaya döner.
+// "BİLGİ ARENASI" başlığına tıklayınca, hangi oyunda olursan ol ana sayfaya döner.
 
 (function () {
   // Ana menü düzenlemesi: "İlerlemeyi Sıfırla" kaldırılır, "Oyuna Başla" -> "Milyoner"

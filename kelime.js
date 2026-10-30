@@ -87,7 +87,7 @@
   const ana = document.getElementById("ana");
   const menuBtn = document.createElement("button");
   menuBtn.className = "btn ikinci oval";
-  menuBtn.textContent = "🔷 Kelime Oyunu";
+  menuBtn.textContent = "Kelime Oyunu";
   ana.append(menuBtn);
 
   // ---------- Ekran ----------
@@ -98,8 +98,8 @@
   sec.id = "kk";
   sec.innerHTML = `
     <div id="kkGiris">
-      <h2>🔷 Kelime Oyunu</h2>
-      <p class="alt">İpucunu oku, altıgenlerdeki kelimeyi bul. Ne kadar az harf açarsan o kadar çok puan kazanırsın. ${TUR} kelime, her kelime için ${SURE} saniye ve ${HAK} tahmin hakkı var. Türkçe karakterleri doğru yaz.</p>
+      <h2><svg viewBox="0 0 48 48" width="44" height="44" aria-hidden="true" style="vertical-align:middle;margin-right:8px"><use href="#i-k"/></svg>Kelime Oyunu</h2>
+      <p class="alt">İpucunu oku, kelimeyi bul.<br>Ne kadar az harf açarsan o kadar çok<br>puan kazanırsın. ${TUR} kelime, her kelime<br>için ${SURE} saniye ve ${HAK} tahmin hakkı var.</p>
       <button class="btn" id="kkBasla">▶️ Başla</button>
       <button class="btn ikinci" id="kkGeri">Ana menü</button>
     </div>
@@ -135,30 +135,10 @@
 
   let baslikUst = null; // başlığın ana ekrandaki üst konumu
   const BASLIK_INDIR = 13; // piksel: başlığı oyun ekranında bu kadar aşağı al (artır = daha aşağı)
-  function baslikHizala() {
-    const h1 = document.querySelector("h1");
-    if (!h1) return;
-    // Sadece oyun ekranında kaydır; başlangıç ve bitiş ekranlarında başlık ana sayfadaki yerinde kalsın
-    if (sec.classList.contains("hidden") || !sec.classList.contains("kkK")) { h1.style.removeProperty("transform"); return; }
-    h1.style.setProperty("transform", "translateY(" + BASLIK_INDIR + "px)", "important");
-  }
-  function baslikKilitle() {
-    const h1 = document.querySelector("h1");
-    if (!h1) return;
-    baslikUst = h1.getBoundingClientRect().top + window.scrollY;
-    const hs = getComputedStyle(h1);
-    BASLIK_OZELLIK.forEach(p => h1.style.setProperty(p, hs.getPropertyValue(p), "important"));
-    document.body.style.paddingTop = getComputedStyle(document.body).paddingTop;
-  }
-  function baslikSerbest() {
-    const h1 = document.querySelector("h1");
-    if (h1) {
-      BASLIK_OZELLIK.forEach(p => h1.style.removeProperty(p));
-      h1.style.removeProperty("transform");
-    }
-    baslikUst = null;
-    document.body.style.paddingTop = "";
-  }
+  // Başlık artık style.css'teki sabit çubuk; bu fonksiyonlar eski çağrılar bozulmasın diye boş bırakıldı.
+  function baslikHizala() {}
+  function baslikKilitle() {}
+  function baslikSerbest() {}
 
   // Cevap kutusunu oku / yaz / odaklan (div olduğu için .value yok)
   const oku = () => inp.textContent;
@@ -343,8 +323,8 @@
     kilit = true;
     let en = 0;
     try {
-      en = Number(localStorage.getItem("bf_kelimeEn")) || 0;
-      if (toplam > en) { en = toplam; localStorage.setItem("bf_kelimeEn", String(en)); }
+      en = Number(localStorage.getItem("kelimeEn")) || 0;
+      if (toplam > en) { en = toplam; localStorage.setItem("kelimeEn", String(en)); }
     } catch (e) { if (toplam > en) en = toplam; }
     $("kkSBaslik").textContent = dogruSayi === liste.length ? "🏆 Hepsini bildin!" : "Oyun bitti!";
     $("kkSMetin").textContent = "Puanın: " + toplam + " • Bildiğin kelime: " + dogruSayi + "/" + liste.length + " • En yüksek puan: " + en;

@@ -3,8 +3,11 @@ html{background:#080c20;color-scheme:dark;overscroll-behavior:none}
 body{min-height:100vh;min-height:100dvh;background:radial-gradient(ellipse at 50% 0%,#14204a 0%,#080c20 50%,#02030f 100%) fixed;color:#fff;font-family:Roboto,system-ui,sans-serif;touch-action:manipulation;
   --bosluk:clamp(10px,2.5vh,24px);--bosluk:clamp(10px,2.5lvh,24px);
   --sec-pad:clamp(9px,1.7vh,16px);--sec-pad:clamp(9px,1.7lvh,16px);
-  padding:var(--bosluk) 16px;padding-top:calc(var(--bosluk) + env(safe-area-inset-top));padding-bottom:calc(var(--bosluk) + env(safe-area-inset-bottom));display:flex;flex-direction:column;justify-content:flex-start;align-items:center}
-h1,.arena-baslik{font-size:clamp(26px,8vw,44px)!important;margin:clamp(12px,4.5vh,40px) 0 clamp(12px,4vh,36px)!important;margin:clamp(12px,4.5lvh,40px) 0 clamp(12px,4lvh,36px)!important;text-align:center;line-height:normal!important;font-weight:700;letter-spacing:normal!important;transform:none!important;zoom:1!important}
+  padding:var(--bosluk) 16px;padding-top:calc(var(--bas-yuk) + env(safe-area-inset-top) + 16px);padding-bottom:calc(var(--bosluk) + env(safe-area-inset-bottom));display:flex;flex-direction:column;justify-content:flex-start;align-items:center}
+/* TEK BAŞLIK ÇUBUĞU: her ekranda aynı yükseklik, aynı yazı boyutu, ekrana sabit. Sadece px/vw kullanır (vh YOK),
+   bu yüzden klavye açılıp kapanınca büyüyüp küçülmez. Ayarlamak için --bas-yuk ve --bas-yazi değişkenlerini değiştir. */
+:root{--bas-yuk:58px;--bas-yazi:clamp(22px,7vw,30px)}
+h1,.arena-baslik{position:fixed;top:0;left:0;right:0;z-index:50;height:calc(var(--bas-yuk) + env(safe-area-inset-top));margin:0;padding:env(safe-area-inset-top) 0 0;display:flex;align-items:center;justify-content:center;white-space:nowrap;font-size:var(--bas-yazi);font-weight:800;letter-spacing:.3px;line-height:1;text-shadow:0 1px 6px rgba(0,0,0,.7);background:rgba(8,12,32,.96);border-bottom:1px solid #1d2540;cursor:pointer;transform:none;zoom:1;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .kart{width:100%;max-width:460px;background:#070b1d;border:2px solid #4a5a9a;box-shadow:0 0 22px rgba(74,90,154,.35);border-radius:36px;padding:clamp(10px,2.4vh,22px) 18px;padding:clamp(10px,2.4lvh,22px) 18px;text-align:center;min-height:0;height:auto}
 .hidden{display:none!important}
 .pill{display:inline-block;background:#3b0000;color:#ffe9c7;font-weight:700;font-size:20px;padding:12px 34px;border-radius:999px}

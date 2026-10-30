@@ -1,1 +1,1 @@
-# beyin-firtinasi
+# bilgi-arenasi

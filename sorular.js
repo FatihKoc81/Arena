@@ -1,9 +1,9 @@
 const milyonerSorulari = {
   seviye1: [
-    { soru: "Hangi element periyodik tabloda 'C' simgesiyle gösterilir?", secenekler: ["Kalsiyum", "Karbon", "Klor", "Bakır"], cevap: "Karbon" },
-    { soru: "Türkiye'nin en büyük kapalı havzası hangi gölün bulunduğu alandır?", secenekler: ["Van Gölü", "Tuz Gölü", "Beyşehir Gölü", "Eğirdir Gölü"], cevap: "Tuz Gölü" },
-    { soru: "Güneş Sistemi'nde en çok uydusu olan gezegen hangisidir?", secenekler: ["Jüpiter", "Satürn", "Uranüs", "Neptün"], cevap: "Satürn" },
-    { soru: "Türkiye'de kadınlara mahalli seçimlerde seçme ve seçilme hakkı hangi yıl tanınmıştır?", secenekler: ["1930", "1933", "1934", "1935"], cevap: "1930" },
+    { soru: "Sümela Manastırı hangi ilimizdedir?", secenekler: ["Trabzon", "Ordu", "Rize", "Giresun"], cevap: "Trabzon" },
+    { soru: "Hangi ülke Avrupa kıtasındadır?", secenekler: ["Yunanistan", "Mısır", "Suriye", "Ürdün"], cevap: "Yunanistan" },
+    { soru: "Türkiye'nin en uzun kıyı şeridine sahip denizi hangisidir?", secenekler: ["Karadeniz", "Akdeniz", "Ege Denizi", "Marmara Denizi"], cevap: "Ege Denizi" },
+    { soru: "Türkiye'nin en çok buğday üreten bölgesi hangisidir?", secenekler: ["İç Anadolu", "Marmara", "Karadeniz", "Akdeniz"], cevap: "İç Anadolu" },
     { soru: "İnsan vücudunda idrarın oluştuğu temel süzme birimi hangi organda yer alır?", secenekler: ["Karaciğer", "Böbrek", "Dalak", "Pankreas"], cevap: "Böbrek" },
     { soru: "Dünyanın en yüksek başkenti olan La Paz hangi ülkededir?", secenekler: ["Peru", "Bolivya", "Ekvador", "Kolombiya"], cevap: "Bolivya" },
     { soru: "Hangi ülke Kuzey Amerika kıtasındadır?", secenekler: ["Küba", "Kolombiya", "Brezilya", "Şili"], cevap: "Küba" },
