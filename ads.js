@@ -41,7 +41,7 @@
   function dinle(olaylar) {
     var tutaclar = [];
     var hepsi = Promise.all(Object.keys(olaylar).map(function (ad) {
-      return AdMob.addListener(ad, olaylar[ad]).then(function (h) { tutaclar.push(h); });
+      return Promise.resolve(AdMob.addListener(ad, olaylar[ad])).then(function (h) { if (h) tutaclar.push(h); });
     }));
     return {
       hazir: hepsi,
