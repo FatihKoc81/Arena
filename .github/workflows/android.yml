@@ -62,12 +62,14 @@ jobs:
             echo "İkon @capacitor/assets ile üretildi"
           else
             echo "İkon icon-512.png'den üretiliyor"
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq imagemagick
             rm -rf $RES/mipmap-anydpi-v26
             for d in "mdpi 48" "hdpi 72" "xhdpi 96" "xxhdpi 144" "xxxhdpi 192"; do
               set -- $d
               mkdir -p $RES/mipmap-$1
               rm -f $RES/mipmap-$1/ic_launcher*
-              convert icon-512.png -resize $2x$2 $RES/mipmap-$1/ic_launcher.png
+              magick icon-512.png -resize $2x$2 $RES/mipmap-$1/ic_launcher.png 2>/dev/null || convert icon-512.png -resize $2x$2 $RES/mipmap-$1/ic_launcher.png
               cp $RES/mipmap-$1/ic_launcher.png $RES/mipmap-$1/ic_launcher_round.png
             done
           fi
