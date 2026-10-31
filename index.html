@@ -40,6 +40,7 @@
 <section class="kart hidden" id="son">
 <h2 id="sBaslik"></h2>
 <p class="alt" id="sMetin"></p>
+<button class="btn hidden" id="sReklam">📺 Reklam izle, devam et</button>
 <button class="btn" id="sDevam"></button>
 <button class="btn ikinci" id="sMenu">Ana menü</button>
 </section>
@@ -161,13 +162,26 @@ function bitir(kazandi) {
     $("sBaslik").textContent = hepsi ? "🏆 Büyük ödül senin!" : "🎉 Seviye geçildi!";
     $("sMetin").textContent = hepsi ? "Tüm seviyeleri tamamladın." : "Sıradaki: Seviye " + st.seviye;
     $("sDevam").textContent = hepsi ? "Baştan oyna" : "Sonraki seviye";
+    $("sReklam").classList.add("hidden");
+    $("sDevam").classList.remove("ikinci");
   } else {
     // Kaybedince seviye düşmez: aynı seviye, bir sonraki seriden yeni sorularla baştan oynanır
     st.seri = (st.seri + 1) % SERI_SAYISI;
     kaydet();
     $("sBaslik").textContent = "❌ Yanlış cevap";
-    $("sMetin").textContent = "Seviye " + st.seviye + " tamamlanamadı. Yeni sorularla tekrar dene!";
-    $("sDevam").textContent = "Seviye " + st.seviye + "'i tekrar dene";
+    // Reklam sadece APK içinde (ads.js yüklüyse) sunulur
+    const reklamVar = !!window.Capacitor && typeof window.cemberReklam === "function";
+    $("sReklam").classList.toggle("hidden", !reklamVar);
+    $("sReklam").disabled = false;
+    $("sReklam").textContent = "📺 Reklam izle, devam et";
+    $("sDevam").classList.toggle("ikinci", reklamVar);
+    if (reklamVar) {
+      $("sMetin").textContent = "Seviye " + st.seviye + " tamamlanamadı. Reklam izleyip kaldığın sorudan devam edebilir ya da yeni sorularla baştan başlayabilirsin.";
+      $("sDevam").textContent = "🔁 Baştan başla";
+    } else {
+      $("sMetin").textContent = "Seviye " + st.seviye + " tamamlanamadı. Yeni sorularla tekrar dene!";
+      $("sDevam").textContent = "Seviye " + st.seviye + "'i tekrar dene";
+    }
   }
   ekran("son");
 }
@@ -186,6 +200,26 @@ function guvenliBaslat() {
 document.addEventListener("click", e => {
   if (e.target.closest("#basla") || e.target.closest("#sDevam")) guvenliBaslat();
 });
+
+// Reklam izleyince kaldığın sorudan devam (soru sırası ve jokerler korunur)
+$("sReklam").onclick = () => {
+  const b = $("sReklam");
+  if (b.disabled || typeof window.cemberReklam !== "function") return;
+  b.disabled = true;
+  b.textContent = "Reklam yükleniyor...";
+  window.cemberReklam("odul", ok => {
+    b.disabled = false;
+    b.textContent = "📺 Reklam izle, devam et";
+    if (!ok) {
+      $("sMetin").textContent = "Reklam tamamlanamadı, devam hakkı verilmedi. Baştan başlayabilirsin.";
+      return;
+    }
+    st.seri = (st.seri + SERI_SAYISI - 1) % SERI_SAYISI; // yanlışta ilerleyen seriyi geri al
+    kaydet();
+    ekran("oyun");
+    goster();
+  });
+};
 
 $("jYarim").onclick = () => {
   if (kilit || !jok.yarim) return;
