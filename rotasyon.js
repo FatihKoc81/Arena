@@ -511,7 +511,7 @@ function boyut() {
 
 function startLevel() {
   var L = LEVELS[lvIdx];
-  can = CAN_MAX; dlg.classList.remove("show");
+  can = CAN_MAX; EKO.sorKapat();
   found = {}; foundB = {}; hintCells = {}; sel = []; drag = false;
   tokmakKapat();
   $("cmOv").classList.remove("show");
@@ -841,57 +841,21 @@ $("gcDevam").onclick = yolGoster;
 $("gcBol").onclick = function () { gec.style.display = "none"; levelBaslat(); };
 $("gcHome").onclick = function () { kapat(); };
 
-// ===== CAN (yanlış hakkı), REKLAMLAR, KAYBETME / HAK DİYALOGLARI =====
+// ===== CAN, ARA REKLAM, HAK DİYALOGLARI (altın / reklam / mağaza / premium: ekonomi.js, tüm oyunlarda ortak) =====
+var EKO = window.Ekonomi;
 var CAN_MAX = 5;          // bir bölümde en fazla kaç yanlış yapılabilir
 var REKLAM_ARALIK = 10;   // kaç bölümde bir ara reklam
 var ODUL_HAK = 3;         // ampül/tokmak için reklam izleyince kazanılan hak
-var can = CAN_MAX, reklamBekle = false, adT = null;
+var KAYIP_BEDEL = 50;     // kaybedince "Devam et" kaç altın
+var can = CAN_MAX, reklamBekle = false;
 try { reklamBekle = localStorage.getItem(UYG + "cemberRekBekle") === "1"; } catch (e) {}
-
-var ecss = document.createElement("style");
-ecss.textContent =
-"#cm .cm-ov.cm-ad{z-index:40;background:#000;flex-direction:column;color:#fff;text-align:center}" +
-"#cm button.cm-opt{display:block;width:100%;margin:10px 0 0;padding:14px 10px;border:0;border-radius:14px;font-family:inherit;font-size:17px;font-weight:800;color:#fff;background:#2fb81a;box-shadow:0 3px 0 #17780a}" +
-"#cm button.cm-opt.gri{background:#8a8f99;box-shadow:0 3px 0 #5f636b}" +
-"#cm button.cm-opt:disabled{opacity:.5}";
-document.head.appendChild(ecss);
-
-var dlg = document.createElement("div"); dlg.className = "cm-ov"; dlg.style.zIndex = 25; root.appendChild(dlg);
-var adEl = document.createElement("div"); adEl.className = "cm-ov cm-ad"; root.appendChild(adEl);
-
-function soruGoster(baslik, mesaj, ops) {
-  dlg.innerHTML = '<div class="cm-dlg"><h3>' + baslik + '</h3><div style="font-size:17px;font-weight:600;line-height:1.35">' + mesaj + '</div><div class="cm-dlgo"></div></div>';
-  var kap = dlg.querySelector(".cm-dlgo");
-  ops.forEach(function (o) {
-    var b = document.createElement("button");
-    b.className = "cm-opt " + (o.c || ""); if (o.h) b.innerHTML = o.h; else b.textContent = o.t;
-    b.onclick = function () { dlg.classList.remove("show"); o.f(); };
-    kap.appendChild(b);
-  });
-  dlg.classList.add("show");
-}
-
-// REKLAM: tur "gecis" (ara reklam) veya "odul" (ödüllü). cb(true) = reklam tamamlandı.
-// Gerçek reklam SDK'sını bağlamak için sayfada window.cemberReklam = function (tur, cb) { ... } tanımla.
-// Tanımlı değilse aşağıdaki 5 saniyelik TEST reklamı gösterilir.
-function reklamIptal() { if (adT) { clearInterval(adT); adT = null; } adEl.classList.remove("show"); }
-function reklamGoster(tur, cb) {
-  if (premium) { cb(true); return; } // Premium: reklam yok, ödül direkt
-  if (typeof window.cemberReklam === "function") { window.cemberReklam(tur, cb); return; }
-  var odul = tur === "odul", sn = 5;
-  adEl.innerHTML = '<div style="font-size:13px;opacity:.6;letter-spacing:2px">REKLAM · TEST</div><div style="font-size:24px;font-weight:800;margin:16px 0 8px;padding:0 20px">Gerçek reklam buraya gelecek</div><div class="cm-ads" style="font-size:54px;font-weight:800;margin:10px 0 24px"></div><button class="cm-opt gri cm-adb" style="width:min(80%,300px)"></button>';
-  adEl.classList.add("show");
-  var s = adEl.querySelector(".cm-ads"), b = adEl.querySelector(".cm-adb");
-  var yaz = function () {
-    s.textContent = sn > 0 ? sn : "✓";
-    b.textContent = sn > 0 ? (odul ? "Vazgeç" : "Bekleniyor…") : (odul ? "Ödülü al" : "Kapat");
-    b.disabled = sn > 0 && !odul;
-  };
-  if (adT) clearInterval(adT);
-  adT = setInterval(function () { sn--; if (sn <= 0) { sn = 0; clearInterval(adT); adT = null; } yaz(); }, 1000);
-  yaz();
-  b.onclick = function () { if (sn > 0 && !odul) return; var ok = sn <= 0; reklamIptal(); cb(ok); };
-}
+var reklamGoster = EKO.reklam, soruGoster = EKO.sor, altinDukkan = EKO.dukkan, altinEkle = EKO.ekle;
+function reklamIptal() { EKO.kapat(); }
+function barYaz() { if (EKO) EKO.barYaz(); }
+var ocss = document.createElement("style");
+ocss.textContent = "#cm .cm-score{display:none}";
+document.head.appendChild(ocss);
+EKO.bar(root, function () { return "⭐ " + puan; });
 
 // Her REKLAM_ARALIK bölümde bir, sonraki bölüm başlarken ara reklam (menüden çıkıp girerek atlanamaz)
 function levelBaslat() {
@@ -915,7 +879,7 @@ function hakReklamSor(tur) {
   ]);
 }
 
-// Yanlış kelime = 1 can gider. Can bitince: bir alt bölüm VEYA reklam izleyip devam
+// Yanlış kelime = 1 can gider. Can bitince: altınla devam VEYA bir alt bölüm
 function canEksil() {
   can = Math.max(0, can - 1); drawBonus();
   if (can <= 0) { tokmakKapat(); setTimeout(kayipSor, 700); }
@@ -929,8 +893,8 @@ function kayipSor() {
   if (root.style.display !== "flex" || can > 0) return;
   var alt = lvIdx > 0;
   soruGoster("Canın bitti! 💔", "Altınla kaldığın yerden devam edebilir ya da " + (alt ? "bir alt bölümden" : "bölümü baştan") + " başlayabilirsin.", [
-    { h: '<span class="cm-chip">🪙 ' + KAYIP_BEDEL + '</span>Devam et', f: function () {
-      if (altin >= KAYIP_BEDEL) { altinEkle(-KAYIP_BEDEL); can = CAN_MAX; drawBonus(); }
+    { h: '<span class="ek-chip">🪙 ' + KAYIP_BEDEL + '</span>Devam et', f: function () {
+      if (EKO.altin() >= KAYIP_BEDEL) { altinEkle(-KAYIP_BEDEL); can = CAN_MAX; drawBonus(); }
       else altinDukkan(kayipSor, "Altının yetmiyor");
     } },
     { t: alt ? "⬇️ Bir alt bölümden başla" : "🔄 Bölümü baştan başla", c: "gri", f: altBolum },
@@ -938,84 +902,11 @@ function kayipSor() {
   ]);
 }
 
-// ===== ALTIN, ALT BAR (kullanıcı adı / altın / puan), ALTIN AL MAĞAZASI, PREMIUM =====
-var KAYIP_BEDEL = 50;       // kaybedince "Devam et" kaç altın
-var ODUL_ALTIN = 30;        // mağazada reklam izleyince kazanılan altın
-var SATIN_ALMA_TEST = true; // true: window.cemberSatinAl tanımlı değilse satın alma ücretsiz simüle edilir. YAYINDA false YAP!
-var URUNLER = [             // fiyatlar örnektir
-  { id: "altin100", t: "🪙 100 Altın", f: "₺29,99", n: 100 },
-  { id: "altin550", t: "🪙 550 Altın", f: "₺129,99", n: 550 },
-  { id: "altin1200", t: "🪙 1.200 Altın", f: "₺249,99", n: 1200 }
-];
-var PREMIUM_URUN = { id: "premium", t: "👑 Premium Üyelik", f: "₺79,99/ay" };
-var altin = 100, premium = false, kullanici = "Oyuncu" + (1000 + Math.floor(Math.random() * 9000));
-try {
-  var ga = localStorage.getItem(UYG + "cemberAltin"); if (ga !== null) altin = Math.max(0, parseInt(ga, 10) || 0);
-  premium = localStorage.getItem(UYG + "cemberPremium") === "1";
-  var gu = localStorage.getItem(UYG + "cemberAd"); if (gu) kullanici = gu; else localStorage.setItem(UYG + "cemberAd", kullanici);
-} catch (e) {}
-
-var fcss = document.createElement("style");
-fcss.textContent =
-"#cm .cm-score{display:none}" +
-"#cm .cm-alt{flex:none;width:100%;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 12px calc(12px + env(safe-area-inset-bottom))}" +
-"#cm .cm-bp,#cm button.cm-bp{background:rgba(10,24,64,.72);border:2px solid rgba(255,255,255,.35);border-radius:999px;padding:7px 12px;font-family:inherit;font-size:15px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;box-shadow:none}" +
-"#cm button#cmKul{flex:1 1 auto;max-width:42%;text-align:left}" +
-"#cm button#cmAlt{border-color:#ffb300;color:#ffe27a}" +
-"#cm button.cm-opt.alt{background:#e0892b;box-shadow:0 3px 0 #a8641a}" +
-"#cm .cm-chip{display:inline-block;background:rgba(0,0,0,.28);border-radius:999px;padding:2px 10px;margin-right:8px;font-size:15px}";
-document.head.appendChild(fcss);
-
-var bar = document.createElement("div"); bar.className = "cm-alt"; root.appendChild(bar);
-function barYaz() {
-  if (!bar) return;
-  bar.innerHTML = '<button class="cm-bp" id="cmKul">👤 ' + kullanici + (premium ? " 👑" : "") + '</button><button class="cm-bp" id="cmAlt">🪙 ' + altin + ' ＋</button><div class="cm-bp">⭐ ' + puan + '</div>';
-  $("cmKul").onclick = adDegistir;
-  $("cmAlt").onclick = function () { altinDukkan(); };
-}
-function adDegistir() {
-  var v = null;
-  try { v = prompt("Kullanıcı adın:", kullanici); } catch (e) {}
-  v = (v || "").replace(/[<>&"]/g, "").trim().slice(0, 14);
-  if (!v) return;
-  kullanici = v;
-  try { localStorage.setItem(UYG + "cemberAd", kullanici); } catch (e) {}
-  barYaz();
-}
-function altinEkle(n) {
-  altin = Math.max(0, altin + n);
-  try { localStorage.setItem(UYG + "cemberAltin", altin); } catch (e) {}
-  barYaz();
-}
-function satinAl(urun, ok) {
-  var bitir = function (b) { if (b) ok(); else altinDukkan(null, "Satın alma tamamlanmadı"); };
-  if (typeof window.cemberSatinAl === "function") window.cemberSatinAl(urun.id, bitir); // gerçek ödeme: bunu bağla
-  else if (SATIN_ALMA_TEST) bitir(true);
-  else altinDukkan(null, "Satın alma henüz bağlı değil");
-}
-function altinDukkan(geri, not) {
-  var ops = [{ t: "📺 Reklam izle  +" + ODUL_ALTIN + " 🪙", f: function () {
-    reklamGoster("odul", function (ok) { altinDukkan(geri, ok ? "+" + ODUL_ALTIN + " 🪙 kazandın" : ""); if (ok) altinEkle(ODUL_ALTIN); });
-  } }];
-  URUNLER.forEach(function (u) {
-    ops.push({ t: u.t + " · " + u.f, f: function () { satinAl(u, function () { altinEkle(u.n); altinDukkan(geri, "+" + u.n + " 🪙 eklendi"); }); } });
-  });
-  if (!premium) ops.push({ t: PREMIUM_URUN.t + " · " + PREMIUM_URUN.f, c: "alt", f: function () {
-    satinAl(PREMIUM_URUN, function () {
-      premium = true; try { localStorage.setItem(UYG + "cemberPremium", "1"); } catch (e) {}
-      barYaz(); altinDukkan(geri, "👑 Premium aktif!");
-    });
-  } });
-  ops.push({ t: "Kapat", c: "gri", f: function () { if (geri) geri(); } });
-  soruGoster("Altın Al 🪙", (not ? "<b>" + not + "</b><br>" : "") + "Bakiyen: 🪙 " + altin + "<br>" + (premium ? "👑 Premium: reklamsız oyun" : "👑 Premium ile reklamsız oyna"), ops);
-}
-barYaz();
-
 window.addEventListener("resize", function () {
   if (root.style.display !== "flex") return;
   baslikHizala(); boyut(); drawWheel(); drawWords();
 });
-function kapat() { tokmakKapat(); temaGeri(); gec.style.display = "none"; dlg.classList.remove("show"); reklamIptal(); root.style.display = "none"; }
+function kapat() { tokmakKapat(); temaGeri(); gec.style.display = "none"; reklamIptal(); root.style.display = "none"; }
 $("cmBack").onclick = kapat;
 document.addEventListener("anasayfa", kapat);
 

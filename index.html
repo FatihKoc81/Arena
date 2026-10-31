@@ -26,7 +26,7 @@
 </main>
 
 <section class="kart hidden" id="oyun">
-<div class="ust"><b id="oSeviye"></b><span id="sayac"></span></div>
+<div class="ust"><b id="oSeviye"></b><span id="oCan"></span><span id="sayac"></span></div>
 <div class="cubuk"><div id="bar"></div></div>
 <p id="soruMetni"></p>
 <div id="secenekler"></div>
@@ -47,6 +47,7 @@
 
 <script src="sorular.js"></script>
 <script src="seriler.js"></script>
+<script src="ekonomi.js"></script>
 <script>
 // milyonerSorulari {seviye1:[{soru,secenekler,cevap}]} -> SORULAR [[soru,[secenekler],dogruIndex]]
 var SORULAR = (function () {
@@ -76,9 +77,17 @@ const $ = id => document.getElementById(id);
 let st = { seviye: 1, seri: 0 };
 try { st = JSON.parse(localStorage.getItem(KEY)) || st; } catch (e) {}
 if (typeof st.seri !== "number") st.seri = 0;
+if (typeof st.biten !== "number") st.biten = 0; // tamamlanan bölüm sayısı
+if (typeof st.bonus !== "number") st.bonus = 0; // her 3 bölümde kazanılan, sonraki bölüme taşınan can
 const kaydet = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} };
 
 let lv, soru, kilit, jok, butonlar, ciftAktif;
+
+// CAN: her bölüm CAN_MAX canla başlar. Yanlış cevap 1 can götürür ve aynı sıraya sonraki seriden yeni soru gelir.
+// Can bitince: KAYIP_BEDEL altınla devam / reklamla +1 can / bir alt bölümün 1. sorusundan başla.
+const CAN_MAX = 3, KAYIP_BEDEL = 50, BONUS_ARALIK = 3; // BONUS_ARALIK bölümde bir +1 can
+let can = CAN_MAX;
+const canYaz = () => { $("oCan").textContent = "❤️ " + can; };
 
 function ekran(id) {
   ["ana", "oyun", "son"].forEach(e => $(e).classList.toggle("hidden", e !== id));
@@ -87,12 +96,14 @@ function ekran(id) {
 function menu() {
   $("seviye").textContent = st.seviye > SEVIYE_SAYISI ? "Tamamlandı 🏆" : "Seviye " + st.seviye;
   ekran("ana");
+  Ekonomi.barYaz();
 }
 
 function baslat() {
   if (st.seviye > SEVIYE_SAYISI) { st.seviye = 1; st.seri = (st.seri + 1) % SERI_SAYISI; kaydet(); }
   lv = seviyeSorulari(st.seri, st.seviye);
   soru = 0;
+  can = CAN_MAX + st.bonus; st.bonus = 0; kaydet(); canYaz();
   jok = { yarim: 1, seyirci: 1, cift: 1 };
   ciftAktif = false;
   $("oSeviye").textContent = "Seviye " + st.seviye;
@@ -150,40 +161,57 @@ function cevapla(i) {
   butonlar[dogru].classList.add("dogru");
   if (i === dogru) return void setTimeout(sonraki, 900);
   butonlar[i].classList.add("yanlis");
-  setTimeout(() => bitir(false), 1300);
+  setTimeout(yanlisCan, 1300);
 }
 
-function bitir(kazandi) {
+function bitir() {
   $("bar").style.width = "100%";
-  if (kazandi) {
-    st.seviye++;
-    kaydet();
-    const hepsi = st.seviye > SEVIYE_SAYISI;
-    $("sBaslik").textContent = hepsi ? "🏆 Büyük ödül senin!" : "🎉 Seviye geçildi!";
-    $("sMetin").textContent = hepsi ? "Tüm seviyeleri tamamladın." : "Sıradaki: Seviye " + st.seviye;
-    $("sDevam").textContent = hepsi ? "Baştan oyna" : "Sonraki seviye";
-    $("sReklam").classList.add("hidden");
-    $("sDevam").classList.remove("ikinci");
-  } else {
-    // Kaybedince seviye düşmez: aynı seviye, bir sonraki seriden yeni sorularla baştan oynanır
-    st.seri = (st.seri + 1) % SERI_SAYISI;
-    kaydet();
-    $("sBaslik").textContent = "❌ Yanlış cevap";
-    // Reklam sadece APK içinde (ads.js yüklüyse) sunulur
-    const reklamVar = !!window.Capacitor && typeof window.cemberReklam === "function";
-    $("sReklam").classList.toggle("hidden", !reklamVar);
-    $("sReklam").disabled = false;
-    $("sReklam").textContent = "📺 Reklam izle, Devam et";
-    $("sDevam").classList.toggle("ikinci", reklamVar);
-    if (reklamVar) {
-      $("sMetin").textContent = "Seviye " + st.seviye + " tamamlanamadı. Reklam izleyip kaldığın sorudan devam edebilir ya da yeni sorularla baştan başlayabilirsin.";
-      $("sDevam").textContent = "🔁 Baştan başla";
-    } else {
-      $("sMetin").textContent = "Seviye " + st.seviye + " tamamlanamadı. Yeni sorularla tekrar dene!";
-      $("sDevam").textContent = "Seviye " + st.seviye + "'i tekrar dene";
-    }
-  }
+  st.seviye++; st.biten++;
+  const bonus = st.biten % BONUS_ARALIK === 0;
+  if (bonus) st.bonus++;
+  kaydet();
+  const hepsi = st.seviye > SEVIYE_SAYISI;
+  $("sBaslik").textContent = hepsi ? "🏆 Büyük ödül senin!" : "🎉 Seviye geçildi!";
+  $("sMetin").textContent = (hepsi ? "Tüm seviyeleri tamamladın." : "Sıradaki: Seviye " + st.seviye) +
+    (bonus ? " ❤️ +1 can kazandın: sıradaki bölüme " + (CAN_MAX + st.bonus) + " canla başlıyorsun." : " Yeni bölüme " + CAN_MAX + " canla başlarsın.");
+  $("sDevam").textContent = hepsi ? "Baştan oyna" : "Sonraki seviye";
+  $("sReklam").classList.add("hidden");
+  $("sDevam").classList.remove("ikinci");
   ekran("son");
+  Ekonomi.barYaz();
+}
+
+// Yanlış cevap: 1 can gider; seri ilerler (aynı sıraya yeni soru gelir)
+function yanlisCan() {
+  can--; canYaz();
+  st.seri = (st.seri + 1) % SERI_SAYISI; kaydet();
+  if (can > 0) { lv = seviyeSorulari(st.seri, st.seviye); goster(); }
+  else kayipSor();
+}
+// Kaldığın sorudan devam: yeni seriden yeni soru, jokerler korunur
+function devamEt(n) {
+  can = n; canYaz();
+  lv = seviyeSorulari(st.seri, st.seviye);
+  ekran("oyun"); goster();
+}
+function altBolum() {
+  if (st.seviye > 1) st.seviye--;
+  kaydet(); baslat();
+}
+function kayipSor() {
+  const alt = st.seviye > 1;
+  Ekonomi.sor("Canın bitti! 💔",
+    "Altınla ya da reklam izleyerek kaldığın sorudan devam edebilir, ya da " + (alt ? "bir alt bölümün 1. sorusundan" : "bölümün 1. sorusundan") + " başlayabilirsin.", [
+    { h: '<span class="ek-chip">🪙 ' + KAYIP_BEDEL + '</span>Devam et', f: () => {
+      if (Ekonomi.altin() >= KAYIP_BEDEL) { Ekonomi.ekle(-KAYIP_BEDEL); devamEt(CAN_MAX); }
+      else Ekonomi.dukkan(kayipSor, "Altının yetmiyor");
+    } },
+    { t: "📺 Reklam izle, 1 can kazan", c: "alt", f: () => {
+      Ekonomi.reklam("odul", ok => { if (ok) devamEt(1); else kayipSor(); });
+    } },
+    { t: alt ? "⬇️ Bir alt bölümden başla" : "🔄 Bölümü baştan başla", c: "gri", f: altBolum },
+    { t: "Ana menü", c: "gri", f: menu }
+  ]);
 }
 
 function guvenliBaslat() {
@@ -200,26 +228,6 @@ function guvenliBaslat() {
 document.addEventListener("click", e => {
   if (e.target.closest("#basla") || e.target.closest("#sDevam")) guvenliBaslat();
 });
-
-// Reklam izleyince kaldığın sorudan devam (soru sırası ve jokerler korunur)
-$("sReklam").onclick = () => {
-  const b = $("sReklam");
-  if (b.disabled || typeof window.cemberReklam !== "function") return;
-  b.disabled = true;
-  b.textContent = "Reklam yükleniyor...";
-  window.cemberReklam("odul", ok => {
-    b.disabled = false;
-    b.textContent = "📺 Reklam izle, Devam et";
-    if (!ok) {
-      $("sMetin").textContent = "Reklam tamamlanamadı, devam hakkı verilmedi. Baştan başlayabilirsin.";
-      return;
-    }
-    st.seri = (st.seri + SERI_SAYISI - 1) % SERI_SAYISI; // yanlışta ilerleyen seriyi geri al
-    kaydet();
-    ekran("oyun");
-    goster();
-  });
-};
 
 $("jYarim").onclick = () => {
   if (kilit || !jok.yarim) return;
@@ -263,6 +271,9 @@ $("jCift").onclick = () => {
 };
 
 $("sMenu").onclick = menu;
+const seviyeYazi = () => "🏁 Seviye " + Math.min(st.seviye, SEVIYE_SAYISI);
+Ekonomi.bar($("ana"), seviyeYazi, "in");
+Ekonomi.bar($("oyun"), seviyeYazi, "in");
 menu();
 </script>
 
