@@ -165,3 +165,91 @@
   window.addEventListener("resize", kaydir);
   kaydir();
 })();
+
+// MİLYONER SORU METNİ: satırlar dengeli olsun, alt satır üst satırdan uzun olmasın
+(function () {
+  const oyun = document.getElementById("oyun");
+  if (!oyun) return;
+  const norm = s => s.replace(/\s+/g, " ").trim();
+  const cv = document.createElement("canvas").getContext("2d");
+
+  // Kelimeleri, en fazla "avail" genişliğinde satırlara böler; satırlar dengeli ve üstten alta kısalan şekilde olur
+  function bol(words, w, avail) {
+    const sp = w(" "), ww = words.map(w);
+    function pack(W) {
+      const out = []; let cur = [], cw = 0;
+      words.forEach((x, i) => {
+        const add = cur.length ? sp + ww[i] : ww[i];
+        if (cur.length && cw + add > W) { out.push(cur.join(" ")); cur = [x]; cw = ww[i]; }
+        else { cur.push(x); cw += add; }
+      });
+      if (cur.length) out.push(cur.join(" "));
+      return out;
+    }
+    const dogal = pack(avail);
+    if (dogal.length < 2) return dogal;
+    let lo = Math.min(Math.max.apply(null, ww), avail), hi = avail;
+    for (let i = 0; i < 24; i++) { const mid = (lo + hi) / 2; if (pack(mid).length <= dogal.length) hi = mid; else lo = mid; }
+    const genis = r => r.map(w);
+    const azalan = r => { const g = genis(r); for (let i = 1; i < g.length; i++) if (g[i] > g[i - 1] + 0.5) return false; return true; };
+    const sonKisa = r => { const g = genis(r); return g[g.length - 1] <= g[0] + 0.5; };
+    for (let W = hi; W <= avail; W += 1) { const r = pack(W); if (r.length <= dogal.length && azalan(r)) return r; }
+    for (let W = hi; W <= avail; W += 1) { const r = pack(W); if (r.length <= dogal.length && sonKisa(r)) return r; }
+    return pack(hi);
+  }
+  window.__soruBol = bol; // test için
+
+  function metin(el) {
+    let s = "";
+    el.childNodes.forEach(n => { s += n.nodeName === "BR" ? " " : n.textContent; });
+    return norm(s);
+  }
+  function soruKumesi() {
+    const k = new Set();
+    try {
+      if (typeof milyonerSorulari !== "undefined")
+        Object.values(milyonerSorulari).forEach(a => (a || []).forEach(q => { if (q && q.soru) k.add(norm(q.soru)); }));
+    } catch (e) {}
+    return k;
+  }
+  function soruElemani() {
+    const adaylar = [];
+    oyun.querySelectorAll("*").forEach(el => {
+      if (el.closest("button")) return;
+      if (Array.prototype.some.call(el.children, c => c.tagName !== "BR")) return;
+      const t = metin(el);
+      if (t.length < 8 || /^(Seviye\s*\d|Soru\s*\d)/.test(t)) return;
+      adaylar.push([el, t]);
+    });
+    if (!adaylar.length) return null;
+    const k = soruKumesi();
+    return adaylar.find(x => k.has(x[1])) || adaylar[0];
+  }
+
+  function uygula() {
+    if (oyun.classList.contains("hidden")) return;
+    const s = soruElemani();
+    if (!s) return;
+    const el = s[0], t = s[1];
+    if (!el.clientWidth) return;
+    const cs = getComputedStyle(el);
+    const anahtar = t + "|" + el.clientWidth + "|" + cs.font;
+    if (el._simetri === anahtar && el._simetriHtml === el.innerHTML) return;
+    cv.font = cs.fontStyle + " " + cs.fontWeight + " " + cs.fontSize + " " + cs.fontFamily;
+    const avail = el.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0) - 6;
+    const satirlar = bol(t.split(" "), x => cv.measureText(x).width, avail);
+    el.textContent = "";
+    satirlar.forEach((l, i) => {
+      if (i) el.appendChild(document.createElement("br"));
+      el.appendChild(document.createTextNode(l));
+    });
+    el._simetri = anahtar;
+    el._simetriHtml = el.innerHTML;
+  }
+
+  new MutationObserver(uygula).observe(oyun, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["class"] });
+  window.addEventListener("resize", uygula);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(uygula);
+  window.addEventListener("load", uygula);
+  uygula();
+})();
