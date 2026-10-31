@@ -11,18 +11,22 @@
   const css = document.createElement("style");
   css.textContent = `
   #isEkran .isHedef{text-align:center;color:#7f89b8}
-  #isEkran .isHedef b{display:block;font-size:60px;line-height:1.1;color:#fff}
-  #isEkran .isSure{height:8px;background:#232f4a;border-radius:8px;margin:12px 0;overflow:hidden}
+  #isEkran .isHedef b{display:block;font-size:clamp(40px,6.4vh,60px);line-height:1.1;color:#fff}
+  #isEkran .isSure{height:8px;background:#232f4a;border-radius:8px;margin:10px 0;overflow:hidden}
   #isEkran .isSure i{display:block;height:100%;width:100%;background:#2fbf71;transition:width 1s linear}
-  #isEkran .isGrid{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-bottom:12px}
+  #isEkran .isGrid{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-bottom:10px}
   #isEkran .isSay button{flex:0 0 calc((100% - 20px) / 3)}
   #isEkran .isIsl button{flex:0 0 calc((100% - 30px) / 4)}
-  #isEkran .isGrid button{box-sizing:border-box;border:0;border-radius:999px;background:#232f4a;color:#fff;font:inherit;font-size:24px;font-weight:700;line-height:1.2;height:64px;padding:0;text-align:center;display:flex;align-items:center;justify-content:center;cursor:pointer}
+  #isEkran .isGrid button{box-sizing:border-box;border:0;border-radius:999px;background:#232f4a;color:#fff;font:inherit;font-size:24px;font-weight:700;line-height:1.2;height:clamp(44px,7vh,64px);padding:0;text-align:center;display:flex;align-items:center;justify-content:center;cursor:pointer}
   #isEkran .isGrid button.secili{background:#5c1a1a}
   #isEkran .isGrid button:disabled{opacity:.3;cursor:default}
-  #isEkran .isLog{min-height:80px;white-space:pre-line;color:#7f89b8;line-height:1.7;margin-bottom:8px;text-align:center}
-  #isEkran .isMsg{text-align:center;font-weight:700;min-height:28px;margin-bottom:8px}
+  #isEkran .isLog{flex:1 1 auto;min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;white-space:pre-line;color:#7f89b8;line-height:1.45;margin-bottom:6px;text-align:center}
+  #isEkran .isMsg{text-align:center;font-weight:700;min-height:24px;margin-bottom:4px}
   #isEkran .isUst{display:flex;justify-content:space-between;color:#7f89b8;margin-bottom:6px}
+  #isEkran:not(.hidden){display:flex;flex-direction:column;box-sizing:border-box;position:relative;overflow:hidden}
+  #isEkran > *{flex:none}
+  #isEkran > .isLog{flex:1 1 auto}
+  html.is-kilit,html.is-kilit body{overflow:hidden!important;overscroll-behavior:none!important;height:100%!important}
   `;
   document.head.append(css);
 
@@ -37,10 +41,8 @@
     <div class="isGrid isIsl" id="isIsl"></div>
     <div class="isLog" id="isLog"></div>
     <div class="isMsg" id="isMsg"></div>
-    <button class="btn" id="isBitir">✅ Bitir</button>
-    <button class="btn ikinci" id="isGeri">↩️ Geri al</button>
-    <button class="btn ikinci" id="isYeni">🔄 Yeni tur</button>
-    <button class="btn ikinci" id="isMenu">Ana menü</button>`;
+    <button class="btn ikinci" id="isGeri">↩️ Geri Al</button>
+    <button class="btn ikinci" id="isYeni">🔄 Yeni Tur</button>`;
   ana.after(ekran);
 
   const buton = document.createElement("button");
@@ -139,7 +141,7 @@
       b.onclick = () => { secOp = o; ciz(); };
       ok.append(b);
     });
-    $("isLog").textContent = gecmis.length ? gecmis.map(h => h.yazi).join("\n") : "Bir sayı, bir işlem, bir sayı seç.";
+    $("isLog").textContent = gecmis.length ? gecmis.slice(-3).map(h => h.yazi).join("\n") : "Bir sayı, bir işlem, bir sayı seç.";
     $("isGeri").disabled = bitti || !gecmis.length;
   }
 
@@ -164,22 +166,41 @@
     ciz();
   }
 
+  // Ekranı sabitle: sayfa kaymaz, kart "Yeni tur" düğmesi yüksekliği kadar aşağı iner ve alta tam sığar
+  function yerlestir() {
+    if (ekran.classList.contains("hidden")) return;
+    const y = $("isYeni"), cs = getComputedStyle(y);
+    const KAYMA_ORAN = 0.6; // 1 = "Yeni Tur" düğmesi yüksekliği kadar; küçültürsen kart yukarı çıkar
+    const kayma = Math.round((y.offsetHeight + (parseFloat(cs.marginTop) || 0)) * KAYMA_ORAN);
+    ekran.style.top = "0px";
+    ekran.style.height = "auto";
+    const ust = ekran.getBoundingClientRect().top + window.scrollY;
+    ekran.style.top = kayma + "px";
+    ekran.style.height = Math.max(300, window.innerHeight - ust - kayma - 12) + "px";
+  }
+  function kilitle() {
+    const ac = !ekran.classList.contains("hidden");
+    document.documentElement.classList.toggle("is-kilit", ac);
+    if (ac) { window.scrollTo(0, 0); yerlestir(); }
+  }
+  new MutationObserver(kilitle).observe(ekran, { attributes: true, attributeFilter: ["class"] });
+  window.addEventListener("resize", yerlestir);
+  window.addEventListener("scroll", () => { if (!ekran.classList.contains("hidden") && window.scrollY) window.scrollTo(0, 0); });
+  document.addEventListener("touchmove", e => {
+    if (!ekran.classList.contains("hidden")) e.preventDefault();
+  }, { passive: false });
+
   buton.onclick = () => {
     ana.classList.add("hidden");
     ekran.classList.remove("hidden");
     basla();
   };
-  $("isBitir").onclick = () => bitti ? basla() : bitir();
   $("isYeni").onclick = basla;
   $("isGeri").onclick = () => {
     if (bitti || !gecmis.length) return;
     sayilar = gecmis.pop().onceki; secA = null; secOp = null;
     $("isMsg").textContent = "";
     ciz();
-  };
-  $("isMenu").onclick = () => {
-    clearTimeout(sonrakiTid);
-    document.querySelector("h1").click();
   };
   document.addEventListener("anasayfa", () => { clearInterval(tid); clearTimeout(sonrakiTid); });
 })();

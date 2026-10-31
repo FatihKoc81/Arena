@@ -31,7 +31,7 @@
   if (milyoner) {
     const b = document.createElement("button");
     b.className = "btn ikinci";
-    b.textContent = "Ana menü";
+    b.textContent = "Ana Menü";
     b.onclick = anaSayfa;
     milyoner.append(b);
   }
@@ -128,4 +128,40 @@
   document.addEventListener("focusin", () => { if (kilitli) setTimeout(() => window.scrollTo(0, 0), 50); });
   new MutationObserver(kontrol).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["class", "style"] });
   kontrol();
+})();
+
+// DÜĞME YAZILARI: "Ana menü" -> "Ana Menü" (tüm oyunlarda, sonradan eklenen düğmelerde de)
+(function () {
+  function duzelt() {
+    document.querySelectorAll("button").forEach(b => {
+      const w = document.createTreeWalker(b, NodeFilter.SHOW_TEXT);
+      let n;
+      while ((n = w.nextNode())) {
+        if (/Ana menü/.test(n.nodeValue)) n.nodeValue = n.nodeValue.replace(/Ana menü/g, "Ana Menü");
+      }
+    });
+  }
+  duzelt();
+  new MutationObserver(duzelt).observe(document.body, { childList: true, subtree: true, characterData: true });
+})();
+
+// MİLYONER EKRANI: kart, İşlem Oyunu ile aynı üst çizgiye insin (kelimelerim.js'deki KAYMA_ORAN ile aynı değer)
+(function () {
+  const oyun = document.getElementById("oyun");
+  if (!oyun) return;
+  const KAYMA_ORAN = 0.6; // kelimelerim.js içindeki değerle aynı olmalı
+
+  function kaydir() {
+    if (oyun.classList.contains("hidden")) { oyun.style.top = ""; return; }
+    // Ölçü: "Ana Menü" düğmesi, İşlem Oyunu'ndaki "Yeni Tur" ile aynı .btn.ikinci stilinde
+    let ref = null;
+    oyun.querySelectorAll("button.btn.ikinci").forEach(b => { if (/Ana Menü/.test(b.textContent)) ref = b; });
+    if (!ref || !ref.offsetHeight) return;
+    const kayma = Math.round((ref.offsetHeight + (parseFloat(getComputedStyle(ref).marginTop) || 0)) * KAYMA_ORAN);
+    if (getComputedStyle(oyun).position === "static") oyun.style.position = "relative";
+    oyun.style.top = kayma + "px";
+  }
+  new MutationObserver(kaydir).observe(oyun, { attributes: true, attributeFilter: ["class"] });
+  window.addEventListener("resize", kaydir);
+  kaydir();
 })();
