@@ -45,7 +45,7 @@
 </section>
 
 <script src="sorular.js"></script>
-<script src="sorular2.js"></script>
+<script src="seriler.js"></script>
 <script>
 // milyonerSorulari {seviye1:[{soru,secenekler,cevap}]} -> SORULAR [[soru,[secenekler],dogruIndex]]
 var SORULAR = (function () {
@@ -59,12 +59,22 @@ var SORULAR = (function () {
       return [q.soru, sec, d];
     }));
 })();
+// 20 seri x 100 seviye: seriler.js yoksa ya da soru havuzu değiştiyse eski sıralı düzene döner
+var HAVUZ = (typeof milyonerSorulari !== "undefined") ? SORULAR.flat() : [];
+var SERI = (typeof MILYONER_SERILER !== "undefined" && MILYONER_SERILER.havuz === HAVUZ.length) ? MILYONER_SERILER.seri : null;
+var SEVIYE_SAYISI = SERI ? SERI[0].length : SORULAR.length;
+var SERI_SAYISI = SERI ? SERI.length : 1;
+function seviyeSorulari(seri, seviye) {
+  if (!SERI) return SORULAR[seviye - 1];
+  return SERI[seri % SERI.length][seviye - 1].map(function (i) { return HAVUZ[i]; });
+}
 </script>
 <script>
 const KEY = "beyinFirtinasi";
 const $ = id => document.getElementById(id);
-let st = { seviye: 1 };
+let st = { seviye: 1, seri: 0 };
 try { st = JSON.parse(localStorage.getItem(KEY)) || st; } catch (e) {}
+if (typeof st.seri !== "number") st.seri = 0;
 const kaydet = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} };
 
 let lv, soru, kilit, jok, butonlar, ciftAktif;
@@ -74,13 +84,13 @@ function ekran(id) {
 }
 
 function menu() {
-  $("seviye").textContent = st.seviye > SORULAR.length ? "Tamamlandı 🏆" : "Seviye " + st.seviye;
+  $("seviye").textContent = st.seviye > SEVIYE_SAYISI ? "Tamamlandı 🏆" : "Seviye " + st.seviye;
   ekran("ana");
 }
 
 function baslat() {
-  if (st.seviye > SORULAR.length) { st.seviye = 1; kaydet(); }
-  lv = SORULAR[st.seviye - 1];
+  if (st.seviye > SEVIYE_SAYISI) { st.seviye = 1; st.seri = (st.seri + 1) % SERI_SAYISI; kaydet(); }
+  lv = seviyeSorulari(st.seri, st.seviye);
   soru = 0;
   jok = { yarim: 1, seyirci: 1, cift: 1 };
   ciftAktif = false;
@@ -147,23 +157,17 @@ function bitir(kazandi) {
   if (kazandi) {
     st.seviye++;
     kaydet();
-    const hepsi = st.seviye > SORULAR.length;
+    const hepsi = st.seviye > SEVIYE_SAYISI;
     $("sBaslik").textContent = hepsi ? "🏆 Büyük ödül senin!" : "🎉 Seviye geçildi!";
     $("sMetin").textContent = hepsi ? "Tüm seviyeleri tamamladın." : "Sıradaki: Seviye " + st.seviye;
     $("sDevam").textContent = hepsi ? "Baştan oyna" : "Sonraki seviye";
   } else {
-    // Kaybedince bir alt seviyeden devam (Seviye 1'de aynı seviye tekrarlanır)
-    const eski = st.seviye;
-    if (st.seviye > 1) st.seviye--;
+    // Kaybedince seviye düşmez: aynı seviye, bir sonraki seriden yeni sorularla baştan oynanır
+    st.seri = (st.seri + 1) % SERI_SAYISI;
     kaydet();
     $("sBaslik").textContent = "❌ Yanlış cevap";
-    if (eski > 1) {
-      $("sMetin").textContent = "Seviye " + eski + " tamamlanamadı. Bir alt seviyeye düştün: Seviye " + st.seviye + ".";
-      $("sDevam").textContent = "Seviye " + st.seviye + "'den devam et";
-    } else {
-      $("sMetin").textContent = "Seviye 1 tamamlanamadı. Tekrar dene!";
-      $("sDevam").textContent = "Tekrar dene";
-    }
+    $("sMetin").textContent = "Seviye " + st.seviye + " tamamlanamadı. Yeni sorularla tekrar dene!";
+    $("sDevam").textContent = "Seviye " + st.seviye + "'i tekrar dene";
   }
   ekran("son");
 }
