@@ -247,90 +247,9 @@
     el._simetriHtml = el.innerHTML;
   }
 
-  window.__soruUygula = uygula; // sabit düzen bloğu yazı küçülünce satırları yeniden dengelemek için çağırır
   new MutationObserver(uygula).observe(oyun, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["class"] });
   window.addEventListener("resize", uygula);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(uygula);
   window.addEventListener("load", uygula);
   uygula();
-})();
-
-// MİLYONER SABİT DÜZEN: soru kaç kelime olursa olsun sayfa/çizgiler yerinden oynamaz.
-// 1) Soru kutusunun yüksekliği sabit (SATIR satır); yazı sığmazsa harfler küçülür, sığıyorsa normal kalır.
-// 2) Kart ekrana sığmıyorsa (alt bölüm dahil) orantılı küçülür ve sayfa kaydırması kilitlenir.
-(function () {
-  const oyun = document.getElementById("oyun");
-  const soru = document.getElementById("soruMetni");
-  if (!oyun || !soru) return;
-  const SATIR = 4, EN_KUCUK = 11;
-  const st = document.createElement("style");
-  st.textContent = "html.mil-kilit,html.mil-kilit body{overflow:hidden!important;overscroll-behavior:none!important}";
-  document.head.appendChild(st);
-
-  let sonYazi = null, sonAnahtar = "", calisiyor = false;
-
-  function sigdir() {
-    if (calisiyor) return;
-    calisiyor = true;
-    try {
-      soru.style.boxSizing = "border-box";
-      soru.style.fontSize = ""; soru.style.lineHeight = ""; soru.style.height = ""; soru.style.paddingTop = "";
-      if (window.__soruUygula) window.__soruUygula();
-      const cs = getComputedStyle(soru);
-      const fs0 = parseFloat(cs.fontSize) || 20;
-      let lh0 = parseFloat(cs.lineHeight); if (isNaN(lh0)) lh0 = fs0 * 1.25;
-      const pt = parseFloat(cs.paddingTop) || 0, pb = parseFloat(cs.paddingBottom) || 0;
-      const H = Math.round(lh0 * SATIR + pt + pb);
-      let f = fs0, nat;
-      for (;;) {
-        soru.style.height = "auto";
-        nat = soru.offsetHeight;
-        if (nat <= H + 0.5 || f <= EN_KUCUK) break;
-        f -= 0.5;
-        soru.style.fontSize = f + "px";
-        soru.style.lineHeight = String(lh0 / fs0);
-        if (window.__soruUygula) window.__soruUygula();
-      }
-      soru.style.height = H + "px";
-      if (nat < H) soru.style.paddingTop = (pt + (H - nat) / 2) + "px"; // kısa soru kutunun ortasında durur
-    } finally { calisiyor = false; }
-  }
-
-  function sigdirKart() {
-    const kl = document.documentElement.classList;
-    if (oyun.classList.contains("hidden")) { oyun.style.transform = ""; kl.remove("mil-kilit"); return; }
-    oyun.style.transform = "";
-    oyun.style.transformOrigin = "top center";
-    const dock = document.querySelector(".ek-dock");
-    const dh = dock && dock.offsetHeight ? dock.offsetHeight : 0;
-    const r = oyun.getBoundingClientRect();
-    const ust = r.top + window.scrollY;
-    const bos = window.innerHeight - dh - 6 - ust;
-    const k = r.height > bos ? Math.max(0.75, bos / r.height) : 1;
-    if (k < 1) oyun.style.transform = "scale(" + k + ")";
-    const kilit = ust + r.height * k <= window.innerHeight + 2;
-    kl.toggle("mil-kilit", kilit);
-    if (kilit && window.scrollY) window.scrollTo(0, 0);
-  }
-
-  function hepsi() {
-    if (oyun.classList.contains("hidden")) { sigdirKart(); sonYazi = null; return; }
-    const t = soru.textContent;
-    if (t && t !== sonYazi) { sonYazi = t; sigdir(); }
-    const a = window.innerHeight + "|" + oyun.offsetHeight + "|" + ((document.querySelector(".ek-dock") || {}).offsetHeight || 0);
-    if (a !== sonAnahtar) { sonAnahtar = a; sigdirKart(); }
-  }
-  new MutationObserver(function () { requestAnimationFrame(hepsi); }).observe(oyun, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["class"] });
-  window.addEventListener("resize", function () { sonYazi = null; sonAnahtar = ""; hepsi(); });
-  window.addEventListener("load", function () { sonYazi = null; sonAnahtar = ""; hepsi(); });
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { sonYazi = null; sonAnahtar = ""; hepsi(); });
-  setInterval(hepsi, 400);
-
-  window.addEventListener("scroll", function () {
-    if (document.documentElement.classList.contains("mil-kilit") && window.scrollY) window.scrollTo(0, 0);
-  });
-  document.addEventListener("touchmove", function (e) {
-    if (document.documentElement.classList.contains("mil-kilit") && !(e.target.closest && e.target.closest("input,textarea,.ek-dlg"))) e.preventDefault();
-  }, { passive: false });
-  hepsi();
 })();
