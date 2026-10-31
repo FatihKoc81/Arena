@@ -246,16 +246,16 @@
   }
   function sayacYaz() {
     if (!sayacEl) return;
-    var n = function (v) { return v == null ? "…" : fmt(v); };
-    sayacEl.innerHTML = '<span><i class="hs-on"></i><b>' + n(anlik == null ? null : Math.max(anlik, 1)) + "</b> çevrimiçi</span>" +
-      '<span>🎮 Bugün <b>' + n(bugunOyun) + "</b> oyun</span>" +
-      '<span>🔥 Bu hafta <b>' + n(haftaAktif) + "</b> aktif</span>";
+    var n = function (v) { return v === false ? "–" : v == null ? "…" : fmt(v); }; // "–": veri okunamadı (Firebase kuralları yayınlanmamış olabilir)
+    sayacEl.innerHTML = '<div class="hs-r1"><span><i class="hs-on"></i><b>' + n(anlik == null ? null : Math.max(anlik, 1)) + "</b> çevrimiçi</span></div>" +
+      '<div class="hs-r2"><span>🎮 Bugün <b>' + n(bugunOyun) + "</b> oyun</span>" +
+      '<span>🔥 Bu hafta <b>' + n(haftaAktif) + "</b> aktif</span></div>";
   }
   function sayacKur() {
     var ana = document.getElementById("ana"); if (!ana || sayacEl) return;
     var c2 = document.createElement("style");
-    c2.textContent = ".hs-say{position:fixed;left:0;right:0;top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top) + 14px);z-index:30;display:none;justify-content:center;flex-wrap:wrap;gap:6px;pointer-events:none}" +
-      ".hs-say.show{display:flex}.hs-say span{background:rgba(16,26,56,.85);border:1px solid #2b3a72;border-radius:999px;padding:4px 9px;color:#cfd8ff;font:600 12px system-ui,sans-serif;white-space:nowrap}.hs-say b{color:#fff}" +
+    c2.textContent = ".hs-say{position:fixed;left:0;right:0;top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top) + 4px);z-index:30;display:none;flex-direction:column;align-items:center;gap:4px;pointer-events:none}" +
+      ".hs-say.show{display:flex}.hs-say span{display:block;background:rgba(16,26,56,.85);border:1px solid #2b3a72;border-radius:999px;padding:3px 9px;color:#cfd8ff;font:600 11.5px system-ui,sans-serif;white-space:nowrap;text-align:center}.hs-say b{color:#fff}.hs-r2{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:min(92vw,340px)}" +
       ".hs-on{display:inline-block;width:8px;height:8px;border-radius:50%;background:#22c55e;margin-right:5px}";
     document.head.appendChild(c2);
     sayacEl = document.createElement("div"); sayacEl.className = "hs-say"; document.body.appendChild(sayacEl);
@@ -270,8 +270,8 @@
     for (var i = 0; i < dinle.length; i++) dinle[i].off();
     gunKey = k.gun; haftaKey = k.hafta;
     var r1 = db.ref("apps/" + APP + "/oyunSayi/" + gunKey), r2 = db.ref("apps/" + APP + "/haftaSayi/" + haftaKey);
-    r1.on("value", function (s) { bugunOyun = s.val() || 0; sayacYaz(); }, noop);
-    r2.on("value", function (s) { haftaAktif = s.val() || 0; sayacYaz(); }, noop);
+    r1.on("value", function (s) { bugunOyun = s.val() || 0; sayacYaz(); }, function (e) { bugunOyun = false; sayacYaz(); try { console.warn("Sayaç okunamadı:", e && e.message); } catch (x) {} });
+    r2.on("value", function (s) { haftaAktif = s.val() || 0; sayacYaz(); }, function (e) { haftaAktif = false; sayacYaz(); try { console.warn("Sayaç okunamadı:", e && e.message); } catch (x) {} });
     dinle = [r1, r2];
   }
   // bitmiş her oyun: bugünkü sayaca +1; oyuncu bu hafta ilk kez oynadıysa haftalık aktif sayısına +1
