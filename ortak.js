@@ -227,24 +227,44 @@
     return adaylar.find(x => k.has(x[1])) || adaylar[0];
   }
 
+  const MAX_SATIR = 3; // soru alanı hep bu kadar satır yüksekliğinde olur: kartın alt çizgisi her soruda aynı yerde kalır
   function uygula() {
     if (oyun.classList.contains("hidden")) return;
     const s = soruElemani();
     if (!s) return;
     const el = s[0], t = s[1];
     if (!el.clientWidth) return;
-    const cs = getComputedStyle(el);
+    let cs = getComputedStyle(el);
     const anahtar = t + "|" + el.clientWidth + "|" + cs.font;
     if (el._simetri === anahtar && el._simetriHtml === el.innerHTML) return;
-    cv.font = cs.fontStyle + " " + cs.fontWeight + " " + cs.fontSize + " " + cs.fontFamily;
+    // önceki sorudan kalan ayarları sıfırla, doğal ölçüyü oku
+    el.style.fontSize = ""; el.style.lineHeight = ""; el.style.paddingTop = ""; el.style.paddingBottom = "";
+    cs = getComputedStyle(el);
+    const temel = parseFloat(cs.fontSize) || 16;
+    let lh = parseFloat(cs.lineHeight); if (!(lh > 0)) lh = temel * 1.25;
+    const oran = lh / temel;
+    const pt = parseFloat(cs.paddingTop) || 0, pb = parseFloat(cs.paddingBottom) || 0;
     const avail = el.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0) - 6;
-    const satirlar = bol(t.split(" "), x => cv.measureText(x).width, avail);
+    const kelimeler = t.split(" ");
+    // uzun soru: yazıyı, MAX_SATIR satırlık yüksekliğe sığana kadar küçült (en fazla %60'a kadar)
+    let px = temel, satirlar;
+    for (;;) {
+      cv.font = cs.fontStyle + " " + cs.fontWeight + " " + px + "px " + cs.fontFamily;
+      satirlar = bol(kelimeler, x => cv.measureText(x).width, avail);
+      if (satirlar.length * px <= MAX_SATIR * temel + 0.5 || px <= temel * 0.6) break;
+      px -= 0.5;
+    }
+    el.style.fontSize = px + "px";
+    el.style.lineHeight = (px * oran) + "px";
+    // kısa soru: üstten/alttan boşluk ekle, toplam yükseklik hep aynı kalsın
+    const fark = MAX_SATIR * lh - satirlar.length * px * oran;
+    if (fark > 1) { el.style.paddingTop = (pt + fark / 2) + "px"; el.style.paddingBottom = (pb + fark / 2) + "px"; }
     el.textContent = "";
     satirlar.forEach((l, i) => {
       if (i) el.appendChild(document.createElement("br"));
       el.appendChild(document.createTextNode(l));
     });
-    el._simetri = anahtar;
+    el._simetri = t + "|" + el.clientWidth + "|" + getComputedStyle(el).font;
     el._simetriHtml = el.innerHTML;
   }
 
@@ -253,4 +273,59 @@
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(uygula);
   window.addEventListener("load", uygula);
   uygula();
+})();
+
+// MİLYONER ALT ÇUBUĞU (ad · altın · seviye): yazı uzun olunca "Fatih ...", "10..." diye kesilmesin; sığana kadar küçülür
+(function () {
+  const oyun = document.getElementById("oyun");
+  if (!oyun) return;
+  const st = document.createElement("style");
+  st.textContent = ".cip-sig,.cip-sig *{font-size:var(--cip-px)!important}";
+  document.head.appendChild(st);
+
+  // Ekranda en altta duran "Seviye N" yazısı alt çubuktaki kutudur (üstteki "Seviye N" başlıktır)
+  function bul() {
+    let chip = null, enAlt = -1;
+    oyun.querySelectorAll("*").forEach(el => {
+      if (el.children.length > 2 || el.closest("button.btn.ikinci")) return;
+      const t = (el.textContent || "").replace(/\s+/g, " ").trim();
+      if (t.length > 24 || !/Seviye\s*\d+$/.test(t)) return;
+      const r = el.getBoundingClientRect();
+      if (r.height && r.top > enAlt) { enAlt = r.top; chip = el; }
+    });
+    if (!chip) return null;
+    let row = chip.parentElement;
+    while (row && row !== oyun && row.children.length < 3) row = row.parentElement;
+    if (!row || row === oyun || row.getBoundingClientRect().height > 120) return null;
+    return { row, chip };
+  }
+  function tasan(row) {
+    if (row.scrollWidth - row.clientWidth > 1) return true;
+    const l = row.querySelectorAll("*");
+    for (let i = 0; i < l.length; i++) if (l[i].scrollWidth - l[i].clientWidth > 1) return true;
+    return false;
+  }
+  function sigdir() {
+    if (oyun.classList.contains("hidden")) return;
+    const b = bul(); if (!b) return;
+    const row = b.row;
+    const anahtar = row.textContent + "|" + row.clientWidth;
+    if (row._cipKey === anahtar) return;
+    row.classList.remove("cip-sig");
+    if (tasan(row)) {
+      let px = parseFloat(getComputedStyle(b.chip).fontSize) || 16;
+      row.classList.add("cip-sig");
+      while (px > 10) {
+        px -= 0.5;
+        row.style.setProperty("--cip-px", px + "px");
+        if (!tasan(row)) break;
+      }
+    }
+    row._cipKey = row.textContent + "|" + row.clientWidth;
+  }
+  new MutationObserver(sigdir).observe(oyun, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["class"] });
+  window.addEventListener("resize", sigdir);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(sigdir);
+  window.addEventListener("load", sigdir);
+  sigdir();
 })();
