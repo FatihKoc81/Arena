@@ -1,4 +1,4 @@
-/* Bilgi Arenası - AdMob reklamları (sadece APK içinde çalışır).
+/* Beyin Fırtınası - AdMob reklamları (sadece APK içinde çalışır).
    rotasyon.js'in beklediği window.cemberReklam(tur, bitti) fonksiyonunu tanımlar.
    tur: "odul" (ödüllü, izlenince bitti(true)) veya "gecis" (bölüm arası geçiş reklamı). */
 (function () {
