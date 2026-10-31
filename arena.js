@@ -126,8 +126,11 @@
     } catch (e) { db = null; return; }
     kok = db.ref("apps/" + APP);
     db.ref(".info/serverTimeOffset").on("value", function (s) { offset = s.val() || 0; });
-    firebase.auth().onAuthStateChanged(function (u) { if (u && u.uid !== uid) { uid = u.uid; baglan(); } });
-    firebase.auth().signInAnonymously().catch(function (e) { try { console.warn("Arena giriş:", e && e.message); } catch (x) {} });
+    // Misafir girişi SADECE hiç oturum yoksa yapılır; yoksa e-posta oturumunu ezip her yenilemede çıkış yaptırır.
+    firebase.auth().onAuthStateChanged(function (u) {
+      if (u) { if (u.uid !== uid) { uid = u.uid; baglan(); } }
+      else firebase.auth().signInAnonymously().catch(function (e) { try { console.warn("Arena giriş:", e && e.message); } catch (x) {} });
+    });
   }
 
   var yazT = null;
