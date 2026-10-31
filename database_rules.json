@@ -65,6 +65,29 @@
             ".write": "auth != null && auth.uid === $uid && !data.exists()",
             ".validate": "newData.val() === true"
           }
+        },
+        "oyunSayi": {
+          ".read": "auth != null",
+          "$gun": {
+            ".write": "auth != null",
+            ".validate": "$gun.matches(/^[0-9]{8}$/) && newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+          }
+        },
+        "haftaSayi": {
+          ".read": "auth != null",
+          "$hafta": {
+            ".write": "auth != null",
+            ".validate": "$hafta.matches(/^[0-9]{8}$/) && newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+          }
+        },
+        "haftaUye": {
+          "$hafta": {
+            "$uid": {
+              ".read": "auth != null && auth.uid === $uid",
+              ".write": "auth != null && auth.uid === $uid && !data.exists()",
+              ".validate": "$hafta.matches(/^[0-9]{8}$/) && newData.val() === true"
+            }
+          }
         }
       }
     },

@@ -233,20 +233,29 @@
   }
 
 
-  // ---------- oyuncu sayacı (ana sayfada: çevrimiçi + toplam) ----------
-  var CARPAN = 8; // ekranda gösterilen sayılar bununla çarpılır. Gerçek sayıyı görmek için 1 yap.
-  var sayacEl = null, anlik = null, toplamS = null, sayacBasladi = false;
+  // ---------- sayaçlar (HEPSİ GERÇEK SAYI): çevrimiçi · bugün oynanan oyun · bu hafta aktif oyuncu ----------
+  var sayacEl = null, anlik = null, bugunOyun = null, haftaAktif = null, sayacBasladi = false;
+  var gunKey = "", haftaKey = "", dinle = [], sonEl = null;
   function fmt(n) { return (n || 0).toLocaleString("tr-TR"); }
+  function ymd(d) { return String(d.getUTCFullYear() * 10000 + (d.getUTCMonth() + 1) * 100 + d.getUTCDate()); }
+  // Türkiye saatine göre gün (YYYYMMDD) ve haftanın pazartesisi (YYYYMMDD)
+  function anahtarlar() {
+    var d = new Date(Date.now() + 3 * 3600 * 1000);
+    var pzt = new Date(d.getTime() - ((d.getUTCDay() + 6) % 7) * 86400000);
+    return { gun: ymd(d), hafta: ymd(pzt) };
+  }
   function sayacYaz() {
     if (!sayacEl) return;
-    sayacEl.innerHTML = '<span><i class="hs-on"></i><b>' + (anlik == null ? "…" : fmt(Math.max(anlik, 1) * CARPAN)) + "</b> çevrimiçi</span>" +
-      '<span>👥 <b>' + (toplamS == null ? "…" : fmt(toplamS * CARPAN)) + "</b> oyuncu</span>";
+    var n = function (v) { return v == null ? "…" : fmt(v); };
+    sayacEl.innerHTML = '<span><i class="hs-on"></i><b>' + n(anlik == null ? null : Math.max(anlik, 1)) + "</b> çevrimiçi</span>" +
+      '<span>🎮 Bugün <b>' + n(bugunOyun) + "</b> oyun</span>" +
+      '<span>🔥 Bu hafta <b>' + n(haftaAktif) + "</b> aktif</span>";
   }
   function sayacKur() {
     var ana = document.getElementById("ana"); if (!ana || sayacEl) return;
     var c2 = document.createElement("style");
-    c2.textContent = ".hs-say{position:fixed;left:0;right:0;top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top) + 14px);z-index:30;display:none;justify-content:center;gap:8px;pointer-events:none}" +
-      ".hs-say.show{display:flex}.hs-say span{background:rgba(16,26,56,.85);border:1px solid #2b3a72;border-radius:999px;padding:5px 12px;color:#cfd8ff;font:600 13px system-ui,sans-serif;white-space:nowrap}.hs-say b{color:#fff}" +
+    c2.textContent = ".hs-say{position:fixed;left:0;right:0;top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top) + 14px);z-index:30;display:none;justify-content:center;flex-wrap:wrap;gap:6px;pointer-events:none}" +
+      ".hs-say.show{display:flex}.hs-say span{background:rgba(16,26,56,.85);border:1px solid #2b3a72;border-radius:999px;padding:4px 9px;color:#cfd8ff;font:600 12px system-ui,sans-serif;white-space:nowrap}.hs-say b{color:#fff}" +
       ".hs-on{display:inline-block;width:8px;height:8px;border-radius:50%;background:#22c55e;margin-right:5px}";
     document.head.appendChild(c2);
     sayacEl = document.createElement("div"); sayacEl.className = "hs-say"; document.body.appendChild(sayacEl);
@@ -254,20 +263,55 @@
     new MutationObserver(g).observe(ana, { attributes: true, attributeFilter: ["class"] }); g();
     sayacYaz();
   }
-  function sayacBaslat(uid) {
-    if (!sayacBasladi) {
-      sayacBasladi = true;
-      db.ref("apps/" + APP + "/online").on("value", function (s) { anlik = s.numChildren(); sayacYaz(); }, noop);
-      db.ref("apps/" + APP + "/sayac/toplam").on("value", function (s) { toplamS = s.val() || 0; sayacYaz(); }, noop);
-    }
-    // her oyuncu (kimlik) toplama bir kez eklenir
-    var r = db.ref("apps/" + APP + "/sayacUye/" + uid);
-    r.once("value").then(function (s) {
+  // gün ya da hafta değişince dinleyicileri yenile
+  function izle() {
+    var k = anahtarlar();
+    if (k.gun === gunKey && k.hafta === haftaKey) return;
+    for (var i = 0; i < dinle.length; i++) dinle[i].off();
+    gunKey = k.gun; haftaKey = k.hafta;
+    var r1 = db.ref("apps/" + APP + "/oyunSayi/" + gunKey), r2 = db.ref("apps/" + APP + "/haftaSayi/" + haftaKey);
+    r1.on("value", function (s) { bugunOyun = s.val() || 0; sayacYaz(); }, noop);
+    r2.on("value", function (s) { haftaAktif = s.val() || 0; sayacYaz(); }, noop);
+    dinle = [r1, r2];
+  }
+  // bitmiş her oyun: bugünkü sayaca +1; oyuncu bu hafta ilk kez oynadıysa haftalık aktif sayısına +1
+  function oyunKaydet(n) {
+    var u = A.currentUser; if (!u) return;
+    var k = anahtarlar(), kok = "apps/" + APP + "/";
+    var rU = db.ref(kok + "haftaUye/" + k.hafta + "/" + u.uid);
+    rU.once("value").then(function (s) {
       if (s.exists()) return;
-      return r.set(true).then(function () {
-        return db.ref("apps/" + APP + "/sayac/toplam").transaction(function (v) { return (v || 0) + 1; });
+      return rU.set(true).then(function () {
+        return db.ref(kok + "haftaSayi/" + k.hafta).transaction(function (v) { return (v || 0) + 1; });
       });
     }).catch(noop);
+    for (var i = 0; i < n; i++) db.ref(kok + "oyunSayi/" + k.gun).transaction(function (v) { return (v || 0) + 1; }).catch(noop);
+  }
+  function PuanNesnesi() { try { return typeof Puan !== "undefined" ? Puan : window.Puan; } catch (e) { return window.Puan; } }
+  function elToplam() {
+    try { var e = PuanNesnesi().eller(), t = 0; for (var k in e) t += +e[k] || 0; return t; } catch (x) { return null; }
+  }
+  // puan sistemi hazır olunca: toplam el sayısı artarsa bir oyun bitmiş demektir
+  function oyunKancasi() {
+    var dene = 0, t = setInterval(function () {
+      var P = PuanNesnesi();
+      if (P && P.degisti && P.eller) {
+        clearInterval(t);
+        sonEl = elToplam();
+        P.degisti(function () {
+          var yeni = elToplam(); if (yeni == null) return;
+          if (sonEl != null && yeni > sonEl) oyunKaydet(Math.min(yeni - sonEl, 3));
+          sonEl = yeni;
+        });
+      } else if (++dene > 40) clearInterval(t);
+    }, 500);
+  }
+  function sayacBaslat(uid) {
+    if (sayacBasladi) return;
+    sayacBasladi = true;
+    db.ref("apps/" + APP + "/online").on("value", function (s) { anlik = s.numChildren(); sayacYaz(); }, noop);
+    izle(); setInterval(izle, 60000);
+    oyunKancasi();
   }
   sayacKur();
 
