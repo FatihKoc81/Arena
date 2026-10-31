@@ -1,10 +1,13 @@
 const milyonerSorulari = {
   seviye1: [
     { soru: "Sümela Manastırı hangi ilimizdedir?", secenekler: ["Trabzon", "Ordu", "Rize", "Giresun"], cevap: "Trabzon" },
-    { soru: "Hangi ülke Avrupa kıtasındadır?", secenekler: ["Yunanistan", "Mısır", "Suriye", "Ürdün"], cevap: "Yunanistan" },
+    { soru: "Barselona hangi ülkededir?", secenekler: ["Portekiz", "İspanya", "İtalya", "Fransa"], cevap: "İspanya" },
     { soru: "Türkiye'nin en uzun kıyı şeridine sahip denizi hangisidir?", secenekler: ["Karadeniz", "Akdeniz", "Ege Denizi", "Marmara Denizi"], cevap: "Ege Denizi" },
-    { soru: "Türkiye'nin en çok buğday üreten bölgesi hangisidir?", secenekler: ["İç Anadolu", "Marmara", "Karadeniz", "Akdeniz"], cevap: "İç Anadolu" },
-    { soru: "İnsan vücudunda idrarın oluştuğu temel süzme birimi hangi organda yer alır?", secenekler: ["Karaciğer", "Böbrek", "Dalak", "Pankreas"], cevap: "Böbrek" },
+    { soru: "Güneş Sistemi'nin en uzak gezegeni hangisidir?", secenekler: ["Uranüs", "Satürn", "Neptün", "Plüton"], cevap: "Neptün" },
+    { soru: "Satrançta bir oyuncunun başlangıçta kaç piyonu vardır?", secenekler: ["6", "8", "10", "16"], cevap: "8" },
+    { soru: "Oda sıcaklığında sıvı halde bulunan metal hangisidir?", secenekler: ["Demir", "Cıva", "Bakır", "Kurşun"], cevap: "Cıva" },
+    { soru: "Fatih Sultan Mehmed ile Yavuz Sultan Selim arasındaki aile bağını hangisi ifade eder?", secenekler: ["Baba - oğul", "Abi - kardeş", "Dede - torun", "Amca - yeğen"], cevap: "Dede - torun" },
+    { soru: "Ses en hızlı hangi ortamda yayılır?", secenekler: ["Hava", "Su", "Çelik", "Boşluk"], cevap: "Çelik" },
     { soru: "Dünyanın en yüksek başkenti olan La Paz hangi ülkededir?", secenekler: ["Peru", "Bolivya", "Ekvador", "Kolombiya"], cevap: "Bolivya" },
     { soru: "Hangi ülke Kuzey Amerika kıtasındadır?", secenekler: ["Küba", "Kolombiya", "Brezilya", "Şili"], cevap: "Küba" },
     { soru: "Matematikte logaritma fonksiyonunun tabanı verilmemişse genelde taban kaça eşittir?", secenekler: ["1", "10", "e", "0"], cevap: "10" },
