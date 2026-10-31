@@ -232,6 +232,45 @@
     msg = ""; el.classList.add("show"); render();
   }
 
+
+  // ---------- oyuncu sayacı (ana sayfada: çevrimiçi + toplam) ----------
+  var CARPAN = 8; // ekranda gösterilen sayılar bununla çarpılır. Gerçek sayıyı görmek için 1 yap.
+  var sayacEl = null, anlik = null, toplamS = null, sayacBasladi = false;
+  function fmt(n) { return (n || 0).toLocaleString("tr-TR"); }
+  function sayacYaz() {
+    if (!sayacEl) return;
+    sayacEl.innerHTML = '<span><i class="hs-on"></i><b>' + (anlik == null ? "…" : fmt(Math.max(anlik, 1) * CARPAN)) + "</b> çevrimiçi</span>" +
+      '<span>👥 <b>' + (toplamS == null ? "…" : fmt(toplamS * CARPAN)) + "</b> oyuncu</span>";
+  }
+  function sayacKur() {
+    var ana = document.getElementById("ana"); if (!ana || sayacEl) return;
+    var c2 = document.createElement("style");
+    c2.textContent = ".hs-say{position:fixed;left:0;right:0;top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top) + 14px);z-index:30;display:none;justify-content:center;gap:8px;pointer-events:none}" +
+      ".hs-say.show{display:flex}.hs-say span{background:rgba(16,26,56,.85);border:1px solid #2b3a72;border-radius:999px;padding:5px 12px;color:#cfd8ff;font:600 13px system-ui,sans-serif;white-space:nowrap}.hs-say b{color:#fff}" +
+      ".hs-on{display:inline-block;width:8px;height:8px;border-radius:50%;background:#22c55e;margin-right:5px}";
+    document.head.appendChild(c2);
+    sayacEl = document.createElement("div"); sayacEl.className = "hs-say"; document.body.appendChild(sayacEl);
+    function g() { sayacEl.classList.toggle("show", !ana.classList.contains("hidden")); }
+    new MutationObserver(g).observe(ana, { attributes: true, attributeFilter: ["class"] }); g();
+    sayacYaz();
+  }
+  function sayacBaslat(uid) {
+    if (!sayacBasladi) {
+      sayacBasladi = true;
+      db.ref("apps/" + APP + "/online").on("value", function (s) { anlik = s.numChildren(); sayacYaz(); }, noop);
+      db.ref("apps/" + APP + "/sayac/toplam").on("value", function (s) { toplamS = s.val() || 0; sayacYaz(); }, noop);
+    }
+    // her oyuncu (kimlik) toplama bir kez eklenir
+    var r = db.ref("apps/" + APP + "/sayacUye/" + uid);
+    r.once("value").then(function (s) {
+      if (s.exists()) return;
+      return r.set(true).then(function () {
+        return db.ref("apps/" + APP + "/sayac/toplam").transaction(function (v) { return (v || 0) + 1; });
+      });
+    }).catch(noop);
+  }
+  sayacKur();
+
   // ---------- hesap kaydını izle, adı oyuna yansıt ----------
   function esitle() {
     var E = window.Ekonomi; if (!E || !E.adAyarla) return;
@@ -242,6 +281,7 @@
     if (hesapRef) { hesapRef.off(); hesapRef = null; }
     kayit = null;
     if (!u) { render(); return; }
+    sayacBaslat(u.uid);
     hesapRef = db.ref("hesap/" + u.uid);
     hesapRef.on("value", function (s) { kayit = s.val(); esitle(); render(); }, noop);
   });
