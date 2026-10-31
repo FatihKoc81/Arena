@@ -48,6 +48,7 @@
 <script src="sorular.js"></script>
 <script src="seriler.js"></script>
 <script src="ekonomi.js"></script>
+<script src="puan.js"></script>
 <script>
 // milyonerSorulari {seviye1:[{soru,secenekler,cevap}]} -> SORULAR [[soru,[secenekler],dogruIndex]]
 var SORULAR = (function () {
@@ -77,7 +78,8 @@ const $ = id => document.getElementById(id);
 let st = { seviye: 1, seri: 0 };
 try { st = JSON.parse(localStorage.getItem(KEY)) || st; } catch (e) {}
 if (typeof st.seri !== "number") st.seri = 0;
-if (typeof st.puan !== "number") st.puan = 0; // doğru cevap başına +10 puan
+if (typeof st.puan !== "number") st.puan = 0; // eski sistem (doğru cevap başına +10); yeni puanlama puan.js'de
+if (Puan.ilk && st.puan > 0) Puan.ekle("milyoner", Math.round(st.puan / 10)); // eski puanı yeni sisteme taşı (bir kez)
 if (typeof st.biten !== "number") st.biten = 0; // tamamlanan bölüm sayısı
 if (typeof st.bonus !== "number") st.bonus = 0; // her 3 bölümde kazanılan, sonraki bölüme taşınan can
 const kaydet = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} };
@@ -90,11 +92,61 @@ const CAN_MAX = 3, KAYIP_BEDEL = 50, BONUS_ARALIK = 3; // BONUS_ARALIK bölümde
 let can = CAN_MAX;
 const canYaz = () => { $("oCan").textContent = "❤️ " + can; };
 
+// SÜRELİ SORULAR: her seviyenin ilk SURELI_SORU sorusu SURE_SN saniye sürelidir (süre dolunca yanlış sayılır)
+const SURE_SN = 20, SURELI_SORU = 5;
+let sureT = null, kalan = 0;
+function sayacYaz() {
+  const el = $("sayac");
+  el.textContent = "Soru " + (soru + 1) + "/" + lv.length + (sureT ? " · ⏱ " + kalan : "");
+  el.classList.toggle("az", !!sureT && kalan <= 5);
+}
+function sureDurdur() { if (sureT) { clearInterval(sureT); sureT = null; } }
+function sureBaslat() {
+  sureDurdur();
+  if (soru >= SURELI_SORU) return;
+  kalan = SURE_SN;
+  sureT = setInterval(() => {
+    kalan--;
+    if (kalan <= 0) { sureDurdur(); sureBitti(); return; }
+    sayacYaz();
+  }, 1000);
+  sayacYaz();
+}
+function sureBitti() {
+  if (kilit) return;
+  kilit = true;
+  butonlar[lv[soru][2]].classList.add("dogru");
+  $("sayac").textContent = "⏰ Süre doldu";
+  setTimeout(yanlisCan, 1300);
+}
+
+// DÜELLO (arena.js): iki oyuncu AYNI seviyeyi aynı anda oynar, bitirmeyi ilk başaran kazanır.
+// Yanlış cevap 1 can götürür (soru değişir); canı bitenin düellosu biter.
+let duel = null;
+(window.ArenaOyunlari = window.ArenaOyunlari || {}).milyoner = {
+  ad: "Milyoner",
+  baslat: function (d, api) {
+    const seviye = Math.min(1 + (d.seed % 10), SEVIYE_SAYISI), seri = d.seed % SERI_SAYISI;
+    duel = { api: api, seviye: seviye, dSeri: seri };
+    lv = seviyeSorulari(seri, seviye);
+    soru = 0; can = CAN_MAX; canYaz();
+    jok = { yarim: 1, seyirci: 1, cift: 1 }; ciftAktif = false;
+    $("oSeviye").textContent = "⚔️ Düello";
+    ["jYarim", "jSeyirci", "jCift"].forEach(j => $(j).disabled = false);
+    api.ilerle(0, lv.length);
+    ekran("oyun");
+    goster();
+  },
+  dur: function () { duel = null; sureDurdur(); }
+};
+document.addEventListener("anasayfa", () => { sureDurdur(); duel = null; });
+
 function ekran(id) {
   ["ana", "oyun", "son"].forEach(e => $(e).classList.toggle("hidden", e !== id));
 }
 
 function menu() {
+  sureDurdur();
   $("seviye").textContent = st.seviye > SEVIYE_SAYISI ? "Tamamlandı 🏆" : "Seviye " + st.seviye;
   ekran("ana");
   Ekonomi.barYaz();
@@ -125,7 +177,7 @@ function goster() {
   const q = lv[soru];
   kilit = false;
   ciftAktif = false; // çift cevap sadece joker basılan soru için geçerli
-  $("sayac").textContent = "Soru " + (soru + 1) + "/" + lv.length;
+  sureDurdur(); sayacYaz();
   $("bar").style.width = (soru / lv.length * 100) + "%";
   $("soruMetni").innerHTML = bol(q[0]);
   const kutu = $("secenekler");
@@ -138,10 +190,16 @@ function goster() {
     kutu.append(b);
     return b;
   });
+  sureBaslat();
 }
 
 function sonraki() {
   soru++;
+  if (duel) {
+    duel.api.ilerle(Math.min(soru, lv.length), lv.length);
+    if (soru >= lv.length) { sureDurdur(); duel.api.bitti(); return; }
+    goster(); return;
+  }
   soru >= lv.length ? bitir(true) : goster();
 }
 
@@ -159,8 +217,9 @@ function cevapla(i) {
   }
 
   kilit = true;
+  sureDurdur();
   butonlar[dogru].classList.add("dogru");
-  if (i === dogru) { st.puan += 10; kaydet(); return void setTimeout(sonraki, 900); }
+  if (i === dogru) { Puan.ekle("milyoner"); return void setTimeout(sonraki, 900); }
   butonlar[i].classList.add("yanlis");
   setTimeout(yanlisCan, 1300);
 }
@@ -185,6 +244,15 @@ function bitir() {
 // Yanlış cevap: 1 can gider; seri ilerler (aynı sıraya yeni soru gelir)
 function yanlisCan() {
   can--; canYaz();
+  if (duel) { // düello: aynı sıraya başka bir soru gelir, can bitince elenir
+    if (can > 0) {
+      duel.dSeri = (duel.dSeri + 1) % SERI_SAYISI;
+      const yeni = seviyeSorulari(duel.dSeri, duel.seviye)[soru];
+      lv = lv.slice(); if (yeni) lv[soru] = yeni;
+      goster();
+    } else { sureDurdur(); duel.api.elendi(); }
+    return;
+  }
   st.seri = (st.seri + 1) % SERI_SAYISI; kaydet();
   if (can > 0) { lv = seviyeSorulari(st.seri, st.seviye); goster(); }
   else kayipSor();
@@ -275,7 +343,7 @@ $("sMenu").onclick = menu;
 const seviyeYazi = () => "🏁 Seviye " + Math.min(st.seviye, SEVIYE_SAYISI);
 Ekonomi.bar($("ana"), seviyeYazi, "in");
 Ekonomi.bar($("oyun"), seviyeYazi, "in");
-Ekonomi.dock($("ana"), () => st.puan, seviyeYazi); // ana sayfanın altı: ad+seviye, altın, premium, puan
+Ekonomi.dock($("ana"), () => Puan.toplam(), seviyeYazi, () => (window.Arena ? Arena.siraYazi() : "Puan")); // ana sayfanın altı: ad+seviye, altın, premium, toplam puan + sıra
 menu();
 </script>
 
@@ -286,6 +354,12 @@ menu();
 <script src="islem.js"></script>
 <script src="rotasyon.js"></script>
 <script src="menu.js"></script>
+<script>window.ARENA_APP="beyinfirtinasi";</script><!-- sıralama/düello verileri bu adla ayrı tutulur -->
+<script src="firebase-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="arena.js"></script>
 <script>
 // Sayfa kaymasın (menü, oyun, sonuç ekranları) + sol alta APK indirme / güncelleme butonu
 // Tarayıcıda "⬇ APK", uygulamanın içinde aynı yerde "⬇ Güncelle" yazar.

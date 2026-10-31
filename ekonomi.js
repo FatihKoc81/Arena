@@ -136,6 +136,7 @@
     kullanici = v;
     try { localStorage.setItem(UYG + "cemberAd", kullanici); } catch (e) {}
     barYaz();
+    if (typeof window.onEkonomiAd === "function") { try { window.onEkonomiAd(kullanici); } catch (e) {} } // arena.js: sıralamadaki adı güncelle
   }
   function yaz1(o) {
     var g = !o.az; // az: altın bu çubukta gösterilmez (alt bölümde ayrı gösterilir)
@@ -168,21 +169,23 @@
     b[1].firstChild.textContent = "🪙 " + altin;
     b[2].firstChild.textContent = "👑"; b[2].lastChild.textContent = premium ? "Premium ✓" : "Premium";
     b[2].classList.toggle("on", premium);
-    b[3].firstChild.textContent = "⭐ " + (o.puan ? o.puan() : 0);
+    b[3].firstChild.textContent = "⭐ " + (o.puan ? o.puan() : 0).toLocaleString("tr-TR");
+    b[3].lastChild.textContent = o.etiket ? o.etiket() : "Puan"; // örn. "Puan · #7" (sıralama)
   }
   // Ana sayfanın altı: ad + seviye, altın (satın alma), premium, puan. izle görünürken açılır.
-  function dock(izle, puanFn, seviyeFn) {
+  function dock(izle, puanFn, seviyeFn, etiketFn) {
     var el = document.createElement("div"); el.className = "ek-dock";
     el.innerHTML = '<button class="ek-dk"><b></b><i></i></button>' +
       '<button class="ek-dk g"><b></b><i>Altın Al</i></button>' +
       '<button class="ek-dk p"><b></b><i></i></button>' +
-      '<div class="ek-dk s"><b></b><i>Puan</i></div>';
+      '<button class="ek-dk s"><b></b><i>Puan</i></button>';
     document.body.appendChild(el);
     var bt = el.querySelectorAll("button");
     bt[0].onclick = adDegistir;
     bt[1].onclick = function () { dukkan(); };
     bt[2].onclick = premiumTikla;
-    var o = { el: el, puan: puanFn, sev: seviyeFn }; docklar.push(o); dockYaz(o);
+    bt[3].onclick = function () { if (window.Arena && window.Arena.ac) window.Arena.ac("siralama"); }; // puan kutusu: sıralama ekranı
+    var o = { el: el, puan: puanFn, sev: seviyeFn, etiket: etiketFn }; docklar.push(o); dockYaz(o);
     function g() { el.classList.toggle("show", !izle.classList.contains("hidden")); }
     new MutationObserver(g).observe(izle, { attributes: true, attributeFilter: ["class"] });
     g();
@@ -191,6 +194,7 @@
 
   window.Ekonomi = {
     UYG: UYG, reklam: reklam, sor: sor, sorKapat: sorKapat, kapat: kapat, dukkan: dukkan, ekle: ekle,
+    ad: function () { return kullanici; },
     altin: function () { return altin; }, premium: function () { return premium; }, bar: bar, dock: dock, barYaz: barYaz
   };
 })();

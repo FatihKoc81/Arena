@@ -118,3 +118,46 @@ window.islemSeviyeTamamla = islemSeviyeTamamla;
 window.islemSeviyeSifirla = islemSeviyeSifirla;
 window.islemSeviyeNo = function () { return islemSeviyeNo; };
 window.islemCozumuGetir = function () { return islemCozumu; };
+
+// ===== PUAN + DÜELLO KANCALARI (puan.js / arena.js ile çalışır) =====
+// Hedef bulununca oyun kodu islemSeviyeTamamla() çağırır: normal oyunda +1 el puanı yazılır.
+// Düelloda iki oyuncuya AYNI tohumdan aynı sayılar/hedef üretilir; DUELLO_TUR hedefi ilk bulan kazanır.
+(function () {
+    var D = null;                 // aktif düello: {seed, tur, api}
+    var DUELLO_SEVIYE = 12, DUELLO_TUR = 3;
+    function tohumluRastgele(a) { // mulberry32
+        return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+    }
+    var asilBaslat = window.islemOyununuBaslat, asilTamam = window.islemSeviyeTamamla;
+
+    window.islemOyununuBaslat = function () {
+        if (!D) return asilBaslat.apply(this, arguments);
+        var r = Math.random, s = islemSeviyeNo;
+        Math.random = tohumluRastgele(D.seed + D.tur * 7919);
+        islemSeviyeNo = DUELLO_SEVIYE;
+        try { asilBaslat(); } finally { Math.random = r; islemSeviyeNo = s; }
+    };
+
+    window.islemSeviyeTamamla = function () {
+        if (window.Puan) window.Puan.ekle("islem");
+        if (!D) return asilTamam();
+        D.tur++;
+        D.api.ilerle(D.tur, DUELLO_TUR);
+        if (D.tur >= DUELLO_TUR) D.api.bitti();
+        return islemSeviyeNo;
+    };
+
+    (window.ArenaOyunlari = window.ArenaOyunlari || {}).islem = {
+        ad: "İşlem",
+        baslat: function (d, api) {
+            D = { seed: d.seed, tur: 0, api: api };
+            api.ilerle(0, DUELLO_TUR);
+            var ana = document.getElementById("ana"), dugme = null;
+            if (ana) ana.querySelectorAll("button").forEach(function (b) { if (/İşlem/.test(b.textContent)) dugme = b; });
+            if (dugme) dugme.click();                       // İşlem Oyunu ekranını aç
+            setTimeout(function () { if (D) window.islemOyununuBaslat(); }, 60); // ilk tur: tohumlu sayılar
+        },
+        dur: function () { D = null; }
+    };
+    document.addEventListener("anasayfa", function () { D = null; });
+})();
