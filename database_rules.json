@@ -1,0 +1,80 @@
+{
+  "rules": {
+    "apps": {
+      "$app": {
+        "users": {
+          ".read": "auth != null",
+          ".indexOn": [
+            "puan"
+          ],
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid",
+            ".validate": "newData.hasChildren(['ad','puan'])",
+            "ad": {
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 18 && (newData.val() === root.child('hesap').child($uid).child('ad').val() || (!root.child('hesap').child($uid).exists() && newData.val().matches(/^Oyuncu[0-9]{4}$/)))"
+            },
+            "puan": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() < 100000000"
+            }
+          }
+        },
+        "online": {
+          ".read": "auth != null",
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid"
+          }
+        },
+        "invites": {
+          "$to": {
+            ".read": "auth != null && auth.uid === $to",
+            "$id": {
+              ".read": "auth != null && (auth.uid === $to || data.child('from').val() === auth.uid)",
+              ".write": "auth != null && (auth.uid === $to || data.child('from').val() === auth.uid || (!data.exists() && newData.child('from').val() === auth.uid))"
+            }
+          }
+        },
+        "duels": {
+          ".read": "auth != null",
+          "$id": {
+            ".write": "auth != null && (data.exists() ? (data.child('a').val() === auth.uid || data.child('b').val() === auth.uid) : (newData.child('a').val() === auth.uid || newData.child('b').val() === auth.uid))"
+          }
+        },
+        "meydan": {
+          ".read": "auth != null",
+          ".write": "auth != null"
+        },
+        "turnuva": {
+          ".read": "auth != null",
+          ".indexOn": [
+            "durum"
+          ],
+          "$id": {
+            ".write": "auth != null"
+          }
+        }
+      }
+    },
+    "adlar": {
+      "$k": {
+        ".read": "auth != null",
+        ".write": "auth != null && auth.token.email != null && ((!data.exists() && newData.val() === auth.uid && $k.matches(/^[a-z][a-z0-9_]{2,17}$/) && (!$k.matches(/^(fk1453|fatih|fatih_|fatihkoc81|fatihkoc7|estergon)$/) || (auth.token.email_verified === true && auth.token.email === 'SENIN_MAILIN@gmail.com')) && (!$k.matches(/^(hatice|haticekoc81|haticekoc1|haticekoc7)$/) || (auth.token.email_verified === true && (auth.token.email === 'ESININ_MAILI@gmail.com' || auth.token.email === 'SENIN_MAILIN@gmail.com'))) && (root.child('hesap').child(auth.uid).child('adT').val() == null || now - root.child('hesap').child(auth.uid).child('adT').val() >= 1296000000)) || (data.val() === auth.uid && !newData.exists()))"
+      }
+    },
+    "hesap": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.token.email != null && auth.uid === $uid && newData.exists()",
+        ".validate": "newData.hasChildren(['ad','adT'])",
+        "ad": {
+          ".validate": "newData.isString() && newData.val().length >= 3 && newData.val().length <= 18 && newData.val().matches(/^[A-Z]([a-z0-9_]*[A-Z])?[a-z0-9_]*$/) && root.child('adlar').child(newData.val().toLowerCase()).val() === $uid && (!data.exists() || data.val() === newData.val() || now - data.parent().child('adT').val() >= 1296000000)"
+        },
+        "adT": {
+          ".validate": "newData.isNumber() && (newData.parent().child('ad').val() === data.parent().child('ad').val() ? newData.val() === data.val() : newData.val() === now)"
+        },
+        "$other": {
+          ".validate": "false"
+        }
+      }
+    }
+  }
+}

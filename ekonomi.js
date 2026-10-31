@@ -129,10 +129,15 @@
 
   // Alt çubuk: kullanıcı adı, altın, (isteğe bağlı) üçüncü bilgi. cls "in": kart içi (boşluksuz)
   function adDegistir() {
+    // Firebase kurulu ise hesap/kullanıcı adı penceresi açılır (hesap.js)
+    if (window.Hesap && window.Hesap.ac) { window.Hesap.ac(); return; }
     var v = null;
     try { v = prompt("Kullanıcı adın:", kullanici); } catch (e) {}
-    v = (v || "").replace(/[<>&"]/g, "").trim().slice(0, 14);
+    v = (v || "").replace(/[<>&"]/g, "").trim().slice(0, 18);
     if (!v) return;
+    adAyarla(v);
+  }
+  function adAyarla(v) {
     kullanici = v;
     try { localStorage.setItem(UYG + "cemberAd", kullanici); } catch (e) {}
     barYaz();
@@ -194,7 +199,11 @@
 
   window.Ekonomi = {
     UYG: UYG, reklam: reklam, sor: sor, sorKapat: sorKapat, kapat: kapat, dukkan: dukkan, ekle: ekle,
-    ad: function () { return kullanici; },
+    ad: function () { return kullanici; }, adAyarla: adAyarla,
     altin: function () { return altin; }, premium: function () { return premium; }, bar: bar, dock: dock, barYaz: barYaz
   };
+
+  // hesap.js (e-posta hesabı + benzersiz kullanıcı adı) sayfa yüklenince, arena.js'den SONRA eklenir
+  function hesapYukle() { var sc = document.createElement("script"); sc.src = "hesap.js"; document.head.appendChild(sc); }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", hesapYukle); else hesapYukle();
 })();
