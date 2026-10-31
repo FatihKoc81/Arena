@@ -29,6 +29,7 @@
     "#ana.hidden{display:none!important}" +
     "#ana>.alt{grid-column:1/-1;margin-bottom:6px;order:0}" +
     "#ana>.pill{display:none}" +
+    "#ana>.ek-bar{grid-column:1/-1;order:20;margin:6px 0 0}" +
     "#ana>.btn.kartB{order:var(--sira);margin:0;width:auto;height:108px;padding:8px 6px;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:16px;line-height:1.25;border:2px solid rgba(255,255,255,.2);background:var(--kc)!important;color:#fff!important}" +
     "#ana>.btn.kartB.genis{grid-column:1/-1;height:100px}" +
     "#ana>.btn.kartB .ic{width:56px;height:56px;display:block;margin-bottom:6px;flex:none}" +
