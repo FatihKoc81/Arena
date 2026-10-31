@@ -108,7 +108,7 @@
       <div id="kkHeks"></div>
       <div id="kkBilgi2" style="display:flex;justify-content:space-between"><span id="kkPot"></span><span id="kkSure" style="font-weight:700"></span></div>
       <p id="kkIpucu"></p>
-      <div id="kkCevap" contenteditable="true" role="textbox" aria-label="Cevap" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="done"></div>
+      <div id="kkCevap" contenteditable="true" role="textbox" aria-label="Cevap" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="send"></div>
       <p id="kkGeriBildirim"></p>
       <div class="kkSatir">
         <button class="btn ikinci" id="kkHarfAl">💡 Harf Al</button>
@@ -342,9 +342,18 @@
   $("kkTekrar").onclick = baslat;
   $("kkGeri").onclick = menuyeDon;
   $("kkMenu").onclick = menuyeDon;
-  $("kkTahmin").onclick = tahmin;
+  $("kkTahmin").onclick = () => { tahmin(); odak(); };
   $("kkHarfAl").onclick = harfAl;
-  $("kkPas").onclick = () => kelimeBitir("⏭️ Pas geçildi. Cevap: " + harfler.join(""));
+  $("kkPas").onclick = () => { kelimeBitir("⏭️ Pas geçildi. Cevap: " + harfler.join("")); odak(); };
+
+  // Klavye kapanıp açılmasın: oyun sırasında butonlara dokunmak cevap kutusundan odağı almasın
+  oyun.addEventListener("mousedown", e => { if (e.target.closest("button")) e.preventDefault(); });
+  oyun.addEventListener("pointerdown", e => { if (e.target.closest("button")) e.preventDefault(); });
+  // Yine de odak kaybolursa (oyun ekranı açıkken) hemen geri ver; klavye kapanmaz
+  inp.addEventListener("blur", () => {
+    if (sec.classList.contains("hidden") || oyun.classList.contains("hidden")) return;
+    inp.focus();
+  });
 
   // Enter: yeni satır açma, tahmin et
   inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); tahmin(); } });
