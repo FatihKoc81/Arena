@@ -233,8 +233,11 @@
   }
 
 
-  // ---------- sayaçlar (HEPSİ GERÇEK SAYI): çevrimiçi · bugün oynanan oyun · bu hafta aktif oyuncu ----------
-  var sayacEl = null, anlik = null, bugunOyun = null, haftaAktif = null, sayacBasladi = false;
+  // ---------- sayaçlar (HEPSİ GERÇEK SAYI): iki uygulamanın TOPLAMI ----------
+  // çevrimiçi · bugün oynanan oyun · bu hafta oynanan oyun. Bilgi Arenası + Beyin Fırtınası verileri toplanır.
+  var APPLER = ["bilgiarenasi", "beyinfirtinasi"];
+  if (APPLER.indexOf(APP) < 0) APPLER.push(APP);
+  var sayacEl = null, onSay = {}, gunSay = {}, haftaSay = {}, sayacBasladi = false;
   var gunKey = "", haftaKey = "", dinle = [], sonEl = null;
   function fmt(n) { return (n || 0).toLocaleString("tr-TR"); }
   function ymd(d) { return String(d.getUTCFullYear() * 10000 + (d.getUTCMonth() + 1) * 100 + d.getUTCDate()); }
@@ -244,12 +247,19 @@
     var pzt = new Date(d.getTime() - ((d.getUTCDay() + 6) % 7) * 86400000);
     return { gun: ymd(d), hafta: ymd(pzt) };
   }
+  // her uygulamanın değerini topla; hiçbiri okunamadıysa false ("–"), henüz gelmediyse null ("…")
+  function topla(o) {
+    var t = 0, yuk = 0, hata = 0;
+    APPLER.forEach(function (a) { var v = o[a]; if (v === false) hata++; else if (v != null) { t += v; yuk++; } });
+    return yuk ? t : (hata === APPLER.length ? false : null);
+  }
   function sayacYaz() {
     if (!sayacEl) return;
-    var n = function (v) { return v === false ? "–" : v == null ? "…" : fmt(v); }; // "–": veri okunamadı (Firebase kuralları yayınlanmamış olabilir)
-    sayacEl.innerHTML = '<div class="hs-r1"><span><i class="hs-on"></i><b>' + n(anlik == null ? null : Math.max(anlik, 1)) + "</b> çevrimiçi</span></div>" +
-      '<div class="hs-r2"><span>🎮 Bugün <b>' + n(bugunOyun) + "</b> oyun</span>" +
-      '<span>🔥 Bu hafta <b>' + n(haftaAktif) + "</b> aktif</span></div>";
+    var n = function (v) { return v === false ? "–" : v == null ? "…" : fmt(v); };
+    var on = topla(onSay);
+    sayacEl.innerHTML = '<div class="hs-r1"><span><i class="hs-on"></i><b>' + n(on == null || on === false ? on : Math.max(on, 1)) + "</b> çevrimiçi</span></div>" +
+      '<div class="hs-r2"><span>🎮 Bugün <b>' + n(topla(gunSay)) + "</b> oyun</span>" +
+      '<span>📅 Bu hafta <b>' + n(topla(haftaSay)) + "</b> oyun</span></div>";
   }
   function sayacKur() {
     var ana = document.getElementById("ana"); if (!ana || sayacEl) return;
@@ -263,29 +273,33 @@
     new MutationObserver(g).observe(ana, { attributes: true, attributeFilter: ["class"] }); g();
     sayacYaz();
   }
+  function oku(ref, hedef, a) {
+    ref.on("value", function (s) { hedef[a] = s.val() || 0; sayacYaz(); },
+      function (e) { hedef[a] = false; sayacYaz(); try { console.warn("Sayaç okunamadı:", e && e.message); } catch (x) {} });
+    dinle.push(ref);
+  }
   // gün ya da hafta değişince dinleyicileri yenile
   function izle() {
     var k = anahtarlar();
     if (k.gun === gunKey && k.hafta === haftaKey) return;
     for (var i = 0; i < dinle.length; i++) dinle[i].off();
+    dinle = []; gunSay = {}; haftaSay = {};
     gunKey = k.gun; haftaKey = k.hafta;
-    var r1 = db.ref("apps/" + APP + "/oyunSayi/" + gunKey), r2 = db.ref("apps/" + APP + "/haftaSayi/" + haftaKey);
-    r1.on("value", function (s) { bugunOyun = s.val() || 0; sayacYaz(); }, function (e) { bugunOyun = false; sayacYaz(); try { console.warn("Sayaç okunamadı:", e && e.message); } catch (x) {} });
-    r2.on("value", function (s) { haftaAktif = s.val() || 0; sayacYaz(); }, function (e) { haftaAktif = false; sayacYaz(); try { console.warn("Sayaç okunamadı:", e && e.message); } catch (x) {} });
-    dinle = [r1, r2];
+    APPLER.forEach(function (a) {
+      oku(db.ref("apps/" + a + "/oyunSayi/" + gunKey), gunSay, a);
+      oku(db.ref("apps/" + a + "/haftaOyun/" + haftaKey), haftaSay, a);
+    });
+    sayacYaz();
   }
-  // bitmiş her oyun: bugünkü sayaca +1; oyuncu bu hafta ilk kez oynadıysa haftalık aktif sayısına +1
+  // bitmiş her oyun: kendi uygulamamızın günlük ve haftalık oyun sayacına +1
   function oyunKaydet(n) {
     var u = A.currentUser; if (!u) return;
     var k = anahtarlar(), kok = "apps/" + APP + "/";
-    var rU = db.ref(kok + "haftaUye/" + k.hafta + "/" + u.uid);
-    rU.once("value").then(function (s) {
-      if (s.exists()) return;
-      return rU.set(true).then(function () {
-        return db.ref(kok + "haftaSayi/" + k.hafta).transaction(function (v) { return (v || 0) + 1; });
-      });
-    }).catch(noop);
-    for (var i = 0; i < n; i++) db.ref(kok + "oyunSayi/" + k.gun).transaction(function (v) { return (v || 0) + 1; }).catch(noop);
+    function artir(v) { return (v || 0) + 1; }
+    for (var i = 0; i < n; i++) {
+      db.ref(kok + "oyunSayi/" + k.gun).transaction(artir).catch(noop);
+      db.ref(kok + "haftaOyun/" + k.hafta).transaction(artir).catch(noop);
+    }
   }
   function PuanNesnesi() { try { return typeof Puan !== "undefined" ? Puan : window.Puan; } catch (e) { return window.Puan; } }
   function elToplam() {
@@ -309,7 +323,9 @@
   function sayacBaslat(uid) {
     if (sayacBasladi) return;
     sayacBasladi = true;
-    db.ref("apps/" + APP + "/online").on("value", function (s) { anlik = s.numChildren(); sayacYaz(); }, noop);
+    APPLER.forEach(function (a) {
+      db.ref("apps/" + a + "/online").on("value", function (s) { onSay[a] = s.numChildren(); sayacYaz(); }, function () { onSay[a] = false; sayacYaz(); });
+    });
     izle(); setInterval(izle, 60000);
     oyunKancasi();
   }

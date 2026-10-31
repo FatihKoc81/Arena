@@ -22,6 +22,25 @@
   var panel = null, sekme = "siralama";
   var duelAktif = null, meydan = null, turnuvaListe = [], turnuvaBen = null;
 
+  // ---------- LİG SİSTEMİ ----------
+  // Ligler: her biri 1-2-3 yıldızlı. Çırak ★ → Çırak ★★ → Çırak ★★★ → Kalfa ★ → ... → Efsane ★★★
+  // Sezon her Pazartesi 00:00'da (TSİ) biter; aynı ligdeki oyuncular o haftaki TURNUVA PUANINA göre sıralanır.
+  var LIGLER = ["Çırak", "Kalfa", "Usta", "Üstad", "Efsane"], LIG_MAX = LIGLER.length * 3 - 1;
+  var YUKSELME = 0.30;   // ilk %30 üst lige çıkar
+  var DUSME = 0.70;      // %70'ten sonrası (son %30) alt lige düşer; ikisinin arası kalır
+  var MIN_GRUP = 4;      // ligde en az bu kadar puanlı oyuncu yoksa kimse yer değiştirmez
+  var TP = { duello: 5, yariGalip: 20, yariMagl: 5, finalMagl: 15, sampiyon: 50, sampiyonlarKat: 2, sampiyonlarSampiyon: 100 };
+  var LK = ((window.Ekonomi && window.Ekonomi.UYG) || "") + "arenaLig";
+  var L = { tp: 0, tz: 0, lig: 0, hafta: "", hp: 0 };    // tp: turnuva puanı, tz: turnuva zaferi, hp: bu haftaki puan
+  try { var lh = localStorage.getItem(LK); if (lh) { var lo = JSON.parse(lh) || {}; for (var lk in L) if (lo[lk] != null) L[lk] = lo[lk]; } } catch (e) {}
+  var tpYuklendi = false, ligHazir = false, bekleyenTp = 0, ligRef = null, ligGrup = [], siraTp = [], siraTur = "genel";
+  function ligAd(i) { i = Math.max(0, Math.min(LIG_MAX, i | 0)); return LIGLER[Math.floor(i / 3)] + " " + new Array(i % 3 + 2).join("★"); }
+  function ligKaydet() { try { localStorage.setItem(LK, JSON.stringify(L)); } catch (e) {} }
+  function haftaKey() {
+    var d = new Date(Date.now() + 3 * 3600 * 1000), p = new Date(d.getTime() - ((d.getUTCDay() + 6) % 7) * 86400000);
+    return String(p.getUTCFullYear() * 10000 + (p.getUTCMonth() + 1) * 100 + p.getUTCDate());
+  }
+
   // ---------- yardımcılar ----------
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function adim() { return (window.Ekonomi && window.Ekonomi.ad && window.Ekonomi.ad()) || "Oyuncu"; }
@@ -58,6 +77,8 @@
     ".ar-pu{font-weight:800;color:#ffe27a}" +
     ".ar-dv{border:0;border-radius:10px;background:#a3231c;color:#fff;font-size:16px;padding:6px 10px;cursor:pointer}.ar-dv[disabled]{opacity:.3}" +
     ".ar-bos{text-align:center;color:#8e9bc4;padding:24px 8px}" +
+    ".ar-alt{flex:1;border:2px solid #4a5a9a;background:#101a38;color:#8e9bc4;border-radius:12px;padding:8px 2px;font:700 13px system-ui,sans-serif;cursor:pointer}.ar-alt.on{background:#7a5a00;color:#fff;border-color:#ffb300}" +
+    ".ar-lgs{display:block;font-size:11px;font-weight:600;color:#8e9bc4}.ar-sr.yuk{border-color:#22c55e}.ar-sr.dus{border-color:#ef4444}" +
     ".ar-tb{width:100%;border-collapse:collapse;font-size:14px}.ar-tb td,.ar-tb th{padding:8px 4px;border-bottom:1px solid #1d2540;text-align:right}.ar-tb td:first-child,.ar-tb th:first-child{text-align:left}.ar-tb th{color:#8e9bc4;font-weight:600}.ar-tb tr.top td{font-weight:800;color:#ffe27a;border-bottom:0}" +
     ".ar-bt{display:block;width:100%;border:0;border-radius:14px;padding:13px;margin:8px 0;font:800 16px system-ui,sans-serif;color:#fff;background:#3b5bd6;cursor:pointer}.ar-bt.gri{background:#6b7280}.ar-bt.kirmizi{background:#a3231c}" +
     ".ar-kt{background:#101a38;border:2px solid #4a5a9a;border-radius:14px;padding:10px 12px;margin:8px 0}" +
@@ -138,7 +159,9 @@
     if (!kok || !uid) return;
     clearTimeout(yazT);
     yazT = setTimeout(function () {
-      kok.child("users/" + uid).update({ ad: adim(), puan: Puan.toplam(), eller: Puan.eller(), t: ts() });
+      var o = { ad: adim(), puan: Puan.toplam(), eller: Puan.eller(), t: ts() };
+      if (tpYuklendi) { o.tp = L.tp; o.tz = L.tz; o.lig = L.lig; }   // sunucudaki değer okunmadan sıfırla ezme
+      kok.child("users/" + uid).update(o);
     }, hemen ? 0 : 1500);
   }
 
@@ -150,11 +173,27 @@
       r.onDisconnect().remove(); r.set(true);
       kullaniciYaz(true);
     });
+    // turnuva puanı / lig bilgisini sunucudan al (başka cihazdaki değerle birleştir), sonra sezonu kontrol et
+    kok.child("users/" + uid).once("value").then(function (s) {
+      var v = s.val() || {};
+      if ((v.tp || 0) > L.tp) L.tp = v.tp;
+      if ((v.tz || 0) > L.tz) L.tz = v.tz;
+      if (!L.hafta && v.lig != null) L.lig = Math.max(0, Math.min(LIG_MAX, v.lig | 0));
+    }).catch(function () {}).then(function () {
+      tpYuklendi = true; ligKaydet(); kullaniciYaz(true); donemKontrol();
+      setInterval(function () { if (ligHazir && L.hafta !== haftaKey()) { ligHazir = false; donemKontrol(); } }, 60000);
+    });
+    // turnuva puanı sıralaması (ilk 100)
+    kok.child("users").orderByChild("tp").limitToLast(100).on("value", function (s) {
+      var a = [];
+      s.forEach(function (c) { var v = c.val() || {}; if ((v.tp || 0) > 0) a.push({ uid: c.key, ad: v.ad || "Oyuncu", tp: v.tp || 0, lig: v.lig | 0 }); });
+      a.reverse(); siraTp = a; yenile();
+    });
     kok.child("online").on("value", function (s) { onlineSet = s.val() || {}; yenile(); });
     // sıralama (ilk 100, gerçek zamanlı)
     kok.child("users").orderByChild("puan").limitToLast(100).on("value", function (s) {
       var a = [];
-      s.forEach(function (c) { var v = c.val() || {}; a.push({ uid: c.key, ad: v.ad || "Oyuncu", puan: v.puan || 0 }); });
+      s.forEach(function (c) { var v = c.val() || {}; a.push({ uid: c.key, ad: v.ad || "Oyuncu", puan: v.puan || 0, lig: v.lig | 0 }); });
       a.reverse(); sira = a; siraHesapla();
     });
     // gelen davetler
@@ -174,6 +213,52 @@
     var kayitli = null;
     try { kayitli = localStorage.getItem(ATK); } catch (e) {}
     if (kayitli) turnuvaBagla(kayitli);
+  }
+
+  function ligDinle() {
+    if (ligRef) { try { ligRef.off(); } catch (e) {} }
+    ligRef = kok.child("ligPuan/" + L.hafta + "/" + L.lig).orderByChild("p").limitToLast(100);
+    ligRef.on("value", function (s) {
+      var a = [];
+      s.forEach(function (c) { var v = c.val() || {}; if ((v.p || 0) > 0) a.push({ uid: c.key, ad: v.ad || "Oyuncu", p: v.p }); });
+      a.reverse(); ligGrup = a; yenile();
+    });
+  }
+  function ligYaz() { if (kok && uid && L.hp > 0) kok.child("ligPuan/" + L.hafta + "/" + L.lig + "/" + uid).set({ ad: adim(), p: L.hp }); }
+  function tpEkle(n) {
+    if (!(n > 0)) return;
+    if (!ligHazir) { bekleyenTp += n; return; }
+    tpUygula(n);
+  }
+  function tpUygula(n) {
+    L.tp += n; L.hp += n; ligKaydet(); ligYaz(); kullaniciYaz(true); yenile();
+  }
+  // Yeni hafta başladıysa geçen haftanın sonucuna göre yüksel / düş / kal
+  function donemKontrol() {
+    var hk = haftaKey();
+    function bitir() {
+      L.hafta = hk; L.hp = 0; ligKaydet(); ligHazir = true; ligDinle();
+      if (bekleyenTp) { var n = bekleyenTp; bekleyenTp = 0; tpUygula(n); } else kullaniciYaz(true);
+      yenile();
+    }
+    if (!L.hafta || L.hafta === hk || L.hp <= 0) { bitir(); return; }
+    var eskiH = L.hafta, eskiL = L.lig, bp = L.hp;
+    kok.child("ligPuan/" + eskiH + "/" + eskiL).orderByChild("p").limitToLast(1000).once("value").then(function (s) {
+      var n = 0, ustte = 0;
+      s.forEach(function (c) { var p = (c.val() || {}).p || 0; if (p > 0) { n++; if (p > bp) ustte++; } });
+      var sira = ustte + 1, oran = n ? sira / n : 1, yeni = eskiL;
+      if (n >= MIN_GRUP) {
+        if (oran <= YUKSELME && eskiL < LIG_MAX) yeni = eskiL + 1;
+        else if (oran > DUSME && eskiL > 0) yeni = eskiL - 1;
+      }
+      L.lig = yeni;
+      var m = "Sezon bitti: <b>" + sira + ".</b> oldun (" + n + " oyuncu).<br>";
+      if (yeni > eskiL) afis("📈 <b>Lig atladın!</b><br>" + m + esc(ligAd(eskiL)) + " → <b>" + esc(ligAd(yeni)) + "</b>", null, 8);
+      else if (yeni < eskiL) afis("📉 <b>Lig düştün</b><br>" + m + esc(ligAd(eskiL)) + " → <b>" + esc(ligAd(yeni)) + "</b>", null, 8);
+      else afis("🏅 " + m + "<b>" + esc(ligAd(yeni)) + "</b> ligindesin, yerinde kaldın.", null, 6);
+      bildirim("🏅 Lig sezonu bitti", ligAd(eskiL) + (yeni === eskiL ? " ligindesin" : " → " + ligAd(yeni)));
+      bitir();
+    }).catch(function () { setTimeout(donemKontrol, 20000); });   // okunamazsa puan kaybolmasın, tekrar dene
   }
 
   function siraHesapla() {
@@ -361,13 +446,22 @@
     else if (ben) {
       bas = "🏆 Kazandın!";
       msg = kz.sebep === "bitirdi" ? "<b>" + sn + " sn</b>'de bitirdin." : kz.sebep === "gelmedi" ? "Rakip gelmedi." : "Rakip elendi.";
-      if (kz.sebep !== "gelmedi" && !D.puanVerildi) { D.puanVerildi = true; Puan.ekle("duello"); msg += "<br>+Düello puanı kazandın ⭐"; }
+      if (kz.sebep !== "gelmedi" && !D.puanVerildi) {
+        D.puanVerildi = true; Puan.ekle("duello"); msg += "<br>+Düello puanı kazandın ⭐";
+        if (!v.tur) { tpEkle(TP.duello); msg += "<br>+" + TP.duello + " turnuva puanı 🏅"; }
+      }
     } else {
       bas = "😔 Kaybettin";
       msg = kz.sebep === "bitirdi" ? esc(D.rakipAd) + " <b>" + sn + " sn</b>'de bitirdi." : kz.sebep === "gelmedi" ? "Zamanında hazır olmadın." : "Bu sefer olmadı.";
     }
     if (v.tur) {
       var w = kz.uid || (v.a < v.b ? v.a : v.b);   // beraberlikte küçük uid ilerler
+      if (!D.tpVerildi) {
+        D.tpVerildi = true;
+        var sm = turnuvaBen && turnuvaBen.id === v.tur.tid && turnuvaBen.v && turnuvaBen.v.sampiyonlar ? TP.sampiyonlarKat : 1;
+        var tpn = w === uid ? (v.tur.m === "f" ? 0 : TP.yariGalip * sm) : (v.tur.m === "f" ? TP.finalMagl * sm : TP.yariMagl * sm);
+        if (tpn) { tpEkle(tpn); msg += "<br>+" + tpn + " turnuva puanı 🏅"; }
+      }
       kok.child("turnuva/" + v.tur.tid + "/maclar/" + v.tur.m + "/kazanan").transaction(function (c) { return c || w; });
     }
     bildirim(bas.replace(/^\S+\s/, ""), msg.replace(/<[^>]+>/g, ""));
@@ -453,7 +547,7 @@
     if (m.f && m.f.kazanan && !t.sampiyon && m.f.kazanan === uid) {
       var yeni = false;
       T.ref.child("sampiyon").transaction(function (c) { yeni = !c; return c || uid; }, function (e, ok) {
-        if (!e && ok && yeni) { Puan.ekle("turnuva"); T.ref.child("durum").set("bitti"); bildirim("🏆 Şampiyon!", "Turnuvayı kazandın."); afis("🏆 <b>Turnuva şampiyonusun!</b>", null, 6); }
+        if (!e && ok && yeni) { Puan.ekle("turnuva"); L.tz++; ligKaydet(); tpEkle(t.sampiyonlar ? TP.sampiyonlarSampiyon : TP.sampiyon); T.ref.child("durum").set("bitti"); bildirim("🏆 Şampiyon!", "Turnuvayı kazandın."); afis("🏆 <b>Turnuva şampiyonusun!</b>", null, 6); }
       });
     }
     ["y1", "y2", "f"].forEach(function (k) {
@@ -475,13 +569,16 @@
       }
     });
   }
-  function turnuvaAc(oyun) {
+  function turnuvaAc(oyun, sampiyonlar) {
     if (!cevrimici(true)) return;
+    if (sampiyonlar && !(L.tz > 0)) { toast("👑 Şampiyonlar Turnuvası sadece bir turnuva kazanmış oyunculara açık."); return; }
     bildirimIzni();
     var ref = kok.child("turnuva").push(), o = {};
     o[uid] = { ad: adim() };
-    ref.set({ oyun: oyun, olusturan: uid, durum: "bekliyor", kapasite: TURNUVA_KISI, t: ts(), oyuncular: o }).then(function () {
-      turnuvaBagla(ref.key); toast("🏆 Turnuva açıldı, " + (TURNUVA_KISI - 1) + " kişi daha bekleniyor");
+    var tv = { oyun: oyun, olusturan: uid, durum: "bekliyor", kapasite: TURNUVA_KISI, t: ts(), oyuncular: o };
+    if (sampiyonlar) tv.sampiyonlar = true;
+    ref.set(tv).then(function () {
+      turnuvaBagla(ref.key); toast((sampiyonlar ? "👑 Şampiyonlar Turnuvası" : "🏆 Turnuva") + " açıldı, " + (TURNUVA_KISI - 1) + " kişi daha bekleniyor");
     });
   }
   function turnuvaKatil(id) {
@@ -491,6 +588,7 @@
     ref.once("value").then(function () {
       return ref.transaction(function (c) {
         if (!c || c.durum !== "bekliyor") return;
+        if (c.sampiyonlar && !(L.tz > 0)) return;   // sadece turnuva kazananlar
         c.oyuncular = c.oyuncular || {};
         if (c.oyuncular[uid]) return c;
         var n = Object.keys(c.oyuncular).length;
@@ -504,7 +602,7 @@
         return c;
       });
     }).then(function (r) {
-      if (r.committed) { turnuvaBagla(id); toast("🏆 Turnuvaya katıldın"); } else toast("Turnuva dolu ya da kapandı.");
+      if (r.committed) { turnuvaBagla(id); toast("🏆 Turnuvaya katıldın"); } else toast(L.tz > 0 ? "Turnuva dolu ya da kapandı." : "Turnuva dolu, kapandı ya da sadece turnuva kazananlara açık.");
     });
   }
   function turnuvaAyril() {
@@ -527,17 +625,20 @@
     panel = document.createElement("div");
     panel.className = "ar-pn";
     panel.innerHTML = '<div class="ar-ph"><span>🏅 Arena</span><button class="ar-x">✕</button></div>' +
-      '<div class="ar-tabs"><button class="ar-tab" data-s="siralama">Sıralama</button><button class="ar-tab" data-s="puan">Puanım</button><button class="ar-tab" data-s="turnuva">Turnuva</button></div>' +
+      '<div class="ar-tabs"><button class="ar-tab" data-s="siralama">Sıralama</button><button class="ar-tab" data-s="puan">Puanım</button><button class="ar-tab" data-s="turnuva">Turnuva</button><button class="ar-tab" data-s="lig">Lig</button></div>' +
       '<div class="ar-body"></div>';
     document.body.appendChild(panel);
     panel.querySelector(".ar-x").onclick = function () { panel.classList.remove("show"); };
     panel.querySelectorAll(".ar-tab").forEach(function (b) { b.onclick = function () { sekme = b.getAttribute("data-s"); yenile(); }; });
     panel.querySelector(".ar-body").addEventListener("click", function (e) {
+      var st = e.target.closest("[data-st]");
+      if (st) { siraTur = st.getAttribute("data-st"); yenile(); return; }
       var d = e.target.closest("[data-u]"), a = e.target.closest("[data-act]");
       if (d && !d.disabled) davetSec(d.getAttribute("data-u"), d.getAttribute("data-a"));
       if (a) {
         var act = a.getAttribute("data-act"), id = a.getAttribute("data-id");
-        if (act === "ac") oyunSec("🏆 Turnuva aç", turnuvaAc);
+        if (act === "ac") oyunSec("🏆 Turnuva aç", function (o) { turnuvaAc(o, false); });
+        else if (act === "acS") oyunSec("👑 Şampiyonlar Turnuvası", function (o) { turnuvaAc(o, true); });
         else if (act === "katil") turnuvaKatil(id);
         else if (act === "ayril") turnuvaAyril();
         else if (act === "mac") duelAc(id);
@@ -561,25 +662,51 @@
   }
   function ciz() {
     panel.querySelectorAll(".ar-tab").forEach(function (b) { b.classList.toggle("on", b.getAttribute("data-s") === sekme); });
-    var h = sekme === "siralama" ? htmlSira() : sekme === "puan" ? htmlPuan() : htmlTurnuva();
+    var h = sekme === "siralama" ? htmlSira() : sekme === "puan" ? htmlPuan() : sekme === "lig" ? htmlLig() : htmlTurnuva();
     var body = panel.querySelector(".ar-body"), y = body.scrollTop;
     body.innerHTML = h; body.scrollTop = y;
   }
   function htmlSira() {
-    var h = '<div class="ar-ben">Sıran: <b>' + esc(benYazi || "…") + "</b> &nbsp;·&nbsp; ⭐ " + fmt(Puan.toplam()) + "</div>";
+    var tpMod = siraTur === "turnuva", liste = tpMod ? siraTp : sira, h = "";
+    h += '<div class="ar-tabs" style="padding:2px 0 8px"><button class="ar-alt' + (tpMod ? "" : " on") + '" data-st="genel">⭐ Genel Puan</button><button class="ar-alt' + (tpMod ? " on" : "") + '" data-st="turnuva">🏆 Turnuva Puanı</button></div>';
+    if (tpMod) {
+      var bi = -1; for (var k = 0; k < siraTp.length; k++) if (siraTp[k].uid === uid) { bi = k; break; }
+      h += '<div class="ar-ben">Sıran: <b>' + (bi >= 0 ? "#" + (bi + 1) : (L.tp > 0 ? "#100+" : "—")) + "</b> &nbsp;·&nbsp; 🏅 " + fmt(L.tp) + '<br><span style="font-size:13px">' + esc(ligAd(L.lig)) + " · 🏆 " + fmt(L.tz) + " turnuva zaferi</span></div>";
+    } else {
+      h += '<div class="ar-ben">Sıran: <b>' + esc(benYazi || "…") + "</b> &nbsp;·&nbsp; ⭐ " + fmt(Puan.toplam()) + "</div>";
+    }
     h += '<button class="ar-bt kirmizi" data-act="meydan">⚔️ Meydan Oku</button>';
-    if (!sira.length) h += '<div class="ar-bos">' + (db ? "Yükleniyor…" : "Çevrimiçi sıralama için firebase-config.js doldurulmalı.") + "</div>";
+    if (!liste.length) h += '<div class="ar-bos">' + (!db ? "Çevrimiçi sıralama için firebase-config.js doldurulmalı." : tpMod ? "Henüz turnuva puanı olan yok. İlk sen ol!" : "Yükleniyor…") + "</div>";
     var madal = ["🥇", "🥈", "🥉"];
-    sira.forEach(function (x, i) {
-      var me = x.uid === uid, on = !!onlineSet[x.uid];
-      h += '<div class="ar-sr' + (me ? " me" : "") + '"><span class="ar-no">' + (i < 3 ? madal[i] : i + 1) + '</span><span class="ar-ad">' + esc(x.ad) + (me ? " (sen)" : "") + "</span>" +
-        (on ? '<i class="ar-on"></i>' : "") + '<span class="ar-pu">' + fmt(me ? Puan.toplam() : x.puan) + "</span>" +
+    liste.forEach(function (x, i) {
+      var me = x.uid === uid, on = !!onlineSet[x.uid], deger = tpMod ? (me ? L.tp : x.tp) : (me ? Puan.toplam() : x.puan), lg = me ? L.lig : x.lig;
+      h += '<div class="ar-sr' + (me ? " me" : "") + '"><span class="ar-no">' + (i < 3 ? madal[i] : i + 1) + '</span><span class="ar-ad">' + esc(x.ad) + (me ? " (sen)" : "") + '<small class="ar-lgs">' + esc(ligAd(lg)) + "</small></span>" +
+        (on ? '<i class="ar-on"></i>' : "") + '<span class="ar-pu">' + fmt(deger) + "</span>" +
         (me ? "" : '<button class="ar-dv" data-u="' + esc(x.uid) + '" data-a="' + esc(x.ad) + '"' + (on ? "" : " disabled") + ">⚔️</button>") + "</div>";
     });
     return h + '<div class="ar-bos" style="font-size:12px">● yeşil nokta = çevrimiçi (sadece onlara istek gönderilir)</div>';
   }
+  function htmlLig() {
+    if (!db) return '<div class="ar-bos">Lig için firebase-config.js doldurulmalı.</div>';
+    var n = ligGrup.length, h = '<div class="ar-ben" style="font-size:18px">' + esc(ligAd(L.lig)) + '<br><span style="font-size:14px">Bu hafta: <b>' + fmt(L.hp) + "</b> turnuva puanı</span></div>";
+    h += '<div class="ar-kt"><h4>Ligler</h4><div style="font-size:14px;line-height:1.7">' + LIGLER.map(function (x, i) {
+      return i === Math.floor(L.lig / 3) ? "<b>" + x + "</b>" : x;
+    }).join(" › ") + '</div><div style="font-size:12px;color:#8e9bc4">Her lig ★ · ★★ · ★★★ olarak 3 kademedir.</div></div>';
+    h += '<div class="ar-kt"><h4>Sezon kuralları</h4>' +
+      '<div class="ar-mc"><span>🟢 İlk %' + Math.round(YUKSELME * 100) + '</span><span>Üst kademeye çıkar</span></div>' +
+      '<div class="ar-mc"><span>⚪ Ortadakiler</span><span>Yerinde kalır</span></div>' +
+      '<div class="ar-mc"><span>🔴 Son %' + Math.round((1 - DUSME) * 100) + '</span><span>Alt kademeye düşer</span></div>' +
+      '<div style="font-size:12px;color:#8e9bc4">Sezon her Pazartesi 00:00\'da (TSİ) biter. Puan almayan oyuncu yer değiştirmez; ligde en az ' + MIN_GRUP + ' puanlı oyuncu yoksa kimse yer değiştirmez.</div></div>';
+    h += "<h4 style=\"margin:10px 2px 6px\">Bu haftaki " + esc(ligAd(L.lig)) + " sıralaması</h4>";
+    if (!n) h += '<div class="ar-bos">Bu hafta bu ligde henüz puan alan yok. Düello ya da turnuva oyna!</div>';
+    ligGrup.forEach(function (x, i) {
+      var me = x.uid === uid, oran = (i + 1) / n, bolge = n >= MIN_GRUP ? (oran <= YUKSELME && L.lig < LIG_MAX ? " yuk" : oran > DUSME && L.lig > 0 ? " dus" : "") : "";
+      h += '<div class="ar-sr' + (me ? " me" : bolge) + '"><span class="ar-no">' + (i + 1) + '</span><span class="ar-ad">' + esc(x.ad) + (me ? " (sen)" : "") + '</span><span class="ar-pu">' + fmt(me ? L.hp : x.p) + "</span></div>";
+    });
+    return h;
+  }
   function htmlPuan() {
-    var h = '<div class="ar-ben">Toplam puan: <b>⭐ ' + fmt(Puan.toplam()) + "</b>" + (benYazi ? " &nbsp;·&nbsp; Sıran: <b>" + esc(benYazi) + "</b>" : "") + "</div>";
+    var h = '<div class="ar-ben">Genel puan: <b>⭐ ' + fmt(Puan.toplam()) + "</b>" + (benYazi ? " &nbsp;·&nbsp; Sıran: <b>" + esc(benYazi) + "</b>" : "") + '<br><span style="font-size:14px">Turnuva puanı: <b>🏅 ' + fmt(L.tp) + "</b> &nbsp;·&nbsp; " + esc(ligAd(L.lig)) + "</span></div>";
     h += '<table class="ar-tb"><tr><th>Oyun</th><th>El</th><th>Puan/el</th><th>Kat</th><th>Puan</th></tr>';
     for (var o in Puan.tablo) {
       var t = Puan.tablo[o];
@@ -593,7 +720,7 @@
     if (!db) return '<div class="ar-bos">Turnuva için firebase-config.js doldurulmalı.</div>';
     if (t) {
       var ids = Object.keys(t.oyuncular || {}), m = t.maclar || {};
-      h += '<div class="ar-kt"><h4>🏆 Turnuvan · ' + esc(oyunAd(t.oyun)) + '</h4><div>Durum: <b>' + (t.durum === "bekliyor" ? "Oyuncu bekleniyor (" + ids.length + "/" + TURNUVA_KISI + ")" : t.durum === "bitti" ? "Bitti" : "Devam ediyor") + "</b></div>";
+      h += '<div class="ar-kt"><h4>' + (t.sampiyonlar ? "👑 Şampiyonlar Turnuvası" : "🏆 Turnuvan") + ' · ' + esc(oyunAd(t.oyun)) + '</h4><div>Durum: <b>' + (t.durum === "bekliyor" ? "Oyuncu bekleniyor (" + ids.length + "/" + TURNUVA_KISI + ")" : t.durum === "bitti" ? "Bitti" : "Devam ediyor") + "</b></div>";
       if (t.durum === "bekliyor") h += "<div>" + ids.map(function (u) { return esc(tAd(t, u)); }).join(", ") + "</div>";
       h += "</div>";
       [["y1", "Yarı final 1"], ["y2", "Yarı final 2"], ["f", "Final"]].forEach(function (p) {
@@ -609,11 +736,14 @@
       h += '<button class="ar-bt gri" data-act="ayril">' + (t.durum === "bekliyor" ? "Turnuvadan ayrıl" : "Turnuva ekranını kapat") + "</button>";
       return h;
     }
+    h += '<div class="ar-ben">🏆 Turnuva zaferin: <b>' + fmt(L.tz) + "</b> &nbsp;·&nbsp; 🏅 " + fmt(L.tp) + " turnuva puanı</div>";
     h += '<button class="ar-bt" data-act="ac">➕ Turnuva Aç (' + TURNUVA_KISI + ' kişilik)</button>';
+    h += '<button class="ar-bt ' + (L.tz > 0 ? "kirmizi" : "gri") + '" data-act="acS">👑 Şampiyonlar Turnuvası Aç</button>';
+    if (!(L.tz > 0)) h += '<div class="ar-bos" style="padding:0 8px 8px;font-size:12px">Şampiyonlar Turnuvası\'na sadece en az bir turnuva kazanmış oyuncular katılabilir.</div>';
     if (!turnuvaListe.length) h += '<div class="ar-bos">Şu an açık turnuva yok. Bir tane aç, arkadaşların katılsın!</div>';
     turnuvaListe.forEach(function (x) {
       var n = Object.keys(x.v.oyuncular || {}).length;
-      h += '<div class="ar-kt"><h4>' + esc(oyunAd(x.v.oyun)) + " turnuvası</h4><div>" + esc(tAd(x.v, x.v.olusturan)) + " açtı · " + n + "/" + TURNUVA_KISI + '</div><button class="ar-bt" data-act="katil" data-id="' + esc(x.id) + '">Katıl</button></div>';
+      h += '<div class="ar-kt"><h4>' + (x.v.sampiyonlar ? "👑 Şampiyonlar Turnuvası · " : "") + esc(oyunAd(x.v.oyun)) + " turnuvası</h4><div>" + esc(tAd(x.v, x.v.olusturan)) + " açtı · " + n + "/" + TURNUVA_KISI + '</div><button class="ar-bt" data-act="katil" data-id="' + esc(x.id) + '">Katıl</button></div>';
     });
     return h;
   }

@@ -5,7 +5,8 @@
         "users": {
           ".read": "auth != null",
           ".indexOn": [
-            "puan"
+            "puan",
+            "tp"
           ],
           "$uid": {
             ".write": "auth != null && auth.uid === $uid",
@@ -15,6 +16,15 @@
             },
             "puan": {
               ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() < 100000000"
+            },
+            "tp": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() < 100000000"
+            },
+            "tz": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() < 100000"
+            },
+            "lig": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 14"
             }
           }
         },
@@ -86,6 +96,27 @@
               ".read": "auth != null && auth.uid === $uid",
               ".write": "auth != null && auth.uid === $uid && !data.exists()",
               ".validate": "$hafta.matches(/^[0-9]{8}$/) && newData.val() === true"
+            }
+          }
+        },
+        "haftaOyun": {
+          ".read": "auth != null",
+          "$hafta": {
+            ".write": "auth != null",
+            ".validate": "$hafta.matches(/^[0-9]{8}$/) && newData.isNumber() && newData.val() === (data.exists() ? data.val() + 1 : 1)"
+          }
+        },
+        "ligPuan": {
+          ".read": "auth != null",
+          "$hafta": {
+            "$lig": {
+              ".indexOn": [
+                "p"
+              ],
+              "$uid": {
+                ".write": "auth != null && auth.uid === $uid",
+                ".validate": "newData.hasChildren(['ad','p']) && newData.child('p').isNumber() && newData.child('p').val() >= 0 && newData.child('p').val() < 1000000 && newData.child('ad').isString() && newData.child('ad').val().length <= 18"
+              }
             }
           }
         }
