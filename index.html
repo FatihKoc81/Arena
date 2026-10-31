@@ -40,7 +40,7 @@
 <section class="kart hidden" id="son">
 <h2 id="sBaslik"></h2>
 <p class="alt" id="sMetin"></p>
-<button class="btn hidden" id="sReklam">📺 Reklam izle, devam et</button>
+<button class="btn hidden" id="sReklam">📺 Reklam izle, Devam et</button>
 <button class="btn" id="sDevam"></button>
 <button class="btn ikinci" id="sMenu">Ana menü</button>
 </section>
@@ -173,7 +173,7 @@ function bitir(kazandi) {
     const reklamVar = !!window.Capacitor && typeof window.cemberReklam === "function";
     $("sReklam").classList.toggle("hidden", !reklamVar);
     $("sReklam").disabled = false;
-    $("sReklam").textContent = "📺 Reklam izle, devam et";
+    $("sReklam").textContent = "📺 Reklam izle, Devam et";
     $("sDevam").classList.toggle("ikinci", reklamVar);
     if (reklamVar) {
       $("sMetin").textContent = "Seviye " + st.seviye + " tamamlanamadı. Reklam izleyip kaldığın sorudan devam edebilir ya da yeni sorularla baştan başlayabilirsin.";
@@ -209,7 +209,7 @@ $("sReklam").onclick = () => {
   b.textContent = "Reklam yükleniyor...";
   window.cemberReklam("odul", ok => {
     b.disabled = false;
-    b.textContent = "📺 Reklam izle, devam et";
+    b.textContent = "📺 Reklam izle, Devam et";
     if (!ok) {
       $("sMetin").textContent = "Reklam tamamlanamadı, devam hakkı verilmedi. Baştan başlayabilirsin.";
       return;
