@@ -150,6 +150,7 @@
   const oyun = document.getElementById("oyun");
   if (!oyun) return;
   const KAYMA_ORAN = 0.6; // kelimelerim.js içindeki değerle aynı olmalı
+  const YUKARI = 14;      // kartı bu kadar piksel yukarı alır (alt çizgi ekranda kesilmesin); İşlem Oyunu'nda da aynı değer çıkarılmalı
 
   function kaydir() {
     if (oyun.classList.contains("hidden")) { oyun.style.top = ""; return; }
@@ -159,7 +160,7 @@
     if (!ref || !ref.offsetHeight) return;
     const kayma = Math.round((ref.offsetHeight + (parseFloat(getComputedStyle(ref).marginTop) || 0)) * KAYMA_ORAN);
     if (getComputedStyle(oyun).position === "static") oyun.style.position = "relative";
-    oyun.style.top = kayma + "px";
+    oyun.style.top = (kayma - YUKARI) + "px";
   }
   new MutationObserver(kaydir).observe(oyun, { attributes: true, attributeFilter: ["class"] });
   window.addEventListener("resize", kaydir);
