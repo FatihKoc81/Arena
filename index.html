@@ -7,7 +7,7 @@
 <meta name="supported-color-schemes" content="light">
 <style>:root,html,body,#cm{color-scheme:only light!important}</style>
 <script>window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();});</script>
-<title>Beyin Fırtınası</title>
+<title>Bilgi Arenası</title>
 <link rel="stylesheet" href="style.css">
 <style id="acilisGizle">#ana{visibility:hidden}</style><!-- ana menü, butonlar tamamlanana kadar gizli (eski başlangıç ekranı görünmesin) -->
 <link rel="manifest" href="manifest.json">
@@ -16,7 +16,7 @@
 <link rel="apple-touch-icon" href="icon-192.png?v=3">
 </head>
 <body>
-<h1>⚡ BEYİN FIRTINASI</h1>
+<h1>🏆 BİLGİ ARENASI</h1>
 
 <main class="kart" id="ana">
 <div class="pill" id="seviye">Seviye 1</div>
@@ -72,11 +72,12 @@ function seviyeSorulari(seri, seviye) {
 }
 </script>
 <script>
-const KEY = "beyinFirtinasi";
+const KEY = "bilgiArenasi";
 const $ = id => document.getElementById(id);
 let st = { seviye: 1, seri: 0 };
 try { st = JSON.parse(localStorage.getItem(KEY)) || st; } catch (e) {}
 if (typeof st.seri !== "number") st.seri = 0;
+if (typeof st.puan !== "number") st.puan = 0; // doğru cevap başına +10 puan
 if (typeof st.biten !== "number") st.biten = 0; // tamamlanan bölüm sayısı
 if (typeof st.bonus !== "number") st.bonus = 0; // her 3 bölümde kazanılan, sonraki bölüme taşınan can
 const kaydet = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} };
@@ -159,7 +160,7 @@ function cevapla(i) {
 
   kilit = true;
   butonlar[dogru].classList.add("dogru");
-  if (i === dogru) return void setTimeout(sonraki, 900);
+  if (i === dogru) { st.puan += 10; kaydet(); Ekonomi.barYaz(); return void setTimeout(sonraki, 900); }
   butonlar[i].classList.add("yanlis");
   setTimeout(yanlisCan, 1300);
 }
@@ -206,7 +207,7 @@ function kayipSor() {
       if (Ekonomi.altin() >= KAYIP_BEDEL) { Ekonomi.ekle(-KAYIP_BEDEL); devamEt(CAN_MAX); }
       else Ekonomi.dukkan(kayipSor, "Altının yetmiyor");
     } },
-    { t: "📺 Reklam izle, 1 can kazan", c: "alt", f: () => {
+    { h: '<span class="ek-chip">📺</span>Can kazan', c: "alt", f: () => {
       Ekonomi.reklam("odul", ok => { if (ok) devamEt(1); else kayipSor(); });
     } },
     { t: alt ? "⬇️ Bir alt bölümden başla" : "🔄 Bölümü baştan başla", c: "gri", f: altBolum },
@@ -273,7 +274,8 @@ $("jCift").onclick = () => {
 $("sMenu").onclick = menu;
 const seviyeYazi = () => "🏁 Seviye " + Math.min(st.seviye, SEVIYE_SAYISI);
 Ekonomi.bar($("ana"), seviyeYazi, "in");
-Ekonomi.bar($("oyun"), seviyeYazi, "in");
+Ekonomi.bar($("oyun"), seviyeYazi, "in", true); // oyun kartında sadece isim + seviye
+Ekonomi.dock($("oyun"), () => st.puan); // ekranın altı: altın/satın alma, premium, puan
 menu();
 </script>
 
@@ -288,7 +290,7 @@ menu();
 // Sayfa kaymasın (menü, oyun, sonuç ekranları) + sol alta APK indirme / güncelleme butonu
 // Tarayıcıda "⬇ APK", uygulamanın içinde aynı yerde "⬇ Güncelle" yazar.
 (function () {
-  var APK_ADRES = "https://github.com/FatihKoc81/BeyinFirtinasi/releases/latest/download/BeyinFirtinasi.apk"; // her derlemede otomatik güncellenir
+  var APK_ADRES = "https://github.com/FatihKoc81/BilgiArenasi/releases/latest/download/BilgiArenasi.apk"; // her derlemede otomatik güncellenir
   var apkUygulamasi = !!window.Capacitor;
   var uygulamaIci = !!(apkUygulamasi || (window.matchMedia && matchMedia("(display-mode: standalone)").matches));
   var stl = document.createElement("style");

@@ -37,10 +37,20 @@
     ".ek-bp{all:unset;display:block;box-sizing:border-box;background:rgba(10,24,64,.72);border:2px solid rgba(255,255,255,.35);border-radius:999px;padding:7px 12px;font:700 15px/1.2 system-ui,sans-serif;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;cursor:pointer}" +
     "div.ek-bp{cursor:default}" +
     ".ek-bp.ad{flex:1 1 auto;max-width:42%}" +
-    ".ek-bp.g{border-color:#ffb300;color:#ffe27a}";
+    ".ek-bp.g{border-color:#ffb300;color:#ffe27a}" +
+    ".ek-bar.az .ek-bp{flex:1 1 0;max-width:none;text-align:center}" +
+    ".ek-bar.az .ek-bp.ad{max-width:none}" +
+    ".ek-dock{position:fixed;left:0;right:0;bottom:0;z-index:50;display:none;gap:8px;box-sizing:border-box;padding:14px 12px calc(8px + env(safe-area-inset-bottom,0px));background:linear-gradient(rgba(8,12,32,0),rgba(8,12,32,.92) 38%)}" +
+    ".ek-dock.show{display:flex}" +
+    ".ek-dk{all:unset;box-sizing:border-box;flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:6px 4px;background:rgba(10,24,64,.85);border:2px solid rgba(255,255,255,.3);border-radius:14px;color:#fff;font-family:system-ui,sans-serif;text-align:center;cursor:pointer}" +
+    ".ek-dk b{display:block;max-width:100%;font-size:15px;font-weight:800;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}" +
+    ".ek-dk i{display:block;font-style:normal;font-size:11px;font-weight:600;opacity:.8;line-height:1.2}" +
+    ".ek-dk.g{border-color:#ffb300;color:#ffe27a}" +
+    ".ek-dk.p.on{border-color:#c79bff;color:#e6d2ff}" +
+    "div.ek-dk{cursor:default}";
   document.head.appendChild(css);
 
-  var ov = null, adEl = null, adT = null, barlar = [];
+  var ov = null, adEl = null, adT = null, barlar = [], docklar = [];
   function mk(c) { var d = document.createElement("div"); d.className = c; document.body.appendChild(d); return d; }
   function ensure() { if (!ov) { ov = mk("ek-ov"); adEl = mk("ek-ov ek-ad"); } }
 
@@ -50,6 +60,9 @@
     ov.innerHTML = '<div class="ek-dlg"><h3></h3><div class="ek-msg"></div><div class="ek-o"></div></div>';
     ov.querySelector("h3").textContent = baslik;
     ov.querySelector(".ek-msg").innerHTML = mesaj;
+    // uzun yazı pencereyi taşırıp kaydırmasın: yazı uzadıkça küçülür
+    var mEl = ov.querySelector(".ek-msg"), uz = mEl.textContent.length;
+    if (uz > 70) { mEl.style.fontSize = uz > 120 ? "13.5px" : uz > 95 ? "14.5px" : "15.5px"; mEl.style.lineHeight = "1.25"; }
     var kap = ov.querySelector(".ek-o");
     ops.forEach(function (o) {
       var b = document.createElement("button");
@@ -125,22 +138,55 @@
     barYaz();
   }
   function yaz1(o) {
-    o.el.innerHTML = '<button class="ek-bp ad"></button><button class="ek-bp g"></button>' + (o.fn ? '<div class="ek-bp"></div>' : "");
+    var g = !o.az; // az: altın bu çubukta gösterilmez (alt bölümde ayrı gösterilir)
+    o.el.innerHTML = '<button class="ek-bp ad"></button>' + (g ? '<button class="ek-bp g"></button>' : "") + (o.fn ? '<div class="ek-bp"></div>' : "");
     var bt = o.el.querySelectorAll("button");
     bt[0].textContent = "👤 " + kullanici + (premium ? " 👑" : ""); bt[0].onclick = adDegistir;
-    bt[1].textContent = "🪙 " + altin + " ＋"; bt[1].onclick = function () { dukkan(); };
+    if (g) { bt[1].textContent = "🪙 " + altin + " ＋"; bt[1].onclick = function () { dukkan(); }; }
     if (o.fn) o.el.querySelector("div.ek-bp").textContent = o.fn();
   }
-  function barYaz() { barlar.forEach(yaz1); }
-  function bar(parent, fn, cls) {
-    var el = document.createElement("div"); el.className = "ek-bar " + (cls || "");
+  function barYaz() { barlar.forEach(yaz1); docklar.forEach(dockYaz); }
+  function bar(parent, fn, cls, az) {
+    var el = document.createElement("div"); el.className = "ek-bar " + (cls || "") + (az ? " az" : "");
     parent.appendChild(el);
-    var o = { el: el, fn: fn }; barlar.push(o); yaz1(o);
+    var o = { el: el, fn: fn, az: !!az }; barlar.push(o); yaz1(o);
+    return el;
+  }
+
+  // Alt bölüm (ekranın altına sabit): altın + satın alma, premium, puan. el görünürken açılır.
+  function premiumTikla() {
+    var tamam = [{ t: "Tamam", c: "gri", f: function () {} }];
+    if (premium) { sor("👑 Premium", "Premium üyeliğin aktif: ara reklam yok.", tamam); return; }
+    satinAl(PREMIUM_URUN, function () {
+      premium = true; try { localStorage.setItem(UYG + "cemberPremium", "1"); } catch (e) {}
+      barYaz(); sor("👑 Premium aktif!", "Ara reklamlar artık kapalı.", tamam);
+    });
+  }
+  function dockYaz(o) {
+    var b = o.el.querySelectorAll(".ek-dk");
+    b[0].firstChild.textContent = "🪙 " + altin;
+    b[1].firstChild.textContent = "👑 Premium"; b[1].lastChild.textContent = premium ? "Aktif ✓" : PREMIUM_URUN.f;
+    b[1].classList.toggle("on", premium);
+    b[2].firstChild.textContent = "⭐ " + (o.puan ? o.puan() : 0);
+  }
+  function dock(izle, puanFn) {
+    var el = document.createElement("div"); el.className = "ek-dock";
+    el.innerHTML = '<button class="ek-dk g"><b></b><i>🛒 Altın Al</i></button>' +
+      '<button class="ek-dk p"><b></b><i></i></button>' +
+      '<div class="ek-dk s"><b></b><i>Puan</i></div>';
+    document.body.appendChild(el);
+    var bt = el.querySelectorAll("button");
+    bt[0].onclick = function () { dukkan(); };
+    bt[1].onclick = premiumTikla;
+    var o = { el: el, puan: puanFn }; docklar.push(o); dockYaz(o);
+    function g() { el.classList.toggle("show", !izle.classList.contains("hidden")); }
+    new MutationObserver(g).observe(izle, { attributes: true, attributeFilter: ["class"] });
+    g();
     return el;
   }
 
   window.Ekonomi = {
     UYG: UYG, reklam: reklam, sor: sor, sorKapat: sorKapat, kapat: kapat, dukkan: dukkan, ekle: ekle,
-    altin: function () { return altin; }, premium: function () { return premium; }, bar: bar, barYaz: barYaz
+    altin: function () { return altin; }, premium: function () { return premium; }, bar: bar, dock: dock, barYaz: barYaz
   };
 })();
