@@ -150,21 +150,33 @@
   const oyun = document.getElementById("oyun");
   if (!oyun) return;
   const KAYMA_ORAN = 0.6; // kelimelerim.js içindeki değerle aynı olmalı
-  const YUKARI = 14;      // kartı bu kadar piksel yukarı alır (alt çizgi ekranda kesilmesin); İşlem Oyunu'nda da aynı değer çıkarılmalı
+  const YUKARI = 0;       // kartı bu kadar piksel yukarı alır (alt çizgi ekranda kesilmesin); İşlem Oyunu'nda da aynı değer çıkarılmalı
 
   function kaydir() {
-    if (oyun.classList.contains("hidden")) { oyun.style.top = ""; return; }
+    if (oyun.classList.contains("hidden")) { oyun.style.top = ""; oyun.style.minHeight = ""; delete oyun.dataset.sik; return; }
     // Ölçü: "Ana Menü" düğmesi, İşlem Oyunu'ndaki "Yeni Tur" ile aynı .btn.ikinci stilinde
     let ref = null;
     oyun.querySelectorAll("button.btn.ikinci").forEach(b => { if (/Ana Menü/.test(b.textContent)) ref = b; });
     if (!ref || !ref.offsetHeight) return;
     const kayma = Math.round((ref.offsetHeight + (parseFloat(getComputedStyle(ref).marginTop) || 0)) * KAYMA_ORAN);
     if (getComputedStyle(oyun).position === "static") oyun.style.position = "relative";
-    oyun.style.top = (kayma - YUKARI) + "px";
+    // İşlem Oyunu ile aynı: üst çizgi aynı, alt çizgi ekranın 12 px üstünde. Sığmazsa boşluklar sıkılaşır.
+    delete oyun.dataset.sik;
+    oyun.style.top = "0px"; oyun.style.minHeight = "";
+    const ust = oyun.getBoundingClientRect().top + window.scrollY, at = kayma - YUKARI, alt = window.innerHeight - 12;
+    oyun.style.top = at + "px";
+    oyun.style.minHeight = Math.max(300, alt - ust - at) + "px";
+    if (oyun.getBoundingClientRect().bottom > alt + 1) oyun.dataset.sik = "1";
   }
-  new MutationObserver(kaydir).observe(oyun, { attributes: true, attributeFilter: ["class"] });
-  window.addEventListener("resize", kaydir);
-  kaydir();
+  const css = document.createElement("style");
+  css.textContent = "#oyun{display:flex;flex-direction:column}#oyun>.btn.ikinci{margin-top:auto!important}#oyun>*:has(+ .btn.ikinci){margin-bottom:12px}" +
+    "#oyun[data-sik] .sec{padding-top:6px!important;padding-bottom:6px!important}#oyun[data-sik] .jokerler{margin-top:6px}";
+  document.head.appendChild(css);
+  const kay2 = () => { kaydir(); setTimeout(kaydir, 350); };
+  new MutationObserver(kay2).observe(oyun, { attributes: true, attributeFilter: ["class"] });
+  window.addEventListener("resize", kay2);
+  window.addEventListener("load", kay2);
+  kay2();
 })();
 
 // MİLYONER SORU METNİ: satırlar dengeli olsun, alt satır üst satırdan uzun olmasın
@@ -229,6 +241,7 @@
 
   const MAX_SATIR = 3; // soru alanı hep bu kadar satır yüksekliğinde olur: kartın alt çizgisi her soruda aynı yerde kalır
   function uygula() {
+    if (typeof soruYaz === "function") return; // soru yazısını artık index.html'deki soruYaz() düzenliyor
     if (oyun.classList.contains("hidden")) return;
     const s = soruElemani();
     if (!s) return;

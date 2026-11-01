@@ -9,7 +9,7 @@
   var APP = window.ARENA_APP || "arena";
   var GUN15 = 15 * 24 * 3600 * 1000;
   var REZERVE = ["fk1453", "fatih", "fatih_", "fatihkoc81", "fatihkoc7", "estergon", "hatice", "haticekoc81", "haticekoc1", "haticekoc7"];
-  var kayit = null, hesapRef = null, el = null, sekme = "kayit", msg = "", msgOk = false, busy = false;
+  var ayar = false, kayit = null, hesapRef = null, el = null, sekme = "kayit", msg = "", msgOk = false, busy = false;
 
   function noop() {}
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
@@ -144,7 +144,10 @@
     ".hs-bt{display:block;width:100%;border:0;border-radius:14px;padding:13px;margin:8px 0;font:800 16px system-ui,sans-serif;color:#fff;background:#3b5bd6;cursor:pointer}.hs-bt.gri{background:#6b7280}.hs-bt.kirmizi{background:#a3231c}.hs-bt[disabled]{opacity:.4}" +
     ".hs-s{margin:6px 0;font-size:15px;word-break:break-all}.hs-k{font-size:12.5px;color:#8e9bc4;line-height:1.45;margin:6px 0}" +
     ".hs-msg{background:#3a1212;border:1px solid #a3231c;border-radius:12px;padding:9px 11px;margin-bottom:10px;font-size:14px;line-height:1.4}.hs-msg.ok{background:#0f2e17;border-color:#2fb81a}" +
-    ".hs-l{background:none;border:0;color:#7d97ff;font:600 14px system-ui,sans-serif;padding:6px 0;cursor:pointer;text-decoration:underline}";
+    ".hs-l{background:none;border:0;color:#7d97ff;font:600 14px system-ui,sans-serif;padding:6px 0;cursor:pointer;text-decoration:underline}" +
+    ".hs-pf{text-align:center;margin:4px 0 10px}.hs-av{width:72px;height:72px;border-radius:50%;margin:0 auto 8px;background:linear-gradient(#f2b92e,#a86f0c);color:#101a38;font:900 34px/72px system-ui,sans-serif}.hs-pn{font-size:22px;font-weight:800}" +
+    ".hs-top{background:#0b1230;border:2px solid #f2b92e;border-radius:14px;padding:11px;text-align:center;font-size:16px;margin:8px 0}.hs-top b{font-size:24px;color:#ffd35a;margin-left:6px}" +
+    ".hs-r{display:flex;justify-content:space-between;padding:8px 4px;border-bottom:1px solid #1d2540;font-size:15px}.hs-r b{color:#ffd35a}";
   document.head.appendChild(css);
 
   var KURAL = "3-18 karakter · ilk harf büyük · ilk harften sonra en fazla 1 büyük harf daha · sadece a-z, 0-9 ve _ (Türkçe karakter yok) · herkesin adı farklı olur · 15 günde bir değişir.";
@@ -167,7 +170,18 @@
     }
     return h;
   }
-  function hesapHtml(u) {
+  function hesapHtml(u) { return ayar ? '<button class="hs-l" data-hs="profil">← Profile dön</button>' + ayarHtml(u) : profilHtml(u); }
+  function profilHtml(u) {
+    var ad = kayit && kayit.ad ? kayit.ad : "Oyuncu", P = window.Puan, satir = "";
+    if (P) Object.keys(P.tablo).map(function (o) { return { ad: P.tablo[o].ad, p: P.oyunPuani(o) }; })
+      .sort(function (a, b) { return b.p - a.p; })
+      .forEach(function (x) { satir += '<div class="hs-r"><span>' + esc(x.ad) + "</span><b>" + x.p + "</b></div>"; });
+    return '<div class="hs-pf"><div class="hs-av">' + esc(ad.charAt(0).toLocaleUpperCase("tr")) + '</div><div class="hs-pn">' + esc(ad) + "</div>" +
+      '<div class="hs-k">📧 ' + esc(u.email) + " " + (u.emailVerified ? "✓ doğrulandı" : "(doğrulanmadı)") + "</div></div>" +
+      '<div class="hs-top">⭐ Toplam puan <b>' + (P ? P.toplam() : 0) + "</b></div>" + satir +
+      '<button class="hs-bt gri" data-hs="ayar">⚙️ Hesap ayarları</button>';
+  }
+  function ayarHtml(u) {
     var h = '<div class="hs-s">📧 <b>' + esc(u.email) + "</b> " + (u.emailVerified ? "✓ doğrulandı" : "(doğrulanmadı)") + "</div>" +
       '<div class="hs-s">👤 Kullanıcı adın: <b>' + esc(kayit && kayit.ad ? kayit.ad : "henüz seçilmedi") + "</b></div>";
     if (!u.emailVerified) h += '<button class="hs-bt gri" data-hs="dogrula-gonder">Doğrulama mailini tekrar gönder</button><button class="hs-bt gri" data-hs="dogrula-kontrol">Doğruladım, kontrol et</button>';
@@ -198,7 +212,9 @@
   function tikla(e) {
     var b = e.target.closest("[data-hs]"); if (!b) return;
     var a = b.getAttribute("data-hs"), u = A.currentUser;
-    if (a === "sekme-kayit") { sekme = "kayit"; msg = ""; render(); }
+    if (a === "ayar") { ayar = true; msg = ""; render(); }
+    else if (a === "profil") { ayar = false; msg = ""; render(); }
+    else if (a === "sekme-kayit") { sekme = "kayit"; msg = ""; render(); }
     else if (a === "sekme-giris") { sekme = "giris"; msg = ""; render(); }
     else if (a === "kayit") isle(kayitOl(val("hs-e").trim(), val("hs-p"), val("hs-a").trim()).then(function () { render(); }));
     else if (a === "giris") isle(girisYap(val("hs-e").trim(), val("hs-p")));
@@ -224,12 +240,12 @@
   function ac() {
     if (!el) {
       el = document.createElement("div"); el.className = "hs-ov";
-      el.innerHTML = '<div class="hs-kt"><div class="hs-ph"><b>👤 Hesap</b><button class="hs-x">✕</button></div><div class="hs-body"></div></div>';
+      el.innerHTML = '<div class="hs-kt"><div class="hs-ph"><b>👤 Profil</b><button class="hs-x">✕</button></div><div class="hs-body"></div></div>';
       document.body.appendChild(el);
       el.querySelector(".hs-x").onclick = function () { el.classList.remove("show"); };
       el.querySelector(".hs-body").addEventListener("click", tikla);
     }
-    msg = ""; el.classList.add("show"); render();
+    msg = ""; ayar = false; el.classList.add("show"); render();
   }
 
 
