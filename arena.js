@@ -248,6 +248,8 @@
     });
     // gelen davetler
     kok.child("invites/" + uid).on("child_added", davetGeldi);
+    istekDinle();
+    pushKur();
     // Meydan Oku eşleşmesi
     kok.child("meydan/eslesme/" + uid).on("value", function (s) {
       var id = s.val(); if (!id) return;
@@ -389,6 +391,134 @@
       { t: "Reddet", c: "gri", f: function () { s.ref.update({ durum: "red" }); } }
     ], DAVET_SN);
     s.ref.on("value", function (x) { if (!x.exists()) { s.ref.off(); kapat(); } });
+  }
+
+
+  // ---------- 48 SAAT GEÇERLİ İSTEKLER (çevrimdışı oyunculara da atılır, telefona bildirim gider) ----------
+  var ISTEK_MS = 48 * 3600 * 1000;
+  var istekGelen = {}, istekGiden = {}, istekGosterildi = {}, pushHazir = false;
+  function istekSure(v) { return !v || !v.bitis || simdi() > v.bitis; }
+  function istekKalan(v) { var h = Math.floor((v.bitis - simdi()) / 3600000); return h >= 1 ? h + " sa kaldı" : "1 saatten az kaldı"; }
+  function istekSec(hedef, hedefAd) {
+    if (!cevrimici(true)) return;
+    bildirimIzni();
+    var ops = [{ t: "🎲 Fark etmez (o seçsin)", f: function () { istekGonder(hedef, hedefAd, ""); } }];
+    Object.keys(OYUN).forEach(function (id) { ops.push({ t: oyunAd(id), f: function () { istekGonder(hedef, hedefAd, id); } }); });
+    ops.push({ t: "Vazgeç", c: "gri", f: function () {} });
+    Ekonomi.sor("📨 " + hedefAd, "İstek 48 saat geçerli. Kabul ederse sana haber gelir.", ops);
+  }
+  function istekGonder(hedef, hedefAd, oyun) {
+    var o = { from: uid, fromAd: adim(), to: hedef, toAd: hedefAd, oyun: oyun || "", oyunAd: oyun ? oyunAd(oyun) : "", durum: "bekliyor", t: ts(), bitis: simdi() + ISTEK_MS };
+    kok.child("istekler/" + uid + "_" + hedef).set(o).then(function () {
+      toast("📨 " + esc(hedefAd) + " kişisine istek gönderildi (48 saat geçerli)");
+    }).catch(function () { toast("İstek gönderilemedi, tekrar dene."); });
+  }
+  function istekKabul(k, v) {
+    if (!v) return;
+    if (istekSure(v)) { toast("İsteğin süresi dolmuş."); return; }
+    var ref = kok.child("istekler/" + k);
+    function bitir(oyun) {
+      ref.update({ durum: "kabul", oyun: oyun, oyunAd: oyunAd(oyun) }).then(function () {
+        toast("✅ Kabul ettin. " + esc(v.fromAd) + " onaylayınca oyun başlayacak.");
+      }).catch(function () { toast("Kabul edilemedi, tekrar dene."); });
+    }
+    if (v.oyun && OYUN[v.oyun]) bitir(v.oyun); else oyunSec("🎲 " + v.fromAd, bitir);
+  }
+  function istekSor(k, v) {
+    var ref = kok.child("istekler/" + k);
+    afis("📨 <b>" + esc(v.fromAd) + "</b> seni " + (v.oyun && OYUN[v.oyun] ? "<b>" + esc(oyunAd(v.oyun)) + "</b> oynamaya" : "oyuna") + " çağırıyor!<br><small>" + istekKalan(v) + "</small>", [
+      { t: "✅ Kabul", f: function () { istekKabul(k, v); } },
+      { t: "Reddet", c: "gri", f: function () { ref.update({ durum: "red" }); } }
+    ], 25);
+  }
+  function istekBaslat(k, v) {
+    if (!v || !OYUN[v.oyun]) { toast("Oyun bulunamadı."); return; }
+    var ref = kok.child("istekler/" + k);
+    duelOlustur(v.oyun, { uid: v.from, ad: v.fromAd }, { uid: v.to, ad: v.toAd }).then(function (id) {
+      ref.update({ durum: "basla", duel: id, baslaT: ts() });
+      duelAc(id);
+    }).catch(function () { toast("Başlatılamadı, tekrar dene."); });
+  }
+  function istekGelenIsle(s) {
+    var v = s.val(), k = s.key;
+    if (!v) { delete istekGelen[k]; yenile(); return; }
+    if (istekSure(v) || v.durum === "red" || v.durum === "iptal" || (v.durum === "basla" && simdi() - (v.baslaT || 0) > 10 * 60000)) {
+      s.ref.remove().catch(function () {}); delete istekGelen[k]; yenile(); return;
+    }
+    istekGelen[k] = v; yenile();
+    var an = k + ":" + v.durum;
+    if (istekGosterildi[an]) return;
+    istekGosterildi[an] = 1;
+    if (v.durum === "bekliyor") {
+      bildirim("📨 " + v.fromAd, "seni oyuna çağırıyor");
+      istekSor(k, v);
+    } else if (v.durum === "basla" && v.duel) {
+      bildirim("▶ " + v.fromAd, "Oyun başlıyor, katıl!");
+      afis("▶ <b>" + esc(v.fromAd) + "</b> oyunu başlattı!", [
+        { t: "▶ Katıl", f: function () { s.ref.remove().catch(function () {}); duelAc(v.duel); } },
+        { t: "Sonra", c: "gri", f: function () {} }
+      ], 60);
+    }
+  }
+  function istekGidenIsle(s) {
+    var v = s.val(), k = s.key;
+    if (!v) { delete istekGiden[k]; yenile(); return; }
+    if (istekSure(v) || v.durum === "iptal") { s.ref.remove().catch(function () {}); delete istekGiden[k]; yenile(); return; }
+    if (v.durum === "red") {
+      s.ref.remove().catch(function () {}); delete istekGiden[k]; yenile();
+      toast("❌ " + esc(v.toAd) + " isteği reddetti"); return;
+    }
+    if (v.durum === "basla") { delete istekGiden[k]; yenile(); return; }
+    istekGiden[k] = v; yenile();
+    var an = k + ":" + v.durum;
+    if (v.durum === "kabul" && !istekGosterildi[an]) {
+      istekGosterildi[an] = 1;
+      bildirim("✅ " + v.toAd, "isteğini kabul etti. Hazırsan oyunu başlat!");
+      afis("✅ <b>" + esc(v.toAd) + "</b> isteğini kabul etti!<br><b>" + esc(v.oyunAd || oyunAd(v.oyun)) + "</b> — başlayalım mı?", [
+        { t: "▶ Başla", f: function () { istekBaslat(k, v); } },
+        { t: "Sonra", c: "gri", f: function () {} }
+      ], 60);
+    }
+  }
+  function istekDinle() {
+    var g = kok.child("istekler").orderByChild("to").equalTo(uid);
+    g.on("child_added", istekGelenIsle); g.on("child_changed", istekGelenIsle);
+    g.on("child_removed", function (s) { delete istekGelen[s.key]; yenile(); });
+    var d = kok.child("istekler").orderByChild("from").equalTo(uid);
+    d.on("child_added", istekGidenIsle); d.on("child_changed", istekGidenIsle);
+    d.on("child_removed", function (s) { delete istekGiden[s.key]; yenile(); });
+  }
+  // Gerçek telefon bildirimi (APK): Capacitor PushNotifications eklentisi varsa cihaz jetonu kaydedilir.
+  function pushKur() {
+    if (pushHazir) return;
+    try {
+      var PN = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.PushNotifications;
+      if (!PN) return;
+      pushHazir = true;
+      PN.addListener("registration", function (t) { if (t && t.value && kok && uid) kok.child("fcm/" + uid).set(t.value).catch(function () {}); });
+      PN.addListener("registrationError", function () {});
+      PN.addListener("pushNotificationActionPerformed", function () { ac("siralama"); });
+      PN.requestPermissions().then(function (r) { if (r && r.receive === "granted") PN.register(); }).catch(function () {});
+    } catch (e) {}
+  }
+  function htmlIstekler() {
+    var g = Object.keys(istekGelen), d = Object.keys(istekGiden);
+    if (!g.length && !d.length) return "";
+    var h = '<div class="ar-ben" style="text-align:left"><b>📨 İstekler</b>';
+    g.forEach(function (k) {
+      var v = istekGelen[k], ne = v.oyun && OYUN[v.oyun] ? oyunAd(v.oyun) : "Fark etmez";
+      h += '<div class="ar-sr"><span class="ar-ad">' + esc(v.fromAd) + '<small class="ar-lgs">' + esc(ne) + " · " + (v.durum === "bekliyor" ? istekKalan(v) : v.durum === "kabul" ? "kabul ettin, bekleniyor" : "başlıyor") + "</small></span>";
+      if (v.durum === "bekliyor") h += '<button class="ar-dv" style="background:#2fb81a" data-act="iKabul" data-id="' + esc(k) + '">✅</button><button class="ar-dv" data-act="iRed" data-id="' + esc(k) + '">✖</button>';
+      else if (v.durum === "basla" && v.duel) h += '<button class="ar-dv" style="background:#2fb81a" data-act="iKatil" data-id="' + esc(k) + '">▶</button>';
+      h += "</div>";
+    });
+    d.forEach(function (k) {
+      var v = istekGiden[k];
+      h += '<div class="ar-sr"><span class="ar-ad">→ ' + esc(v.toAd) + '<small class="ar-lgs">' + (v.durum === "kabul" ? "kabul etti! " + esc(v.oyunAd || "") : "bekliyor · " + istekKalan(v)) + "</small></span>";
+      if (v.durum === "kabul") h += '<button class="ar-dv" style="background:#2fb81a" data-act="iBasla" data-id="' + esc(k) + '">▶</button>';
+      h += '<button class="ar-dv" data-act="iIptal" data-id="' + esc(k) + '">✖</button></div>';
+    });
+    return h + "</div>";
   }
 
   // ---------- düello ----------
@@ -728,7 +858,7 @@
       var st = e.target.closest("[data-st]");
       if (st) { siraTur = st.getAttribute("data-st"); yenile(); return; }
       var d = e.target.closest("[data-u]"), a = e.target.closest("[data-act]");
-      if (d && !d.disabled) davetSec(d.getAttribute("data-u"), d.getAttribute("data-a"));
+      if (d && !d.disabled) { if (d.getAttribute("data-off")) istekSec(d.getAttribute("data-u"), d.getAttribute("data-a")); else davetSec(d.getAttribute("data-u"), d.getAttribute("data-a")); }
       if (a) {
         var act = a.getAttribute("data-act"), id = a.getAttribute("data-id");
         if (act === "ac") oyunSec("🏆 Turnuva aç", function (o) { turnuvaAc(o, false); });
@@ -736,6 +866,11 @@
         else if (act === "katil") turnuvaKatil(id);
         else if (act === "ayril") turnuvaAyril();
         else if (act === "mac") duelAc(id);
+        else if (act === "iKabul") istekKabul(id, istekGelen[id]);
+        else if (act === "iRed") kok.child("istekler/" + id).update({ durum: "red" });
+        else if (act === "iKatil") { var iv = istekGelen[id]; if (iv && iv.duel) { kok.child("istekler/" + id).remove().catch(function () {}); panel.classList.remove("show"); duelAc(iv.duel); } }
+        else if (act === "iBasla") { panel.classList.remove("show"); istekBaslat(id, istekGiden[id]); }
+        else if (act === "iIptal") kok.child("istekler/" + id).remove().catch(function () {});
         else if (act === "meydan") { panel.classList.remove("show"); meydanOku(); }
       }
     });
@@ -787,15 +922,16 @@
       h += '<div class="ar-ben">Sıran: <b>' + esc(benYazi || "…") + "</b> &nbsp;·&nbsp; ⭐ " + fmt(Puan.toplam()) + "</div>";
     }
     h += '<button class="ar-bt kirmizi" data-act="meydan">⚔️ Meydan Oku</button>';
+    h += htmlIstekler();
     if (!liste.length) h += '<div class="ar-bos">' + (!db ? "Çevrimiçi sıralama için firebase-config.js doldurulmalı." : tpMod ? "Henüz turnuva puanı olan yok. İlk sen ol!" : "Yükleniyor…") + "</div>";
     var madal = ["🥇", "🥈", "🥉"];
     liste.forEach(function (x, i) {
       var me = x.uid === uid, on = !!onlineSet[x.uid], deger = tpMod ? (me ? L.tp : x.tp) : (me ? Puan.toplam() : x.puan), lg = me ? L.lig : x.lig;
       h += '<div class="ar-sr' + (me ? " me" : "") + '"><span class="ar-no">' + (i < 3 ? madal[i] : i + 1) + '</span><span class="ar-ad">' + esc(x.ad) + (me ? " (sen)" : "") + '<small class="ar-lgs">' + esc(ligAd(lg)) + "</small></span>" +
         (on ? '<i class="ar-on"></i>' : "") + '<span class="ar-pu">' + fmt(deger) + "</span>" +
-        (me ? "" : '<button class="ar-dv" data-u="' + esc(x.uid) + '" data-a="' + esc(x.ad) + '"' + (on ? "" : " disabled") + ">⚔️</button>") + "</div>";
+        (me ? "" : '<button class="ar-dv" data-u="' + esc(x.uid) + '" data-a="' + esc(x.ad) + '"' + (on ? "" : ' data-off="1"') + ">" + (on ? "⚔️" : "📨") + "</button>") + "</div>";
     });
-    return h + '<div class="ar-bos" style="font-size:12px">● yeşil nokta = çevrimiçi (sadece onlara istek gönderilir)</div>';
+    return h + '<div class="ar-bos" style="font-size:12px">● yeşil nokta = çevrimiçi · ⚔️ hemen düello · 📨 48 saat geçerli istek</div>';
   }
   function htmlLig() {
     if (!db) return '<div class="ar-bos">Lig için firebase-config.js doldurulmalı.</div>';
