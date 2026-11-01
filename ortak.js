@@ -342,3 +342,52 @@
   window.addEventListener("load", sigdir);
   sigdir();
 })();
+
+// GERİ TUŞU: oyunun neresinde olursan ol ana sayfaya götürür (açık pencere varsa önce onu kapatır).
+// Ana sayfadayken iki kez arka arkaya basınca uygulamadan çıkar.
+(function () {
+  const ana = document.getElementById("ana"), h1 = document.querySelector("h1");
+  if (!ana || !h1) return;
+  let son = 0;
+  const durum = () => history.pushState({ arena: 1 }, "");
+
+  function toast(m) {
+    const t = document.createElement("div");
+    t.textContent = m;
+    t.style.cssText = "position:fixed;left:50%;bottom:calc(70px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:100050;background:rgba(20,28,60,.95);color:#fff;border:1px solid #4a5a9a;border-radius:14px;padding:10px 16px;font:600 15px system-ui,sans-serif;pointer-events:none";
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 1800);
+  }
+  // Açık pencereyi (Hesap, Arena/Sıralama, seviye geçildi...) kapatır; kapattıysa true döner
+  function katmanKapat() {
+    const g = document.getElementById("gecis");
+    if (g && g.classList.contains("ac")) { g.classList.remove("ac"); return true; }
+    let bulundu = false;
+    document.querySelectorAll("body > *").forEach(e => {
+      if (bulundu || e === h1) return;
+      const cs = getComputedStyle(e);
+      if (cs.position !== "fixed" || cs.display === "none" || cs.visibility === "hidden" || +cs.opacity === 0) return;
+      const r = e.getBoundingClientRect();
+      if (r.width < innerWidth * 0.9 || r.height < innerHeight * 0.5) return;
+      const x = Array.from(e.querySelectorAll("button")).find(b => /^[✕×✖xX]$/.test(b.textContent.trim()));
+      if (x) { x.click(); bulundu = true; }
+    });
+    return bulundu;
+  }
+
+  durum();
+  window.addEventListener("popstate", () => {
+    const kapandi = katmanKapat();
+    if (!ana.classList.contains("hidden")) {
+      if (kapandi) { durum(); return; }                 // ana sayfa üstündeki pencere kapandı
+      if (Date.now() - son < 2000) {                    // ikinci basış: çık
+        try { window.Capacitor.Plugins.App.exitApp(); } catch (e) {}
+        return;
+      }
+      son = Date.now(); toast("Çıkmak için tekrar geri bas"); durum();
+      return;
+    }
+    h1.click();                                          // oyundaysa ana sayfaya dön
+    durum();
+  });
+})();
