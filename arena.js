@@ -177,16 +177,55 @@
     }, hemen ? 0 : 1500);
   }
 
+  // ESKİ KLASÖRLERDEN TAŞIMA (her oyuncu için tek seferlik, otomatik):
+  // Eski klasörlerdeki puan / turnuva puanı / lig bu oyuncunun yeni klasördeki kaydıyla birleştirilir (büyük olan kalır).
+  var ESKI_APPLER = ["beyinfirtinasi", "bilgiarenasi"];
+  function eskiTasi() {
+    var bayrak = "arena_tasindi_" + APP + "_" + uid;
+    try { if (localStorage.getItem(bayrak)) return Promise.resolve(); } catch (e) {}
+    var eskiler = ESKI_APPLER.filter(function (a) { return a !== APP; });
+    return Promise.all(eskiler.map(function (a) {
+      return db.ref("apps/" + a + "/users/" + uid).once("value").then(function (x) { return x.val(); }).catch(function () { return null; });
+    })).then(function (liste) {
+      var yeni = null;
+      return kok.child("users/" + uid).once("value").then(function (s) {
+        yeni = s.val() || {};
+        var m = {}, sayilar = ["puan", "tp", "tz", "lig"], degisti = false;
+        liste.forEach(function (o) {
+          if (!o || typeof o !== "object") return;
+          ["ad", "eller", "t"].forEach(function (k) { if (o[k] != null && yeni[k] == null && m[k] == null) m[k] = o[k]; });
+          sayilar.forEach(function (k) {
+            var a = typeof o[k] === "number" ? o[k] : null;
+            var mevcut = m[k] != null ? m[k] : (typeof yeni[k] === "number" ? yeni[k] : null);
+            if (a != null && (mevcut == null || a > mevcut)) m[k] = a;
+          });
+        });
+        for (var k in m) { if (yeni[k] !== m[k]) degisti = true; }
+        if (!degisti) return;
+        if (yeni.ad == null && m.ad == null) return;
+        if (yeni.puan == null && m.puan == null) m.puan = 0;
+        return kok.child("users/" + uid).update(m);
+      });
+    }).then(function () {
+      try { localStorage.setItem(bayrak, "1"); } catch (e) {}
+    }).catch(function () {});
+  }
+
   function baglan() {
     // varlık (çevrimiçi göstergesi)
     db.ref(".info/connected").on("value", function (s) {
       if (s.val() !== true) return;
       var r = kok.child("online/" + uid);
       r.onDisconnect().remove(); r.set(true);
+      // ÇEVRİMİÇİ SAYACI: tek bir sayı (liste indirmek yerine). Bağlantı koparsa sunucu otomatik 1 azaltır.
+      var cv = kok.child("cevrimici");
+      cv.onDisconnect().set(firebase.database.ServerValue.increment(-1)).then(function () {
+        return cv.set(firebase.database.ServerValue.increment(1));
+      }).catch(function () {});
       kullaniciYaz(true);
     });
     // turnuva puanı / lig bilgisini sunucudan al (başka cihazdaki değerle birleştir), sonra sezonu kontrol et
-    kok.child("users/" + uid).once("value").then(function (s) {
+    eskiTasi().then(function () { return kok.child("users/" + uid).once("value"); }).then(function (s) {
       var v = s.val() || {};
       if ((v.tp || 0) > L.tp) L.tp = v.tp;
       if ((v.tz || 0) > L.tz) L.tz = v.tz;
@@ -201,7 +240,6 @@
       s.forEach(function (c) { var v = c.val() || {}; if ((v.tp || 0) > 0) a.push({ uid: c.key, ad: v.ad || "Oyuncu", tp: v.tp || 0, lig: v.lig | 0 }); });
       a.reverse(); siraTp = a; yenile();
     });
-    kok.child("online").on("value", function (s) { onlineSet = s.val() || {}; yenile(); });
     // sıralama (ilk 100, gerçek zamanlı)
     kok.child("users").orderByChild("puan").limitToLast(100).on("value", function (s) {
       var a = [];
@@ -664,10 +702,12 @@
       var hedef = s.val();
       if (!hedef) { toast("Bu kullanıcı adıyla biri yok."); return; }
       if (hedef === uid) { toast("Kendine istek atamazsın 🙂"); return; }
-      if (!onlineSet[hedef]) { toast("Bu oyuncu şu an çevrimiçi değil, istek gönderilemez."); return; }
-      return kok.child("users/" + hedef + "/ad").once("value").then(function (a) {
-        inp.value = ""; inp.blur();
-        davetSec(hedef, a.val() || ad);
+      return kok.child("online/" + hedef).once("value").then(function (o) {
+        if (!o.exists()) { toast("Bu oyuncu şu an çevrimiçi değil, istek gönderilemez."); return; }
+        return kok.child("users/" + hedef + "/ad").once("value").then(function (a) {
+          inp.value = ""; inp.blur();
+          davetSec(hedef, a.val() || ad);
+        });
       });
     }).catch(function () { toast("Aranamadı, tekrar dene."); });
   }
@@ -709,8 +749,24 @@
     yenile();
   }
   var yT = null;
+  var sonOnlineBak = 0;
+  function onlineBak() {
+    if (!kok || Date.now() - sonOnlineBak < 30000) return;
+    sonOnlineBak = Date.now();
+    var gor = {}, liste = [];
+    sira.concat(siraTp).forEach(function (x) { if (x && x.uid && x.uid !== uid && !gor[x.uid] && liste.length < 100) { gor[x.uid] = 1; liste.push(x.uid); } });
+    Promise.all(liste.map(function (u) {
+      return kok.child("online/" + u).once("value").then(function (o) { return o.exists(); }).catch(function () { return false; });
+    })).then(function (r) {
+      var yeni = {}; yeni[uid] = true;
+      liste.forEach(function (u, i) { if (r[i]) yeni[u] = true; });
+      onlineSet = yeni;
+      cancelAnimationFrame(yT); yT = requestAnimationFrame(ciz);
+    });
+  }
   function yenile() {
     if (!panel || !panel.classList.contains("show")) return;
+    onlineBak();
     cancelAnimationFrame(yT);
     yT = requestAnimationFrame(ciz);
   }

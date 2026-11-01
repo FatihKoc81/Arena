@@ -1,6 +1,6 @@
 // ORTAK AYARLAR (tüm oyunlar için)
 // index.html'de </body> öncesine ekle: <script src="ortak.js"></script>
-// "BİLGİ ARENASI" başlığına tıklayınca, hangi oyunda olursan ol ana sayfaya döner.
+// "ARENA" başlığına tıklayınca, hangi oyunda olursan ol ana sayfaya döner.
 
 // TÜM YAZILAR: satırlar dengeli (simetrik) kırılsın, üst satır alttakinden uzun kalmasın
 (function () {

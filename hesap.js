@@ -257,9 +257,8 @@
 
 
   // ---------- sayaçlar (HEPSİ GERÇEK SAYI): iki uygulamanın TOPLAMI ----------
-  // çevrimiçi · bugün oynanan oyun · bu hafta oynanan oyun. Bilgi Arenası + Beyin Fırtınası verileri toplanır.
-  var APPLER = ["bilgiarenasi", "beyinfirtinasi"];
-  if (APPLER.indexOf(APP) < 0) APPLER.push(APP);
+  // çevrimiçi · bugün oynanan oyun · bu hafta oynanan oyun (yalnızca Arena verisi).
+  var APPLER = [APP];
   var sayacEl = null, onSay = {}, gunSay = {}, haftaSay = {}, sayacBasladi = false;
   var gunKey = "", haftaKey = "", dinle = [], sonEl = null;
   function fmt(n) { return (n || 0).toLocaleString("tr-TR"); }
@@ -347,7 +346,7 @@
     if (sayacBasladi) return;
     sayacBasladi = true;
     APPLER.forEach(function (a) {
-      db.ref("apps/" + a + "/online").on("value", function (s) { onSay[a] = s.numChildren(); sayacYaz(); }, function () { onSay[a] = false; sayacYaz(); });
+      db.ref("apps/" + a + "/cevrimici").on("value", function (s) { onSay[a] = Math.max(0, s.val() || 0); sayacYaz(); }, function () { onSay[a] = false; sayacYaz(); });
     });
     izle(); setInterval(izle, 60000);
     oyunKancasi();
