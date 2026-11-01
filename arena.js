@@ -833,10 +833,10 @@
       if (!hedef) { toast("Bu kullanıcı adıyla biri yok."); return; }
       if (hedef === uid) { toast("Kendine istek atamazsın 🙂"); return; }
       return kok.child("online/" + hedef).once("value").then(function (o) {
-        if (!o.exists()) { toast("Bu oyuncu şu an çevrimiçi değil, istek gönderilemez."); return; }
         return kok.child("users/" + hedef + "/ad").once("value").then(function (a) {
           inp.value = ""; inp.blur();
-          davetSec(hedef, a.val() || ad);
+          // Çevrimiçiyse anında düello isteği, değilse 48 saat geçerli istek
+          if (o.exists()) davetSec(hedef, a.val() || ad); else istekSec(hedef, a.val() || ad);
         });
       });
     }).catch(function () { toast("Aranamadı, tekrar dene."); });
