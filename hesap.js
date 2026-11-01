@@ -1,14 +1,15 @@
 // hesap.js: E-POSTA İLE HESAP + BENZERSİZ KULLANICI ADI
 // ekonomi.js bu dosyayı sayfa yüklenince kendisi ekler (index.html'e dokunmana gerek yok).
-// Kurallar: 3-18 karakter · ilk harf büyük · ilk harften sonra en fazla 1 büyük harf daha ·
-// sadece a-z, 0-9, _ (Türkçe karakter yok) · adlar büyük/küçük harf fark etmeksizin tektir · 15 günde bir değişir.
+// Kurallar: 3-18 karakter · ilk harf büyükse 1 büyük harf daha olabilir, küçükse hepsi küçük ·
+// sadece a-z, 0-9, _ (boşluk ve Türkçe karakter yok) · adlar büyük/küçük harf fark etmeksizin tektir · 7 günde bir değişir.
+// Kurallar ekranda yazmaz, sadece kuralı çiğneyen kişi uyarı görür. Sahip (SAHIP e-postası, doğrulanmış) kuralların dışındadır.
 (function () {
   "use strict";
   if (typeof firebase === "undefined" || !firebase.apps || !firebase.apps.length) return; // Firebase kurulu değilse eski yöntem kalır
   var A = firebase.auth(), db = firebase.database();
   var APP = window.ARENA_APP || "arena";
-  var GUN15 = 15 * 24 * 3600 * 1000;
-  var REZERVE = ["fk1453", "fatih", "fatih_", "fatihkoc81", "fatihkoc7", "estergon", "hatice", "haticekoc81", "haticekoc1", "haticekoc7"];
+  var GUN7 = 7 * 24 * 3600 * 1000, SAHIP = "fatihkoc7@gmail.com", SAHIP_ADLARI = ["estergon", "osmanli"];
+  var REZERVE = ["fk1453", "fatih", "fatih_", "fatihkoc81", "fatihkoc7", "estergon", "osmanli", "hatice", "haticekoc81", "haticekoc1", "haticekoc7"];
   var ayar = false, kayit = null, hesapRef = null, el = null, sekme = "kayit", msg = "", msgOk = false, busy = false;
 
   function noop() {}
@@ -16,12 +17,20 @@
   function UYG() { return (window.Ekonomi && window.Ekonomi.UYG) || ""; }
 
   // ---------- ad kuralları ----------
-  function adDogrula(v) {
+  function sahipMi(u) { return !!(u && u.email && u.emailVerified && u.email.toLowerCase() === SAHIP); }
+  function adDogrula(v, sahip) {
     if (!v) return "Kullanıcı adı yaz.";
+    var yasak = v.match(/[^A-Za-z0-9_]/g);
+    if (yasak) {
+      var l = [];
+      yasak.forEach(function (c) { var g = c === " " ? "boşluk" : c; if (l.indexOf(g) < 0) l.push(g); });
+      return "Şu karakterler kullanılamıyor: " + l.join(", ") + " (sadece a-z, 0-9 ve _ olabilir).";
+    }
     if (v.length < 3 || v.length > 18) return "Ad 3-18 karakter olmalı.";
-    if (/[^A-Za-z0-9_]/.test(v)) return "Sadece İngilizce harf (a-z), rakam ve _ kullanılabilir. Türkçe karakter (ç ğ ı ö ş ü), boşluk ve işaret olmaz.";
-    if (!/^[A-Z]/.test(v)) return "İlk harf büyük harf olmalı.";
-    if ((v.match(/[A-Z]/g) || []).length > 2) return "İlk harften sonra en fazla bir büyük harf daha olabilir.";
+    if (sahip) return "";
+    var buyuk = (v.match(/[A-Z]/g) || []).length, ilkBuyuk = /^[A-Z]/.test(v);
+    if (!ilkBuyuk && buyuk) return "İlk harf küçükse büyük harf kullanılamaz.";
+    if (ilkBuyuk && buyuk > 2) return "İlk harften sonra en fazla bir büyük harf daha kullanılabilir.";
     return "";
   }
   function rezerveMi(lower) { return REZERVE.indexOf(lower) >= 0; }
@@ -47,15 +56,16 @@
   }
 
   // ---------- ad alma (rezerve et + kaydet + eskisini bırak) ----------
-  function sonrakiTarih() { return kayit && kayit.adT ? kayit.adT + GUN15 : 0; }
+  function sonrakiTarih() { return kayit && kayit.adT ? kayit.adT + GUN7 : 0; }
 
   function adAl(ad) {
-    var u = A.currentUser, lower = ad.toLowerCase();
+    var u = A.currentUser, lower = ad.toLowerCase(), sahip = sahipMi(A.currentUser);
     var eski = kayit && kayit.ad ? kayit.ad.toLowerCase() : null;
     var yeniAlindi = false;
     if (!u || !u.email) return Promise.reject({ ozel: "Önce e-postayla kayıt ol." });
+    if (SAHIP_ADLARI.indexOf(lower) >= 0 && !sahip) return Promise.reject({ ozel: "“" + ad + "” rezerve edilmiş bir ad." + (u.emailVerified ? "" : " Sahibiysen önce e-postanı doğrula.") });
     if (kayit && kayit.ad === ad) return Promise.reject({ ozel: "Zaten bu adı kullanıyorsun." });
-    if (sonrakiTarih() > Date.now()) return Promise.reject({ ozel: "Adını " + new Date(sonrakiTarih()).toLocaleDateString("tr-TR") + " tarihinden sonra değiştirebilirsin." });
+    if (!sahip && sonrakiTarih() > Date.now()) return Promise.reject({ ozel: "Adını " + new Date(sonrakiTarih()).toLocaleDateString("tr-TR") + " tarihinden sonra değiştirebilirsin." });
     return db.ref("adlar/" + lower).once("value").then(function (s) {
       if (s.exists() && s.val() !== u.uid) throw { ozel: "Bu ad alınmış, başka bir ad dene." };
       if (s.val() === u.uid) return;
@@ -159,7 +169,6 @@
         '<input class="hs-in" id="hs-e" type="email" autocomplete="email" placeholder="E-posta">' +
         '<input class="hs-in" id="hs-p" type="password" autocomplete="new-password" placeholder="Şifre (en az 6 karakter)">' +
         '<input class="hs-in" id="hs-a" maxlength="18" autocomplete="off" autocapitalize="words" autocorrect="off" spellcheck="false" placeholder="Kullanıcı adı">' +
-        '<div class="hs-k">' + KURAL + "</div>" +
         '<button class="hs-bt" data-hs="kayit">Kayıt Ol</button>';
     } else {
       h += '<input class="hs-in" id="hs-e" type="email" autocomplete="email" placeholder="E-posta">' +
@@ -185,10 +194,8 @@
     var h = '<div class="hs-s">📧 <b>' + esc(u.email) + "</b> " + (u.emailVerified ? "✓ doğrulandı" : "(doğrulanmadı)") + "</div>" +
       '<div class="hs-s">👤 Kullanıcı adın: <b>' + esc(kayit && kayit.ad ? kayit.ad : "henüz seçilmedi") + "</b></div>";
     if (!u.emailVerified) h += '<button class="hs-bt gri" data-hs="dogrula-gonder">Doğrulama mailini tekrar gönder</button><button class="hs-bt gri" data-hs="dogrula-kontrol">Doğruladım, kontrol et</button>';
-    var bekle = sonrakiTarih() > Date.now();
-    if (bekle) h += '<div class="hs-k">Adını <b>' + esc(new Date(sonrakiTarih()).toLocaleDateString("tr-TR")) + "</b> tarihinden sonra değiştirebilirsin.</div>";
-    else h += '<input class="hs-in" id="hs-a" maxlength="18" autocomplete="off" autocapitalize="words" autocorrect="off" spellcheck="false" placeholder="' + (kayit && kayit.ad ? "Yeni kullanıcı adı" : "Kullanıcı adı seç") + '">' +
-      '<div class="hs-k">' + KURAL + '</div><button class="hs-bt" data-hs="ad-kaydet">Adı Kaydet</button>';
+    h += '<input class="hs-in" id="hs-a" maxlength="18" autocomplete="off" autocapitalize="words" autocorrect="off" spellcheck="false" placeholder="' + (kayit && kayit.ad ? "Yeni kullanıcı adı" : "Kullanıcı adı seç") + '">' +
+      '<button class="hs-bt" data-hs="ad-kaydet">Adı Kaydet</button>';
     return h + '<button class="hs-bt kirmizi" data-hs="cikis">Çıkış yap</button>';
   }
   function render() {
@@ -224,7 +231,7 @@
       isle(A.sendPasswordResetEmail(m), "Şifre yenileme bağlantısı e-postana gönderildi.");
     }
     else if (a === "ad-kaydet") {
-      var ad = val("hs-a").trim(), h = adDogrula(ad);
+      var ad = val("hs-a").trim(), h = adDogrula(ad, sahipMi(u));
       if (h) { mesaj(h); return; }
       isle(adAl(ad), "Kullanıcı adın kaydedildi: " + ad);
     }
