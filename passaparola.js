@@ -1128,6 +1128,11 @@
 
   function bitir() {
     clearInterval(zaman);
+    if (window.Puan && dur._p !== true) { // her oyunda bir kez: doğru oranı kadar tur puanı
+      dur._p = true;
+      const d0 = dur.filter(x => x === 1).length;
+      if (d0 > 0) Puan.ekle("passaparola", d0 / HARFLER.length);
+    }
     kilit = true;
     const d = dur.filter(x => x === 1).length;
     const y = dur.filter(x => x === 2).length;

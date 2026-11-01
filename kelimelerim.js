@@ -113,6 +113,7 @@
     else if (fark <= 10) { puan = 5; yazi = "En yakın " + yakin + " (" + fark + " fark). +5 puan"; }
     else yazi = "En yakın " + yakin + " (" + fark + " fark). Puan yok";
     toplam += puan;
+    if (window.Puan && puan > 0) Puan.ekle("islem", puan / 10); // 10 puan = 1 el; kısmi puan orantılı eklenir
     $("isPuan").textContent = "Puan: " + toplam;
     $("isMsg").style.color = puan ? "#2fbf71" : "#f0b429";
     $("isMsg").textContent = yazi;
