@@ -402,8 +402,11 @@
   function istekSec(hedef, hedefAd) {
     if (!cevrimici(true)) return;
     bildirimIzni();
-    var ops = [{ t: "🎲 Fark etmez (o seçsin)", f: function () { istekGonder(hedef, hedefAd, ""); } }];
-    Object.keys(OYUN).forEach(function (id) { ops.push({ t: oyunAd(id), f: function () { istekGonder(hedef, hedefAd, id); } }); });
+    var ids = Object.keys(OYUN);
+    if (!ids.length) { toast("Düello için kayıtlı oyun yok."); return; }
+    if (ids.length === 1) { istekGonder(hedef, hedefAd, ids[0]); return; }
+    var ops = [];
+    ids.forEach(function (id) { ops.push({ t: oyunAd(id), f: function () { istekGonder(hedef, hedefAd, id); } }); });
     ops.push({ t: "Vazgeç", c: "gri", f: function () {} });
     Ekonomi.sor("📨 " + hedefAd, "İstek 48 saat geçerli. Kabul ederse sana haber gelir.", ops);
   }
@@ -821,10 +824,46 @@
     yenile();
   }
 
+
+  // ---------- İSİMLE İSTEK: ana sayfadaki düğmeyle açılan pencere ----------
+  var adPen = null, adPenInp = null;
+  function adPenKapat() { if (adPen) adPen.style.display = "none"; }
+  function adPenAc() {
+    if (!adPen) {
+      adPen = document.createElement("div");
+      adPen.style.cssText = "position:fixed;left:0;top:0;right:0;bottom:0;z-index:100040;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;padding:18px;box-sizing:border-box";
+      adPen.innerHTML = '<div style="width:100%;max-width:380px;background:#fcefd0;border:3px solid #f2c94c;border-radius:20px;padding:16px;box-sizing:border-box;color:#5a3a12;font-family:system-ui,sans-serif">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><b style="font-size:20px">👤 İsimle istek at</b><button class="ar-pk" style="border:0;background:#8a8f9e;color:#fff;border-radius:10px;width:36px;height:36px;font-size:18px">✕</button></div>' +
+        '<input class="ar-ai ar-pi" type="text" maxlength="18" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Kullanıcı adı yaz" style="width:100%;box-sizing:border-box;margin-bottom:10px">' +
+        '<button class="ar-ag ar-pg" style="width:100%;box-sizing:border-box">⚔️ İstek At</button></div>';
+      document.body.appendChild(adPen);
+      adPenInp = adPen.querySelector(".ar-pi");
+      adPen.querySelector(".ar-pk").onclick = adPenKapat;
+      adPen.onclick = function (e) { if (e.target === adPen) adPenKapat(); };
+      adPen.querySelector(".ar-pg").onclick = adlaDavet;
+      adPenInp.addEventListener("keydown", function (e) { if (e.key === "Enter") adlaDavet(); });
+    }
+    adPen.style.display = "flex";
+    setTimeout(function () { try { adPenInp.focus(); } catch (e) {} }, 60);
+  }
+  function adDugmesi() {
+    var ana = document.getElementById("ana");
+    if (!ana || document.getElementById("arAdBtn")) return;
+    var b = document.createElement("div");
+    b.id = "arAdBtn";
+    b.textContent = "👤 İsimle istek";
+    b.style.cssText = "position:fixed;right:84px;bottom:4px;height:40px;padding:0 10px;display:flex;align-items:center;justify-content:center;border:2px solid #d4a63a;border-radius:11px;color:#d4a63a;font:700 13px system-ui,sans-serif;background:rgba(0,0,0,.25);z-index:5;cursor:pointer;white-space:nowrap";
+    b.onclick = adPenAc;
+    document.body.appendChild(b);
+    var g = function () { b.style.display = ana.classList.contains("hidden") || ana.style.display === "none" ? "none" : "flex"; };
+    new MutationObserver(g).observe(ana, { attributes: true, attributeFilter: ["class", "style"] });
+    g();
+  }
+
   // ---------- panel ----------
   // Kullanıcı adını yazarak istek at (büyük/küçük harf fark etmez)
   function adlaDavet() {
-    var inp = panel.querySelector(".ar-ai"), ad = (inp.value || "").trim().replace(/^@/, "").toLowerCase();
+    var inp = adPenInp, ad = (inp && inp.value || "").trim().replace(/^@/, "").toLowerCase();
     if (!ad) { toast("Bir kullanıcı adı yaz."); return; }
     if (!cevrimici(true)) return;
     if (!/^[a-z][a-z0-9_]{2,17}$/.test(ad)) { toast("Kullanıcı adı geçersiz (3-18 karakter; a-z, 0-9, _)."); return; }
@@ -834,7 +873,7 @@
       if (hedef === uid) { toast("Kendine istek atamazsın 🙂"); return; }
       return kok.child("online/" + hedef).once("value").then(function (o) {
         return kok.child("users/" + hedef + "/ad").once("value").then(function (a) {
-          inp.value = ""; inp.blur();
+          inp.value = ""; inp.blur(); adPenKapat();
           // Çevrimiçiyse anında düello isteği, değilse 48 saat geçerli istek
           if (o.exists()) davetSec(hedef, a.val() || ad); else istekSec(hedef, a.val() || ad);
         });
@@ -845,14 +884,15 @@
     if (panel) return panel;
     panel = document.createElement("div");
     panel.className = "ar-pn";
-    panel.innerHTML = '<div class="ar-ph"><span>🏅 Arena</span><button class="ar-x">✕</button></div>' +
+    panel.innerHTML = '<div class="ar-ph"><span class="ar-ba" style="cursor:pointer">🏅 ARENA</span><button class="ar-x">✕</button></div>' +
       '<div class="ar-tabs"><button class="ar-tab" data-s="siralama">Sıralama</button><button class="ar-tab" data-s="puan">Puanım</button><button class="ar-tab" data-s="turnuva">Turnuva</button><button class="ar-tab" data-s="lig">Lig</button></div>' +
-      '<div class="ar-ara"><input class="ar-ai" type="text" maxlength="18" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Kullanıcı adı yaz, istek at"><button class="ar-ag">⚔️ İstek At</button></div>' +
       '<div class="ar-body"></div>';
     document.body.appendChild(panel);
     panel.querySelector(".ar-x").onclick = function () { panel.classList.remove("show"); };
-    panel.querySelector(".ar-ag").onclick = adlaDavet;
-    panel.querySelector(".ar-ai").addEventListener("keydown", function (e) { if (e.key === "Enter") adlaDavet(); });
+    panel.querySelector(".ar-ba").onclick = function () {
+      panel.classList.remove("show");
+      var h = document.querySelector("h1"); if (h) h.click();   // ana sayfa
+    };
     panel.querySelectorAll(".ar-tab").forEach(function (b) { b.onclick = function () { sekme = b.getAttribute("data-s"); yenile(); }; });
     panel.querySelector(".ar-body").addEventListener("click", function (e) {
       var st = e.target.closest("[data-st]");
@@ -907,7 +947,6 @@
   }
   function ciz() {
     panel.querySelectorAll(".ar-tab").forEach(function (b) { b.classList.toggle("on", b.getAttribute("data-s") === sekme); });
-    var ara = panel.querySelector(".ar-ara"); if (ara) ara.classList.toggle("show", sekme === "siralama");
     var h = sekme === "siralama" ? htmlSira() : sekme === "puan" ? htmlPuan() : sekme === "lig" ? htmlLig() : htmlTurnuva();
     var body = panel.querySelector(".ar-body"), y = body.scrollTop;
     body.innerHTML = h; body.scrollTop = y;
@@ -927,7 +966,7 @@
     var madal = ["🥇", "🥈", "🥉"];
     liste.forEach(function (x, i) {
       var me = x.uid === uid, on = !!onlineSet[x.uid], deger = tpMod ? (me ? L.tp : x.tp) : (me ? Puan.toplam() : x.puan), lg = me ? L.lig : x.lig;
-      h += '<div class="ar-sr' + (me ? " me" : "") + '"><span class="ar-no">' + (i < 3 ? madal[i] : i + 1) + '</span><span class="ar-ad">' + esc(x.ad) + (me ? " (sen)" : "") + '<small class="ar-lgs">' + esc(ligAd(lg)) + "</small></span>" +
+      h += '<div class="ar-sr' + (me ? " me" : "") + '"><span class="ar-no">' + (i < 3 ? madal[i] : i + 1) + '</span><span class="ar-ad">' + esc(x.ad) + '<small class="ar-lgs">' + esc(ligAd(lg)) + "</small></span>" +
         (on ? '<i class="ar-on"></i>' : "") + '<span class="ar-pu">' + fmt(deger) + "</span>" +
         (me ? "" : '<button class="ar-dv" data-u="' + esc(x.uid) + '" data-a="' + esc(x.ad) + '"' + (on ? "" : ' data-off="1"') + ">" + (on ? "⚔️" : "📨") + "</button>") + "</div>";
     });
@@ -950,7 +989,7 @@
     if (L.grup >= 0) h += '<h4 style="margin:10px 2px 6px">' + esc(sehirAd(L.lig, L.grup)) + " · bu haftaki sıralama</h4>";
     ligGrup.forEach(function (x, i) {
       var me = x.uid === uid, oran = (i + 1) / n, bolge = n >= MIN_GRUP ? (oran <= YUKSELME && L.lig < LIG_MAX ? " yuk" : oran > DUSME && L.lig > 0 ? " dus" : "") : "";
-      h += '<div class="ar-sr' + (me ? " me" : bolge) + '"><span class="ar-no">' + (i + 1) + '</span><span class="ar-ad">' + esc(x.ad) + (me ? " (sen)" : "") + '</span><span class="ar-pu">' + fmt(me ? L.hp : x.p) + "</span></div>";
+      h += '<div class="ar-sr' + (me ? " me" : bolge) + '"><span class="ar-no">' + (i + 1) + '</span><span class="ar-ad">' + esc(x.ad) + '</span><span class="ar-pu">' + fmt(me ? L.hp : x.p) + "</span></div>";
     });
     return h;
   }
@@ -1021,5 +1060,6 @@
   };
 
   anaButonlar();
+  adDugmesi();
   baslat();
 })();

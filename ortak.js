@@ -186,6 +186,142 @@
   kay2();
 })();
 
+
+// TÜM UYGULAMA YAZILARI: çok satırlı yazılar dengeli bölünür, ALT satır üst satırdan KISA olmaz.
+// (CSS text-wrap eski WebView'lerde çalışmadığı için kendimiz ölçüp satırları belirliyoruz.)
+(function () {
+  const cv = document.createElement("canvas").getContext("2d");
+  const izlenen = new Set();
+  let bekle = false;
+  const kuyruk = new Set();
+
+  function adayMi(el) {
+    if (!el || el.nodeType !== 1) return false;
+    if (/^(SCRIPT|STYLE|INPUT|TEXTAREA|SELECT|OPTION|CODE|PRE|SVG|CANVAS|HTML|BODY)$/i.test(el.tagName)) return false;
+    if (el.isContentEditable || el.closest("#oyun")) return false; // Milyoner soru metninin kendi düzenleyicisi var
+    let n = 0;
+    for (const c of el.childNodes) {
+      if (c.nodeType === 3) n += c.textContent.trim().length;
+      else if (c.nodeName !== "BR") return false;
+    }
+    return n >= 10;
+  }
+
+  // Kelimeleri k satıra böler: satırlar birbirine en yakın uzunlukta, alt satır üsttekinden kısa olmayacak şekilde
+  function bol(words, olc, maxW) {
+    const n = words.length;
+    if (n < 3 || n > 45) return null;
+    const sp = olc(" "), wd = words.map(olc);
+    let k = 1, cw = 0;
+    wd.forEach((w, i) => {
+      const add = cw ? sp + w : w;
+      if (cw && cw + add > maxW) { k++; cw = w; } else cw += add;
+    });
+    if (k < 2 || k > 5 || k > n) return null;
+    const pre = [0]; wd.forEach((w, i) => pre.push(pre[i] + w));
+    const gen = (i, j) => pre[j] - pre[i] + sp * (j - i - 1);
+    let en = null, enSkor = Infinity;
+    (function dene(basla, kalan, kes) {
+      if (kalan === 0) {
+        const sn = [0].concat(kes, [n]), w = [];
+        let toplam = 0;
+        for (let a = 0; a < k; a++) { const x = gen(sn[a], sn[a + 1]); if (x > maxW) return; w.push(x); toplam += x; }
+        const ort = toplam / k;
+        let skor = 0;
+        w.forEach(x => { skor += (x - ort) * (x - ort); });
+        for (let a = 0; a < k - 1; a++) if (w[a] > w[a + 1] + 1) skor += 1e4 * (w[a] - w[a + 1]);
+        if (skor < enSkor) { enSkor = skor; en = sn.slice(); }
+        return;
+      }
+      for (let pos = basla; pos <= n - kalan; pos++) { kes.push(pos); dene(pos + 1, kalan - 1, kes); kes.pop(); }
+    })(1, k - 1, []);
+    if (!en) return null;
+    const out = [];
+    for (let a = 0; a < k; a++) out.push(words.slice(en[a], en[a + 1]).join(" "));
+    return out;
+  }
+
+  function yaz(el, parcalar) {
+    el.textContent = "";
+    parcalar.forEach((satirlar, si) => {
+      satirlar.forEach((l, li) => {
+        const sonSatir = li === satirlar.length - 1;
+        el.appendChild(document.createTextNode(sonSatir && si === parcalar.length - 1 ? l : l + " "));
+        if (!sonSatir) el.appendChild(document.createElement("br"));
+      });
+      if (si < parcalar.length - 1) el.appendChild(document.createElement("br"));
+    });
+    el.__dgHtml = el.innerHTML;
+  }
+
+  function isle(el) {
+    if (!el.isConnected || !adayMi(el)) return;
+    const cs = getComputedStyle(el);
+    if (cs.display === "none" || cs.display === "inline" || /nowrap|^pre$|pre-wrap/.test(cs.whiteSpace) || cs.textOverflow === "ellipsis") return;
+    const maxW = el.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0) - 2;
+    if (maxW < 40) return;
+    let ham = "";
+    el.childNodes.forEach(c => { ham += c.nodeName === "BR" ? "\u0001" : c.textContent; });
+    const parcalar = ham.split(/[\u0001\n]/).map(x => x.replace(/\s+/g, " ").trim()).filter(Boolean);
+    if (!parcalar.length) return;
+    const buyuk = cs.textTransform === "uppercase", ls = parseFloat(cs.letterSpacing) || 0;
+    cv.font = cs.fontStyle + " " + cs.fontWeight + " " + cs.fontSize + " " + cs.fontFamily;
+    const olc = t => cv.measureText(buyuk ? t.toUpperCase() : t).width + ls * t.length;
+    let degisti = false;
+    const sonuc = parcalar.map(seg => {
+      const r = bol(seg.split(" "), olc, maxW);
+      if (r) { degisti = true; return r; }
+      return [seg];
+    });
+    if (!degisti) return;
+    if (!el.__dgOrig) el.__dgOrig = Array.from(el.childNodes).map(c => c.cloneNode(true));
+    yaz(el, sonuc);
+    izlenen.add(el);
+  }
+
+  function tara(n) {
+    if (!n || n.nodeType !== 1) return;
+    isle(n);
+    const l = n.querySelectorAll ? n.querySelectorAll("*") : [];
+    if (l.length <= 800) l.forEach(isle);
+  }
+  function isleKuyruk() {
+    bekle = false;
+    const l = Array.from(kuyruk); kuyruk.clear();
+    l.forEach(n => { if (n && n.nodeType === 3) n = n.parentElement; if (n && n.isConnected) tara(n); });
+    mo.takeRecords();
+  }
+  function ekle(n) { if (!n) return; kuyruk.add(n); if (!bekle) { bekle = true; requestAnimationFrame(isleKuyruk); } }
+
+  const mo = new MutationObserver(ml => {
+    ml.forEach(m => {
+      if (m.type === "characterData") ekle(m.target);
+      else if (m.type === "attributes") ekle(m.target);
+      else m.addedNodes.forEach(ekle);
+    });
+  });
+  function basla() {
+    mo.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["class", "style", "hidden"] });
+    ekle(document.body);
+  }
+  // Ekran genişliği değişince (döndürme vb.) baştan hesapla
+  let rt = null;
+  window.addEventListener("resize", () => {
+    clearTimeout(rt);
+    rt = setTimeout(() => {
+      Array.from(izlenen).forEach(el => {
+        if (!el.isConnected || el.__dgHtml !== el.innerHTML) { izlenen.delete(el); return; }
+        el.textContent = ""; el.__dgOrig.forEach(c => el.appendChild(c.cloneNode(true)));
+        izlenen.delete(el); isle(el);
+      });
+      mo.takeRecords();
+    }, 250);
+  });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => ekle(document.body));
+  if (document.body) basla(); else document.addEventListener("DOMContentLoaded", basla);
+  window.addEventListener("load", () => ekle(document.body));
+})();
+
 // MİLYONER SORU METNİ: satırlar dengeli olsun, alt satır üst satırdan uzun olmasın
 (function () {
   const oyun = document.getElementById("oyun");
@@ -350,22 +486,38 @@
   sigdir();
 })();
 
+
+// PREMIUM: alt çubuktaki "Premium" düğmesine basınca "Çok yakında" yazar (şimdilik)
+(function () {
+  document.addEventListener("click", function (e) {
+    let el = e.target;
+    for (let i = 0; el && i < 5; i++, el = el.parentElement) {
+      const t = (el.textContent || "").replace(/[\uFE0E\uFE0F]/g, "").replace(/\s+/g, " ").trim();
+      if (/^(👑\s*)?Premium(\s*[✓✔☑])?$/.test(t) && el.parentElement && /Altın/.test(el.parentElement.textContent) && /Puan/.test(el.parentElement.textContent)) {
+        e.preventDefault(); e.stopImmediatePropagation();
+        try { window.Ekonomi.sor("👑 Premium", "Çok yakında!", [{ t: "Tamam", c: "gri", f: function () {} }]); } catch (x) {}
+        return;
+      }
+    }
+  }, true);
+})();
+
 // GERİ TUŞU: oyunun neresinde olursan ol ana sayfaya götürür (açık pencere varsa önce onu kapatır).
 // Ana sayfadayken iki kez arka arkaya basınca uygulamadan çıkar.
 (function () {
   const ana = document.getElementById("ana"), h1 = document.querySelector("h1");
   if (!ana || !h1) return;
-  let son = 0;
-  const durum = () => history.pushState({ arena: 1 }, "");
+  let son = 0, hazir = false;
+  const durum = () => { try { history.pushState({ arena: 1 }, ""); } catch (e) {} };
 
   function toast(m) {
     const t = document.createElement("div");
     t.textContent = m;
-    t.style.cssText = "position:fixed;left:50%;bottom:calc(70px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:100050;background:rgba(20,28,60,.95);color:#fff;border:1px solid #4a5a9a;border-radius:14px;padding:10px 16px;font:600 15px system-ui,sans-serif;pointer-events:none";
+    t.style.cssText = "position:fixed;left:50%;bottom:calc(70px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:100050;background:rgba(20,28,60,.95);color:#fff;border:1px solid #4a5a9a;border-radius:14px;padding:10px 16px;font:600 14px system-ui,sans-serif";
     document.body.appendChild(t);
     setTimeout(() => t.remove(), 1800);
   }
-  // Açık pencereyi (Hesap, Arena/Sıralama, seviye geçildi...) kapatır; kapattıysa true döner
+  // Açık pencereyi (Hesap, Arena/Sıralama, istek penceresi, seviye geçildi...) kapatır; kapattıysa true döner
   function katmanKapat() {
     const g = document.getElementById("gecis");
     if (g && g.classList.contains("ac")) { g.classList.remove("ac"); return true; }
@@ -376,25 +528,40 @@
       if (cs.position !== "fixed" || cs.display === "none" || cs.visibility === "hidden" || +cs.opacity === 0) return;
       const r = e.getBoundingClientRect();
       if (r.width < innerWidth * 0.9 || r.height < innerHeight * 0.5) return;
-      const x = Array.from(e.querySelectorAll("button")).find(b => /^[✕×✖xX]$/.test(b.textContent.trim()));
+      const x = Array.from(e.querySelectorAll("button")).find(b => /^(✕|×|✖|x|X|Vazgeç|Kapat)$/.test(b.textContent.trim()));
       if (x) { x.click(); bulundu = true; }
     });
     return bulundu;
   }
 
-  durum();
-  window.addEventListener("popstate", () => {
+  // Geri tuşuna basılınca yapılacak iş (tus: true = Capacitor'dan geldi, geçmiş kaydı eklemeye gerek yok)
+  function geri(tus) {
     const kapandi = katmanKapat();
+    const yeniden = () => { if (!tus) durum(); };
     if (!ana.classList.contains("hidden")) {
-      if (kapandi) { durum(); return; }                 // ana sayfa üstündeki pencere kapandı
-      if (Date.now() - son < 2000) {                    // ikinci basış: çık
+      if (kapandi) { yeniden(); return; }
+      if (Date.now() - son < 2000) {
         try { window.Capacitor.Plugins.App.exitApp(); } catch (e) {}
         return;
       }
-      son = Date.now(); toast("Çıkmak için tekrar geri bas"); durum();
+      son = Date.now(); toast("Çıkmak için tekrar geri bas"); yeniden();
       return;
     }
-    h1.click();                                          // oyundaysa ana sayfaya dön
+    if (!kapandi) h1.click();                           // oyundaysa ana sayfaya dön
+    yeniden();
+  }
+
+  // 1) APK: Capacitor geri tuşu olayı (en sağlam yol; uygulamanın kendiliğinden kapanmasını engeller)
+  try {
+    const App = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App;
+    if (App && App.addListener) { App.addListener("backButton", () => geri(true)); hazir = true; }
+  } catch (e) {}
+  // 2) Tarayıcı / PWA: geçmiş kaydı. Chrome, kullanıcı dokunmadan eklenen kayıtları geri tuşunda atladığı için
+  //    ilk dokunuşta eklenir.
+  if (!hazir) {
+    const ilk = () => { document.removeEventListener("pointerdown", ilk, true); durum(); };
+    document.addEventListener("pointerdown", ilk, true);
     durum();
-  });
+    window.addEventListener("popstate", () => geri(false));
+  }
 })();

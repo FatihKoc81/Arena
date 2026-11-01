@@ -8,7 +8,7 @@
 <style>:root,html,body,#cm{color-scheme:only light!important}</style>
 <script>window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();});</script>
 <title>ARENA</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=20261102">
 <style id="acilisGizle">#ana{visibility:hidden}</style><!-- ana menü, butonlar tamamlanana kadar gizli (eski başlangıç ekranı görünmesin) -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#080c20">
@@ -74,10 +74,10 @@ h1{display:grid!important;grid-template-columns:1fr auto 1fr;justify-content:nor
 <button class="btn ikinci" id="sMenu">Ana menü</button>
 </section>
 
-<script src="sorular.js"></script>
-<script src="seriler.js"></script>
-<script src="ekonomi.js"></script>
-<script src="puan.js"></script>
+<script src="sorular.js?v=20261102"></script>
+<script src="seriler.js?v=20261102"></script>
+<script src="ekonomi.js?v=20261102"></script>
+<script src="puan.js?v=20261102"></script>
 <script>
 // milyonerSorulari {seviye1:[{soru,secenekler,cevap}]} -> SORULAR [[soru,[secenekler],dogruIndex]]
 var SORULAR = (function () {
@@ -472,24 +472,24 @@ $("gDevam").onclick = () => { gKapat(); guvenliBaslat(); };
 $("gMenu").onclick = () => { gKapat(); menu(); };
 document.addEventListener("anasayfa", gKapat);
 </script>
-<script src="ortak.js"></script>
-<script src="passaparola.js"></script>
-<script src="kelime.js"></script>
-<script src="kelimelerim.js"></script>
-<script src="islem.js"></script>
-<script src="rotasyon.js"></script>
-<script src="menu.js"></script>
+<script src="ortak.js?v=20261102"></script>
+<script src="passaparola.js?v=20261102"></script>
+<script src="kelime.js?v=20261102"></script>
+<script src="kelimelerim.js?v=20261102"></script>
+<script src="islem.js?v=20261102"></script>
+<script src="rotasyon.js?v=20261102"></script>
+<script src="menu.js?v=20261102"></script>
 <script>window.ARENA_APP="arena";</script><!-- sıralama/düello verileri bu adla ayrı tutulur -->
-<script src="firebase-config.js"></script>
+<script src="firebase-config.js?v=20261102"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="arena.js"></script>
+<script src="arena.js?v=20261102"></script>
 <script>
 // Sayfa kaymasın (menü, oyun, sonuç ekranları) + sol alta APK indirme / güncelleme butonu
 // Tarayıcıda "⬇ APK", uygulamanın içinde aynı yerde "⬇ Güncelle" yazar.
 (function () {
-  var APK_ADRES = "https://github.com/FatihKoc81/Arena/releases/latest/download/Arena.apk"; // her derlemede otomatik güncellenir
+  var APK_ADRES = "https://github.com/FatihKoc81/Arena/releases/latest"; // her derlemede otomatik güncellenir
   var apkUygulamasi = !!window.Capacitor;
   var uygulamaIci = !!(apkUygulamasi || (window.matchMedia && matchMedia("(display-mode: standalone)").matches));
   var stl = document.createElement("style");
@@ -527,7 +527,6 @@ document.addEventListener("anasayfa", gKapat);
     a = document.createElement("a");
     a.className = "apk-btn gizli";
     a.href = APK_ADRES;
-    a.setAttribute("download", "");
     a.target = "_blank";
     a.rel = "noopener";
     a.textContent = apkUygulamasi ? "⬇ Güncelle" : "⬇ APK";
