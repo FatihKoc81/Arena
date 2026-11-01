@@ -2,6 +2,13 @@
 // index.html'de </body> öncesine ekle: <script src="ortak.js"></script>
 // "BİLGİ ARENASI" başlığına tıklayınca, hangi oyunda olursan ol ana sayfaya döner.
 
+// TÜM YAZILAR: satırlar dengeli (simetrik) kırılsın, üst satır alttakinden uzun kalmasın
+(function () {
+  const st = document.createElement("style");
+  st.textContent = "html{text-wrap:balance}input,textarea,pre,code{text-wrap:wrap}";
+  document.head.appendChild(st);
+})();
+
 (function () {
   // Ana menü düzenlemesi: "İlerlemeyi Sıfırla" kaldırılır, "Oyuna Başla" -> "Milyoner"
   const sifirla = document.getElementById("sifirla");
