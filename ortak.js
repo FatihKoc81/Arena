@@ -188,7 +188,7 @@ window.altSatir = function () {
     let ref = null;
     oyun.querySelectorAll("button.btn.ikinci").forEach(b => { if (/Ana Menü/.test(b.textContent)) ref = b; });
     if (!ref || !ref.offsetHeight) return;
-    const kayma = Math.round((ref.offsetHeight + (parseFloat(getComputedStyle(ref).marginTop) || 0)) * KAYMA_ORAN);
+    const kayma = Math.round(ref.offsetHeight * KAYMA_ORAN); // üst boşluk (margin) eklenmez: Milyoner'de margin-top:auto olduğundan ölçüm her seferinde değişiyordu, kart İşlem'den yukarıda kalıyordu
     if (getComputedStyle(oyun).position === "static") oyun.style.position = "relative";
     delete oyun.dataset.sik;
     oyun.style.top = "0px"; oyun.style.minHeight = ""; oyun.style.height = "auto";

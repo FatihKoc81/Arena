@@ -172,7 +172,7 @@
     if (ekran.classList.contains("hidden")) return;
     const y = $("isYeni"), cs = getComputedStyle(y);
     const KAYMA_ORAN = 0.6; // 1 = "Yeni Tur" düğmesi yüksekliği kadar; küçültürsen kart yukarı çıkar
-    const kayma = Math.round((y.offsetHeight + (parseFloat(cs.marginTop) || 0)) * KAYMA_ORAN);
+    const kayma = Math.round(y.offsetHeight * KAYMA_ORAN); // ortak.js'deki Milyoner hesabıyla BİREBİR aynı (margin eklenmez)
     ekran.style.top = "0px";
     ekran.style.height = "auto";
     const ust = ekran.getBoundingClientRect().top + window.scrollY;
