@@ -460,9 +460,13 @@
   const cikis = () => { if (duel) document.querySelector("h1").click(); else menuyeDon(); };
   $("kkGeri").onclick = cikis;
   $("kkMenu").onclick = cikis;
-  $("kkTahmin").onclick = tahmin;
+  // KLAVYE AÇIK KALSIN: Tahmin / Harf Al / Pas düğmesine basınca odak düğmeye geçip klavye kapanıyordu
+  // (sonraki kelimede tekrar açılıyor, kart aşağı yukarı sıçrıyordu). Düğmeler odağı çalamaz, tıklama sonrası odak kutuya geri verilir.
+  const odakKoru = () => { if (!sec.classList.contains("hidden") && !oyun.classList.contains("hidden")) odak(); };
+  ["kkTahmin", "kkHarfAl", "kkPas"].forEach(id => $(id).addEventListener("mousedown", e => e.preventDefault()));
+  $("kkTahmin").onclick = () => { tahmin(); odakKoru(); };
   $("kkHarfAl").onclick = harfAl;
-  $("kkPas").onclick = () => kelimeBitir("⏭️ Pas geçildi. Cevap: " + harfler.join(""));
+  $("kkPas").onclick = () => { kelimeBitir("⏭️ Pas geçildi. Cevap: " + harfler.join("")); odakKoru(); };
 
   // Enter: yeni satır açma, tahmin et
   inp.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); tahmin(); } });
