@@ -574,8 +574,16 @@ document.addEventListener("anasayfa", gKapat);
   window.addEventListener("scroll", function () {
     if (document.documentElement.classList.contains("menu-kilit") && window.scrollY) window.scrollTo(0, 0);
   });
+  // Sayfa kilitliyken bile kaydırılabilir bir liste (Sıralama, pencereler) içindeki kaydırma engellenmez
+  function kayanVar(el) {
+    for (; el && el !== document.body && el.nodeType === 1; el = el.parentElement) {
+      var cs = getComputedStyle(el);
+      if (/(auto|scroll)/.test(cs.overflowY) && el.scrollHeight > el.clientHeight + 1) return true;
+    }
+    return false;
+  }
   document.addEventListener("touchmove", function (e) {
-    if (document.documentElement.classList.contains("menu-kilit") && !(e.target.closest && e.target.closest("input,textarea"))) e.preventDefault();
+    if (document.documentElement.classList.contains("menu-kilit") && !(e.target.closest && e.target.closest("input,textarea")) && !kayanVar(e.target)) e.preventDefault();
   }, { passive: false });
   guncelle();
   setInterval(guncelle, 500);

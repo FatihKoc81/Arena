@@ -58,11 +58,7 @@ window.altSatir = function () {
       "#altSatir{position:fixed;left:0;right:0;bottom:calc(6px + env(safe-area-inset-bottom));z-index:5;display:flex;gap:8px;padding:0 max(14px,calc((100vw - 460px) / 2));pointer-events:none}#altSatir>*{flex:1 1 0;pointer-events:auto}#altSatir.gizli{display:none}";
     document.head.appendChild(st);
   }
-  if (dock) {
-    // Alt bölüm sonradan oluştuysa önceden açılmış ayrı satırdaki düğmeleri (APK/Güncelle) de içine taşı: hepsi aynı satırda, aynı hizada
-    if (s) { Array.from(s.children).forEach(c => dock.appendChild(c)); s.remove(); }
-    return dock;
-  }
+  if (dock) return dock;
   if (s) return s;
   const ana = document.getElementById("ana");
   s = document.createElement("div");
@@ -531,7 +527,7 @@ window.altSatir = function () {
 (function () {
   const ana = document.getElementById("ana"), h1 = document.querySelector("h1");
   if (!ana || !h1) return;
-  let son = 0, hazir = false;
+  let son = 0, hazir = false, cik = false;
   const durum = () => { try { history.pushState({ arena: 1 }, ""); } catch (e) {} };
 
   function toast(m) {
@@ -559,7 +555,7 @@ window.altSatir = function () {
   }
 
   // Geri tuşuna basılınca yapılacak iş (tus: true = Capacitor'dan geldi, geçmiş kaydı eklemeye gerek yok)
-  function geri(tus) {
+  function geri(tus, gecmis) {
     const kapandi = katmanKapat();
     const yeniden = () => { if (!tus) durum(); };
     if (!ana.classList.contains("hidden")) {
@@ -567,8 +563,7 @@ window.altSatir = function () {
       if (kapandi) { yeniden(); return; }
       if (!window.Capacitor) { yeniden(); return; }
       if (Date.now() - son < 2000) {
-        try { window.Capacitor.Plugins.App.exitApp(); return; } catch (e) {}
-        try { history.back(); } catch (e) {} // eklenti yoksa: geçmiş kaydı eklemeden geri git, uygulama kapanır
+        cikis();
         return;
       }
       son = Date.now(); toast("Çıkmak için tekrar geri bas"); yeniden();
@@ -578,21 +573,24 @@ window.altSatir = function () {
     yeniden();
   }
 
-  // 1) APK: Capacitor geri tuşu olayı (en sağlam yol; uygulamanın kendiliğinden kapanmasını engeller)
+  // 1) APK: Capacitor geri tuşu olayı. Eklenti yoksa veya dinleyici kurulamazsa tarayıcı geçmişine düşülür.
+  const cikis = () => {
+    try { window.Capacitor.Plugins.App.exitApp(); return; } catch (e) {}
+    try { navigator.app.exitApp(); return; } catch (e) {}
+    cik = true; try { history.go(-2); } catch (e) {} // eklenti yoksa: koruma kayıtlarını aşıp geri çık
+  };
   try {
     const App = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App;
-    if (App && App.addListener) { App.addListener("backButton", () => geri(true)); hazir = true; }
+    if (App && App.addListener) {
+      const p = App.addListener("backButton", () => geri(true));
+      if (p && p.catch) p.catch(() => {});
+    }
   } catch (e) {}
-  // 2) Tarayıcı / PWA: geçmiş kaydı. Chrome, kullanıcı dokunmadan eklenen kayıtları geri tuşunda atladığı için
-  //    ilk dokunuşta eklenir.
-  if (!hazir) {
-    // Geri tuşu bizim eklediğimiz geçmiş kaydını harcar; her dokunuşta kayıt yoksa yeniden eklenir
-    // (Chrome/Samsung Internet, dokunuşsuz eklenen kayıtları geri tuşunda atlayıp siteden çıkıyordu).
-    const sagla = () => { if (!(history.state && history.state.arena)) durum(); };
-    document.addEventListener("pointerdown", sagla, true);
-    document.addEventListener("touchend", sagla, true);
-    document.addEventListener("keydown", sagla, true);
-    durum();
-    window.addEventListener("popstate", () => geri(false));
-  }
+  // 2) Her durumda geçmiş koruması: dinleyici çalışmazsa bile geri tuşu uygulamayı kapatmaz, sadece bizim kaydı harcar.
+  const sagla = () => { if (!(history.state && history.state.arena)) durum(); };
+  document.addEventListener("pointerdown", sagla, true);
+  document.addEventListener("touchend", sagla, true);
+  document.addEventListener("keydown", sagla, true);
+  durum();
+  window.addEventListener("popstate", () => { if (!cik) geri(false, true); });
 })();
