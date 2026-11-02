@@ -495,6 +495,7 @@ document.addEventListener("anasayfa", gKapat);
   var stl = document.createElement("style");
   stl.textContent =
     ".apk-btn{position:fixed;left:10px;bottom:4px;height:40px;padding:0 14px;box-sizing:border-box;z-index:5;display:flex;align-items:center;justify-content:center;gap:5px;border:2px solid #d4a63a;border-radius:11px;background:rgba(0,0,0,.35);color:#d4a63a;font-family:Georgia,'Times New Roman',serif;font-style:italic;font-weight:700;font-size:21px;line-height:1;text-decoration:none}" +
+    ".apk-btn.gnc{padding:0 9px;gap:3px;font-family:system-ui,sans-serif;font-style:normal;font-size:14px}" +
     ".apk-btn:active{opacity:.7}.apk-btn.gizli{display:none}" +
     "html.menu-kilit,html.menu-kilit body{overflow:hidden!important;overscroll-behavior:none!important;height:100%!important}" +
     "html.menu-kilit body{position:fixed!important;top:0;left:0;right:0;width:100%}" +
@@ -530,6 +531,7 @@ document.addEventListener("anasayfa", gKapat);
     a.target = "_blank";
     a.rel = "noopener";
     a.textContent = apkUygulamasi ? "⬇ Güncelle" : "⬇ APK";
+    if (apkUygulamasi) a.classList.add("gnc");
     document.body.appendChild(a);
   }
   // Passaparola oyunda başlık, ana sayfadaki yerine ölçülerek hizalanır
@@ -537,11 +539,30 @@ document.addEventListener("anasayfa", gKapat);
   function ppHizala() {} // başlık artık CSS ile sabit; kaydırma/ölçme gerekmiyor
   // Kilit kararı sadece ekran/yükseklik değişince verilir (sürekli açıp kapatma titremeye ve yazıların kaybolmasına yol açıyordu)
   var sonAnahtar = "";
+  // Chrome'da adres/gezinti çubuğu yüzünden ekranın altındaki sabit düğmeler taşıyordu: ana sayfada yukarı alınır
+  function altYukari(gor) {
+    var pay = 0;
+    if (gor && !uygulamaIci) {
+      var vv = window.visualViewport, olc = vv ? document.documentElement.clientHeight - vv.height - vv.offsetTop : 0;
+      pay = Math.max(14, Math.round(olc));
+    }
+    Array.prototype.forEach.call(document.body.children, function (e) {
+      if (e.tagName === "SCRIPT" || e.tagName === "STYLE") return;
+      var cs = getComputedStyle(e);
+      if (cs.position !== "fixed" || cs.display === "none") return;
+      var r = e.getBoundingClientRect();
+      if (r.height > 160 || r.top < window.innerHeight * 0.6) return; // sadece alttaki küçük öğeler
+      if ((e.getAttribute("data-alt-pay") | 0) === pay) return;
+      e.style.marginBottom = pay ? pay + "px" : "";
+      e.setAttribute("data-alt-pay", pay);
+    });
+  }
   function guncelle() {
     ppHizala();
     var ana = document.getElementById("ana");
     var gor = !!(ana && !ana.classList.contains("hidden") && getComputedStyle(ana).display !== "none");
     if (a) a.classList.toggle("gizli", !gor);
+    altYukari(gor);
     var gorunen = [];
     document.querySelectorAll(".kart").forEach(function (k) {
       if (k.classList.contains("hidden") || getComputedStyle(k).display === "none") return;

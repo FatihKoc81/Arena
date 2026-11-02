@@ -67,7 +67,8 @@
   css.textContent =
     "#ana>.btn.arKart{order:var(--sira);margin:0;width:auto;height:72px;padding:6px;border-radius:20px;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:8px;font-size:clamp(14px,4.2vw,16px);font-weight:700;border:2px solid rgba(255,255,255,.2);background:var(--kc)!important;color:#fff!important}" +
     "#ana>.btn.arKart .ar-ik{font-size:28px;line-height:1}" +
-    "@media (max-height:700px){#ana>.btn.arKart{height:58px}}" +
+    "@media (max-height:860px){#ana>.btn.arKart{height:60px;gap:6px;padding:4px}#ana>.btn.arKart .ar-ik{font-size:24px}}" +
+    "@media (max-height:700px){#ana>.btn.arKart{height:52px}}" +
     ".ar-afisK{position:fixed;left:0;right:0;top:calc(env(safe-area-inset-top) + 6px);z-index:100010;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;padding:0 10px}" +
     ".ar-afis{pointer-events:auto;width:min(100%,440px);box-sizing:border-box;background:#101a38;border:2px solid #ffb300;border-radius:16px;padding:10px 12px;color:#fff;font:600 15px/1.35 system-ui,sans-serif;text-align:center;box-shadow:0 6px 24px rgba(0,0,0,.6)}" +
     ".ar-ab{display:flex;gap:8px;margin-top:8px}" +
@@ -88,6 +89,7 @@
     ".ar-ad{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700}" +
     ".ar-on{width:9px;height:9px;border-radius:50%;background:#22c55e;flex:none}" +
     ".ar-pu{font-weight:800;color:#ffe27a}" +
+    ".ar-sr.k{padding:5px 10px;margin-bottom:5px}.ar-sr.k .ar-dv{padding:4px 10px}" +
     ".ar-dv{border:0;border-radius:10px;background:#a3231c;color:#fff;font-size:16px;padding:6px 10px;cursor:pointer}.ar-dv[disabled]{opacity:.3}" +
     ".ar-bos{text-align:center;color:#8e9bc4;padding:24px 8px}" +
     ".ar-ara{display:none;gap:6px;padding:0 10px 6px}.ar-ara.show{display:flex}.ar-ai{flex:1;min-width:0;box-sizing:border-box;border:2px solid #4a5a9a;background:#101a38;color:#fff;border-radius:12px;padding:9px 10px;font:600 16px system-ui,sans-serif;outline:0}.ar-ai:focus{border-color:#7d97ff}.ar-ag{border:0;border-radius:12px;background:#a3231c;color:#fff;padding:0 14px;font:800 14px system-ui,sans-serif;cursor:pointer;white-space:nowrap}" +
@@ -348,13 +350,49 @@
   function sonra() { if (window.Ekonomi && window.Ekonomi.barYaz) window.Ekonomi.barYaz(); yenile(); }
 
   // ---------- davet ----------
+  // Oyun seçme penceresi: ana sayfadaki gibi 2 sütunlu renkli kartlar (Rotasyon altta geniş)
+  var KART_STIL = [
+    { re: /Milyoner/i, renk: "#5a1818", simge: "m", sira: 1 },
+    { re: /Passaparola/i, renk: "#0b6a52", simge: "p", sira: 2 },
+    { re: /Kelime/i, renk: "#0a3aa5", simge: "k", sira: 3 },
+    { re: /İşlem|islem/i, renk: "#52139a", simge: "o", sira: 4 },
+    { re: /Rotasyon/i, renk: "#8a3300", simge: "c", sira: 5, genis: true }
+  ];
+  function oyunKartlari(baslik, metin, cb) {
+    var ids = Object.keys(OYUN);
+    if (ids.indexOf("rotasyon") < 0) ids.push("rotasyon"); // Rotasyon her zaman listede
+    var liste = ids.map(function (id) {
+      var ad = id === "rotasyon" && !OYUN[id] ? "Rotasyon" : oyunAd(id), s = null;
+      KART_STIL.forEach(function (x) { if (!s && (x.re.test(ad) || x.re.test(id))) s = x; });
+      return { id: id, ad: ad, s: s || { renk: "#222f45", simge: "", sira: 9 } };
+    }).sort(function (a, b) { return a.s.sira - b.s.sira; });
+    var ov = document.createElement("div");
+    ov.style.cssText = "position:fixed;inset:0;z-index:100030;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:14px;box-sizing:border-box;font-family:system-ui,sans-serif";
+    var h = '<div style="width:min(100%,420px);max-height:100%;overflow:auto;background:#fdf0d2;border:3px solid #e3b93a;border-radius:28px;padding:14px 14px 12px;box-sizing:border-box;color:#5a3a14;text-align:center">' +
+      '<div style="font-size:24px;font-weight:800;margin:2px 0 4px">' + esc(baslik) + "</div>" +
+      '<div style="font-size:15px;font-weight:600;line-height:1.35;margin-bottom:10px">' + metin + "</div>" +
+      '<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">';
+    liste.forEach(function (o, i) {
+      h += '<button data-i="' + i + '" style="' + (o.s.genis ? "grid-column:1/-1;height:76px;" : "height:86px;") + "background:" + o.s.renk + ';border:2px solid rgba(255,255,255,.25);border-radius:18px;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font:700 15px system-ui,sans-serif;padding:4px;cursor:pointer">' +
+        (o.s.simge ? '<svg viewBox="0 0 48 48" width="44" height="44" aria-hidden="true"><use href="#i-' + o.s.simge + '"/></svg>' : "") + "<span>" + esc(o.ad) + "</span></button>";
+    });
+    h += '</div><button data-i="-1" style="display:block;width:100%;margin-top:10px;border:0;border-radius:16px;padding:12px;background:#8b8f9c;color:#fff;font:800 16px system-ui,sans-serif;cursor:pointer">Vazgeç</button></div>';
+    ov.innerHTML = h;
+    ov.addEventListener("click", function (e) {
+      var b = e.target.closest && e.target.closest("button[data-i]");
+      if (!b && e.target !== ov) return;
+      var i = b ? +b.getAttribute("data-i") : -1;
+      ov.remove();
+      if (i < 0) return;
+      if (!OYUN[liste[i].id]) { toast(liste[i].ad + " düellosu henüz hazır değil."); return; }
+      cb(liste[i].id);
+    });
+    document.body.appendChild(ov);
+  }
   function oyunSec(baslik, cb) {
     var ids = Object.keys(OYUN);
     if (!ids.length) { toast("Düello için kayıtlı oyun yok."); return; }
-    if (ids.length === 1) { cb(ids[0]); return; }
-    var ops = ids.map(function (id) { return { t: oyunAd(id), f: function () { cb(id); } }; });
-    ops.push({ t: "Vazgeç", c: "gri", f: function () {} });
-    Ekonomi.sor(baslik, "Hangi oyunu oynayacaksınız?", ops);
+    oyunKartlari(baslik, "Hangi oyunu oynayacaksınız?", cb);
   }
   function davetSec(hedef, hedefAd) {
     if (!cevrimici(true)) return;
@@ -406,11 +444,7 @@
     bildirimIzni();
     var ids = Object.keys(OYUN);
     if (!ids.length) { toast("Düello için kayıtlı oyun yok."); return; }
-    if (ids.length === 1) { istekGonder(hedef, hedefAd, ids[0]); return; }
-    var ops = [];
-    ids.forEach(function (id) { ops.push({ t: oyunAd(id), f: function () { istekGonder(hedef, hedefAd, id); } }); });
-    ops.push({ t: "Vazgeç", c: "gri", f: function () {} });
-    Ekonomi.sor("📨 " + hedefAd, "İstek 48 saat geçerli. Kabul ederse sana haber gelir.", ops);
+    oyunKartlari("📨 " + hedefAd, "İstek 48 saat geçerli.<br>Kabul ederse sana haber gelir.", function (id) { istekGonder(hedef, hedefAd, id); });
   }
   function istekGonder(hedef, hedefAd, oyun) {
     var o = { from: uid, fromAd: adim(), to: hedef, toAd: hedefAd, oyun: oyun || "", oyunAd: oyun ? oyunAd(oyun) : "", durum: "bekliyor", t: ts(), bitis: simdi() + ISTEK_MS };
@@ -854,7 +888,7 @@
     var b = document.createElement("div");
     b.id = "arAdBtn";
     b.textContent = "👤 İsimle istek";
-    b.style.cssText = "position:fixed;right:84px;bottom:4px;height:40px;padding:0 10px;display:flex;align-items:center;justify-content:center;border:2px solid #d4a63a;border-radius:11px;color:#d4a63a;font:700 13px system-ui,sans-serif;background:rgba(0,0,0,.25);z-index:5;cursor:pointer;white-space:nowrap";
+    b.style.cssText = "position:fixed;right:84px;bottom:calc(4px + env(safe-area-inset-bottom));height:40px;padding:0 10px;display:flex;align-items:center;justify-content:center;border:2px solid #d4a63a;border-radius:11px;color:#d4a63a;font:700 13px system-ui,sans-serif;background:rgba(0,0,0,.25);z-index:5;cursor:pointer;white-space:nowrap";
     b.onclick = adPenAc;
     document.body.appendChild(b);
     var g = function () { b.style.display = ana.classList.contains("hidden") || ana.style.display === "none" ? "none" : "flex"; };
@@ -963,14 +997,14 @@
   }
   function htmlSira() {
     var tpMod = siraTur === "turnuva", liste = tpMod ? siraTp : sira, h = "";
-    h += '<div class="ar-tabs" style="padding:2px 0 8px"><button class="ar-alt' + (tpMod ? "" : " on") + '" data-st="genel">⭐ Genel Puan</button><button class="ar-alt' + (tpMod ? " on" : "") + '" data-st="turnuva">🏆 Turnuva Puanı</button></div>';
-    h += '<button class="ar-bt kirmizi" data-act="meydan">⚔️ Meydan Oku</button>';
+    h += '<div class="ar-tabs" style="padding:2px 0 0"><button class="ar-alt' + (tpMod ? "" : " on") + '" data-st="genel">⭐ Genel Puan</button><button class="ar-alt' + (tpMod ? " on" : "") + '" data-st="turnuva">🏆 Turnuva Puanı</button></div>';
+    h += '<button class="ar-bt kirmizi" data-act="meydan" style="margin:6px 0;padding:11px">⚔️ Meydan Oku</button>';
     h += htmlIstekler();
     if (!liste.length) h += '<div class="ar-bos">' + (!db ? "Çevrimiçi sıralama için firebase-config.js doldurulmalı." : tpMod ? "Henüz turnuva puanı olan yok. İlk sen ol!" : "Yükleniyor…") + "</div>";
     var madal = ["🥇", "🥈", "🥉"];
     liste.forEach(function (x, i) {
       var me = x.uid === uid, on = !!onlineSet[x.uid], deger = tpMod ? (me ? L.tp : x.tp) : (me ? Puan.toplam() : x.puan), lg = me ? L.lig : x.lig;
-      h += '<div class="ar-sr' + (me ? " me" : "") + '"' + (me ? ' data-me="1" data-sr="' + (i + 1) + '" style="cursor:pointer"' : "") + '><span class="ar-no">' + (i < 3 ? madal[i] : i + 1) + '</span><span class="ar-ad">' + esc(x.ad) + '<small class="ar-lgs">' + esc(ligAd(lg)) + "</small></span>" +
+      h += '<div class="ar-sr k' + (me ? " me" : "") + '"' + (me ? ' data-me="1" data-sr="' + (i + 1) + '" style="cursor:pointer"' : "") + '><span class="ar-no">' + (i < 3 ? madal[i] : i + 1) + '</span><span class="ar-ad">' + esc(x.ad) + '<small class="ar-lgs">' + esc(ligAd(lg)) + "</small></span>" +
         (on ? '<i class="ar-on"></i>' : "") + '<span class="ar-pu">' + fmt(deger) + "</span>" +
         (me ? "" : '<button class="ar-dv" data-u="' + esc(x.uid) + '" data-a="' + esc(x.ad) + '"' + (on ? "" : ' data-off="1"') + ">" + (on ? "⚔️" : "📨") + "</button>") + "</div>";
     });

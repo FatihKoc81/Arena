@@ -51,7 +51,7 @@
 
   const r = document.createElement("div");
   r.textContent = "FK";
-  r.style.cssText = "position:fixed;right:10px;bottom:4px;width:62px;height:40px;display:flex;align-items:center;justify-content:center;border:2px solid #d4a63a;border-radius:11px;color:#d4a63a;font-family:Georgia,'Times New Roman',serif;font-style:italic;font-weight:700;font-size:21px;line-height:1;pointer-events:none;z-index:5";
+  r.style.cssText = "position:fixed;right:10px;bottom:calc(4px + env(safe-area-inset-bottom));width:62px;height:40px;display:flex;align-items:center;justify-content:center;border:2px solid #d4a63a;border-radius:11px;color:#d4a63a;font-family:Georgia,'Times New Roman',serif;font-style:italic;font-weight:700;font-size:21px;line-height:1;pointer-events:none;z-index:5";
   document.body.append(r);
   const g = () => { r.style.display = ana.classList.contains("hidden") || ana.style.display === "none" ? "none" : "flex"; };
   new MutationObserver(g).observe(ana, { attributes: true, attributeFilter: ["class", "style"] });
@@ -165,9 +165,7 @@
     let ref = null;
     oyun.querySelectorAll("button.btn.ikinci").forEach(b => { if (/Ana Menü/.test(b.textContent)) ref = b; });
     if (!ref || !ref.offsetHeight) return;
-    // margin-top:auto (alta yapıştırma) ölçüye karışmasın: İşlem Oyunu'ndaki .btn boşluğu (8-14px) kullanılır
-    const bosluk = Math.max(8, Math.min(14, Math.round(window.innerHeight * 0.018)));
-    const kayma = Math.round((ref.offsetHeight + bosluk) * KAYMA_ORAN);
+    const kayma = Math.round((ref.offsetHeight + (parseFloat(getComputedStyle(ref).marginTop) || 0)) * KAYMA_ORAN);
     if (getComputedStyle(oyun).position === "static") oyun.style.position = "relative";
     // İşlem Oyunu ile aynı: üst çizgi aynı, alt çizgi ekranın 12 px üstünde. Sığmazsa boşluklar sıkılaşır.
     delete oyun.dataset.sik;
