@@ -183,6 +183,9 @@ function menu() {
 
 function baslat() {
   if (st.seviye > SEVIYE_SAYISI) { st.seviye = 1; st.seri = (st.seri + 1) % SERI_SAYISI; kaydet(); }
+  // Yarım bırakılan bölüme geri dönünce aynı sorular gelmesin (ve süre hilesi olmasın): her girişte sonraki seri
+  if (st.acik) st.seri = (st.seri + 1) % SERI_SAYISI;
+  st.acik = true;
   lv = seviyeSorulari(st.seri, st.seviye);
   soru = 0;
   can = CAN_MAX + st.bonus; st.bonus = 0; kaydet(); canYaz();
@@ -255,7 +258,7 @@ function cevapla(i) {
 
 function bitir() {
   $("bar").style.width = "100%";
-  st.seviye++; st.biten++;
+  st.seviye++; st.biten++; st.acik = false;
   const bonus = st.biten % BONUS_ARALIK === 0;
   if (bonus) st.bonus++;
   kaydet();
@@ -500,6 +503,7 @@ document.addEventListener("anasayfa", gKapat);
     "html.menu-kilit body{position:fixed!important;top:0;left:0;right:0;width:100%}" +
     // Kısa ekranlarda (tarayıcı çubukları açıkken) oyun ekranı sığsın diye boşlukları azalt
     "@media (max-height:800px){#oyun,#son{margin-top:8px!important;padding-top:14px!important;padding-bottom:14px!important}#oyun .sec,#son .btn{padding-top:10px!important;padding-bottom:10px!important}}" +
+    "body:has(#ana.hidden) .apk-btn,body:has(#ana.hidden) #altSatir,body:has(#ana.hidden) .ar-adb{display:none!important}" +
     "body.ppOyunda{padding-top:calc(58px + env(safe-area-inset-top))!important}" +
     // Kelime Oyunu: başlık Passaparola ile aynı; kart içeriğe göre kısalır (boşluklar azaltıldı)
     "body.kkOyunda{padding-top:calc(58px + env(safe-area-inset-top))!important;padding-bottom:10px!important}" +

@@ -40,7 +40,17 @@
       ["Paris ve Roma'nın bulunduğu kıta", ["Avrupa"]],
       ["Hastaları hastaneye taşıyan, sirenli araç", ["Ambulans"]],
       ["Başkenti Berlin olan ülke", ["Almanya"]],
-      ["Mutfakta yemek pişirmeyi meslek edinen kişi", ["Aşçı"]]
+      ["Mutfakta yemek pişirmeyi meslek edinen kişi", ["Aşçı"]],
+      ["Bir dilin harflerinin sıralı bütünü", ["Alfabe"]],
+      ["Binalarda insanları katlar arasında taşıyan kabin", ["Asansör"]],
+      ["Sapı uzun, alt kısmı iri, tatlı ve sulu ağaç meyvesi", ["Armut"]],
+      ["Sekiz kolu olan, mürekkep püskürtebilen deniz canlısı", ["Ahtapot"]],
+      ["Kuyruğunun ucundaki iğneyle zehirleyen, kum rengi eklem bacaklı", ["Akrep"]],
+      ["Güneşe doğru dönen, çerezi ve yağı yapılan sarı çiçek", ["Ayçiçeği"]],
+      ["Takı yapımında kullanılan, sarı renkli değerli maden", ["Altın"]],
+      ["Hayvan peşinde koşan, tüfek taşıyan kişi", ["Avcı"]],
+      ["Televizyon ve radyo yayınlarını yakalayan çatı aleti", ["Anten"]],
+      ["Odun yanınca çıkan alevli ısı kaynağı", ["Ateş"]]
     ],
     "B": [
       ["Çocukların oynadığı, üflenince şişen renkli lastik oyuncak", ["Balon"]],
@@ -72,7 +82,17 @@
       ["Otobüse veya sinemaya girerken alınan kâğıt", ["Bilet"]],
       ["Karın rengi", ["Beyaz"]],
       ["Mahalledeki küçük market", ["Bakkal"]],
-      ["Türkiye'nin kuzeybatı komşusu", ["Bulgaristan"]]
+      ["Türkiye'nin kuzeybatı komşusu", ["Bulgaristan"]],
+      ["Pilav ve köfte yapımında kullanılan, kırılmış buğday", ["Bulgur"]],
+      ["Üst dudağın üstünde çıkan kıllar", ["Bıyık"]],
+      ["Duvarları renklendirmek için sürülen sıvı madde", ["Boya"]],
+      ["İnşaat işçilerinin başına taktığı koruyucu sert şapka", ["Baret"]],
+      ["Seyahatte eşyaların konduğu, kulplu büyük çanta", ["Bavul"]],
+      ["Yufkadan yapılan peynirli veya kıymalı hamur işi", ["Börek"]],
+      ["Muğla'da kalesiyle ünlü tatil ilçesi", ["Bodrum"]],
+      ["Acısı ve dolması olan, kırmızı veya yeşil sebze", ["Biber"]],
+      ["Küçük benekli yumurtalarıyla bilinen, ufak yabani kuş", ["Bıldırcın"]],
+      ["Ramazan ve Kurban olmak üzere kutlanan özel gün", ["Bayram"]]
     ],
     "C": [
       ["Yumurtadan yeni çıkmış tavuk yavrusu", ["Civciv"]],
@@ -104,7 +124,17 @@
       ["Masallarda süpürgeyle uçan kötü büyücü kadın", ["Cadı"]],
       ["Boyu normalden çok kısa olan kişi", ["Cüce"]],
       ["Korkutucu ve zararlı masal yaratığı", ["Canavar"]],
-      ["Gözle görülmeyen, ateşten yaratıldığına inanılan varlık", ["Cin"]]
+      ["Gözle görülmeyen, ateşten yaratıldığına inanılan varlık", ["Cin"]],
+      ["Plajlarda boğulma tehlikesine karşı bekleyen görevli", ["Cankurtaran"]],
+      ["İnce dilimlenmiş kızarmış patates atıştırmalığı", ["Cips"]],
+      ["Harflerle denklemleri çözen matematik dalı", ["Cebir"]],
+      ["Yeryüzünün şekillerini, iklimini ve ülkeleri inceleyen bilim", ["Coğrafya"]],
+      ["Madenin işlenmemiş, taşlı hâli", ["Cevher"]],
+      ["Müslümanların ibadet için toplandığı yapı", ["Cami"]],
+      ["Suç işleyene verilen yaptırım", ["Ceza"]],
+      ["Eski evlerde üst katın dışa taşan çıkması", ["Cumba"]],
+      ["Hâkimlerin ve din görevlilerinin giydiği uzun, geniş giysi", ["Cüppe"]],
+      ["Müminlerin ahirette gireceğine inandığı güzel yurt", ["Cennet"]]
     ],
     "Ç": [
       ["Yemek yerken kullanılan, uçları dişli sofra aleti", ["Çatal"]],
@@ -136,7 +166,17 @@
       ["Topraktan yapılan yemek pişirme kabı", ["Çömlek"]],
       ["Tuz Mağarası ile bilinen İç Anadolu şehri", ["Çankırı"]],
       ["Kışın sonunda açan, küçük soğanlı çiçek", ["Çiğdem"]],
-      ["Tahıl veya un konan kalın kumaş torba", ["Çuval"]]
+      ["Tahıl veya un konan kalın kumaş torba", ["Çuval"]],
+      ["Kilitleri açan usta", ["Çilingir"]],
+      ["Masanın içinde kayarak açılan göz", ["Çekmece"]],
+      ["Çocukların sopayla yuvarladığı halka", ["Çember"]],
+      ["Ustanın yanında meslek öğrenen genç", ["Çırak"]],
+      ["Musluğundan su akan, yol kenarındaki yapı", ["Çeşme"]],
+      ["Çekiçle çakılan sivri metal parça", ["Çivi"]],
+      ["Makinede yıkanan giysiler", ["Çamaşır"]],
+      ["Hayvan ve tarım işlerinin yapıldığı kırsal işletme", ["Çiftlik"]],
+      ["Kara ekmeği yapılan tahıl", ["Çavdar"]],
+      ["Ayçekirdeği, fıstık, leblebi gibi atıştırılan kuruyemişler", ["Çerez"]]
     ],
     "D": [
       ["Yemekleri çiğnememizi sağlayan, ağızdaki sert yapılar", ["Diş"]],
@@ -168,7 +208,17 @@
       ["Başkenti Kopenhag olan ülke", ["Danimarka"]],
       ["Çemberin iç kısmıyla oluşan yuvarlak geometrik şekil", ["Daire"]],
       ["Yaprağı yemeklerde kullanılan, kokulu ağaç", ["Defne"]],
-      ["Milyonlarca yıl önce yaşamış devasa sürüngen", ["Dinozor"]]
+      ["Milyonlarca yıl önce yaşamış devasa sürüngen", ["Dinozor"]],
+      ["Bir kuruma yazılan resmî istek yazısı", ["Dilekçe"]],
+      ["Zeytinyağlı, içi pirinç doldurulmuş biber veya patlıcan yemeği", ["Dolma"]],
+      ["Denizin altına dalan kişi", ["Dalgıç"]],
+      ["Lavaşa sarılan et yemeği", ["Dürüm"]],
+      ["Annenin erkek kardeşi", ["Dayı"]],
+      ["Birbirine geçerek hareket ileten çark", ["Dişli"]],
+      ["Gizemli olayları çözen araştırmacı", ["Dedektif"]],
+      ["Kahramanlıkları anlatan uzun manzum anlatı", ["Destan"]],
+      ["Uzaktaki şeyleri yakın gösteren, iki gözlü alet", ["Dürbün"]],
+      ["Pastadan veya ekmekten kesilen parça", ["Dilim"]]
     ],
     "E": [
       ["Adem ile Havva'nın yediği rivayet edilen meyve", ["Elma"]],
@@ -200,7 +250,17 @@
       ["Dağlarda yol kesen, soygun yapan haydut", ["Eşkıya"]],
       ["Boynun arka bölümü", ["Ense"]],
       ["Tırnağı veya metali düzeltmede kullanılan pürüzlü araç", ["Eğe"]],
-      ["Roman, şiir ve hikâyeleri inceleyen sanat dalı", ["Edebiyat"]]
+      ["Roman, şiir ve hikâyeleri inceleyen sanat dalı", ["Edebiyat"]],
+      ["Ata binmek için sırta konan deri takım", ["Eyer"]],
+      ["Çalışma hayatını bitirip aylık alan kimse", ["Emekli"]],
+      ["Spor yaparken giyilen rahat altlı üstlü giysi", ["Eşofman"]],
+      ["Ürünlerin üzerine yapıştırılan fiyat kâğıdı", ["Etiket"]],
+      ["Fiyatların genel olarak artması", ["Enflasyon"]],
+      ["Küçük dükkân sahibi, çarşı ticaretiyle uğraşan kimse", ["Esnaf"]],
+      ["Su üzerine boya damlatılarak yapılan geleneksel kâğıt sanatı", ["Ebru"]],
+      ["Aynı işi birlikte yapan topluluk", ["Ekip"]],
+      ["Anne ve babaya birlikte verilen ad", ["Ebeveyn"]],
+      ["Bebeklerin ağlamasını kesmek için ağzına verilen lastik uç", ["Emzik"]]
     ],
     "F": [
       ["Hortumu olan, karaların en büyük hayvanı", ["Fil"]],
@@ -232,7 +292,17 @@
       ["Kutuplarda yaşayan, yüzgeçli sevimli deniz memelisi", ["Fok"]],
       ["Domatesli yemeklerde kullanılan, kokulu yeşil ot", ["Fesleğen"]],
       ["Rüzgârda dönen kâğıt oyuncak", ["Fırıldak"]],
-      ["Filin uzun dişlerinden elde edilen beyaz madde", ["Fildişi"]]
+      ["Filin uzun dişlerinden elde edilen beyaz madde", ["Fildişi"]],
+      ["Banyo ve mutfak duvarlarına döşenen sırlı çini", ["Fayans"]],
+      ["Araçları ve yolcuları karşıya geçiren gemi", ["Feribot"]],
+      ["Bir belgenin makineyle çoğaltılmış hâli", ["Fotokopi"]],
+      ["Bir malın satış bedeli", ["Fiyat"]],
+      ["Baklavanın üstüne serpilen yeşil kuruyemiş", ["Fıstık", "Antep fıstığı"]],
+      ["Hayvanların konuştuğu, ders veren kısa hikâye", ["Fabl"]],
+      ["Zihinde beliren düşünce", ["Fikir"]],
+      ["Taşlaşmış canlı kalıntısı", ["Fosil"]],
+      ["Turşu ve şarap konulan, tahtadan yapılmış büyük kap", ["Fıçı"]],
+      ["Gömleğin altına giyilen kolsuz iç giysisi", ["Fanila"]]
     ],
     "G": [
       ["Dünyamızı ısıtan ve aydınlatan yıldız", ["Güneş"]],
@@ -264,7 +334,17 @@
       ["Afrika ormanlarında yaşayan dev maymun", ["Goril"]],
       ["Acımsı, büyük sarı veya pembe narenciye", ["Greyfurt"]],
       ["Başımızın üstündeki mavi alan", ["Gökyüzü"]],
-      ["Rahatsız eden yüksek ses", ["Gürültü"]]
+      ["Rahatsız eden yüksek ses", ["Gürültü"]],
+      ["Çikolata kaplı, katmanlı ince bisküvi", ["Gofret"]],
+      ["Giysilerin asıldığı büyük mobilya", ["Gardırop"]],
+      ["Boynuzları dallı, ormanda yaşayan hayvan", ["Geyik"]],
+      ["Kuşaktan kuşağa aktarılan âdetler", ["Gelenek"]],
+      ["Sınırdan geçen malların kontrol edildiği yer", ["Gümrük"]],
+      ["Kuşların yemek yediği sert ağız", ["Gaga"]],
+      ["Işığın önüne çıkan cismin yere düşen karartısı", ["Gölge"]],
+      ["Arabanın park edildiği kapalı yer", ["Garaj"]],
+      ["Yünlü giysileri delen küçük kelebek", ["Güve"]],
+      ["Çalışarak veya yatırımla kazanılan para", ["Gelir"]]
     ],
     "H": [
       ["Mekke'ye yapılan kutsal ziyaret", ["Hac"]],
@@ -296,7 +376,17 @@
       ["Banyodan sonra kurulanmak için kullanılan bez", ["Havlu"]],
       ["Kafeste çark çeviren küçük kemirgen", ["Hamster"]],
       ["Burnu gıdıklayınca istemsizce yapılan hareket", ["Hapşırık"]],
-      ["Sabahları öten, ibiği olan erkek kümes hayvanı", ["Horoz"]]
+      ["Sabahları öten, ibiği olan erkek kümes hayvanı", ["Horoz"]],
+      ["Önü düğmeli örgü üst giysi", ["Hırka"]],
+      ["Toplama, çıkarma gibi sayılarla yapılan işlem", ["Hesap"]],
+      ["Olgunlaşan ürünlerin toplanması", ["Hasat"]],
+      ["Kısa, sivri uçlu bıçak", ["Hançer"]],
+      ["Gemileri bağlamakta kullanılan kalın ip", ["Halat"]],
+      ["Bilgileri akılda tutma yetisi", ["Hafıza"]],
+      ["Uçakların kalkıp indiği yer", ["Havaalanı", "Havalimanı"]],
+      ["Başkalarının farklılıklarına anlayış gösterme", ["Hoşgörü"]],
+      ["Kısa anlatı türü, öykü", ["Hikâye", "Hikaye"]],
+      ["Şükran Günü sofralarının iri kümes hayvanı", ["Hindi"]]
     ],
     "I": [
       ["Lambadan ve güneşten yayılan, aydınlatan şey", ["Işık"]],
@@ -328,7 +418,17 @@
       ["Suyu kaynatan veya odayı ısıtan cihaza verilen genel ad", ["Isıtıcı"]],
       ["Üşüyen birinin sıcaklık kazanması", ["Isınmak"]],
       ["Hedefi vuramamak", ["Iskalamak"]],
-      ["Aşırıya kaçmayan, ölçülü", ["Ilımlı"]]
+      ["Aşırıya kaçmayan, ölçülü", ["Ilımlı"]],
+      ["Soğuk ve sıcak ölçüsünü belirleyen fiziksel nicelik", ["Isı"]],
+      ["Kırmızı kabuklu, kıskaçlı büyük deniz canlısı", ["Istakoz"]],
+      ["Mühür basılan mürekkepli ped", ["Istampa"]],
+      ["Kullanılmayacak kadar bozuk, ayıklanan mal", ["Iskarta"]],
+      ["Dişle koparmak", ["Isırmak"]],
+      ["Doğruluğunu kanıtlamak", ["Ispatlamak"]],
+      ["Suyla ıslak hâle getirmek", ["Islatmak"]],
+      ["Soğuk yemeği tekrar sıcak yapmak", ["Isıtmak"]],
+      ["Sıcak su kaynağı bulunan yer", ["Ilıca"]],
+      ["Karanlık, harap ve kasvetli yer", ["Izbe"]]
     ],
     "İ": [
       ["Türkiye'nin en kalabalık şehri", ["İstanbul"]],
@@ -360,7 +460,17 @@
       ["Ayak basılan yerde kalan işaret", ["İz"]],
       ["Ağzı kapaklı, sapı olan su kabı", ["İbrik"]],
       ["İlin alt bölgesi", ["İlçe"]],
-      ["Trenlerin durduğu yer", ["İstasyon"]]
+      ["Trenlerin durduğu yer", ["İstasyon"]],
+      ["Aynı anda doğan kardeşlerden biri", ["İkiz"]],
+      ["Fabrikada çalışan kimse", ["İşçi"]],
+      ["Dört yıl süren ilk okul", ["İlkokul"]],
+      ["Su, ayran, meyve suyu gibi sıvılar", ["İçecek"]],
+      ["Papaz, kız ve vale kartlarının bulunduğu oyun destesi", ["İskambil"]],
+      ["Büyük bir devletin en üst yöneticisi", ["İmparator"]],
+      ["Bir şeyi bulmaya yardım eden küçük bilgi", ["İpucu"]],
+      ["Daha önce olmayan bir şeyi ilk kez yapma", ["İcat"]],
+      ["Pusula ve saatte yön gösteren çubuk", ["İbre"]],
+      ["Bir yerin uzun yıllar boyu süren hava durumu", ["İklim"]]
     ],
     "J": [
       ["Kırsal bölgelerde görev yapan askeri güvenlik gücü", ["Jandarma"]],
@@ -392,7 +502,14 @@
       ["Meslek grubuna özgü özel konuşma dili", ["Jargon"]],
       ["Meyve aromalı, çiğnenen yumuşak şekerleme", ["Jelibon"]],
       ["At yarışlarında atı süren kişi", ["Jokey"]],
-      ["Filmin başında veya sonunda geçen oyuncu ve yapımcı listesi", ["Jenerik"]]
+      ["Filmin başında veya sonunda geçen oyuncu ve yapımcı listesi", ["Jenerik"]],
+      ["Arazide giden yüksek, dayanıklı araç", ["Jip", "Jeep"]],
+      ["Topları havaya atıp yakalayan sirk sanatçısı", ["Jonglör"]],
+      ["Japonya'da yaşayan kişi", ["Japon"]],
+      ["Yerin ısısından elde edilen enerji türü", ["Jeotermal"]],
+      ["Spor giysilerinde kullanılan esnek örme kumaş", ["Jarse"]],
+      ["Judo yapan sporcu", ["Judoka"]],
+      ["Jimnastik yapan sporcu", ["Jimnastikçi"]]
     ],
     "K": [
       ["Yazı yazmaya yarayan araç", ["Kalem"]],
@@ -424,7 +541,17 @@
       ["Malatya'nın en ünlü sarı meyvesi", ["Kayısı"]],
       ["Nehir ve boğazların iki yakasını bağlayan yapı", ["Köprü"]],
       ["Çorba içmeye yarayan sofra aleti", ["Kaşık"]],
-      ["Rengârenk kanatlı, tırtıldan dönüşen böcek", ["Kelebek"]]
+      ["Rengârenk kanatlı, tırtıldan dönüşen böcek", ["Kelebek"]],
+      ["Para biriktirilen küçük kap", ["Kumbara"]],
+      ["Et satan esnaf", ["Kasap"]],
+      ["Altın ve takı satan esnaf", ["Kuyumcu"]],
+      ["Arıların bal yaptığı yer", ["Kovan"]],
+      ["Çölde yetişen dikenli bitki", ["Kaktüs"]],
+      ["Yünden dokunan, yere serilen süslü örtü", ["Kilim"]],
+      ["Karnındaki keseyle yavrusunu taşıyan Avustralya hayvanı", ["Kanguru"]],
+      ["Saç kesen ve şekillendiren kişi", ["Kuaför"]],
+      ["Makineden geçirilmiş et", ["Kıyma"]],
+      ["Denizin kıyısındaki kumlu yer", ["Kumsal"]]
     ],
     "L": [
       ["Sarı renkli, ekşi bir narenciye", ["Limon"]],
@@ -456,7 +583,17 @@
       ["El yıkamak için kullanılan banyo parçası", ["Lavabo"]],
       ["Yanardağdan çıkan kızgın erimiş kayaç", ["Lav"]],
       ["Limondan yapılan serinletici içecek", ["Limonata"]],
-      ["Futbol takımlarının sezon boyunca oynadığı puanlı turnuva", ["Lig"]]
+      ["Futbol takımlarının sezon boyunca oynadığı puanlı turnuva", ["Lig"]],
+      ["Mor renkli, güzel kokulu bitki", ["Lavanta"]],
+      ["Çamaşır veya el yıkamaya yarayan geniş kap", ["Leğen"]],
+      ["Sözlük anlamında eski bir sözcük", ["Lügat"]],
+      ["Atlıkarınca ve dönme dolabın bulunduğu eğlence yeri", ["Lunapark"]],
+      ["Izgarası meşhur, gümüş renkli deniz balığı", ["Levrek"]],
+      ["Eski çağlarda ölülerin konulduğu taş sandık", ["Lahit"]],
+      ["Uzun, lüks otomobil", ["Limuzin"]],
+      ["Gösterişli ve pahalı olma durumu", ["Lüks"]],
+      ["Güney Amerika'da yaşayan tüylü, deve akrabası hayvan", ["Lama"]],
+      ["Giysi üzerinde kalan kirli iz", ["Leke"]]
     ],
     "M": [
       ["Güneş Sistemi'nin Kızıl Gezegeni", ["Mars"]],
@@ -488,7 +625,17 @@
       ["Kâğıt ve kumaş kesen alet", ["Makas"]],
       ["Araçları hareket ettiren makine", ["Motor"]],
       ["Komşuların oturduğu, şehrin küçük bölümü", ["Mahalle"]],
-      ["Sayılar ve işlemlerle uğraşan ders", ["Matematik"]]
+      ["Sayılar ve işlemlerle uğraşan ders", ["Matematik"]],
+      ["Spagetti ve penne gibi hamur yemeği", ["Makarna"]],
+      ["Kayalarda doğal olarak oluşmuş boşluk", ["Mağara"]],
+      ["Denizde yaşayan, kırmızısı süs taşı olarak kullanılan canlı", ["Mercan"]],
+      ["Eve konuk olarak gelen kişi", ["Misafir"]],
+      ["Yüzü örten, kimliği gizleyen veya koruyan ön yüz", ["Maske"]],
+      ["Okulun veya kurumun yöneticisi", ["Müdür"]],
+      ["Ahşaptan mobilya yapan usta", ["Marangoz"]],
+      ["Bina tasarlayan meslek insanı", ["Mimar"]],
+      ["Mahallenin seçilmiş başkanı", ["Muhtar"]],
+      ["Köprü, yol ve bina tasarlayan teknik meslek insanı", ["Mühendis"]]
     ],
     "N": [
       ["Mısır'dan geçen, dünyanın en uzun nehirlerinden biri", ["Nil"]],
@@ -520,7 +667,17 @@
       ["Kışın sonunda açan sarı veya beyaz kokulu çiçek", ["Nergis"]],
       ["Mutluluktan doğan canlılık", ["Neşe"]],
       ["Afrika'nın en kalabalık ülkesi", ["Nijerya"]],
-      ["Elmasıyla ünlü İç Anadolu şehri", ["Niğde"]]
+      ["Elmasıyla ünlü İç Anadolu şehri", ["Niğde"]],
+      ["Atın ayağına çakılan demir", ["Nal"]],
+      ["Mevlevi müziğinde üflenen kamıştan çalgı", ["Ney"]],
+      ["Hedefi vuran kişi", ["Nişancı"]],
+      ["Hristiyanların aralık ayında kutladığı bayram", ["Noel"]],
+      ["Kumaşa iğneyle işlenen süsleme", ["Nakış"]],
+      ["İnce ve saygılı davranış", ["Nezaket"]],
+      ["Meyve, çiçek gibi cansız nesnelerin resmi", ["Natürmort"]],
+      ["Kalp atışının bilekte hissedilen vuruşu", ["Nabız"]],
+      ["Adıyaman'daki dev heykelleriyle ünlü dağ", ["Nemrut"]],
+      ["Eşya veya yolcunun bir yerden başka yere taşınması", ["Nakliye", "Nakliyat"]]
     ],
     "O": [
       ["Öğrencilerin ders gördüğü yer", ["Okul"]],
@@ -552,7 +709,17 @@
       ["Bir ana babanın erkek çocuğu", ["Oğul"]],
       ["Ok ve yay kullanan sporcu", ["Okçu"]],
       ["Türk ordusunda yüksek rütbeli asker", ["Orgeneral"]],
-      ["Erden sonra gelen ilk askeri rütbe", ["Onbaşı"]]
+      ["Erden sonra gelen ilk askeri rütbe", ["Onbaşı"]],
+      ["Gösterişli çiçekleriyle bilinen süs bitkisi", ["Orkide"]],
+      ["Arabaların bırakıldığı yer", ["Otopark"]],
+      ["Sırtımızdaki kemik dizisi", ["Omurga"]],
+      ["Hamur açmakta kullanılan uzun değnek", ["Oklava"]],
+      ["Saz çalıp şiir söyleyen halk şairi", ["Ozan"]],
+      ["Çocukların eğlenmek için yaptığı etkinlik", ["Oyun"]],
+      ["Kitap okuyan kişi", ["Okuyucu"]],
+      ["Eski Türk yazıtlarının bulunduğu vadi", ["Orhun"]],
+      ["Dört tekerlekli motorlu özel yolcu taşıtı", ["Otomobil"]],
+      ["Kişinin saygınlığı, şeref", ["Onur"]]
     ],
     "Ö": [
       ["Okulda ders anlatan kişi", ["Öğretmen"]],
@@ -584,7 +751,17 @@
       ["Kötü bir durumu engellemek için alınan tedbir", ["Önlem"]],
       ["Borcun veya fiyatın karşılığını verme", ["Ödeme"]],
       ["Bir işi dikkatle yapma", ["Özen"]],
-      ["Birine verilen nasihat", ["Öğüt"]]
+      ["Birine verilen nasihat", ["Öğüt"]],
+      ["Harita veya çizimde küçültme oranı", ["Ölçek"]],
+      ["İş başvurusunda yazılan yaşam özeti", ["Özgeçmiş"]],
+      ["Kitabın başında yazarın yazdığı kısa yazı", ["Önsöz"]],
+      ["Başkası için kendinden fedakârlık etme", ["Özveri"]],
+      ["Taneleri değirmende ezip un yapmak", ["Öğütmek"]],
+      ["Metre veya cetvelle uzunluğunu bulma işi", ["Ölçmek"]],
+      ["Bağımsız, kimseye bağlı olmayan", ["Özgür"]],
+      ["Sevgi göstermek için dudakla dokunmak", ["Öpmek"]],
+      ["Bir işte başkalarından önce ilerleyen kişi", ["Öncü"]],
+      ["Yeni bilgi veya beceri edinmek", ["Öğrenmek"]]
     ],
     "P": [
       ["İtalyan mutfağından, yuvarlak hamur üzerine peynirli yemek", ["Pizza"]],
@@ -616,7 +793,17 @@
       ["Sirkte komik kıyafetli, güldüren kişi", ["Palyaço"]],
       ["Bambu yiyen siyah beyaz Çin ayısı", ["Panda"]],
       ["Kırmızı ile beyazın karışımı renk", ["Pembe"]],
-      ["Mor renkli, musakkası yapılan sebze", ["Patlıcan"]]
+      ["Mor renkli, musakkası yapılan sebze", ["Patlıcan"]],
+      ["Kışın giyilen kalın, uzun dış giysi", ["Palto"]],
+      ["Yemekte ağız silmeye yarayan ince kâğıt", ["Peçete"]],
+      ["Uçak ve vantilatörde dönen kanatlı parça", ["Pervane"]],
+      ["Denizde yüzülen kumsal", ["Plaj"]],
+      ["Yeşillik alanda yemek yeme etkinliği", ["Piknik"]],
+      ["Fener ve kumandalarda kullanılan enerji kaynağı", ["Pil"]],
+      ["Pilavın yapıldığı tane", ["Pirinç"]],
+      ["Sütle yapılan, kaşıkla yenen tatlı", ["Puding"]],
+      ["Masallarda sihirli değnekli, kanatlı küçük karakter", ["Peri"]],
+      ["Yönü gösteren ibreli alet", ["Pusula"]]
     ],
     "R": [
       ["Kırmızı, mavi, sarı gibi şeylere verilen genel ad", ["Renk"]],
@@ -648,7 +835,17 @@
       ["Türkiye kıyısına yakın, Yunanistan'a ait ada", ["Rodos"]],
       ["Eğimli çıkış yolu", ["Rampa"]],
       ["Uzun, kurgusal edebiyat eseri", ["Roman"]],
-      ["Marketlerde ürünlerin sergilendiği bölüm", ["Reyon"]]
+      ["Marketlerde ürünlerin sergilendiği bölüm", ["Reyon"]],
+      ["Kalorifer peteği", ["Radyatör"]],
+      ["Üç dakika kaynatılan, sarısı akışkan yumurta", ["Rafadan"]],
+      ["Sarılmış kâğıt tomarı", ["Rulo"]],
+      ["Müzikte düzenli vuruş akışı", ["Ritim"]],
+      ["Yakaya iğnelenen küçük nişan", ["Rozet"]],
+      ["Geminin veya uçağın izleyeceği yol", ["Rota"]],
+      ["Yüzü maskeli, yiyeceğini suda yıkayan Amerika hayvanı", ["Rakun"]],
+      ["Evin duvarlarında oluşan nem", ["Rutubet"]],
+      ["Kokulu, yeşil, otsu bitki", ["Reyhan"]],
+      ["Bir sporda ulaşılan en yüksek derece", ["Rekor"]]
     ],
     "S": [
       ["İnekten elde edilen beyaz içecek", ["Süt"]],
@@ -680,7 +877,17 @@
       ["Yerleri temizlemeye yarayan araç", ["Süpürge"]],
       ["Ağız kokusu yapan, dişli beyaz baharat", ["Sarımsak"]],
       ["Kışın odayı ısıtan, odunlu veya kömürlü cihaz", ["Soba"]],
-      ["Su doldurup masaya konan cam kap", ["Sürahi"]]
+      ["Su doldurup masaya konan cam kap", ["Sürahi"]],
+      ["Parkta ileri geri sallanılan oyun aracı", ["Salıncak"]],
+      ["Pazarda meyve taşınan örgü kap", ["Sepet"]],
+      ["Banyoda ve bulaşıkta kullanılan emici malzeme", ["Sünger"]],
+      ["Çiçeklerin dikildiği kap", ["Saksı"]],
+      ["Eşyaların konulduğu ahşap kutu", ["Sandık"]],
+      ["Yemek yenen masa veya örtü", ["Sofra"]],
+      ["Çay kaynatılan metal kap", ["Semaver"]],
+      ["Ekşi, salatalarda kullanılan sıvı", ["Sirke"]],
+      ["Süt ve et için beslenen büyükbaş", ["Sığır"]],
+      ["Havuç, ıspanak gibi toprakta yetişen yiyecek", ["Sebze"]]
     ],
     "Ş": [
       ["Çaya katılan tatlı beyaz kristal", ["Şeker"]],
@@ -712,7 +919,17 @@
       ["Avını pençeleyen, hızlı yırtıcı kuş", ["Şahin"]],
       ["Gülmek için yapılan eğlence", ["Şaka"]],
       ["Verilen nimete teşekkür", ["Şükür"]],
-      ["Üçgen, kare gibi biçim", ["Şekil"]]
+      ["Üçgen, kare gibi biçim", ["Şekil"]],
+      ["Gözün yanındaki yüz bölümü", ["Şakak"]],
+      ["İran'ın eski hükümdarlarına verilen ad", ["Şah"]],
+      ["Baklavanın üzerine dökülen tatlı sıvı", ["Şerbet"]],
+      ["Bir olayı gören ve mahkemede anlatan kişi", ["Şahit"]],
+      ["Eğlenceli kutlama", ["Şenlik"]],
+      ["İğneyle ilaç veren tıbbi alet", ["Şırınga"]],
+      ["Padişahın oğlu", ["Şehzade"]],
+      ["Şarkı söyleyen sanatçı", ["Şarkıcı"]],
+      ["Mavi renkli, beyaz külahlı çizgi film karakteri", ["Şirin"]],
+      ["Adana'nın morumsu, ekşi içeceği", ["Şalgam"]]
     ],
     "T": [
       ["Raylar üzerinde giden ulaşım aracı", ["Tren"]],
@@ -744,7 +961,17 @@
       ["Kuşların vücudunu kaplayan yumuşak yapı", ["Tüy"]],
       ["Evlerin yapımında kullanılan, kırmızı pişmiş toprak blok", ["Tuğla"]],
       ["Sıcaklığı ölçen araç", ["Termometre"]],
-      ["Zar atılarak oynanan masa oyunu", ["Tavla"]]
+      ["Zar atılarak oynanan masa oyunu", ["Tavla"]],
+      ["Okul tahtasına yazı yazmaya yarayan beyaz çubuk", ["Tebeşir"]],
+      ["Yemek veya çay taşımada kullanılan yassı kap", ["Tepsi"]],
+      ["Evde ayağa giyilen hafif ayakkabı", ["Terlik"]],
+      ["Dükkânın adı yazılı levha", ["Tabela"]],
+      ["Arkalıksız küçük oturak", ["Tabure"]],
+      ["Günleri ve ayları gösteren çizelge", ["Takvim"]],
+      ["Gökyüzünü uzaktan gözlemeye yarayan alet", ["Teleskop"]],
+      ["Toprağa ekilince bitkiye dönüşen küçük parça", ["Tohum"]],
+      ["Kelebeğe dönüşmeden önceki böcek", ["Tırtıl"]],
+      ["Doğalgaz yoksa kullanılan metal gaz kabı", ["Tüp"]]
     ],
     "U": [
       ["Gökyüzünde uçan, yolcu taşıyan araç", ["Uçak"]],
@@ -776,7 +1003,17 @@
       ["Bir konuda çok bilgili ve deneyimli kişi", ["Uzman"]],
       ["Fişi uzaktaki prize ulaştıran, çoklu prizli kablo", ["Uzatma"]],
       ["Kuşların kanatlarını çırparak havada gitmesi", ["Uçmak"]],
-      ["Geceleri gözleri kapatıp dinlenmek", ["Uyumak"]]
+      ["Geceleri gözleri kapatıp dinlenmek", ["Uyumak"]],
+      ["Başka gezegenden geldiği düşünülen yaratık", ["Uzaylı"]],
+      ["Bir toplumun ilerlemiş kültür düzeyi", ["Uygarlık"]],
+      ["Hatırlamamak, aklından çıkarmak", ["Unutmak"]],
+      ["Haber taşıyan kişi", ["Ulak"]],
+      ["Ayağın kan dolaşımı azalınca his kaybetmesi", ["Uyuşmak"]],
+      ["Kamp yaparken içine girilen torba", ["Uyku tulumu"]],
+      ["İki tarafın anlaşması", ["Uzlaşma"]],
+      ["Çekingen, kolay kızaran kimse", ["Utangaç"]],
+      ["Televizyonu uzaktan açıp kapatan düğmeli alet", ["Uzaktan kumanda"]],
+      ["Gece uyuyamama durumu", ["Uykusuzluk"]]
     ],
     "Ü": [
       ["Salkım halinde yetişen, şarabı yapılan meyve", ["Üzüm"]],
@@ -808,7 +1045,17 @@
       ["Ordu'da, deniz kıyısında bir ilçe", ["Ünye"]],
       ["Diğerlerinden daha iyi olan", ["Üstün"]],
       ["Ağızla hava vermek", ["Üflemek"]],
-      ["İkinciden sonra gelen sıra sayısı", ["Üçüncü"]]
+      ["İkinciden sonra gelen sıra sayısı", ["Üçüncü"]],
+      ["Hüzünlü, kederli kişi", ["Üzgün"]],
+      ["Ulaşılmak istenen yüce amaç", ["Ülkü"]],
+      ["Bir topluluğun içindeki kişi", ["Üye"]],
+      ["İş yapmaya isteksiz, tembel kimse", ["Üşengeç"]],
+      ["Canlıların yavru vermesi", ["Üreme"]],
+      ["Soğuktan veya korkudan titreme hissi", ["Ürperti"]],
+      ["Uzak ve ıssız yer", ["Ücra"]],
+      ["Mide gibi yerlerde oluşan yara", ["Ülser"]],
+      ["Yazarın anlatım biçimi", ["Üslup"]],
+      ["Sorumluluğu üzerine almak", ["Üstlenmek"]]
     ],
     "V": [
       ["Elektrik geriliminin birimi", ["Volt"]],
@@ -840,7 +1087,17 @@
       ["Meyvelerde bulunan, sağlık için gerekli besin öğesi", ["Vitamin"]],
       ["Üç zamanlı klasik dans", ["Vals"]],
       ["Bankada para yatırılan yer", ["Vezne"]],
-      ["İş yerinde sırayla çalışma saati", ["Vardiya"]]
+      ["İş yerinde sırayla çalışma saati", ["Vardiya"]],
+      ["Saat ve gün gibi zaman dilimi", ["Vakit"]],
+      ["Çölün ortasında su ve ağaç bulunan yeşil alan", ["Vaha"]],
+      ["Sıcakta pervanesi dönerek serinleten cihaz", ["Vantilatör"]],
+      ["Lav püskürten dağ", ["Volkan"]],
+      ["Petrol dolu büyük metal fıçı", ["Varil"]],
+      ["Hayvanların doktoru", ["Veteriner"]],
+      ["Bir devletin vatandaşlık bağıyla bağlı kişisi", ["Vatandaş"]],
+      ["İki dağ arasındaki alçak yer", ["Vadi"]],
+      ["Büyük, yaylı çalgılardan, ayaklar arasına konup çalınan", ["Viyolonsel"]],
+      ["Mal veya gelirini hayır işine bağışlayan kuruluş", ["Vakıf"]]
     ],
     "Y": [
       ["Bulutlardan damla damla düşen su", ["Yağmur"]],
@@ -872,7 +1129,17 @@
       ["İç Anadolu'daki çamlık şehri", ["Yozgat"]],
       ["Kitap yazan kişi", ["Yazar"]],
       ["Suyun içinde hareket edilen spor", ["Yüzme"]],
-      ["Dört yapraklı olanı şans getirdiği sanılan bitki", ["Yonca"]]
+      ["Dört yapraklı olanı şans getirdiği sanılan bitki", ["Yonca"]],
+      ["Kızartma ve salataya konan sıvı", ["Yağ"]],
+      ["Sallanınca serinlik veren katlanır araç", ["Yelpaze"]],
+      ["Örgü için sarılmış ip topu", ["Yumak"]],
+      ["Parçaları birleştirilen resim oyunu", ["Yapboz"]],
+      ["Saatte dakikayı gösteren uzun ibre", ["Yelkovan"]],
+      ["Filmi yöneten kişi", ["Yönetmen"]],
+      ["Suyun üstünde uçan, ince gövdeli böcek", ["Yusufçuk"]],
+      ["Yatakta üstümüzü örten kalın örtü", ["Yorgan"]],
+      ["Yüzde burnun iki yanındaki bölüm", ["Yanak"]],
+      ["Mutfakta pişirilen ve yenen şey", ["Yemek"]]
     ],
     "Z": [
       ["Siyah beyaz çizgili, at benzeri hayvan", ["Zebra"]],
@@ -904,7 +1171,17 @@
       ["Birinin evine konuk olma", ["Ziyaret"]],
       ["Deprem", ["Zelzele"]],
       ["Kilosu az olan", ["Zayıf"]],
-      ["Balık avlamak için fırlatılan, sivri uçlu alet", ["Zıpkın"]]
+      ["Balık avlamak için fırlatılan, sivri uçlu alet", ["Zıpkın"]],
+      ["Gaz dolu uçan büyük balon", ["Zeplin"]],
+      ["Düşünme gücü, akıl", ["Zihin"]],
+      ["El becerisiyle yapılan meslek", ["Zanaat"]],
+      ["İncelik, narin güzellik", ["Zerafet"]],
+      ["Varlıklı kimsenin yoksula vermek zorunda olduğu dinî bağış", ["Zekat", "Zekât"]],
+      ["Ege'nin efelerinin oynadığı halk oyunu", ["Zeybek"]],
+      ["Yeşil renkli değerli taş", ["Zümrüt"]],
+      ["Dağın en yüksek noktası", ["Zirve"]],
+      ["Toprağı işleyip ürün yetiştirme işi", ["Ziraat"]],
+      ["Kâr etmemenin tersi, kayıp", ["Zarar"]]
     ]
   };
 

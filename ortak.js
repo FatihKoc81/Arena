@@ -58,7 +58,11 @@ window.altSatir = function () {
       "#altSatir{position:fixed;left:0;right:0;bottom:calc(6px + env(safe-area-inset-bottom));z-index:5;display:flex;gap:8px;padding:0 max(14px,calc((100vw - 460px) / 2));pointer-events:none}#altSatir>*{flex:1 1 0;pointer-events:auto}#altSatir.gizli{display:none}";
     document.head.appendChild(st);
   }
-  if (dock) return dock;
+  if (dock) {
+    // Alt bölüm sonradan oluştuysa önceden açılmış ayrı satırdaki düğmeleri (APK/Güncelle) de içine taşı: hepsi aynı satırda, aynı hizada
+    if (s) { Array.from(s.children).forEach(c => dock.appendChild(c)); s.remove(); }
+    return dock;
+  }
   if (s) return s;
   const ana = document.getElementById("ana");
   s = document.createElement("div");
