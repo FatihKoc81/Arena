@@ -994,6 +994,9 @@
 
   // ---------- Durum ----------
   let dur, sorular, idx, sure, zaman, kilit;
+  let duel = null; // düello: { api, elendi }
+  const DUELLO_HEDEF = Math.round(HARFLER.length / 2); // düelloda hedef: bu kadar harfi ilk bilen kazanır
+  const tohumlu = seed => { let s = (Math.abs(Math.floor(seed)) % 233280) || 1; return () => { s = (s * 9301 + 49297) % 233280; return s / 233280; }; };
   // dur: 0 bekliyor, 1 doğru, 2 yanlış, 3 pas
 
   const norm = s => s.toLocaleLowerCase("tr").replace(/[^a-zçğıöşü0-9]/g, "");
@@ -1078,10 +1081,13 @@
     p.style.minHeight = en + "px";
   }
 
-  function baslat() {
+  function baslat() { duel = null; baslatCek(null); }
+  function baslatCek(seed) {
+    $("ppTekrar").style.display = "";
     kararYuk = 0; adayAdet = 0; baslatYuk = yukOku(); baslatT = Date.now();
     dur = HARFLER.map(() => 0);
-    sorular = HARFLER.map(h => SORU[h][Math.floor(Math.random() * SORU[h].length)]);
+    const rg = seed == null ? Math.random : tohumlu(seed);
+    sorular = HARFLER.map(h => SORU[h][Math.floor(rg() * SORU[h].length)]);
     idx = 0;
     sure = SURE;
     kilit = false;
@@ -1106,6 +1112,11 @@
     const q = sorular[idx];
     if (q[1].map(norm).includes(v)) {
       dur[idx] = 1;
+      if (duel) {
+        const dg = dur.filter(x => x === 1).length;
+        duel.api.ilerle(dg, DUELLO_HEDEF);
+        if (dg >= DUELLO_HEDEF) { kilit = true; clearInterval(zaman); fb.textContent = "✅ Hedefe ulaştın!"; duel.api.bitti(); return; }
+      }
       fb.textContent = "✅ Doğru!";
       fb.style.color = "#22c55e";
       ileri();
@@ -1128,6 +1139,15 @@
 
   function bitir() {
     clearInterval(zaman);
+    if (duel) {
+      kilit = true;
+      if (!duel.elendi) { duel.elendi = true; duel.api.elendi(); }
+      $("ppSBaslik").textContent = "Hedefe ulaşamadın";
+      $("ppSMetin").textContent = "Doğru: " + dur.filter(x => x === 1).length + " / " + DUELLO_HEDEF + " • Rakibin bitirmesini bekle.";
+      $("ppTekrar").style.display = "none";
+      bolum("son");
+      return;
+    }
     if (window.Puan && dur._p !== true) { // her oyunda bir kez: doğru oranı kadar tur puanı
       dur._p = true;
       const d0 = dur.filter(x => x === 1).length;
@@ -1146,8 +1166,9 @@
   menuBtn.onclick = () => { ana.classList.add("hidden"); sec.classList.remove("hidden"); bolum("giris"); };
   $("ppBasla").onclick = baslat;
   $("ppTekrar").onclick = baslat;
-  $("ppGeri").onclick = menuyeDon;
-  $("ppMenu").onclick = menuyeDon;
+  const cikis = () => { if (duel) document.querySelector("h1").click(); else menuyeDon(); };
+  $("ppGeri").onclick = cikis;
+  $("ppMenu").onclick = cikis;
   $("ppGonder").onclick = gonder;
   $("ppPas").onclick = pas;
   // DÜZELTME: düğmeye basınca odak kutudan çıkıyor, klavye kapanıp yeniden açılıyordu (halka zıplıyordu).
@@ -1175,6 +1196,17 @@
   document.querySelector("h1").addEventListener("click", () => {
     if (document.body.classList.contains("ppOyunda")) menuyeDon();
   });
+  // DÜELLO (arena.js): iki oyuncu aynı sorularla oynar, ilk DUELLO_HEDEF harfi bilen kazanır
+  (window.ArenaOyunlari = window.ArenaOyunlari || {}).passaparola = {
+    ad: "Passaparola",
+    baslat: function (d, api) {
+      duel = { api: api, elendi: false };
+      ana.classList.add("hidden"); sec.classList.remove("hidden");
+      baslatCek(d.seed);
+      api.ilerle(0, DUELLO_HEDEF);
+    },
+    dur: function () { duel = null; clearInterval(zaman); clearTimeout(acTimer); kilit = true; }
+  };
   document.addEventListener("anasayfa", menuyeDon);
 
   // HALKA ÖLÇEĞİ (sabit): Chrome klavye açıkken visualViewport.height'ı bazen tam, bazen kısalmış okuyor.

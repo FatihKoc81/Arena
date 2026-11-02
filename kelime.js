@@ -155,6 +155,9 @@
 
   // ---------- Durum ----------
   let liste, k, harfler, acik, hak, sure, toplam, dogruSayi, zaman, kilit;
+  let duel = null; // düello: { api, elendi }
+  const DUELLO_HEDEF = 5; // düelloda hedef: bu kadar kelimeyi ilk bilen kazanır
+  const tohumlu = (a, seed) => { let s = (Math.abs(Math.floor(seed)) % 233280) || 1; const r = () => { s = (s * 9301 + 49297) % 233280; return s / 233280; }; a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
   const norm = s => s.toLocaleLowerCase("tr").replace(/[^a-zçğıöşü0-9]/g, "");
   const karistir = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
@@ -257,8 +260,10 @@
     }, 1000);
   }
 
-  function baslat() {
-    liste = karistir(KELIMELER).slice(0, TUR);
+  function baslat() { duel = null; baslatCek(null); }
+  function baslatCek(seed) {
+    $("kkTekrar").style.display = "";
+    liste = (seed == null ? karistir(KELIMELER) : tohumlu(KELIMELER, seed)).slice(0, TUR);
     k = 0; toplam = 0; dogruSayi = 0;
     bolum("oyun");
     yeniKelime();
@@ -269,7 +274,7 @@
 
   function sonraki() {
     k++;
-    if (k >= liste.length) return bitir();
+    if (k >= liste.length || (duel && dogruSayi + (liste.length - k) < DUELLO_HEDEF)) return bitir();
     yeniKelime();
   }
 
@@ -292,6 +297,10 @@
       toplam += p;
       dogruSayi++;
       if (window.Puan) Puan.ekle("kelime"); // bulunan kelime puanı hemen genel puana ve sıralamaya yansır
+      if (duel) {
+        duel.api.ilerle(dogruSayi, DUELLO_HEDEF);
+        if (dogruSayi >= DUELLO_HEDEF) { kilit = true; clearInterval(zaman); ciz("d"); fb.textContent = "✅ Hedefe ulaştın!"; fb.style.color = "#22c55e"; duel.api.bitti(); return; }
+      }
       kilit = true;
       clearInterval(zaman);
       ciz("d");
@@ -322,6 +331,14 @@
   function bitir() {
     clearInterval(zaman);
     kilit = true;
+    if (duel) {
+      if (!duel.elendi) { duel.elendi = true; duel.api.elendi(); }
+      $("kkSBaslik").textContent = "Hedefe ulaşamadın";
+      $("kkSMetin").textContent = "Bildiğin kelime: " + dogruSayi + " / " + DUELLO_HEDEF + " • Rakibin bitirmesini bekle.";
+      $("kkTekrar").style.display = "none";
+      bolum("son");
+      return;
+    }
     let en = 0;
     try {
       en = Number(localStorage.getItem("kelimeEn")) || 0;
@@ -341,8 +358,9 @@
   };
   $("kkBasla").onclick = baslat;
   $("kkTekrar").onclick = baslat;
-  $("kkGeri").onclick = menuyeDon;
-  $("kkMenu").onclick = menuyeDon;
+  const cikis = () => { if (duel) document.querySelector("h1").click(); else menuyeDon(); };
+  $("kkGeri").onclick = cikis;
+  $("kkMenu").onclick = cikis;
   $("kkTahmin").onclick = tahmin;
   $("kkHarfAl").onclick = harfAl;
   $("kkPas").onclick = () => kelimeBitir("⏭️ Pas geçildi. Cevap: " + harfler.join(""));
@@ -366,5 +384,17 @@
   inp.addEventListener("blur", () => setTimeout(alta, 200));
 
   // Başlığa tıklanınca (ortak.js) süreyi durdur ve ana sayfaya dön
+  // DÜELLO (arena.js): iki oyuncu aynı kelimelerle oynar, ilk DUELLO_HEDEF kelimeyi bilen kazanır
+  (window.ArenaOyunlari = window.ArenaOyunlari || {}).kelime = {
+    ad: "Kelime Oyunu",
+    baslat: function (d, api) {
+      duel = { api: api, elendi: false };
+      ana.classList.add("hidden"); sec.classList.remove("hidden");
+      bolum("giris");
+      baslatCek(d.seed);
+      api.ilerle(0, DUELLO_HEDEF);
+    },
+    dur: function () { duel = null; clearInterval(zaman); kilit = true; }
+  };
   document.addEventListener("anasayfa", menuyeDon);
 })();
