@@ -37,7 +37,13 @@
     "#ana>.btn.kartB.genis{grid-column:1/-1;height:calc(var(--ch) * .9)}" +
     "#ana>.btn.kartB .ic{width:clamp(30px,calc(var(--ch) * .52),56px);height:clamp(30px,calc(var(--ch) * .52),56px);display:block;margin-bottom:4px;flex:none}" +
     "#ana>.btn.kartB b{font-size:clamp(14px,4.2vw,16px);font-weight:700;display:block;white-space:nowrap}" +
-    "#ana>.btn.kartB:active{opacity:.85;transform:none}";
+    "#ana>.btn.kartB:active{opacity:.85;transform:none}" +
+    // ALT BÖLÜM: iki sıra. Üst sıra Fatih / Altın / Premium / Puan (4 eşit kutu, yazılar tam okunur), alt sıra İsimle istek + APK/Güncelle (her biri 2 kutu genişliğinde)
+    "html body .ek-dock{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;grid-auto-rows:auto!important;gap:8px!important;align-items:stretch!important}" +
+    "html body .ek-dock>*{min-width:0!important;width:auto!important;max-width:none!important;box-sizing:border-box!important;overflow:hidden!important;text-overflow:clip!important}" +
+    "html body .ek-dock>*:not(.ar-adb):not(.apk-btn){grid-column:span 1!important;height:56px!important}" +
+    "html body .ek-dock>.ar-adb,html body .ek-dock>.apk-btn{grid-column:span 2!important;height:52px!important;font-size:15px!important}" +
+    "html body .ek-dock>.ar-adb:only-of-type{grid-column:1/-1!important}";
   document.head.appendChild(st);
   document.body.insertAdjacentHTML("beforeend", SIMGELER);
 
