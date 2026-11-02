@@ -559,7 +559,10 @@ window.altSatir = function () {
   }
 
   // Geri tuşuna basılınca yapılacak iş (tus: true = Capacitor'dan geldi, geçmiş kaydı eklemeye gerek yok)
+  let sonBasis = 0;
   function geri(tus, gecmis) {
+    // Aynı basış hem Capacitor hem "backbutton" olayından gelirse iki kez çalışmasın
+    const t = Date.now(); if (t - sonBasis < 350) return; sonBasis = t;
     const kapandi = katmanKapat();
     const yeniden = () => { if (!tus) durum(); };
     if (!ana.classList.contains("hidden")) {
@@ -577,19 +580,41 @@ window.altSatir = function () {
     yeniden();
   }
 
-  // 1) APK: Capacitor geri tuşu olayı. Eklenti yoksa veya dinleyici kurulamazsa tarayıcı geçmişine düşülür.
+  // 1) APK: Capacitor geri tuşu olayı.
+  // DÜZELTME: Capacitor.Plugins.App bu projede (paketleyicisiz web) hazır gelmiyor; bu yüzden dinleyici hiç kurulmuyor,
+  // Android geri tuşu doğrudan uygulamayı kapatıyordu. Eklenti artık registerPlugin("App") ile açıkça bağlanıyor.
+  const eklentiBul = () => {
+    const C = window.Capacitor;
+    if (!C) return null;
+    try { if (C.Plugins && C.Plugins.App) return C.Plugins.App; } catch (e) {}
+    try { if (typeof C.registerPlugin === "function") return C.registerPlugin("App"); } catch (e) {}
+    return null;
+  };
   const cikis = () => {
-    try { window.Capacitor.Plugins.App.exitApp(); return; } catch (e) {}
+    const App = eklentiBul();
+    try { if (App && App.exitApp) { App.exitApp(); return; } } catch (e) {}
     try { navigator.app.exitApp(); return; } catch (e) {}
     cik = true; try { history.go(-2); } catch (e) {} // eklenti yoksa: koruma kayıtlarını aşıp geri çık
   };
-  try {
-    const App = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App;
-    if (App && App.addListener) {
+  let dinlendi = false;
+  const dinleyiciKur = () => {
+    if (dinlendi) return;
+    try {
+      const App = eklentiBul();
+      if (!App || !App.addListener) return;
+      dinlendi = true;
       const p = App.addListener("backButton", () => geri(true));
-      if (p && p.catch) p.catch(() => {});
-    }
-  } catch (e) {}
+      if (p && p.catch) p.catch(() => { dinlendi = false; });
+    } catch (e) { dinlendi = false; }
+  };
+  dinleyiciKur();
+  // Sayfa/köprü geç hazırlanırsa tekrar dene (ilk 5 sn)
+  let deneme = 0;
+  const tekrar = setInterval(() => { dinleyiciKur(); if (dinlendi || ++deneme > 25) clearInterval(tekrar); }, 200);
+  document.addEventListener("deviceready", dinleyiciKur, false);
+  window.addEventListener("load", dinleyiciKur);
+  // Eski Cordova tarzı olay (varsa)
+  document.addEventListener("backbutton", (e) => { if (e && e.preventDefault) e.preventDefault(); geri(true); }, false);
   // 2) Her durumda geçmiş koruması: dinleyici çalışmazsa bile geri tuşu uygulamayı kapatmaz, sadece bizim kaydı harcar.
   const sagla = () => { if (!aktif || !(history.state && history.state.arena)) durum(true); };
   document.addEventListener("pointerdown", sagla, true);
