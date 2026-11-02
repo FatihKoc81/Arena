@@ -35,7 +35,8 @@
     "#ana>.btn.kartB .ic{width:56px;height:56px;display:block;margin-bottom:6px;flex:none}" +
     "#ana>.btn.kartB.genis .ic{width:56px;height:56px;margin-bottom:4px}" +
     "#ana>.btn.kartB b{font-size:clamp(14px,4.2vw,16px);font-weight:700;display:block;white-space:nowrap}" +
-        "@media (max-height:700px){#ana>.btn.kartB{height:98px}#ana>.btn.kartB.genis{height:80px}#ana>.btn.kartB .ic,#ana>.btn.kartB.genis .ic{width:42px;height:42px}}";
+    "@media (max-height:860px){#ana{gap:8px;top:0}#ana>.alt{margin-bottom:2px;line-height:1.45}#ana>.btn.kartB{height:92px}#ana>.btn.kartB.genis{height:82px}#ana>.btn.kartB .ic,#ana>.btn.kartB.genis .ic{width:46px;height:46px;margin-bottom:2px}}" +
+    "@media (max-height:700px){#ana>.btn.kartB{height:80px}#ana>.btn.kartB.genis{height:68px}#ana>.btn.kartB .ic,#ana>.btn.kartB.genis .ic{width:36px;height:36px}}";
   document.head.appendChild(st);
   document.body.insertAdjacentHTML("beforeend", SIMGELER);
 
