@@ -180,29 +180,32 @@ window.altSatir = function () {
   const YUKARI = 0;       // kartı bu kadar piksel yukarı alır (alt çizgi ekranda kesilmesin); İşlem Oyunu'nda da aynı değer çıkarılmalı
 
   function kaydir() {
-    if (oyun.classList.contains("hidden")) { oyun.style.top = ""; oyun.style.minHeight = ""; delete oyun.dataset.sik; return; }
-    // Ölçü: "Ana Menü" düğmesi, İşlem Oyunu'ndaki "Yeni Tur" ile aynı .btn.ikinci stilinde
+    const gizli = oyun.classList.contains("hidden");
+    document.documentElement.classList.toggle("mil-kilit", !gizli);
+    if (gizli) { oyun.style.top = ""; oyun.style.height = ""; oyun.style.minHeight = ""; delete oyun.dataset.sik; return; }
+    if (window.scrollY) window.scrollTo(0, 0);
+    // İşlem Oyunu (kelimelerim.js yerlestir) ile birebir aynı hesap: "Ana Menü" = "Yeni Tur" ölçü düğmesi
     let ref = null;
     oyun.querySelectorAll("button.btn.ikinci").forEach(b => { if (/Ana Menü/.test(b.textContent)) ref = b; });
     if (!ref || !ref.offsetHeight) return;
     const kayma = Math.round((ref.offsetHeight + (parseFloat(getComputedStyle(ref).marginTop) || 0)) * KAYMA_ORAN);
     if (getComputedStyle(oyun).position === "static") oyun.style.position = "relative";
-    // İşlem Oyunu ile aynı: üst çizgi aynı, alt çizgi ekranın 12 px üstünde. Sığmazsa boşluklar sıkılaşır.
     delete oyun.dataset.sik;
-    oyun.style.top = "0px"; oyun.style.minHeight = "";
-    const ust = oyun.getBoundingClientRect().top + window.scrollY, at = kayma - YUKARI, alt = window.innerHeight - 12;
-    oyun.style.top = at + "px";
-    oyun.style.minHeight = Math.max(300, alt - ust - at) + "px";
-    if (oyun.getBoundingClientRect().bottom > alt + 1) oyun.dataset.sik = "1";
+    oyun.style.top = "0px"; oyun.style.minHeight = ""; oyun.style.height = "auto";
+    const ust = oyun.getBoundingClientRect().top + window.scrollY;
+    oyun.style.top = kayma + "px";
+    oyun.style.height = Math.max(300, window.innerHeight - ust - kayma - 12) + "px"; // sabit yükseklik: kart içerik değişince oynamaz
+    if (oyun.scrollHeight > oyun.clientHeight + 1) oyun.dataset.sik = "1";
   }
   const css = document.createElement("style");
-  css.textContent = "#oyun{display:flex;flex-direction:column}#oyun>.btn.ikinci{margin-top:auto!important}#oyun>*:has(+ .btn.ikinci){margin-bottom:12px}" +
+  css.textContent = "html.mil-kilit,html.mil-kilit body{overflow:hidden!important;overscroll-behavior:none!important;height:100%!important}#oyun{display:flex;flex-direction:column;box-sizing:border-box;overflow:hidden}#oyun>.btn.ikinci{margin-top:auto!important}#oyun>*:has(+ .btn.ikinci){margin-bottom:12px}" +
     "#oyun[data-sik] .sec{padding-top:6px!important;padding-bottom:6px!important}#oyun[data-sik] .jokerler{margin-top:6px}";
   document.head.appendChild(css);
-  const kay2 = () => { kaydir(); setTimeout(kaydir, 350); };
+  const kay2 = () => kaydir();
   new MutationObserver(kay2).observe(oyun, { attributes: true, attributeFilter: ["class"] });
   window.addEventListener("resize", kay2);
   window.addEventListener("load", kay2);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(kay2);
   kay2();
 })();
 
@@ -528,7 +531,8 @@ window.altSatir = function () {
   const ana = document.getElementById("ana"), h1 = document.querySelector("h1");
   if (!ana || !h1) return;
   let son = 0, hazir = false, cik = false;
-  const durum = () => { try { history.pushState({ arena: 1 }, ""); } catch (e) {} };
+  let aktif = false; // son eklenen kayıt gerçek bir dokunuşla mı eklendi? (dokunuşsuz kayıtlar geri tuşunda atlanıp uygulamadan çıkarır)
+  const durum = (dokunus) => { aktif = !!dokunus; try { history.pushState({ arena: 1 }, ""); } catch (e) {} };
 
   function toast(m) {
     const t = document.createElement("div");
@@ -587,7 +591,7 @@ window.altSatir = function () {
     }
   } catch (e) {}
   // 2) Her durumda geçmiş koruması: dinleyici çalışmazsa bile geri tuşu uygulamayı kapatmaz, sadece bizim kaydı harcar.
-  const sagla = () => { if (!(history.state && history.state.arena)) durum(); };
+  const sagla = () => { if (!aktif || !(history.state && history.state.arena)) durum(true); };
   document.addEventListener("pointerdown", sagla, true);
   document.addEventListener("touchend", sagla, true);
   document.addEventListener("keydown", sagla, true);
