@@ -165,7 +165,9 @@
     let ref = null;
     oyun.querySelectorAll("button.btn.ikinci").forEach(b => { if (/Ana Menü/.test(b.textContent)) ref = b; });
     if (!ref || !ref.offsetHeight) return;
-    const kayma = Math.round((ref.offsetHeight + (parseFloat(getComputedStyle(ref).marginTop) || 0)) * KAYMA_ORAN);
+    // margin-top:auto (alta yapıştırma) ölçüye karışmasın: İşlem Oyunu'ndaki .btn boşluğu (8-14px) kullanılır
+    const bosluk = Math.max(8, Math.min(14, Math.round(window.innerHeight * 0.018)));
+    const kayma = Math.round((ref.offsetHeight + bosluk) * KAYMA_ORAN);
     if (getComputedStyle(oyun).position === "static") oyun.style.position = "relative";
     // İşlem Oyunu ile aynı: üst çizgi aynı, alt çizgi ekranın 12 px üstünde. Sığmazsa boşluklar sıkılaşır.
     delete oyun.dataset.sik;

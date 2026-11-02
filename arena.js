@@ -897,6 +897,15 @@
     panel.querySelector(".ar-body").addEventListener("click", function (e) {
       var st = e.target.closest("[data-st]");
       if (st) { siraTur = st.getAttribute("data-st"); yenile(); return; }
+      var bn = e.target.closest("[data-me]");
+      if (bn) {
+        var no = bn.getAttribute("data-sr"), tm = siraTur === "turnuva";
+        var ad = bn.querySelector(".ar-ad") && bn.querySelector(".ar-ad").firstChild ? bn.querySelector(".ar-ad").firstChild.textContent : "Sen";
+        Ekonomi.sor("👤 " + ad,
+          "Sıran: #" + no + " · " + (tm ? "🏅 " + fmt(L.tp) + " turnuva puanı · " + fmt(L.tz) + " zafer · " + ligTam() : "⭐ " + fmt(Puan.toplam()) + " puan · " + ligTam()),
+          [{ t: "Tamam", c: "gri", f: function () {} }]);
+        return;
+      }
       var d = e.target.closest("[data-u]"), a = e.target.closest("[data-act]");
       if (d && !d.disabled) { if (d.getAttribute("data-off")) istekSec(d.getAttribute("data-u"), d.getAttribute("data-a")); else davetSec(d.getAttribute("data-u"), d.getAttribute("data-a")); }
       if (a) {
@@ -954,19 +963,13 @@
   function htmlSira() {
     var tpMod = siraTur === "turnuva", liste = tpMod ? siraTp : sira, h = "";
     h += '<div class="ar-tabs" style="padding:2px 0 8px"><button class="ar-alt' + (tpMod ? "" : " on") + '" data-st="genel">⭐ Genel Puan</button><button class="ar-alt' + (tpMod ? " on" : "") + '" data-st="turnuva">🏆 Turnuva Puanı</button></div>';
-    if (tpMod) {
-      var bi = -1; for (var k = 0; k < siraTp.length; k++) if (siraTp[k].uid === uid) { bi = k; break; }
-      h += '<div class="ar-ben">Sıran: <b>' + (bi >= 0 ? "#" + (bi + 1) : (L.tp > 0 ? "#100+" : "—")) + "</b> &nbsp;·&nbsp; 🏅 " + fmt(L.tp) + '<br><span style="font-size:13px">' + esc(ligTam()) + " · 🏆 " + fmt(L.tz) + " turnuva zaferi</span></div>";
-    } else {
-      h += '<div class="ar-ben">Sıran: <b>' + esc(benYazi || "…") + "</b> &nbsp;·&nbsp; ⭐ " + fmt(Puan.toplam()) + "</div>";
-    }
     h += '<button class="ar-bt kirmizi" data-act="meydan">⚔️ Meydan Oku</button>';
     h += htmlIstekler();
     if (!liste.length) h += '<div class="ar-bos">' + (!db ? "Çevrimiçi sıralama için firebase-config.js doldurulmalı." : tpMod ? "Henüz turnuva puanı olan yok. İlk sen ol!" : "Yükleniyor…") + "</div>";
     var madal = ["🥇", "🥈", "🥉"];
     liste.forEach(function (x, i) {
       var me = x.uid === uid, on = !!onlineSet[x.uid], deger = tpMod ? (me ? L.tp : x.tp) : (me ? Puan.toplam() : x.puan), lg = me ? L.lig : x.lig;
-      h += '<div class="ar-sr' + (me ? " me" : "") + '"><span class="ar-no">' + (i < 3 ? madal[i] : i + 1) + '</span><span class="ar-ad">' + esc(x.ad) + '<small class="ar-lgs">' + esc(ligAd(lg)) + "</small></span>" +
+      h += '<div class="ar-sr' + (me ? " me" : "") + '"' + (me ? ' data-me="1" data-sr="' + (i + 1) + '" style="cursor:pointer"' : "") + '><span class="ar-no">' + (i < 3 ? madal[i] : i + 1) + '</span><span class="ar-ad">' + esc(x.ad) + '<small class="ar-lgs">' + esc(ligAd(lg)) + "</small></span>" +
         (on ? '<i class="ar-on"></i>' : "") + '<span class="ar-pu">' + fmt(deger) + "</span>" +
         (me ? "" : '<button class="ar-dv" data-u="' + esc(x.uid) + '" data-a="' + esc(x.ad) + '"' + (on ? "" : ' data-off="1"') + ">" + (on ? "⚔️" : "📨") + "</button>") + "</div>";
     });
