@@ -260,10 +260,25 @@
     }, 1000);
   }
 
+  // Kelimeler destesi: bütün kelimeler bitmeden hiçbiri tekrar etmez; deste bitince yeniden karılır.
+  function kelimeDesteCek() {
+    let d = [];
+    try { d = JSON.parse(localStorage.getItem("kkDeste")) || []; } catch (e) {}
+    d = d.filter(i => i >= 0 && i < KELIMELER.length);
+    const al = [];
+    while (al.length < TUR) {
+      if (!d.length) {
+        d = karistir(KELIMELER.map((_, i) => i)).filter(i => al.indexOf(i) < 0);
+      }
+      al.push(d.shift());
+    }
+    try { localStorage.setItem("kkDeste", JSON.stringify(d)); } catch (e) {}
+    return al.map(i => KELIMELER[i]);
+  }
   function baslat() { duel = null; baslatCek(null); }
   function baslatCek(seed) {
     $("kkTekrar").style.display = "";
-    liste = (seed == null ? karistir(KELIMELER) : tohumlu(KELIMELER, seed)).slice(0, TUR);
+    liste = (seed == null ? kelimeDesteCek() : tohumlu(KELIMELER, seed).slice(0, TUR));
     k = 0; toplam = 0; dogruSayi = 0;
     bolum("oyun");
     yeniKelime();

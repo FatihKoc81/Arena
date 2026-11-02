@@ -1081,13 +1081,26 @@
     p.style.minHeight = en + "px";
   }
 
+  const SERI_SAYISI = 20;
+  function seriSorulari(seri) {
+    return HARFLER.map((h, i) => {
+      const rg = tohumlu(i + 1), o = SORU[h].map((_, j) => j);
+      for (let x = o.length - 1; x > 0; x--) { const y = Math.floor(rg() * (x + 1)); [o[x], o[y]] = [o[y], o[x]]; }
+      return SORU[h][o[seri % o.length]];
+    });
+  }
   function baslat() { duel = null; baslatCek(null); }
   function baslatCek(seed) {
     $("ppTekrar").style.display = "";
     kararYuk = 0; adayAdet = 0; baslatYuk = yukOku(); baslatT = Date.now();
     dur = HARFLER.map(() => 0);
-    const rg = seed == null ? Math.random : tohumlu(seed);
-    sorular = HARFLER.map(h => SORU[h][Math.floor(rg() * SORU[h].length)]);
+    // 20 SERİ: her oyun bir sonraki seriden gelir, sorular hep değişir (havuz bitince başa döner).
+    // Düelloda seri tohumdan çıkar, iki oyuncu aynı soruları görür.
+    let seriNo;
+    if (seed == null) {
+      try { seriNo = parseInt(localStorage.getItem("ppSeriNo") || "0", 10) || 0; localStorage.setItem("ppSeriNo", String(seriNo + 1)); } catch (e) { seriNo = Math.floor(Math.random() * 1000); }
+    } else seriNo = Math.abs(Math.floor(seed)) % SERI_SAYISI;
+    sorular = seriSorulari(seriNo);
     idx = 0;
     sure = SURE;
     kilit = false;

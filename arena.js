@@ -81,11 +81,11 @@
     ".ar-x{border:0;background:#222f45;color:#fff;border-radius:10px;width:38px;height:38px;font-size:18px;cursor:pointer}" +
     ".ar-tabs{display:flex;gap:6px;padding:8px 10px}" +
     ".ar-tab{flex:1;border:2px solid #4a5a9a;background:#101a38;color:#8e9bc4;border-radius:12px;padding:9px 2px;font:700 14px system-ui,sans-serif;cursor:pointer}.ar-tab.on{background:#3b5bd6;color:#fff;border-color:#7d97ff}" +
-    ".ar-body{flex:1;overflow:auto;padding:4px 12px calc(16px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch}" +
+    ".ar-body{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;padding:4px 12px calc(16px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch}" +
     ".ar-ben{background:#14204a;border:2px solid #ffb300;border-radius:14px;padding:10px;margin:6px 0 10px;text-align:center;font-size:16px}" +
     ".ar-sr{display:flex;align-items:center;gap:8px;background:#101a38;border:1px solid #2b3a72;border-radius:12px;padding:8px 10px;margin-bottom:6px}" +
     ".ar-sr.me{border-color:#ffb300;background:#241d08}" +
-    ".ar-no{width:34px;text-align:center;font-weight:800;color:#ffe27a}" +
+    ".ar-no{min-width:34px;padding:0 2px;text-align:center;font-weight:800;color:#ffe27a}" +
     ".ar-ad{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700}" +
     ".ar-on{width:9px;height:9px;border-radius:50%;background:#22c55e;flex:none}" +
     ".ar-pu{font-weight:800;color:#ffe27a}" +
@@ -888,12 +888,9 @@
     var b = document.createElement("div");
     b.id = "arAdBtn";
     b.textContent = "👤 İsimle istek";
-    b.style.cssText = "position:fixed;right:84px;bottom:calc(4px + env(safe-area-inset-bottom));height:40px;padding:0 10px;display:flex;align-items:center;justify-content:center;border:2px solid #d4a63a;border-radius:11px;color:#d4a63a;font:700 13px system-ui,sans-serif;background:rgba(0,0,0,.25);z-index:5;cursor:pointer;white-space:nowrap";
+    b.className = "ar-adb";
     b.onclick = adPenAc;
-    document.body.appendChild(b);
-    var g = function () { b.style.display = ana.classList.contains("hidden") || ana.style.display === "none" ? "none" : "flex"; };
-    new MutationObserver(g).observe(ana, { attributes: true, attributeFilter: ["class", "style"] });
-    g();
+    (window.altSatir ? window.altSatir() : document.body).appendChild(b);
   }
 
   // ---------- panel ----------
@@ -1002,9 +999,20 @@
     h += htmlIstekler();
     if (!liste.length) h += '<div class="ar-bos">' + (!db ? "Çevrimiçi sıralama için firebase-config.js doldurulmalı." : tpMod ? "Henüz turnuva puanı olan yok. İlk sen ol!" : "Yükleniyor…") + "</div>";
     var madal = ["🥇", "🥈", "🥉"];
-    liste.forEach(function (x, i) {
+    // İlk 100 görünür. Oyuncu ilk 100'de değilse 99 oyuncu + en altta kendisi görünür.
+    var benIdx = -1;
+    liste.forEach(function (x, i) { if (x.uid === uid) benIdx = i; });
+    var gosterim = liste.slice(0, 100).map(function (x, i) { return { x: x, no: i + 1 }; });
+    if (benIdx < 0 && liste.length && uid && (!tpMod || L.tp > 0)) {
+      var benNo = tpMod ? "100+" : String(benYazi || "").replace("#", "");
+      gosterim = liste.slice(0, 99).map(function (x, i) { return { x: x, no: i + 1 }; });
+      gosterim.push({ x: { uid: uid, ad: adim(), puan: Puan.toplam(), tp: L.tp, lig: L.lig }, no: benNo || "…" });
+    }
+    gosterim.forEach(function (g) {
+      var x = g.x, i = typeof g.no === "number" ? g.no - 1 : 99;
       var me = x.uid === uid, on = !!onlineSet[x.uid], deger = tpMod ? (me ? L.tp : x.tp) : (me ? Puan.toplam() : x.puan), lg = me ? L.lig : x.lig;
-      h += '<div class="ar-sr k' + (me ? " me" : "") + '"' + (me ? ' data-me="1" data-sr="' + (i + 1) + '" style="cursor:pointer"' : "") + '><span class="ar-no">' + (i < 3 ? madal[i] : i + 1) + '</span><span class="ar-ad">' + esc(x.ad) + '<small class="ar-lgs">' + esc(ligAd(lg)) + "</small></span>" +
+      var sen = me ? ' <b style="color:#ffd35a;font-size:14px;white-space:nowrap">#' + esc(String(g.no)) + "</b>" : "";
+      h += '<div class="ar-sr k' + (me ? " me" : "") + '"' + (me ? ' data-me="1" data-sr="' + esc(String(g.no)) + '" style="cursor:pointer"' : "") + '><span class="ar-no">' + (i < 3 ? madal[i] : esc(String(g.no))) + '</span><span class="ar-ad">' + esc(x.ad) + sen + '<small class="ar-lgs">' + esc(ligAd(lg)) + "</small></span>" +
         (on ? '<i class="ar-on"></i>' : "") + '<span class="ar-pu">' + fmt(deger) + "</span>" +
         (me ? "" : '<button class="ar-dv" data-u="' + esc(x.uid) + '" data-a="' + esc(x.ad) + '"' + (on ? "" : ' data-off="1"') + ">" + (on ? "⚔️" : "📨") + "</button>") + "</div>";
     });

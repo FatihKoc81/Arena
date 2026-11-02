@@ -44,18 +44,38 @@
   }
 })();
 
-// FK LOGOSU (sadece ana sayfada) + OYUN BUTONLARI RENKLERİ
+// ALT SATIR: ana sayfanın altındaki küçük butonlar (APK/Güncelle, İsimle istek) tek bir satırda, aynı boyutta ve aynı hizada durur.
+// Her buton kendi başına "fixed" olunca tarayıcı çubukları açılıp kapanınca birbirine göre kayıyordu; artık hepsi tek kapta.
+window.altSatir = function () {
+  // Önce alt bölüm (Fatih / Altın / Premium / Puan) varsa onun içine konur: 6 kutu, 3x2 ızgara, hepsi aynı boyut.
+  const dock = document.querySelector(".ek-dock");
+  let s = document.getElementById("altSatir");
+  if (!document.getElementById("altSatirCss")) {
+    const st = document.createElement("style");
+    st.id = "altSatirCss";
+    st.textContent = ".ek-dock>.apk-btn,.ek-dock>.ar-adb,#altSatir>*{display:flex;align-items:center;justify-content:center;margin:0;padding:0 6px;border:2px solid #d4a63a;border-radius:14px;background:rgba(0,0,0,.3);color:#d4a63a;font:700 15px/1.1 system-ui,sans-serif;text-decoration:none;white-space:nowrap;cursor:pointer;position:static;box-sizing:border-box;height:52px;min-width:0}" +
+      ".ek-dock>.apk-btn.gizli,.ek-dock>.ar-adb.gizli,#altSatir>*.gizli{display:none}.ek-dock>.apk-btn:active,.ek-dock>.ar-adb:active,#altSatir>*:active{opacity:.7}" +
+      "#altSatir{position:fixed;left:0;right:0;bottom:calc(6px + env(safe-area-inset-bottom));z-index:5;display:flex;gap:8px;padding:0 max(14px,calc((100vw - 460px) / 2));pointer-events:none}#altSatir>*{flex:1 1 0;pointer-events:auto}#altSatir.gizli{display:none}";
+    document.head.appendChild(st);
+  }
+  if (dock) return dock;
+  if (s) return s;
+  const ana = document.getElementById("ana");
+  s = document.createElement("div");
+  s.id = "altSatir";
+  document.body.appendChild(s);
+  if (ana) {
+    const g = () => s.classList.toggle("gizli", ana.classList.contains("hidden") || ana.style.display === "none");
+    new MutationObserver(g).observe(ana, { attributes: true, attributeFilter: ["class", "style"] });
+    g();
+  }
+  return s;
+};
+
+// OYUN BUTONLARI RENKLERİ (FK logosu kaldırıldı)
 (function () {
   const ana = document.getElementById("ana");
   if (!ana) return;
-
-  const r = document.createElement("div");
-  r.textContent = "FK";
-  r.style.cssText = "position:fixed;right:10px;bottom:calc(4px + env(safe-area-inset-bottom));width:62px;height:40px;display:flex;align-items:center;justify-content:center;border:2px solid #d4a63a;border-radius:11px;color:#d4a63a;font-family:Georgia,'Times New Roman',serif;font-style:italic;font-weight:700;font-size:21px;line-height:1;pointer-events:none;z-index:5";
-  document.body.append(r);
-  const g = () => { r.style.display = ana.classList.contains("hidden") || ana.style.display === "none" ? "none" : "flex"; };
-  new MutationObserver(g).observe(ana, { attributes: true, attributeFilter: ["class", "style"] });
-  g();
 
   // Milyoner koyu kalır, diğer oyunlar renkli (butonlar yazısına göre bulunur)
   window.addEventListener("load", () => {
@@ -539,9 +559,12 @@
     const kapandi = katmanKapat();
     const yeniden = () => { if (!tus) durum(); };
     if (!ana.classList.contains("hidden")) {
+      // Ana sayfa. Tarayıcıda hiç çıkma. APK'da ARKA ARKAYA İKİ basış uygulamadan çıkar, tek basış sadece uyarı verir.
       if (kapandi) { yeniden(); return; }
+      if (!window.Capacitor) { yeniden(); return; }
       if (Date.now() - son < 2000) {
-        try { window.Capacitor.Plugins.App.exitApp(); } catch (e) {}
+        try { window.Capacitor.Plugins.App.exitApp(); return; } catch (e) {}
+        try { history.back(); } catch (e) {} // eklenti yoksa: geçmiş kaydı eklemeden geri git, uygulama kapanır
         return;
       }
       son = Date.now(); toast("Çıkmak için tekrar geri bas"); yeniden();
@@ -559,8 +582,12 @@
   // 2) Tarayıcı / PWA: geçmiş kaydı. Chrome, kullanıcı dokunmadan eklenen kayıtları geri tuşunda atladığı için
   //    ilk dokunuşta eklenir.
   if (!hazir) {
-    const ilk = () => { document.removeEventListener("pointerdown", ilk, true); durum(); };
-    document.addEventListener("pointerdown", ilk, true);
+    // Geri tuşu bizim eklediğimiz geçmiş kaydını harcar; her dokunuşta kayıt yoksa yeniden eklenir
+    // (Chrome/Samsung Internet, dokunuşsuz eklenen kayıtları geri tuşunda atlayıp siteden çıkıyordu).
+    const sagla = () => { if (!(history.state && history.state.arena)) durum(); };
+    document.addEventListener("pointerdown", sagla, true);
+    document.addEventListener("touchend", sagla, true);
+    document.addEventListener("keydown", sagla, true);
     durum();
     window.addEventListener("popstate", () => geri(false));
   }

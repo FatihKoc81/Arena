@@ -25,18 +25,19 @@
 
   const st = document.createElement("style");
   st.textContent =
-    "#ana{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:auto;margin-bottom:auto;position:relative;top:-21px}" +
+    // Boyutlar tarayıcı çubuklarına göre zıplamasın diye "svh" (küçük ekran yüksekliği) ile hesaplanır; sabit eşik (media query) yok.
+    "#ana{--ch:92px;--ch:clamp(56px,calc((100svh - 471px) / 2.9),108px);display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:auto;margin-bottom:auto;position:relative;top:0}" +
+    "body:has(#ana:not(.hidden)){padding-top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top) + 96px)!important;padding-bottom:calc(132px + env(safe-area-inset-bottom))!important}" +
     "#ana.hidden{display:none!important}" +
     "#ana>.alt{grid-column:1/-1;margin-bottom:6px;order:0}" +
     "#ana>.pill{display:none}" +
     "#ana>.ek-bar{display:none}" +
-    "#ana>.btn.kartB{order:var(--sira);margin:0;width:auto;height:108px;padding:8px 6px;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:16px;line-height:1.25;border:2px solid rgba(255,255,255,.2);background:var(--kc)!important;color:#fff!important}" +
-    "#ana>.btn.kartB.genis{grid-column:1/-1;height:100px}" +
-    "#ana>.btn.kartB .ic{width:56px;height:56px;display:block;margin-bottom:6px;flex:none}" +
-    "#ana>.btn.kartB.genis .ic{width:56px;height:56px;margin-bottom:4px}" +
+    // Tüm oyun kartları (Milyoner dahil) birebir aynı: aynı kenarlık, aynı yükseklik, gölge yok
+    "#ana>.btn.kartB{order:var(--sira);margin:0!important;width:auto;height:var(--ch);padding:8px 6px;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:16px;line-height:1.25;border:2px solid rgba(255,255,255,.2)!important;outline:0!important;box-shadow:none!important;transform:none;animation:none;background:var(--kc)!important;color:#fff!important}" +
+    "#ana>.btn.kartB.genis{grid-column:1/-1;height:calc(var(--ch) * .9)}" +
+    "#ana>.btn.kartB .ic{width:clamp(30px,calc(var(--ch) * .52),56px);height:clamp(30px,calc(var(--ch) * .52),56px);display:block;margin-bottom:4px;flex:none}" +
     "#ana>.btn.kartB b{font-size:clamp(14px,4.2vw,16px);font-weight:700;display:block;white-space:nowrap}" +
-    "@media (max-height:860px){#ana{gap:8px;top:0}#ana>.alt{margin-bottom:2px;line-height:1.45}#ana>.btn.kartB{height:92px}#ana>.btn.kartB.genis{height:82px}#ana>.btn.kartB .ic,#ana>.btn.kartB.genis .ic{width:46px;height:46px;margin-bottom:2px}}" +
-    "@media (max-height:700px){#ana>.btn.kartB{height:80px}#ana>.btn.kartB.genis{height:68px}#ana>.btn.kartB .ic,#ana>.btn.kartB.genis .ic{width:36px;height:36px}}";
+    "#ana>.btn.kartB:active{opacity:.85;transform:none}";
   document.head.appendChild(st);
   document.body.insertAdjacentHTML("beforeend", SIMGELER);
 
