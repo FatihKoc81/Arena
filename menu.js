@@ -26,8 +26,8 @@
   const st = document.createElement("style");
   st.textContent =
     // Boyutlar tarayıcı çubuklarına göre zıplamasın diye "svh" (küçük ekran yüksekliği) ile hesaplanır; sabit eşik (media query) yok.
-    "#ana{--ch:92px;--ch:clamp(56px,calc((100svh - 471px) / 2.9),108px);display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:auto;margin-bottom:auto;position:relative;top:0}" +
-    "body:has(#ana:not(.hidden)){padding-top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top) + 96px)!important;padding-bottom:calc(132px + env(safe-area-inset-bottom))!important}" +
+    "#ana{--ch:92px;--ch:clamp(56px,calc((100svh - 480px) / 2.9),108px);display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:auto;margin-bottom:auto;position:relative;top:0}" +
+    "body:has(#ana:not(.hidden)){padding-top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top) + 96px)!important;padding-bottom:calc(var(--dock-yuk,116px) + 24px + env(safe-area-inset-bottom))!important}" +
     "#ana.hidden{display:none!important}" +
     "#ana>.alt{grid-column:1/-1;margin-bottom:6px;order:0}" +
     "#ana>.pill{display:none}" +
@@ -38,12 +38,16 @@
     "#ana>.btn.kartB .ic{width:clamp(30px,calc(var(--ch) * .52),56px);height:clamp(30px,calc(var(--ch) * .52),56px);display:block;margin-bottom:4px;flex:none}" +
     "#ana>.btn.kartB b{font-size:clamp(14px,4.2vw,16px);font-weight:700;display:block;white-space:nowrap}" +
     "#ana>.btn.kartB:active{opacity:.85;transform:none}" +
-    // ALT BÖLÜM: iki sıra. Üst sıra Fatih / Altın / Premium / Puan (4 eşit kutu, yazılar tam okunur), alt sıra İsimle istek + APK/Güncelle (her biri 2 kutu genişliğinde)
-    "html body .ek-dock{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;grid-auto-rows:auto!important;gap:8px!important;align-items:stretch!important}" +
+    // ALT BÖLÜM: kartın ALTINDA, ekranın en dibine yakın durur (eskiden 62px yukarıdaydı, kartın üstüne biniyordu).
+    // Üst sıra Fatih / Altın / Premium / Puan (4 eşit kutu), alt sıra yan yana İsimle istek + Güncelle (her biri 2 kutu genişliğinde).
+    // Sayfa alt boşluğu (padding-bottom) bu bölümün gerçek yüksekliğine göre ayarlanır (--dock-yuk), böylece kart asla altına girmez.
+    "html body .ek-dock{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;grid-auto-rows:auto!important;gap:8px!important;align-items:stretch!important;bottom:calc(10px + env(safe-area-inset-bottom))!important}" +
+    "html body .ek-dock:not(.show){display:none!important}" +
     "html body .ek-dock>*{min-width:0!important;width:auto!important;max-width:none!important;box-sizing:border-box!important;overflow:hidden!important;text-overflow:clip!important}" +
     "html body .ek-dock>*:not(.ar-adb):not(.apk-btn){grid-column:span 1!important;height:56px!important}" +
     "html body .ek-dock>.ar-adb,html body .ek-dock>.apk-btn{grid-column:span 2!important;height:52px!important;font-size:15px!important}" +
-    "html body .ek-dock>.ar-adb:only-of-type{grid-column:1/-1!important}";
+    // tek başına kalan alt buton (diğeri gizliyse) tam genişlik olur
+    "html body .ek-dock:not(:has(.apk-btn:not(.gizli)))>.ar-adb,html body .ek-dock:not(:has(.ar-adb:not(.gizli)))>.apk-btn{grid-column:1/-1!important}";
   document.head.appendChild(st);
   document.body.insertAdjacentHTML("beforeend", SIMGELER);
 
@@ -73,4 +77,17 @@
   }).observe(ana, { childList: true, subtree: true, attributes: true, attributeFilter: ["style", "class"] });
 
   window.addEventListener("load", hepsi);
+
+  // Alt bölümün (dock) gerçek yüksekliğini ölç, sayfa alt boşluğuna yaz
+  function dockYuk() {
+    const d = document.querySelector(".ek-dock");
+    if (!d) return;
+    if (!d._yuk && window.ResizeObserver) { d._yuk = true; new ResizeObserver(dockYuk).observe(d); }
+    const h = d.offsetHeight;
+    if (h) document.documentElement.style.setProperty("--dock-yuk", h + "px");
+  }
+  new MutationObserver(dockYuk).observe(document.body, { childList: true });
+  window.addEventListener("load", dockYuk);
+  window.addEventListener("resize", dockYuk);
+  dockYuk();
 })();
