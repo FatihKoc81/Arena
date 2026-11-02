@@ -74,7 +74,9 @@
     ".ar-b{flex:1;border:0;border-radius:12px;padding:10px 6px;font:800 15px system-ui,sans-serif;color:#fff;background:#2fb81a;cursor:pointer}.ar-b.gri{background:#6b7280}" +
     ".ar-pn{position:fixed;inset:0;z-index:99990;background:#080c20;display:none;flex-direction:column;color:#fff;font-family:system-ui,sans-serif;padding-top:env(safe-area-inset-top)}" +
     ".ar-pn.show{display:flex}" +
-    ".ar-ph{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;font-size:20px;font-weight:800;border-bottom:1px solid #1d2540}" +
+    ".ar-ph{position:relative;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;box-sizing:border-box;height:var(--bas-yuk,58px);padding:0;margin:0;font-family:Roboto,system-ui,sans-serif;font-size:var(--bas-yazi,clamp(22px,7vw,30px));font-weight:800;letter-spacing:.3px;line-height:1;white-space:nowrap;text-shadow:0 1px 6px rgba(0,0,0,.7);background:rgba(8,12,32,.96);border-bottom:1px solid #1d2540}" +
+    ".ar-ph .hl{font-style:normal;justify-self:end;margin-right:.3em}.ar-ph .hl.hs{justify-self:start;margin:0 0 0 .3em;transform:scaleX(-1)}" +
+    ".ar-ph .ar-x{position:absolute;right:14px;top:50%;transform:translateY(-50%)}" +
     ".ar-x{border:0;background:#222f45;color:#fff;border-radius:10px;width:38px;height:38px;font-size:18px;cursor:pointer}" +
     ".ar-tabs{display:flex;gap:6px;padding:8px 10px}" +
     ".ar-tab{flex:1;border:2px solid #4a5a9a;background:#101a38;color:#8e9bc4;border-radius:12px;padding:9px 2px;font:700 14px system-ui,sans-serif;cursor:pointer}.ar-tab.on{background:#3b5bd6;color:#fff;border-color:#7d97ff}" +
@@ -884,11 +886,10 @@
     if (panel) return panel;
     panel = document.createElement("div");
     panel.className = "ar-pn";
-    panel.innerHTML = '<div class="ar-ph"><span class="ar-ba" style="cursor:pointer">🏅 ARENA</span><button class="ar-x">✕</button></div>' +
+    panel.innerHTML = '<div class="ar-ph"><i class="hl">⚡</i><span class="ar-ba" style="cursor:pointer">ARENA</span><i class="hl hs">⚡</i></div>' +
       '<div class="ar-tabs"><button class="ar-tab" data-s="siralama">Sıralama</button><button class="ar-tab" data-s="puan">Puanım</button><button class="ar-tab" data-s="turnuva">Turnuva</button><button class="ar-tab" data-s="lig">Lig</button></div>' +
       '<div class="ar-body"></div>';
     document.body.appendChild(panel);
-    panel.querySelector(".ar-x").onclick = function () { panel.classList.remove("show"); };
     panel.querySelector(".ar-ba").onclick = function () {
       panel.classList.remove("show");
       var h = document.querySelector("h1"); if (h) h.click();   // ana sayfa
