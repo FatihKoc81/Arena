@@ -492,7 +492,7 @@ document.addEventListener("anasayfa", gKapat);
 // Sayfa kaymasın (menü, oyun, sonuç ekranları) + sol alta APK indirme / güncelleme butonu
 // Tarayıcıda "⬇ APK", uygulamanın içinde aynı yerde "⬇ Güncelle" yazar.
 (function () {
-  var APK_ADRES = "https://github.com/FatihKoc81/Arena/releases/latest"; // her derlemede otomatik güncellenir
+  var APK_ADRES = "https://github.com/FatihKoc81/Arena/releases/latest/download/Arena.apk"; // doğrudan indirme: sürüm sayfası açılmaz
   var apkUygulamasi = !!window.Capacitor;
   var uygulamaIci = !!(apkUygulamasi || (window.matchMedia && matchMedia("(display-mode: standalone)").matches));
   var stl = document.createElement("style");
