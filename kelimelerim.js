@@ -6,7 +6,14 @@
 
   const SURE = 90, OPS = ["+", "−", "×", "÷"];
   const $ = id => document.getElementById(id);
-  const rnd = n => Math.floor(Math.random() * n);
+  // Düelloda iki oyuncuya AYNI tohumdan aynı bulmaca üretilir (rand geçici olarak tohumlu üreteçle değiştirilir)
+  let rand = Math.random;
+  const rnd = n => Math.floor(rand() * n);
+  const DUELLO_TUR = 3;          // düello: hedefi TAM bulduğun tur sayısı; ilk 3'e ulaşan kazanır
+  let duel = null;               // aktif düello: {seed, tur, api}
+  function tohumlu(a) { // mulberry32
+    return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  }
 
   const css = document.createElement("style");
   css.textContent = `
@@ -61,7 +68,7 @@
   }
 
   function bulmaca() {
-    const buyuk = [25, 50, 75, 100].sort(() => Math.random() - .5).slice(0, 1 + rnd(3));
+    const buyuk = [25, 50, 75, 100].sort(() => rand() - .5).slice(0, 1 + rnd(3));
     const havuz = buyuk.slice();
     while (havuz.length < 6) havuz.push(1 + rnd(10));
     for (let t = 0; t < 3000; t++) {
@@ -83,7 +90,9 @@
 
   function basla() {
     clearTimeout(sonrakiTid);
-    const p = bulmaca();
+    if (duel) rand = tohumlu(duel.seed + duel.tur * 7919);
+    let p;
+    try { p = bulmaca(); } finally { rand = Math.random; }
     hedef = p.hedef;
     sayilar = p.havuz.map((v, i) => ({ v, id: i }));
     gecmis = []; secA = null; secOp = null; kalan = SURE; bitti = false;
@@ -113,11 +122,17 @@
     else if (fark <= 10) { puan = 5; yazi = "En yakın " + yakin + " (" + fark + " fark). +5 puan"; }
     else yazi = "En yakın " + yakin + " (" + fark + " fark). Puan yok";
     toplam += puan;
+    let sonraki = true;
+    if (duel && fark === 0) { // düello: hedef TAM bulundu -> ilerleme kaydedilir
+      duel.tur++;
+      try { duel.api.ilerle(duel.tur, DUELLO_TUR); } catch (e) {}
+      if (duel.tur >= DUELLO_TUR) { sonraki = false; try { duel.api.bitti(); } catch (e) {} }
+    }
     if (window.Puan && puan > 0) Puan.ekle("islem", puan / 10); // 10 puan = 1 el; kısmi puan orantılı eklenir
     $("isPuan").textContent = "Puan: " + toplam;
     $("isMsg").style.color = puan ? "#2fbf71" : "#f0b429";
     $("isMsg").textContent = yazi;
-    sonrakiTid = setTimeout(basla, 3000);
+    if (sonraki) sonrakiTid = setTimeout(basla, 3000);
     ciz();
   }
 
@@ -203,5 +218,19 @@
     $("isMsg").textContent = "";
     ciz();
   };
-  document.addEventListener("anasayfa", () => { clearInterval(tid); clearTimeout(sonrakiTid); });
+  document.addEventListener("anasayfa", () => { clearInterval(tid); clearTimeout(sonrakiTid); duel = null; });
+
+  // DÜELLO: arena.js bu kaydı kullanır (baslat(d, api), dur())
+  (window.ArenaOyunlari = window.ArenaOyunlari || {}).islem = {
+    ad: "İşlem",
+    baslat: function (d, api) {
+      duel = { seed: d.seed, tur: 0, api: api };
+      toplam = 0; $("isPuan").textContent = "Puan: 0";
+      try { api.ilerle(0, DUELLO_TUR); } catch (e) {}
+      ana.classList.add("hidden");
+      ekran.classList.remove("hidden");
+      basla();
+    },
+    dur: function () { duel = null; bitti = true; clearInterval(tid); clearTimeout(sonrakiTid); ciz(); }
+  };
 })();
