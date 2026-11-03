@@ -545,6 +545,9 @@ window.altSatir = function () {
   function katmanKapat() {
     const g = document.getElementById("gecis");
     if (g && g.classList.contains("ac")) { g.classList.remove("ac"); return true; }
+    // Sıralama / Puanım / Turnuva / Lig paneli (arena.js, .ar-pn): kapatma düğmesi yok, geri tuşu paneli kapatıp ana sayfaya götürür
+    const pn = document.querySelector(".ar-pn.show");
+    if (pn) { pn.classList.remove("show"); try { h1.click(); } catch (e) {} return true; }
     let bulundu = false;
     document.querySelectorAll("body > *").forEach(e => {
       if (bulundu || e === h1 || e.id === "cm" || e.id === "cmGec") return; // Rotasyon oyun alanı pencere değil (içindeki ✕ gizli pencere düğmesi geri tuşunu yutuyordu)

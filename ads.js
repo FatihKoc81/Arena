@@ -22,6 +22,16 @@
   }
   window.__adHata = AdMob ? "" : ("AdMob eklentisi yok " + hata);
 
+  function bildir(m) {
+    try {
+      var t = document.createElement("div");
+      t.textContent = m;
+      t.style.cssText = "position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:2147483000;max-width:88vw;background:rgba(120,20,20,.96);color:#fff;border-radius:14px;padding:10px 16px;font:600 13px system-ui,sans-serif;text-align:center";
+      document.body.appendChild(t);
+      setTimeout(function () { t.remove(); }, 6000);
+    } catch (e) {}
+  }
+
   function hataYaz(e) {
     var m = (e && (e.message || e.errorMessage || e.code)) || String(e);
     window.__adHata = String(m).slice(0, 80);
@@ -51,12 +61,14 @@
 
   function goster(tur, bitti) {
     var odul = tur === "odul";
+    if (AdMob) window.__adHata = "";
     var bitisti = false, kazandi = false, dl = null, zamanAsimi;
     function son(ok) {
       if (bitisti) return;
       bitisti = true;
       clearTimeout(zamanAsimi);
       if (dl) dl.temizle();
+      if (!ok && window.__adHata) bildir("Reklam açılamadı: " + window.__adHata);
       bitti(ok);
     }
     zamanAsimi = setTimeout(function () { if (!window.__adHata) window.__adHata = "zaman aşımı"; son(false); }, 45000);
