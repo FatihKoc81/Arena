@@ -53,7 +53,7 @@ window.altSatir = function () {
   if (!document.getElementById("altSatirCss")) {
     const st = document.createElement("style");
     st.id = "altSatirCss";
-    st.textContent = ".ek-dock>.apk-btn,.ek-dock>.ar-adb,#altSatir>*{display:flex;align-items:center;justify-content:center;margin:0;padding:0 6px;border:2px solid #d4a63a;border-radius:14px;background:rgba(0,0,0,.3);color:#d4a63a;font:700 15px/1.1 system-ui,sans-serif;text-decoration:none;white-space:nowrap;cursor:pointer;position:static;box-sizing:border-box;height:52px;min-width:0}" +
+    st.textContent = ".ek-dock>.apk-btn,.ek-dock>.ar-adb,#altSatir>*{display:flex;align-items:center;justify-content:center;margin:0;padding:0 6px;border:2px solid #d4a63a;border-radius:14px;background:rgba(0,0,0,.3);color:#d4a63a;font:800 17px/1.1 system-ui,sans-serif;text-decoration:none;white-space:nowrap;cursor:pointer;position:static;box-sizing:border-box;height:66px;min-width:0}" +
       ".ek-dock>.apk-btn.gizli,.ek-dock>.ar-adb.gizli,#altSatir>*.gizli{display:none}.ek-dock>.apk-btn:active,.ek-dock>.ar-adb:active,#altSatir>*:active{opacity:.7}" +
       "#altSatir{position:fixed;left:0;right:0;bottom:calc(6px + env(safe-area-inset-bottom));z-index:5;display:flex;gap:8px;padding:0 max(14px,calc((100vw - 460px) / 2));pointer-events:none}#altSatir>*{flex:1 1 0;pointer-events:auto}#altSatir.gizli{display:none}";
     document.head.appendChild(st);
@@ -547,15 +547,38 @@ window.altSatir = function () {
     if (g && g.classList.contains("ac")) { g.classList.remove("ac"); return true; }
     let bulundu = false;
     document.querySelectorAll("body > *").forEach(e => {
-      if (bulundu || e === h1) return;
+      if (bulundu || e === h1 || e.id === "cm" || e.id === "cmGec") return; // Rotasyon oyun alanı pencere değil (içindeki ✕ gizli pencere düğmesi geri tuşunu yutuyordu)
       const cs = getComputedStyle(e);
       if (cs.position !== "fixed" || cs.display === "none" || cs.visibility === "hidden" || +cs.opacity === 0) return;
       const r = e.getBoundingClientRect();
       if (r.width < innerWidth * 0.9 || r.height < innerHeight * 0.5) return;
-      const x = Array.from(e.querySelectorAll("button")).find(b => /^(✕|×|✖|x|X|Vazgeç|Kapat)$/.test(b.textContent.trim()));
+      if (e.querySelector("#cm")) return; // Rotasyon oyun alanı pencere değil: içindeki düğmeler kapatma düğmesi sayılmaz
+      const x = Array.from(e.querySelectorAll("button")).find(b => /^(✕|×|✖|Vazgeç|Kapat)$/.test(b.textContent.trim()));
       if (x) { x.click(); bulundu = true; }
     });
+    if (!bulundu) {
+      const ov = document.getElementById("cmOv"); // Rotasyon: açık "Ekstra kelimeler" penceresi önce kapanır
+      if (ov && ov.classList.contains("show")) { ov.classList.remove("show"); bulundu = true; }
+    }
     return bulundu;
+  }
+
+  // Başlığa tıklamak ana sayfayı açmadıysa (ör. Rotasyon oyunu) oyun katmanını kapatıp ana sayfayı kendimiz açarız
+  function zorlaAna() {
+    if (!ana.classList.contains("hidden")) return;
+    const cm = document.getElementById("cm");
+    if (cm) {
+      // önce oyunun kendi çıkış düğmesi
+      let k = cm;
+      while (k.parentElement && k.parentElement !== document.body) k = k.parentElement;
+      const dugme = Array.from(k.querySelectorAll("button")).find(b => /Ana\s*men|Menü|Çıkış|Çık|Geri|←|✕|×|Kapat|Vazgeç/i.test(b.textContent.trim()));
+      if (dugme) { dugme.click(); if (!ana.classList.contains("hidden")) return; }
+      if (k !== ana && !k.contains(h1)) k.classList.add("hidden");
+    }
+    document.querySelectorAll("section.kart").forEach(e => e.classList.add("hidden"));
+    document.dispatchEvent(new Event("anasayfa"));
+    ana.classList.remove("hidden");
+    try { window.scrollTo(0, 0); } catch (e) {}
   }
 
   // Geri tuşuna basılınca yapılacak iş (tus: true = Capacitor'dan geldi, geçmiş kaydı eklemeye gerek yok)
@@ -576,7 +599,7 @@ window.altSatir = function () {
       son = Date.now(); toast("Çıkmak için tekrar geri bas"); yeniden();
       return;
     }
-    if (!kapandi) h1.click();                           // oyundaysa ana sayfaya dön
+    if (!kapandi) { h1.click(); zorlaAna(); }           // oyundaysa ana sayfaya dön
     yeniden();
   }
 
@@ -615,6 +638,26 @@ window.altSatir = function () {
   window.addEventListener("load", dinleyiciKur);
   // Eski Cordova tarzı olay (varsa)
   document.addEventListener("backbutton", (e) => { if (e && e.preventDefault) e.preventDefault(); geri(true); }, false);
+  // KLAVYE: Passaparola/Kelime oyununda klavye açıkken Android'in ilk geri basışı sadece klavyeyi kapatıyordu (uygulamaya hiç gelmiyordu).
+  // Cevap kutusu odaktayken klavye kendiliğinden kapanırsa (dokunuş yok) bunu geri basışı sayıp ana sayfaya dönüyoruz.
+  let sonDok = 0, oncekiH = window.innerHeight;
+  ["pointerdown", "touchstart", "mousedown", "keydown"].forEach(t => document.addEventListener(t, () => { sonDok = Date.now(); }, true));
+  const klavyeKontrol = () => {
+    const vv = window.visualViewport;
+    const h = vv ? vv.height : window.innerHeight;
+    const kapandi = h > oncekiH + 120;
+    oncekiH = h;
+    if (!kapandi || !window.Capacitor) return;
+    if (ana.classList.contains("hidden") === false) return;
+    const a = document.activeElement;
+    if (!a || !/^(kkCevap|ppCevap)$/.test(a.id)) return;
+    if (Date.now() - sonDok < 700) return;
+    geri(true);
+  };
+  oncekiH = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+  window.addEventListener("resize", klavyeKontrol);
+  if (window.visualViewport) window.visualViewport.addEventListener("resize", klavyeKontrol);
+
   // 2) Her durumda geçmiş koruması: dinleyici çalışmazsa bile geri tuşu uygulamayı kapatmaz, sadece bizim kaydı harcar.
   const sagla = () => { if (!aktif || !(history.state && history.state.arena)) durum(true); };
   document.addEventListener("pointerdown", sagla, true);
