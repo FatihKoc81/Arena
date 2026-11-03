@@ -871,7 +871,7 @@
       adPen.innerHTML = '<div style="width:100%;max-width:380px;background:#fcefd0;border:3px solid #f2c94c;border-radius:20px;padding:16px;box-sizing:border-box;color:#5a3a12;font-family:system-ui,sans-serif">' +
         '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><b style="font-size:20px">👤 İsimle istek at</b><button class="ar-pk" style="border:0;background:#8a8f9e;color:#fff;border-radius:10px;width:36px;height:36px;font-size:18px">✕</button></div>' +
         '<input class="ar-ai ar-pi" type="text" maxlength="18" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Kullanıcı adı yaz" style="width:100%;box-sizing:border-box;margin-bottom:10px">' +
-        '<button class="ar-ag ar-pg" style="width:100%;box-sizing:border-box">⚔️ İstek At</button></div>';
+        '<button class="ar-ag ar-pg" style="width:100%;box-sizing:border-box;height:60px;font-size:19px;border-radius:16px">⚔️ İstek At</button></div>';
       document.body.appendChild(adPen);
       adPenInp = adPen.querySelector(".ar-pi");
       adPen.querySelector(".ar-pk").onclick = adPenKapat;

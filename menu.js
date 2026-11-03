@@ -45,7 +45,7 @@
     "html body .ek-dock:not(.show){display:none!important}" +
     "html body .ek-dock>*{min-width:0!important;width:auto!important;max-width:none!important;box-sizing:border-box!important;overflow:hidden!important;text-overflow:clip!important}" +
     "html body .ek-dock>*:not(.ar-adb):not(.apk-btn){grid-column:span 1!important;height:56px!important}" +
-    "html body .ek-dock>.ar-adb,html body .ek-dock>.apk-btn{grid-column:span 2!important;height:66px!important;font-size:17px!important;font-weight:800!important}" +
+    "html body .ek-dock>.ar-adb,html body .ek-dock>.apk-btn{grid-column:span 2!important;height:52px!important;font-size:15px!important}" +
     // tek başına kalan alt buton (diğeri gizliyse) tam genişlik olur
     "html body .ek-dock:not(:has(.apk-btn:not(.gizli)))>.ar-adb,html body .ek-dock:not(:has(.ar-adb:not(.gizli)))>.apk-btn{grid-column:1/-1!important}";
   document.head.appendChild(st);

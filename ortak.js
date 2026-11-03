@@ -53,7 +53,7 @@ window.altSatir = function () {
   if (!document.getElementById("altSatirCss")) {
     const st = document.createElement("style");
     st.id = "altSatirCss";
-    st.textContent = ".ek-dock>.apk-btn,.ek-dock>.ar-adb,#altSatir>*{display:flex;align-items:center;justify-content:center;margin:0;padding:0 6px;border:2px solid #d4a63a;border-radius:14px;background:rgba(0,0,0,.3);color:#d4a63a;font:800 17px/1.1 system-ui,sans-serif;text-decoration:none;white-space:nowrap;cursor:pointer;position:static;box-sizing:border-box;height:66px;min-width:0}" +
+    st.textContent = ".ek-dock>.apk-btn,.ek-dock>.ar-adb,#altSatir>*{display:flex;align-items:center;justify-content:center;margin:0;padding:0 6px;border:2px solid #d4a63a;border-radius:14px;background:rgba(0,0,0,.3);color:#d4a63a;font:700 15px/1.1 system-ui,sans-serif;text-decoration:none;white-space:nowrap;cursor:pointer;position:static;box-sizing:border-box;height:52px;min-width:0}" +
       ".ek-dock>.apk-btn.gizli,.ek-dock>.ar-adb.gizli,#altSatir>*.gizli{display:none}.ek-dock>.apk-btn:active,.ek-dock>.ar-adb:active,#altSatir>*:active{opacity:.7}" +
       "#altSatir{position:fixed;left:0;right:0;bottom:calc(6px + env(safe-area-inset-bottom));z-index:5;display:flex;gap:8px;padding:0 max(14px,calc((100vw - 460px) / 2));pointer-events:none}#altSatir>*{flex:1 1 0;pointer-events:auto}#altSatir.gizli{display:none}";
     document.head.appendChild(st);
@@ -565,14 +565,16 @@ window.altSatir = function () {
 
   // Başlığa tıklamak ana sayfayı açmadıysa (ör. Rotasyon oyunu) oyun katmanını kapatıp ana sayfayı kendimiz açarız
   function zorlaAna() {
-    if (!ana.classList.contains("hidden")) return;
+    if (anaMi()) return;
     const cm = document.getElementById("cm");
+    if (cm && cm.style.display === "flex") { const b = document.getElementById("cmBack"); if (b) b.click(); if (anaMi()) return; cm.style.display = "none"; }
+    if (anaMi()) return;
     if (cm) {
       // önce oyunun kendi çıkış düğmesi
       let k = cm;
       while (k.parentElement && k.parentElement !== document.body) k = k.parentElement;
       const dugme = Array.from(k.querySelectorAll("button")).find(b => /Ana\s*men|Menü|Çıkış|Çık|Geri|←|✕|×|Kapat|Vazgeç/i.test(b.textContent.trim()));
-      if (dugme) { dugme.click(); if (!ana.classList.contains("hidden")) return; }
+      if (dugme) { dugme.click(); if (anaMi()) return; }
       if (k !== ana && !k.contains(h1)) k.classList.add("hidden");
     }
     document.querySelectorAll("section.kart").forEach(e => e.classList.add("hidden"));
@@ -583,12 +585,14 @@ window.altSatir = function () {
 
   // Geri tuşuna basılınca yapılacak iş (tus: true = Capacitor'dan geldi, geçmiş kaydı eklemeye gerek yok)
   let sonBasis = 0;
+  const rotAcik = () => { const c = document.getElementById("cm"); return !!c && c.style.display === "flex"; };
+  const anaMi = () => !ana.classList.contains("hidden") && !rotAcik();
   function geri(tus, gecmis) {
     // Aynı basış hem Capacitor hem "backbutton" olayından gelirse iki kez çalışmasın
     const t = Date.now(); if (t - sonBasis < 350) return; sonBasis = t;
     const kapandi = katmanKapat();
     const yeniden = () => { if (!tus) durum(); };
-    if (!ana.classList.contains("hidden")) {
+    if (anaMi()) {
       // Ana sayfa. Tarayıcıda hiç çıkma. APK'da ARKA ARKAYA İKİ basış uygulamadan çıkar, tek basış sadece uyarı verir.
       if (kapandi) { yeniden(); return; }
       if (!window.Capacitor) { yeniden(); return; }
@@ -648,7 +652,7 @@ window.altSatir = function () {
     const kapandi = h > oncekiH + 120;
     oncekiH = h;
     if (!kapandi || !window.Capacitor) return;
-    if (ana.classList.contains("hidden") === false) return;
+    if (anaMi()) return;
     const a = document.activeElement;
     if (!a || !/^(kkCevap|ppCevap)$/.test(a.id)) return;
     if (Date.now() - sonDok < 700) return;

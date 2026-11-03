@@ -498,6 +498,8 @@ document.addEventListener("anasayfa", gKapat);
   var stl = document.createElement("style");
   stl.textContent =
     ".apk-btn{}" +
+    ".ar-pg{height:60px!important;min-height:60px!important;font-size:19px!important;border-radius:16px!important}" +
+    ".surum{position:fixed;left:0;right:0;bottom:calc(2px + env(safe-area-inset-bottom));text-align:center;font:600 10px system-ui,sans-serif;color:#fff;opacity:.35;pointer-events:none;z-index:5}body:has(#ana.hidden) .surum{display:none}" +
     ".apk-btn:active{opacity:.7}.apk-btn.gizli{display:none}" +
     "html.menu-kilit,html.menu-kilit body{overflow:hidden!important;overscroll-behavior:none!important;height:100%!important}" +
     "html.menu-kilit body{position:fixed!important;top:0;left:0;right:0;width:100%}" +
@@ -515,6 +517,7 @@ document.addEventListener("anasayfa", gKapat);
     "#kkHeks::after{content:counter(kkh) \" Harfli\";order:-1;flex:0 0 100%;text-align:center;color:#8e9bc4;font-size:15px;font-weight:700;margin-bottom:4px}" +
     "";
   document.head.appendChild(stl);
+  var sv = document.createElement("div"); sv.className = "surum"; sv.textContent = "sürüm 20261103a"; document.body.appendChild(sv);
   // Kelime Oyunu ekranı açıkken body'ye kkOyunda sınıfı ekle
   var kk = document.getElementById("kk"), ko = document.getElementById("kkOyun");
   function kkG() {
