@@ -35,14 +35,8 @@ jobs:
             cp -r assets "$WEB"/ 2>/dev/null || true
           fi
 
-      - name: Paket adını ayır (eski uygulamayla çakışmasın)
-        run: |
-          node -e "
-          const fs=require('fs');
-          const c=JSON.parse(fs.readFileSync('capacitor.config.json','utf8'));
-          if(!c.appId.endsWith('.v2')) c.appId=c.appId+'.v2';
-          fs.writeFileSync('capacitor.config.json',JSON.stringify(c,null,2));
-          console.log('appId:',c.appId);"
+      - name: Paket adını yazdır
+        run: node -p "'appId: ' + require('./capacitor.config.json').appId"
 
       - name: Android projesini hazırla
         run: |
