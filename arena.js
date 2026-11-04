@@ -442,7 +442,7 @@
 
   // ---------- 48 SAAT GEÇERLİ İSTEKLER (çevrimdışı oyunculara da atılır, telefona bildirim gider) ----------
   var ISTEK_MS = 48 * 3600 * 1000;
-  var istekGelen = {}, istekGiden = {}, istekGosterildi = {}, pushHazir = false;
+  var istekGelen = {}, istekGiden = {}, istekGosterildi = {}, pushHazir = false, pushKurCalisiyor = false;
   function istekSure(v) { return !v || !v.bitis || simdi() > v.bitis; }
   function istekKalan(v) { var h = Math.floor((v.bitis - simdi()) / 3600000); return h >= 1 ? h + " sa kaldı" : "1 saatten az kaldı"; }
   function istekSec(hedef, hedefAd) {
@@ -581,7 +581,7 @@
     return null;
   }
   function pushKur() {
-    if (!kok || !uid) return;
+    if (!kok || !uid || pushKurCalisiyor) return;
     try {
       var cap = window.Capacitor;
       var platform = "web";
@@ -590,47 +590,73 @@
       var native = false;
       try { native = !!(cap && ((typeof cap.isNativePlatform === "function" && cap.isNativePlatform()) || platform !== "web")); }
       catch (e) { native = platform !== "web"; }
+
       if (native && !pushHazir) {
         var PN = pushEklentisi(cap);
         if (!PN || typeof PN.addListener !== "function" || typeof PN.register !== "function") {
-          console.error("ARENA: PushNotifications eklentisi bulunamadı. Capacitor Android eklentisi kontrol edilmeli.");
-          if (pushDeneme++ < 4) setTimeout(pushKur, 2000);
+          console.error("ARENA: PushNotifications eklentisi bulunamadı. APK Capacitor Android eklentisi kontrol edilmeli.");
+          if (pushDeneme++ < 5) setTimeout(pushKur, 3000);
           return;
         }
-        pushHazir = true;
-        PN.addListener("registration", function (t) {
-          if (!t || !t.value || !kok || !uid) { console.error("ARENA: FCM kayıt jetonu boş geldi."); return; }
-          kok.child(pushCihazYolu()).set(t.value).then(function () {
-            console.info("ARENA: FCM cihaz kaydı Firebase'e yazıldı.");
-          }).catch(function (e) { console.error("ARENA: FCM jetonu Firebase'e yazılamadı:", e); });
-        });
-        PN.addListener("registrationError", function (e) {
-          console.error("ARENA: FCM kayıt hatası:", e);
-          toast("🔔 Bildirim kaydı başarısız. İnternet bağlantısını kontrol et.");
-        });
-        PN.addListener("pushNotificationReceived", function (n) {
-          toast("🔔 " + ((n && n.title) || "ARENA") + (n && n.body ? " · " + n.body : ""));
-        });
-        PN.addListener("pushNotificationActionPerformed", function () { ac("siralama"); });
-        var kanal = Promise.resolve();
-        try {
-          if (typeof PN.createChannel === "function") kanal = PN.createChannel({
-            id: "default", name: "ARENA Bildirimleri",
-            description: "ARENA oyun ve davet bildirimleri", importance: 5, visibility: 1
-          });
-        } catch (e) { console.warn("ARENA bildirim kanalı:", e); }
-        Promise.resolve(kanal).then(function () {
+
+        // ÖNEMLİ: Önce bütün olay dinleyicilerinin kurulmasını bekle, sonra FCM register çağır.
+        // Böylece hızlı dönen cihazlarda registration olayı kaçırılmaz.
+        pushKurCalisiyor = true;
+        Promise.all([
+          Promise.resolve(PN.addListener("registration", function (t) {
+            if (!t || !t.value || !kok || !uid) {
+              console.error("ARENA: FCM kayıt jetonu boş geldi.");
+              return;
+            }
+            var hedef = pushCihazYolu();
+            kok.child(hedef).set(t.value).then(function () {
+              console.info("ARENA: FCM cihaz kaydı Firebase'e yazıldı:", hedef);
+              pushDeneme = 0;
+            }).catch(function (e) {
+              console.error("ARENA: FCM jetonu Firebase'e yazılamadı:", e);
+              toast("🔔 Bildirim tokenı kaydedilemedi.");
+            });
+          })),
+          Promise.resolve(PN.addListener("registrationError", function (e) {
+            console.error("ARENA: FCM kayıt hatası:", e);
+            toast("🔔 FCM kaydı başarısız. Yeniden denenecek.");
+            pushHazir = false;
+            if (pushDeneme++ < 5) setTimeout(pushKur, 4000);
+          })),
+          Promise.resolve(PN.addListener("pushNotificationReceived", function (n) {
+            toast("🔔 " + ((n && n.title) || "ARENA") + (n && n.body ? " · " + n.body : ""));
+          })),
+          Promise.resolve(PN.addListener("pushNotificationActionPerformed", function () {
+            ac("siralama");
+          }))
+        ]).then(function () {
+          var kanal = Promise.resolve();
+          if (typeof PN.createChannel === "function") {
+            kanal = Promise.resolve(PN.createChannel({
+              id: "default", name: "ARENA Bildirimleri",
+              description: "ARENA oyun ve davet bildirimleri", importance: 5, visibility: 1
+            }));
+          }
+          return kanal;
+        }).then(function () {
           return PN.requestPermissions();
         }).then(function (r) {
           if (r && r.receive === "granted") {
-            console.info("ARENA: Bildirim izni verildi, FCM kaydı başlatılıyor.");
-            PN.register();
-          } else {
-            console.warn("ARENA: Bildirim izni verilmedi:", r);
+            console.info("ARENA: Bildirim izni verildi; dinleyiciler hazır, FCM kaydı başlatılıyor.");
+            return PN.register();
           }
-        }).catch(function (e) {
-          console.error("ARENA: Bildirim izni/kayıt başlatılamadı:", e);
+          console.warn("ARENA: Bildirim izni verilmedi:", r);
           pushHazir = false;
+          toast("🔔 ARENA bildirim izni verilmedi.");
+        }).then(function () {
+          // Register çağrısı başarıyla başlatıldı; registration olayı tokenı ayrıca kaydeder.
+          pushHazir = true;
+          pushKurCalisiyor = false;
+        }).catch(function (e) {
+          console.error("ARENA: Bildirim dinleyicisi/izni/FCM kaydı başlatılamadı:", e);
+          pushHazir = false;
+          pushKurCalisiyor = false;
+          if (pushDeneme++ < 5) setTimeout(pushKur, 4000);
         });
       } else if (!native && "Notification" in window && Notification.permission === "granted") {
         webPushKur();
@@ -638,6 +664,8 @@
     } catch (e) {
       console.error("ARENA push başlatma hatası:", e);
       pushHazir = false;
+      pushKurCalisiyor = false;
+      if (pushDeneme++ < 5) setTimeout(pushKur, 4000);
     }
   }
   function htmlIstekler() {
