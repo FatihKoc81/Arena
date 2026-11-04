@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "275840158100",
+    "firebase_url": "https://estergon-8e8a4-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "estergon-8e8a4",
+    "storage_bucket": "estergon-8e8a4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:275840158100:android:a3cec3ef1dab5a14e62781",
+        "android_client_info": {
+          "package_name": "com.fatihkoc.arena"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZw0zopxgT1bZrRoMxzowA4LEIHlrg0cQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
