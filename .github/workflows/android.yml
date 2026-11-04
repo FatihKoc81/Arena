@@ -99,33 +99,30 @@ jobs:
           sed -i -E 's|<string name="app_name">[^<]*</string>|<string name="app_name">ARENA</string>|; s|<string name="title_activity_main">[^<]*</string>|<string name="title_activity_main">ARENA</string>|' android/app/src/main/res/values/strings.xml
           grep -n app_name android/app/src/main/res/values/strings.xml
 
-      - name: Uygulama ikonunu ayarla (büyük logo, uyarlanabilir ikon)
+      - name: Uygulama ikonunu ayarla (yuvarlatılmış kare logo, uyarlanabilir ikon)
         run: |
           RES=android/app/src/main/res
-          BG="#f6ead7"
-          # ImageMagick yoksa kur; yeni sürümde komut "magick", eskisinde "convert"
+          BG="#04102c"
           if ! command -v magick >/dev/null && ! command -v convert >/dev/null; then
             sudo apt-get update -qq
             sudo apt-get install -y -qq imagemagick
           fi
           IM=$(command -v magick || command -v convert)
-          # logoyu daire olarak kırp (altın halka dahil, köşeler dışarıda)
+          # yuvarlak ikon için daire kırpma
           $IM icon-512.png -alpha set \
-            \( -size 512x512 xc:none -fill white -draw "circle 256,256 256,18" \) \
+            \( -size 512x512 xc:none -fill white -draw "circle 256,256 256,10" \) \
             -compose DstIn -composite logo-round.png
           rm -f $RES/mipmap-*/ic_launcher*
           rm -rf $RES/mipmap-anydpi-v26
           mkdir -p $RES/mipmap-anydpi-v26 $RES/values
-          # ön plan: logo, görünen alanı (72/108) neredeyse tam dolduracak boyda
+          # ön plan: icon-foreground.png (logo zaten güvenli alana küçültülmüş, 1024x1024)
           for d in "mdpi 108 48" "hdpi 162 72" "xhdpi 216 96" "xxhdpi 324 144" "xxxhdpi 432 192"; do
             set -- $d
-            S=$2; L=$3; W=$((S*728/1000))
             mkdir -p $RES/mipmap-$1
-            $IM -size ${S}x${S} xc:none \( logo-round.png -resize ${W}x${W} \) \
-              -gravity center -composite $RES/mipmap-$1/ic_launcher_foreground.png
-            # eski Android sürümleri için düz ikonlar
-            $IM icon-512.png -resize ${L}x${L} $RES/mipmap-$1/ic_launcher.png
-            $IM logo-round.png -resize ${L}x${L} $RES/mipmap-$1/ic_launcher_round.png
+            $IM icon-foreground.png -resize $2x$2 $RES/mipmap-$1/ic_launcher_foreground.png
+            # eski Android sürümleri için düz ikonlar (yuvarlatılmış kare)
+            $IM icon-512.png -resize $3x$3 $RES/mipmap-$1/ic_launcher.png
+            $IM logo-round.png -resize $3x$3 $RES/mipmap-$1/ic_launcher_round.png
           done
           echo "<?xml version=\"1.0\" encoding=\"utf-8\"?><resources><color name=\"ic_launcher_background\">$BG</color></resources>" > $RES/values/ic_launcher_background.xml
           for n in ic_launcher ic_launcher_round; do
