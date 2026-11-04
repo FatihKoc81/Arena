@@ -74,6 +74,15 @@
     ov.classList.add("show");
   }
   function sorKapat() { if (ov) ov.classList.remove("show"); }
+  // GERİ TUŞU: açık pencereyi kapatır. true = bir şey kapandı / geri tuşu yutuldu.
+  // Pencerede Vazgeç/Tamam/Kapat/İptal düğmesi varsa ona basılmış sayılır (kendi iptal işlevi çalışır).
+  function geriKapat() {
+    if (adEl && adEl.classList.contains("show")) return true; // test reklamı: kendi düğmesiyle kapanır
+    if (!ov || !ov.classList.contains("show")) return false;
+    var bt = Array.prototype.slice.call(ov.querySelectorAll(".ek-opt")).filter(function (b) { return /^(Vazgeç|Tamam|Kapat|İptal)$/.test(b.textContent.trim()); })[0];
+    if (bt) { bt.click(); return true; }
+    ov.classList.remove("show"); return true; // kararlı pencere (Canın bitti vb.): sadece kapat
+  }
   function adKapat() { if (adT) { clearInterval(adT); adT = null; } if (adEl) adEl.classList.remove("show"); }
   function kapat() { sorKapat(); adKapat(); }
 
@@ -198,7 +207,7 @@
   }
 
   window.Ekonomi = {
-    UYG: UYG, reklam: reklam, sor: sor, sorKapat: sorKapat, kapat: kapat, dukkan: dukkan, ekle: ekle,
+    UYG: UYG, reklam: reklam, sor: sor, sorKapat: sorKapat, geriKapat: geriKapat, kapat: kapat, dukkan: dukkan, ekle: ekle,
     ad: function () { return kullanici; }, adAyarla: adAyarla,
     altin: function () { return altin; }, premium: function () { return premium; }, bar: bar, dock: dock, barYaz: barYaz
   };

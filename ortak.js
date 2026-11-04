@@ -543,6 +543,8 @@ window.altSatir = function () {
   }
   // Açık pencereyi (Hesap, Arena/Sıralama, istek penceresi, seviye geçildi...) kapatır; kapattıysa true döner
   function katmanKapat() {
+    // Ekonomi pencereleri (Hakkın bitti, Premium, Altın al, Meydan Oku...) body'ye ayrı eklenir; önce onlar kapanır
+    try { if (window.Ekonomi && window.Ekonomi.geriKapat && window.Ekonomi.geriKapat()) return true; } catch (e) {}
     const g = document.getElementById("gecis");
     if (g && g.classList.contains("ac")) { g.classList.remove("ac"); return true; }
     // Sıralama / Puanım / Turnuva / Lig paneli (arena.js, .ar-pn): kapatma düğmesi yok, geri tuşu paneli kapatıp ana sayfaya götürür
@@ -606,7 +608,7 @@ window.altSatir = function () {
       son = Date.now(); toast("Çıkmak için tekrar geri bas"); yeniden();
       return;
     }
-    if (!kapandi) { h1.click(); zorlaAna(); }           // oyundaysa ana sayfaya dön
+    if (!kapandi) { h1.click(); zorlaAna(); try { window.Ekonomi.kapat(); } catch (e) {} }           // oyundaysa ana sayfaya dön (açık pencere kalmasın)
     yeniden();
   }
 

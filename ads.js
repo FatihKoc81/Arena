@@ -1,4 +1,4 @@
-/* Beyin Fırtınası - AdMob reklamları (sadece APK içinde çalışır).
+/* ARENA - AdMob reklamları (sadece APK içinde çalışır).
    rotasyon.js'in beklediği window.cemberReklam(tur, bitti) fonksiyonunu tanımlar.
    tur: "odul" (ödüllü, izlenince bitti(true)) veya "gecis" (bölüm arası geçiş reklamı). */
 (function () {
@@ -29,6 +29,18 @@
       t.style.cssText = "position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:2147483000;max-width:88vw;background:rgba(120,20,20,.96);color:#fff;border-radius:14px;padding:10px 16px;font:600 13px system-ui,sans-serif;text-align:center";
       document.body.appendChild(t);
       setTimeout(function () { t.remove(); }, 6000);
+    } catch (e) {}
+  }
+
+  var yukleniyor = null;
+  function yukleGoster(ac) {
+    try {
+      if (yukleniyor) { yukleniyor.remove(); yukleniyor = null; }
+      if (!ac) return;
+      var t = document.createElement("div");
+      t.textContent = "Reklam yükleniyor…";
+      t.style.cssText = "position:fixed;left:50%;top:45%;transform:translateX(-50%);z-index:2147483000;background:rgba(20,28,60,.95);color:#fff;border:1px solid #4a5a9a;border-radius:14px;padding:12px 20px;font:700 15px system-ui,sans-serif";
+      document.body.appendChild(t); yukleniyor = t;
     } catch (e) {}
   }
 
@@ -67,11 +79,13 @@
       if (bitisti) return;
       bitisti = true;
       clearTimeout(zamanAsimi);
+      yukleGoster(false);
       if (dl) dl.temizle();
       if (!ok && window.__adHata) bildir("Reklam açılamadı: " + window.__adHata);
       bitti(ok);
     }
-    zamanAsimi = setTimeout(function () { if (!window.__adHata) window.__adHata = "zaman aşımı"; son(false); }, 45000);
+    yukleGoster(true);
+    zamanAsimi = setTimeout(function () { if (!window.__adHata) window.__adHata = "zaman aşımı"; son(false); }, 25000);
 
     baslat().then(function () {
       var olaylar = {};
@@ -90,7 +104,7 @@
       return dl.hazir.then(function () {
         return odul ? AdMob.prepareRewardVideoAd({ adId: id }) : AdMob.prepareInterstitial({ adId: id });
       }).then(function () {
-        clearTimeout(zamanAsimi); // reklam yüklendi, gösterim süresi sınırsız
+        clearTimeout(zamanAsimi); yukleGoster(false); // reklam yüklendi, gösterim süresi sınırsız
         return odul ? AdMob.showRewardVideoAd() : AdMob.showInterstitial();
       });
     }).catch(function (e) { hataYaz(e); son(false); });
