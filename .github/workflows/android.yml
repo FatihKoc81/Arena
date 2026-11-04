@@ -37,7 +37,7 @@ jobs:
 
       - name: Paket adını yazdır
         run: |
-          node -p "require('./capacitor.config.json').appId"
+          node -p "'appId: ' + require('./capacitor.config.json').appId"
 
       - name: Android projesini hazırla
         run: |
@@ -63,6 +63,43 @@ jobs:
             fs.writeFileSync(f,x);
           }
           console.log('AdMob app id:',process.env.ADMOB_APP_ID);"
+
+      - name: Firebase Android bildirim yapılandırması
+        run: |
+          if [ ! -f google-services.json ]; then echo "HATA: Depo kökünde google-services.json bulunamadı"; exit 1; fi
+          cp google-services.json android/app/google-services.json
+          node <<'NODE'
+          const fs = require('fs');
+          const cfg = JSON.parse(fs.readFileSync('google-services.json', 'utf8'));
+          const appId = require('./capacitor.config.json').appId;
+          const client = (cfg.client || []).find(c => c.client_info?.android_client_info?.package_name === appId);
+          if (!client) throw new Error(`google-services.json içinde ${appId} paketine ait Android istemcisi yok`);
+
+          const root = 'android/build.gradle';
+          let b = fs.readFileSync(root, 'utf8');
+          if (!b.includes('com.google.gms:google-services')) {
+            if (!/dependencies\s*\{/.test(b)) throw new Error('android/build.gradle içinde dependencies bloğu bulunamadı');
+            b = b.replace(/dependencies\s*\{/, m => m + "\n        classpath 'com.google.gms:google-services:4.4.2'");
+          }
+          fs.writeFileSync(root, b);
+
+          const app = 'android/app/build.gradle';
+          let a = fs.readFileSync(app, 'utf8');
+          if (!a.includes('com.google.gms.google-services')) a += "\napply plugin: 'com.google.gms.google-services'\n";
+          fs.writeFileSync(app, a);
+
+          const mf = 'android/app/src/main/AndroidManifest.xml';
+          let m = fs.readFileSync(mf, 'utf8');
+          if (!m.includes('android.permission.POST_NOTIFICATIONS')) {
+            if (!m.includes('<application')) throw new Error('AndroidManifest.xml içinde application etiketi bulunamadı');
+            m = m.replace('<application', '<uses-permission android:name=\"android.permission.POST_NOTIFICATIONS\"/>\n    <application');
+          }
+          fs.writeFileSync(mf, m);
+          console.log('Firebase Android yapılandırması tamamlandı:', appId);
+          NODE
+          grep -q 'com.google.gms.google-services' android/app/build.gradle
+          grep -i 'push-notifications' android/capacitor.settings.gradle || { echo 'HATA: Push Notifications eklentisi Android projesine eklenmedi'; exit 1; }
+          test -f android/app/google-services.json
 
       - name: Ekranı dikeyde sabitle
         run: |
