@@ -102,7 +102,7 @@ jobs:
       - name: Uygulama ikonunu ayarla (büyük logo, uyarlanabilir ikon)
         run: |
           RES=android/app/src/main/res
-          BG="#00102b"
+          BG="#f6ead7"
           # ImageMagick yoksa kur; yeni sürümde komut "magick", eskisinde "convert"
           if ! command -v magick >/dev/null && ! command -v convert >/dev/null; then
             sudo apt-get update -qq
