@@ -376,6 +376,7 @@ document.body.appendChild(root);
 var $ = function (id) { return document.getElementById(id); };
 var lvIdx = 0, found = {}, foundB = {}, hintCells = {}, letters = [], sel = [], drag = false, puan = 0;
 var cur = null, bonusList = [], placedMap = {}, S = 260, D = 54, ptr = null, flashT = null;
+var rotDuel = null, rotDuelBitti = false, rotDuelNormalLv = null;
 // Arka plan sahneleri: her bölümde sırayla değişir (dışarıdan resim gerekmez)
 function RND(seed) { var s = seed; return function () { s = (s * 9301 + 49297) % 233280; return s / 233280; }; }
 function svgSar(ic) { return "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 800' preserveAspectRatio='xMidYMid slice'>" + ic + "</svg>"; }
@@ -515,15 +516,24 @@ function startLevel() {
   found = {}; foundB = {}; hintCells = {}; sel = []; drag = false;
   tokmakKapat();
   $("cmOv").classList.remove("show");
-  cur = makeLayout(L.w);
+  // Düelloda iki cihaz aynı tohumla aynı bulmaca düzenini ve harf sırasını üretir.
+  var eskiRandom = Math.random;
+  if (rotDuel) {
+    var durum = (rotDuel.seed >>> 0) || 1;
+    Math.random = function () { durum = (durum * 1664525 + 1013904223) >>> 0; return durum / 4294967296; };
+  }
+  try {
+    cur = makeLayout(L.w);
+    letters = shuffle(L.l.split(""));
+  } finally { Math.random = eskiRandom; }
   placedMap = {};
   cur.words.forEach(function (p) { placedMap[p.w] = p; });
   bonusList = L.b.concat(cur.un.filter(function (w) { return L.b.indexOf(w) === -1; }));
-  letters = shuffle(L.l.split(""));
   arkaYaz(); barRenk(); baslikHizala(); baslikYaz(); hakYaz(); bolumGoster();
   $("cmCur").innerHTML = "";
   boyut();
   drawWords(); drawBonus(); drawWheel();
+  if (rotDuel && rotDuel.api) rotDuel.api.ilerle(0, cur.words.length);
 }
 
 function drawWords() {
@@ -648,15 +658,22 @@ function end() {
       puan += p; puanKaydet(); baslikYaz();
       flash("✅ " + w + " +" + p, "ok");
       drawWords();
-      if (cur.words.every(function (x) { return found[x.w]; })) {
+      if (rotDuel && !rotDuelBitti) {
+        var bulunan = cur.words.filter(function (x) { return found[x.w]; }).length;
+        rotDuel.api.ilerle(bulunan, cur.words.length);
+        if (bulunan >= cur.words.length) {
+          rotDuelBitti = true;
+          flash("🏁 Düelloyu tamamladın!", "ok");
+          rotDuel.api.bitti();
+        }
+      } else if (cur.words.every(function (x) { return found[x.w]; })) {
         flash("🎉 Seviye tamamlandı!", "ok");
         setTimeout(function () {
           lvIdx = (lvIdx + 1) % LEVELS.length;
           try { localStorage.setItem("cemberLv", lvIdx); } catch (e) {}
-          // Her yeni bölümde haklar tazelenir (ampül 7, tokmak 5). Satın alınan/kazanılan fazla hak varsa korunur.
           hakIpucu = Math.max(hakIpucu, HAK_IPUCU);
           hakTokmak = Math.max(hakTokmak, HAK_TOKMAK);
-          gecisGoster(); // Seri ekranı (günde ilk kez) -> Yolculuk ekranı -> BÖLÜM N
+          gecisGoster();
         }, 1500);
       }
     } else if (bonusList.indexOf(w) > -1 && !foundB[w]) {
@@ -882,7 +899,14 @@ function hakReklamSor(tur) {
 // Yanlış kelime = 1 can gider. Can bitince: altınla devam VEYA bir alt bölüm
 function canEksil() {
   can = Math.max(0, can - 1); drawBonus();
-  if (can <= 0) { tokmakKapat(); setTimeout(kayipSor, 700); }
+  if (can <= 0) {
+    tokmakKapat();
+    if (rotDuel && !rotDuelBitti) {
+      rotDuelBitti = true;
+      rotDuel.api.elendi();
+      flash("💔 Canın bitti", "bad");
+    } else setTimeout(kayipSor, 700);
+  }
 }
 function altBolum() {
   if (lvIdx > 0) lvIdx--;
@@ -957,4 +981,32 @@ if (anaEl) {
   mo.observe(anaEl, { childList: true, subtree: true });
 }
 window.addEventListener("load", function () { addButton(true); boya(); });
+
+// ARENA gerçek zamanlı düello entegrasyonu
+window.ArenaOyunlari = window.ArenaOyunlari || {};
+window.ArenaOyunlari.rotasyon = {
+  ad: "🔤 Rotasyon",
+  baslat: function (d, api) {
+    if (rotDuel) return;
+    rotDuelNormalLv = lvIdx;
+    rotDuelBitti = false;
+    rotDuel = { api: api, seed: d.seed || 1 };
+    // İki oyuncu aynı tohumdan aynı bölümü oynar; normal bölüm kaydı değişmez.
+    lvIdx = (Math.abs(d.seed || 1) - 1) % LEVELS.length;
+    root.style.display = "flex";
+    gec.style.display = "none";
+    baslikHizala();
+    startLevel();
+  },
+  dur: function () {
+    if (!rotDuel) return;
+    rotDuel = null;
+    rotDuelBitti = false;
+    if (rotDuelNormalLv !== null) lvIdx = rotDuelNormalLv;
+    rotDuelNormalLv = null;
+    tokmakKapat();
+    gec.style.display = "none";
+    root.style.display = "none";
+  }
+};
 })();
