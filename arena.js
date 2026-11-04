@@ -133,7 +133,11 @@
 
   // Uygulama bildirimi: APK'da LocalNotifications eklentisi varsa onu, tarayıcıda Notification API'yi kullanır.
   function bildirimIzni() {
-    try { if ("Notification" in window && Notification.permission === "default") Notification.requestPermission(); } catch (e) {}
+    try {
+      if ("Notification" in window && Notification.permission === "default") {
+        Notification.requestPermission().then(function (p) { if (p === "granted") webPushKur(); }).catch(function () {});
+      } else if ("Notification" in window && Notification.permission === "granted") webPushKur();
+    } catch (e) {}
     try {
       var LN = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications;
       if (LN && LN.requestPermissions) LN.requestPermissions();
@@ -401,7 +405,9 @@
   }
   function davetGonder(hedef, hedefAd, oyun) {
     var ref = kok.child("invites/" + hedef).push(), bitti = false;
-    ref.set({ from: uid, fromAd: adim(), oyun: oyun, durum: "bekliyor", t: ts() });
+    ref.set({ from: uid, fromAd: adim(), oyun: oyun, durum: "bekliyor", t: ts() }).then(function () {
+      pushGonder(hedef, "invite", ref.key);
+    });
     toast("📨 " + esc(hedefAd) + " kişisine " + esc(oyunAd(oyun)) + " isteği gönderildi");
     function son() { bitti = true; clearTimeout(zt); ref.off(); ref.remove(); }
     var zt = setTimeout(function () { if (!bitti) { son(); toast(esc(hedefAd) + " yanıt vermedi."); } }, DAVET_SN * 1000);
@@ -425,7 +431,7 @@
     var kapat = afis("⚔️ <b>" + esc(v.fromAd) + "</b> seni <b>" + esc(oyunAd(v.oyun)) + "</b> düellosuna çağırıyor!", [
       { t: "✅ Kabul", f: function () {
         duelOlustur(v.oyun, { uid: v.from, ad: v.fromAd }, { uid: uid, ad: adim() }).then(function (id) {
-          s.ref.update({ durum: "kabul", duel: id }); duelAc(id);
+          s.ref.update({ durum: "kabul", duel: id }).then(function () { pushGonder(v.from, "invite_accepted", s.key); }); duelAc(id);
         });
       } },
       { t: "Reddet", c: "gri", f: function () { s.ref.update({ durum: "red" }); } }
@@ -449,6 +455,7 @@
   function istekGonder(hedef, hedefAd, oyun) {
     var o = { from: uid, fromAd: adim(), to: hedef, toAd: hedefAd, oyun: oyun || "", oyunAd: oyun ? oyunAd(oyun) : "", durum: "bekliyor", t: ts(), bitis: simdi() + ISTEK_MS };
     kok.child("istekler/" + uid + "_" + hedef).set(o).then(function () {
+      pushGonder(hedef, "request", uid + "_" + hedef);
       toast("📨 " + esc(hedefAd) + " kişisine istek gönderildi (48 saat geçerli)");
     }).catch(function () { toast("İstek gönderilemedi, tekrar dene."); });
   }
@@ -458,6 +465,7 @@
     var ref = kok.child("istekler/" + k);
     function bitir(oyun) {
       ref.update({ durum: "kabul", oyun: oyun, oyunAd: oyunAd(oyun) }).then(function () {
+        pushGonder(v.from, "request_accepted", k);
         toast("✅ Kabul ettin. " + esc(v.fromAd) + " onaylayınca oyun başlayacak.");
       }).catch(function () { toast("Kabul edilemedi, tekrar dene."); });
     }
@@ -474,7 +482,7 @@
     if (!v || !OYUN[v.oyun]) { toast("Oyun bulunamadı."); return; }
     var ref = kok.child("istekler/" + k);
     duelOlustur(v.oyun, { uid: v.from, ad: v.fromAd }, { uid: v.to, ad: v.toAd }).then(function (id) {
-      ref.update({ durum: "basla", duel: id, baslaT: ts() });
+      ref.update({ durum: "basla", duel: id, baslaT: ts() }).then(function () { pushGonder(v.to, "request_start", k); });
       duelAc(id);
     }).catch(function () { toast("Başlatılamadı, tekrar dene."); });
   }
@@ -527,18 +535,110 @@
     d.on("child_added", istekGidenIsle); d.on("child_changed", istekGidenIsle);
     d.on("child_removed", function (s) { delete istekGiden[s.key]; yenile(); });
   }
-  // Gerçek telefon bildirimi (APK): Capacitor PushNotifications eklentisi varsa cihaz jetonu kaydedilir.
-  function pushKur() {
-    if (pushHazir) return;
+  // Her cihaz için ayrı FCM kaydı: aynı hesabın APK ve tarayıcı tokenları birbirini ezmez.
+  function pushCihazYolu() {
+    var id = "web";
     try {
-      var PN = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.PushNotifications;
-      if (!PN) return;
-      pushHazir = true;
-      PN.addListener("registration", function (t) { if (t && t.value && kok && uid) kok.child("fcm/" + uid).set(t.value).catch(function () {}); });
-      PN.addListener("registrationError", function () {});
-      PN.addListener("pushNotificationActionPerformed", function () { ac("siralama"); });
-      PN.requestPermissions().then(function (r) { if (r && r.receive === "granted") PN.register(); }).catch(function () {});
+      id = localStorage.getItem("arena_fcm_device");
+      if (!id) { id = "c" + Math.random().toString(36).slice(2, 12); localStorage.setItem("arena_fcm_device", id); }
     } catch (e) {}
+    return "fcm/" + uid + "/" + id;
+  }
+  function webPushKur() {
+    if (!kok || !uid || !window.firebase || !firebase.messaging || !navigator.serviceWorker || !("Notification" in window) || Notification.permission !== "granted") return;
+    try {
+      if (firebase.messaging.isSupported && !firebase.messaging.isSupported()) return;
+      navigator.serviceWorker.ready.then(function (reg) {
+        var msg = firebase.messaging();
+        return msg.getToken({
+          vapidKey: "BPTSvFy3rEDTFKOyfjfh4g290cgOZwmIz6ezaJAaKm4EfTt1fkCbe0KX_jkUi_S12Yk4u46LUZvjaoPBi0zSk_g",
+          serviceWorkerRegistration: reg
+        }).then(function (token) {
+          if (token && kok && uid) kok.child(pushCihazYolu()).set(token).catch(function () {});
+        });
+      }).catch(function (e) { try { console.warn("ARENA web push:", e && e.message); } catch (x) {} });
+    } catch (e) {}
+  }
+  // Olayı Worker'a gönder; Worker Firebase verisini yeniden doğrulamadan FCM göndermez.
+  function pushGonder(to, eventType, eventId, matchKey) {
+    try {
+      if (!to || !uid || !firebase.auth().currentUser) return;
+      firebase.auth().currentUser.getIdToken().then(function (token) {
+        return fetch("https://arena-bildirim.fatihkoc7.workers.dev/send", {
+          method: "POST", headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+          body: JSON.stringify({ to: to, eventType: eventType, eventId: eventId, matchKey: matchKey || "" })
+        });
+      }).then(function (r) { if (r && !r.ok) console.warn("ARENA push gönderilemedi:", r.status); }).catch(function (e) { console.warn("ARENA push:", e && e.message); });
+    } catch (e) {}
+  }
+  var pushDeneme = 0;
+  function pushEklentisi(cap) {
+    if (!cap) return null;
+    // Capacitor 5/6 eski köprü ve yeni plugin kayıt biçimlerini birlikte destekle.
+    try { if (cap.Plugins && cap.Plugins.PushNotifications) return cap.Plugins.PushNotifications; } catch (e) {}
+    try { if (typeof cap.registerPlugin === "function") return cap.registerPlugin("PushNotifications"); } catch (e) {}
+    try { if (window.PushNotifications) return window.PushNotifications; } catch (e) {}
+    return null;
+  }
+  function pushKur() {
+    if (!kok || !uid) return;
+    try {
+      var cap = window.Capacitor;
+      var platform = "web";
+      try { if (cap && typeof cap.getPlatform === "function") platform = cap.getPlatform(); }
+      catch (e) {}
+      var native = false;
+      try { native = !!(cap && ((typeof cap.isNativePlatform === "function" && cap.isNativePlatform()) || platform !== "web")); }
+      catch (e) { native = platform !== "web"; }
+      if (native && !pushHazir) {
+        var PN = pushEklentisi(cap);
+        if (!PN || typeof PN.addListener !== "function" || typeof PN.register !== "function") {
+          console.error("ARENA: PushNotifications eklentisi bulunamadı. Capacitor Android eklentisi kontrol edilmeli.");
+          if (pushDeneme++ < 4) setTimeout(pushKur, 2000);
+          return;
+        }
+        pushHazir = true;
+        PN.addListener("registration", function (t) {
+          if (!t || !t.value || !kok || !uid) { console.error("ARENA: FCM kayıt jetonu boş geldi."); return; }
+          kok.child(pushCihazYolu()).set(t.value).then(function () {
+            console.info("ARENA: FCM cihaz kaydı Firebase'e yazıldı.");
+          }).catch(function (e) { console.error("ARENA: FCM jetonu Firebase'e yazılamadı:", e); });
+        });
+        PN.addListener("registrationError", function (e) {
+          console.error("ARENA: FCM kayıt hatası:", e);
+          toast("🔔 Bildirim kaydı başarısız. İnternet bağlantısını kontrol et.");
+        });
+        PN.addListener("pushNotificationReceived", function (n) {
+          toast("🔔 " + ((n && n.title) || "ARENA") + (n && n.body ? " · " + n.body : ""));
+        });
+        PN.addListener("pushNotificationActionPerformed", function () { ac("siralama"); });
+        var kanal = Promise.resolve();
+        try {
+          if (typeof PN.createChannel === "function") kanal = PN.createChannel({
+            id: "default", name: "ARENA Bildirimleri",
+            description: "ARENA oyun ve davet bildirimleri", importance: 5, visibility: 1
+          });
+        } catch (e) { console.warn("ARENA bildirim kanalı:", e); }
+        Promise.resolve(kanal).then(function () {
+          return PN.requestPermissions();
+        }).then(function (r) {
+          if (r && r.receive === "granted") {
+            console.info("ARENA: Bildirim izni verildi, FCM kaydı başlatılıyor.");
+            PN.register();
+          } else {
+            console.warn("ARENA: Bildirim izni verilmedi:", r);
+          }
+        }).catch(function (e) {
+          console.error("ARENA: Bildirim izni/kayıt başlatılamadı:", e);
+          pushHazir = false;
+        });
+      } else if (!native && "Notification" in window && Notification.permission === "granted") {
+        webPushKur();
+      }
+    } catch (e) {
+      console.error("ARENA push başlatma hatası:", e);
+      pushHazir = false;
+    }
   }
   function htmlIstekler() {
     var g = Object.keys(istekGelen), d = Object.keys(istekGiden);
@@ -705,6 +805,7 @@
       }
       kok.child("turnuva/" + v.tur.tid + "/maclar/" + v.tur.m + "/kazanan").transaction(function (c) { return c || w; });
     }
+    if (kz.uid === uid && D.rakip) pushGonder(D.rakip, "duel_result", D.id);
     bildirim(bas.replace(/^\S+\s/, ""), msg.replace(/<[^>]+>/g, ""));
     var ops = [];
     if (v.tur) ops.push({ t: "🏆 Turnuvaya dön", f: function () { duelKapat(); ana(); ac("turnuva"); } });
@@ -750,7 +851,7 @@
         var rakip = alinan, oyun = ids[Math.floor(Math.random() * ids.length)];
         meydanBitir();
         duelOlustur(oyun, { uid: rakip.uid, ad: rakip.ad }, { uid: uid, ad: adim() }).then(function (id) {
-          kok.child("meydan/eslesme/" + rakip.uid).set(id);
+          kok.child("meydan/eslesme/" + rakip.uid).set(id).then(function () { pushGonder(rakip.uid, "match", id); });
           duelAc(id);
         });
       } else {
@@ -788,7 +889,12 @@
     if (m.f && m.f.kazanan && !t.sampiyon && m.f.kazanan === uid) {
       var yeni = false;
       T.ref.child("sampiyon").transaction(function (c) { yeni = !c; return c || uid; }, function (e, ok) {
-        if (!e && ok && yeni) { Puan.ekle("turnuva"); L.tz++; ligKaydet(); tpEkle(t.sampiyonlar ? TP.sampiyonlarSampiyon : TP.sampiyon); T.ref.child("durum").set("bitti"); bildirim("🏆 Şampiyon!", "Turnuvayı kazandın."); afis("🏆 <b>Turnuva şampiyonusun!</b>", null, 6); }
+        if (!e && ok && yeni) {
+          Puan.ekle("turnuva"); L.tz++; ligKaydet(); tpEkle(t.sampiyonlar ? TP.sampiyonlarSampiyon : TP.sampiyon);
+          T.ref.child("durum").set("bitti");
+          Object.keys(t.oyuncular || {}).forEach(function (u) { if (u !== uid) pushGonder(u, "tournament_champion", T.id); });
+          bildirim("🏆 Şampiyon!", "Turnuvayı kazandın."); afis("🏆 <b>Turnuva şampiyonusun!</b>", null, 6);
+        }
       });
     }
     ["y1", "y2", "f"].forEach(function (k) {
@@ -797,7 +903,9 @@
         if (x.a === uid && !T.olusturuluyor[k]) {
           T.olusturuluyor[k] = true;
           duelOlustur(t.oyun, { uid: x.a, ad: tAd(t, x.a) }, { uid: x.b, ad: tAd(t, x.b) }, { tur: { tid: T.id, m: k } }).then(function (id) {
-            T.ref.child("maclar/" + k + "/duel").transaction(function (c) { return c || id; });
+            T.ref.child("maclar/" + k + "/duel").transaction(function (c) { return c || id; }, function (err, ok, snap) {
+              if (!err && ok && snap && snap.val() === id) pushGonder(x.b, "tournament_match", T.id, k);
+            });
           });
         }
         return;
@@ -843,7 +951,12 @@
         return c;
       });
     }).then(function (r) {
-      if (r.committed) { turnuvaBagla(id); toast("🏆 Turnuvaya katıldın"); } else toast(L.tz > 0 ? "Turnuva dolu ya da kapandı." : "Turnuva dolu, kapandı ya da sadece turnuva kazananlara açık.");
+      if (r.committed) {
+        var tv = r.snapshot && r.snapshot.val();
+        if (tv && tv.olusturan && tv.olusturan !== uid) pushGonder(tv.olusturan, "tournament_join", id);
+        if (tv && tv.durum === "basladi" && tv.oyuncular) Object.keys(tv.oyuncular).forEach(function (u) { if (u !== uid) pushGonder(u, "tournament_start", id); });
+        turnuvaBagla(id); toast("🏆 Turnuvaya katıldın");
+      } else toast(L.tz > 0 ? "Turnuva dolu ya da kapandı." : "Turnuva dolu, kapandı ya da sadece turnuva kazananlara açık.");
     });
   }
   function turnuvaAyril() {
