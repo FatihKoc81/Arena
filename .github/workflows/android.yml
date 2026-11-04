@@ -177,7 +177,21 @@ jobs:
           openssl enc -d -aes-256-cbc -pbkdf2 -iter 200000 \
             -pass env:KEYSTORE_PASS -in release.keystore.enc \
             -out ~/.android/release.keystore
-
+            
+      - name: Google SHA-1 parmak izini göster
+        env:
+          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
+        run: |
+          ALIAS=$(keytool -list -keystore ~/.android/release.keystore -storetype PKCS12 \
+            -storepass "$KEYSTORE_PASS" 2>/dev/null | grep -m1 PrivateKeyEntry | cut -d, -f1)
+          if [ -z "$ALIAS" ]; then
+            echo "HATA: İmza anahtarı bulunamadı"
+            exit 1
+          fi
+          keytool -list -v -keystore ~/.android/release.keystore \
+            -storetype PKCS12 -storepass "$KEYSTORE_PASS" \
+            -alias "$ALIAS" | grep -E "SHA1:|SHA256:"
+            
       - name: APK derle
         working-directory: android
         run: ./gradlew assembleDebug
