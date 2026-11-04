@@ -56,6 +56,7 @@ jobs:
         env:
           ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID || 'ca-app-pub-3940256099942544~3347511713' }}
         run: |
+          if [ -z "${{ secrets.ADMOB_APP_ID }}" ]; then echo "::warning::ADMOB_APP_ID secret tanımlı değil: test uygulama kimliği kullanılıyor, gerçek reklam birimleri YÜKLENMEZ. GitHub > Settings > Secrets > Actions içine ADMOB_APP_ID (ca-app-pub-8747781588851121~...) ekle."; fi
           npx cap sync android
           sed -i -E 's/minSdkVersion = [0-9]+/minSdkVersion = 23/' android/variables.gradle || true
           node -e "
@@ -85,6 +86,7 @@ jobs:
         run: |
           npm ls @capacitor/core @capacitor-community/admob || true
           grep -i admob android/capacitor.settings.gradle || { echo "HATA: AdMob eklentisi Android projesine eklenmedi"; exit 1; }
+          grep -i "capacitor-app" android/capacitor.settings.gradle || { echo "HATA: Geri tuşu eklentisi (@capacitor/app) Android projesine eklenmedi"; exit 1; }
 
       - name: Paket adını Gradle'a uygula
         run: |
@@ -100,7 +102,7 @@ jobs:
       - name: Uygulama ikonunu ayarla (büyük logo, uyarlanabilir ikon)
         run: |
           RES=android/app/src/main/res
-          BG="#00102b"
+          BG="#f6ead7"
           # ImageMagick yoksa kur; yeni sürümde komut "magick", eskisinde "convert"
           if ! command -v magick >/dev/null && ! command -v convert >/dev/null; then
             sudo apt-get update -qq
