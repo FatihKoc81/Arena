@@ -36,7 +36,8 @@ jobs:
           fi
 
       - name: Paket adını yazdır
-        run: node -p "'appId: ' + require('./capacitor.config.json').appId"
+        run: |
+          node -p "require('./capacitor.config.json').appId"
 
       - name: Android projesini hazırla
         run: |
