@@ -191,7 +191,23 @@ jobs:
           keytool -list -v -keystore ~/.android/release.keystore \
             -storetype PKCS12 -storepass "$KEYSTORE_PASS" \
             -alias "$ALIAS" | grep -E "SHA1:|SHA256:"
-            
+
+      - name: Facebook Key Hash hesapla
+        env:
+          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
+        run: |
+          ALIAS=$(keytool -list -keystore ~/.android/release.keystore -storetype PKCS12 \
+            -storepass "$KEYSTORE_PASS" 2>/dev/null | grep -m1 PrivateKeyEntry | cut -d, -f1)
+          if [ -z "$ALIAS" ]; then
+            echo "HATA: İmza anahtarı bulunamadı"
+            exit 1
+          fi
+          echo "Facebook Android Key Hash:"
+          keytool -exportcert -alias "$ALIAS" \
+            -keystore ~/.android/release.keystore \
+            -storetype PKCS12 -storepass "$KEYSTORE_PASS" 2>/dev/null \
+            | openssl sha1 -binary | openssl base64
+
       - name: APK derle
         working-directory: android
         run: ./gradlew assembleDebug
