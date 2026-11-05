@@ -44,33 +44,31 @@
   }
 })();
 
-// ALT SATIR: ana sayfanın altındaki küçük butonlar (APK/Güncelle, İsimle istek) tek bir satırda, aynı boyutta ve aynı hizada durur.
-// Her buton kendi başına "fixed" olunca tarayıcı çubukları açılıp kapanınca birbirine göre kayıyordu; artık hepsi tek kapta.
+// ALT SATIR: Davet ve APK düğmeleri profil kutularından AYRI bir satırda durur.
+// Düğmeler .ek-dock içine eklenmez; böylece 4 profil kutusunun ölçüsü bozulmaz.
 window.altSatir = function () {
-  // APK / Davet düğmeleri oyuncu-altın-premium-puan dock'undan ayrı satırda durur.
   let s = document.getElementById("altSatir");
   if (!document.getElementById("altSatirCss")) {
     const st = document.createElement("style");
     st.id = "altSatirCss";
-    st.textContent = ".ek-dock>#altSatir{order:2;display:flex;flex:0 0 100%;width:100%;gap:8px;position:static;box-sizing:border-box;padding:0;margin:0;z-index:auto;pointer-events:auto}" +
-      ".ek-dock>#altSatir>*{display:flex;align-items:center;justify-content:center;flex:1 1 0;min-width:0;height:50px;margin:0;padding:0 5px;border:2px solid #d4a63a;border-radius:14px;background:rgba(0,0,0,.3);color:#d4a63a;font:700 clamp(12px,3.5vw,15px)/1.1 system-ui,sans-serif;text-decoration:none;white-space:nowrap;cursor:pointer;box-sizing:border-box}" +
-      ".ek-dock>#altSatir>*.gizli{display:none}.ek-dock>#altSatir>*:active{opacity:.7}" +
-      ".ek-dock.show{bottom:calc(8px + env(safe-area-inset-bottom))}" +
-      "@media(max-width:380px){.ek-dock{gap:5px!important;padding-left:8px!important;padding-right:8px!important}.ek-dock>.ek-dk{height:70px;min-height:70px}.ek-dock>#altSatir{gap:5px}.ek-dock>#altSatir>*{font-size:12px}}";
+    st.textContent =
+      ".ek-dock{bottom:calc(66px + env(safe-area-inset-bottom))!important;z-index:50}" +
+      "#altSatir{position:fixed;left:0;right:0;bottom:calc(7px + env(safe-area-inset-bottom));z-index:55;display:flex;align-items:center;justify-content:center;gap:10px;box-sizing:border-box;padding:0 14px;pointer-events:none}" +
+      "#altSatir>.apk-btn,#altSatir>.ar-adb{display:flex;flex:1 1 0;align-items:center;justify-content:center;min-width:0;max-width:180px;height:44px;margin:0;padding:0 8px;box-sizing:border-box;border:2px solid #d4a63a;border-radius:14px;background:rgba(10,18,45,.96);color:#ffe08a;font:800 clamp(12px,3.5vw,15px)/1.1 system-ui,sans-serif;text-align:center;text-decoration:none;white-space:normal;overflow:hidden;cursor:pointer;pointer-events:auto}" +
+      "#altSatir>.gizli{display:none!important}#altSatir>*:active{opacity:.72}" +
+      "#altSatir.gizli{display:none!important}";
     document.head.appendChild(st);
   }
-  if (s) return s;
-  const ana = document.getElementById("ana");
-  s = document.createElement("div");
-  s.id = "altSatir";
-  // Alt düğmeleri profil kartlarıyla aynı sabit kapsayıcıya al: tarayıcı araç
-  // çubukları açılıp kapansa bile iki ayrı fixed satır üst üste binmez.
-  const dock = document.querySelector(".ek-dock");
-  if (dock) dock.appendChild(s); else document.body.appendChild(s);
-  if (ana) {
-    const g = () => s.classList.toggle("gizli", ana.classList.contains("hidden") || ana.style.display === "none");
-    new MutationObserver(g).observe(ana, { attributes: true, attributeFilter: ["class", "style"] });
-    g();
+  if (!s) {
+    s = document.createElement("div");
+    s.id = "altSatir";
+    document.body.appendChild(s);
+    const ana = document.getElementById("ana");
+    if (ana) {
+      const g = () => s.classList.toggle("gizli", ana.classList.contains("hidden") || getComputedStyle(ana).display === "none");
+      new MutationObserver(g).observe(ana, { attributes: true, attributeFilter: ["class", "style"] });
+      g();
+    }
   }
   return s;
 };
