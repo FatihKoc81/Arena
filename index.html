@@ -475,7 +475,7 @@ $("gDevam").onclick = () => { gKapat(); guvenliBaslat(); };
 $("gMenu").onclick = () => { gKapat(); menu(); };
 document.addEventListener("anasayfa", gKapat);
 </script>
-<script src="ortak.js?v=20261105b"></script>
+<script src="ortak.js?v=20261105c"></script>
 <script src="passaparola.js?v=20261104a"></script>
 <script src="kelime.js?v=20261104a"></script>
 <script src="kelimelerim.js?v=20261104a"></script>
@@ -489,7 +489,7 @@ document.addEventListener("anasayfa", gKapat);
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
-<script src="arena.js?v=20261104a"></script>
+<script src="arena.js?v=20261105c"></script>
 <script>
 // Sayfa kaymasın (menü, oyun, sonuç ekranları) + sol alta APK indirme / güncelleme butonu
 // Tarayıcıda "⬇ APK", uygulamanın içinde aynı yerde "⬇ Güncelle" yazar.
@@ -501,7 +501,7 @@ document.addEventListener("anasayfa", gKapat);
   stl.textContent =
     ".apk-btn{}" +
     ".ar-pg{height:60px!important;min-height:60px!important;font-size:19px!important;border-radius:16px!important}" +
-    ".surum{position:fixed;left:0;right:0;bottom:calc(2px + env(safe-area-inset-bottom));text-align:center;font:600 10px system-ui,sans-serif;color:#fff;opacity:.35;pointer-events:none;z-index:5}body:has(#ana.hidden) .surum{display:none}" +
+    ".surum{display:none!important}" +
     ".apk-btn:active{opacity:.7}.apk-btn.gizli{display:none}" +
     "html.menu-kilit,html.menu-kilit body{overflow:hidden!important;overscroll-behavior:none!important;height:100%!important}" +
     "html.menu-kilit body{position:fixed!important;top:0;left:0;right:0;width:100%}" +

@@ -52,9 +52,9 @@ window.altSatir = function () {
     const st = document.createElement("style");
     st.id = "altSatirCss";
     st.textContent =
-      ".ek-dock{bottom:calc(80px + env(safe-area-inset-bottom))!important;z-index:50}" +
+      ".ek-dock{bottom:calc(66px + env(safe-area-inset-bottom))!important;z-index:50}" +
       "#altSatir{position:fixed;left:0;right:0;bottom:calc(8px + env(safe-area-inset-bottom));z-index:55;display:flex;align-items:center;justify-content:center;gap:14px;box-sizing:border-box;padding:0 22px;pointer-events:none}" +
-      "#altSatir>.apk-btn,#altSatir>.ar-adb{display:flex;flex:1 1 0;align-items:center;justify-content:center;min-width:0;max-width:none;height:60px;margin:0;padding:0 10px;box-sizing:border-box;border:2px solid #d4a63a;border-radius:16px;background:rgba(10,18,45,.96);color:#ffe08a;font:800 clamp(14px,4vw,18px)/1.1 system-ui,sans-serif;text-align:center;text-decoration:none;white-space:normal;overflow:hidden;cursor:pointer;pointer-events:auto}" +
+      "#altSatir>.apk-btn,#altSatir>.ar-adb{display:flex;flex:1 1 0;align-items:center;justify-content:center;min-width:0;max-width:180px;height:44px;margin:0;padding:0 8px;box-sizing:border-box;border:2px solid #d4a63a;border-radius:14px;background:rgba(10,18,45,.96);color:#ffe08a;font:800 clamp(12px,3.5vw,15px)/1.1 system-ui,sans-serif;text-align:center;text-decoration:none;white-space:normal;overflow:hidden;cursor:pointer;pointer-events:auto}" +
       "#altSatir>.gizli{display:none!important}#altSatir>*:active{opacity:.72}" +
       "#altSatir.gizli{display:none!important}";
     document.head.appendChild(st);

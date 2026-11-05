@@ -1028,7 +1028,7 @@
     if (!ana || document.getElementById("arAdBtn")) return;
     var b = document.createElement("div");
     b.id = "arAdBtn";
-    b.textContent = "👤 Davet";
+    b.textContent = "👤 İsimle İstek";
     b.className = "ar-adb";
     b.onclick = adPenAc;
     (window.altSatir ? window.altSatir() : document.body).appendChild(b);
