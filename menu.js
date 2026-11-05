@@ -7,11 +7,13 @@
 
   // eşleşme sırası önemli: "Rotasyon" "Kelime"den önce bakılır
   const OYUNLAR = [
-    { re: /Milyoner/, ad: "Milyoner", renk: "#5a1818", simge: "m", sira: 1 },
-    { re: /Passaparola/, ad: "Passaparola", renk: "#0b6a52", simge: "p", sira: 2 },
-    { re: /Rotasyon/, ad: "Rotasyon", renk: "#8a3300", simge: "c", sira: 5, genis: true },
-    { re: /Kelime/, ad: "Kelime Oyunu", renk: "#0a3aa5", simge: "k", sira: 3 },
-    { re: /İşlem/, ad: "İşlem Oyunu", renk: "#52139a", simge: "o", sira: 4 }
+    { re: /Milyoner/, ad: "Milyoner", renk: "linear-gradient(145deg,#8f263d,#54152f)", simge: "m", sira: 1 },
+    { re: /Passaparola/, ad: "Passaparola", renk: "linear-gradient(145deg,#087f78,#07504f)", simge: "p", sira: 2 },
+    { re: /Rotasyon/, ad: "Rotasyon", renk: "linear-gradient(145deg,#c05a20,#713018)", simge: "c", sira: 5, genis: true },
+    { re: /Kelime/, ad: "Kelime Oyunu", renk: "linear-gradient(145deg,#245fc7,#173477)", simge: "k", sira: 3 },
+    { re: /İşlem/, ad: "İşlem Oyunu", renk: "linear-gradient(145deg,#7844c9,#432477)", simge: "o", sira: 4 },
+    { re: /Meydan Oku/, ad: "Meydan Oku", renk: "linear-gradient(145deg,#c23c4a,#762538)", simge: "m", sira: 6 },
+    { re: /Sıralama/, ad: "Sıralama", renk: "linear-gradient(145deg,#b68a25,#705316)", simge: "p", sira: 7 }
   ];
 
   const SIMGELER =
@@ -26,16 +28,16 @@
   const st = document.createElement("style");
   st.textContent =
     // Boyutlar tarayıcı çubuklarına göre zıplamasın diye "svh" (küçük ekran yüksekliği) ile hesaplanır; sabit eşik (media query) yok.
-    "#ana{--ch:92px;--ch:clamp(56px,calc((100svh - 480px) / 2.9),108px);display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:auto;margin-bottom:auto;position:relative;top:0}" +
+    "#ana{--ch:92px;--ch:clamp(56px,calc((100svh - 480px) / 2.9),108px);display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0 18px!important;position:relative;top:0;width:100%;max-width:460px;background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:0 4px!important}" +
     "body:has(#ana:not(.hidden)){padding-top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top) + 96px)!important;padding-bottom:calc(var(--dock-yuk,116px) + 24px + env(safe-area-inset-bottom))!important}" +
     "#ana.hidden{display:none!important}" +
-    "#ana>.alt{grid-column:1/-1;margin-bottom:6px;order:0}" +
+    "#ana>.alt{display:none!important}" +
     "#ana>.pill{display:none}" +
     "#ana>.ek-bar{display:none}" +
     // Tüm oyun kartları (Milyoner dahil) birebir aynı: aynı kenarlık, aynı yükseklik, gölge yok
-    "#ana>.btn.kartB{order:var(--sira);margin:0!important;width:auto;height:var(--ch);padding:8px 6px;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:16px;line-height:1.25;border:2px solid rgba(255,255,255,.2)!important;outline:0!important;box-shadow:none!important;transform:none;animation:none;background:var(--kc)!important;color:#fff!important}" +
+    "#ana>.btn.kartB{order:var(--sira);margin:0!important;width:auto;height:var(--ch);padding:8px 6px;border-radius:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:16px;line-height:1.25;border:1px solid rgba(255,255,255,.34)!important;outline:0!important;box-shadow:0 7px 18px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.16)!important;transform:none;animation:none;background:var(--kc)!important;color:#fff!important}" +
     "#ana>.btn.kartB.genis{grid-column:1/-1;height:calc(var(--ch) * .9)}" +
-    "#ana>.btn.kartB .ic{width:clamp(30px,calc(var(--ch) * .52),56px);height:clamp(30px,calc(var(--ch) * .52),56px);display:block;margin-bottom:4px;flex:none}" +
+    "#ana>.btn.kartB .ic{width:clamp(30px,calc(var(--ch) * .48),52px);height:clamp(30px,calc(var(--ch) * .48),52px);display:block;margin-bottom:4px;flex:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.2))}" +
     "#ana>.btn.kartB b{font-size:clamp(14px,4.2vw,16px);font-weight:700;display:block;white-space:nowrap}" +
     "#ana>.btn.kartB:active{opacity:.85;transform:none}" +
     // ALT BÖLÜM: kartın ALTINDA, ekranın en dibine yakın durur (eskiden 62px yukarıdaydı, kartın üstüne biniyordu).
