@@ -44,19 +44,21 @@
   }
 })();
 
-// ALT SATIR: Davet ve APK düğmeleri profil kutularından AYRI bir satırda durur.
-// Düğmeler .ek-dock içine eklenmez; böylece 4 profil kutusunun ölçüsü bozulmaz.
+// ANA MENÜ ALT ALANI: 4 profil kutusu üstte, Davet ve APK ayrı satırda.
+// Her iki satır sabit ölçülüdür; tarayıcı alt çubukları ve safe-area hesaba katılır.
 window.altSatir = function () {
   let s = document.getElementById("altSatir");
   if (!document.getElementById("altSatirCss")) {
     const st = document.createElement("style");
     st.id = "altSatirCss";
     st.textContent =
-      ".ek-dock{bottom:calc(66px + env(safe-area-inset-bottom))!important;z-index:50}" +
-      "#altSatir{position:fixed;left:0;right:0;bottom:calc(7px + env(safe-area-inset-bottom));z-index:55;display:flex;align-items:center;justify-content:center;gap:10px;box-sizing:border-box;padding:0 14px;pointer-events:none}" +
-      "#altSatir>.apk-btn,#altSatir>.ar-adb{display:flex;flex:1 1 0;align-items:center;justify-content:center;min-width:0;max-width:180px;height:44px;margin:0;padding:0 8px;box-sizing:border-box;border:2px solid #d4a63a;border-radius:14px;background:rgba(10,18,45,.96);color:#ffe08a;font:800 clamp(12px,3.5vw,15px)/1.1 system-ui,sans-serif;text-align:center;text-decoration:none;white-space:normal;overflow:hidden;cursor:pointer;pointer-events:auto}" +
-      "#altSatir>.gizli{display:none!important}#altSatir>*:active{opacity:.72}" +
-      "#altSatir.gizli{display:none!important}";
+      ".ek-dock{position:fixed!important;left:0!important;right:0!important;bottom:calc(62px + env(safe-area-inset-bottom,0px))!important;z-index:50!important;display:none;gap:6px!important;box-sizing:border-box!important;padding:0 12px!important;height:84px!important;align-items:stretch!important}" +
+      ".ek-dock.show{display:flex!important}" +
+      ".ek-dock>.ek-dk{min-width:0!important;height:100%!important;flex:1 1 0!important}" +
+      "#altSatir{position:fixed!important;left:0!important;right:0!important;bottom:calc(6px + env(safe-area-inset-bottom,0px))!important;z-index:55!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;box-sizing:border-box!important;padding:0 14px!important;height:46px!important;min-height:46px!important;pointer-events:none!important}" +
+      "#altSatir>.apk-btn,#altSatir>.ar-adb{position:static!important;display:flex!important;flex:1 1 0!important;align-items:center!important;justify-content:center!important;min-width:0!important;max-width:180px!important;width:auto!important;height:46px!important;min-height:46px!important;max-height:46px!important;margin:0!important;padding:0 8px!important;box-sizing:border-box!important;border:2px solid #d4a63a!important;border-radius:14px!important;background:rgba(10,18,45,.98)!important;color:#ffe08a!important;font:800 clamp(12px,3.5vw,15px)/1.1 system-ui,sans-serif!important;text-align:center!important;text-decoration:none!important;white-space:nowrap!important;overflow:hidden!important;cursor:pointer!important;pointer-events:auto!important}" +
+      "#altSatir>.gizli{display:none!important}#altSatir>*:active{opacity:.72}#altSatir.gizli{display:none!important}" +
+      "body:has(#ana.hidden) #altSatir{display:none!important}body:has(#ana.hidden) .ek-dock{display:none!important}";
     document.head.appendChild(st);
   }
   if (!s) {
