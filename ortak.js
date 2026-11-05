@@ -52,17 +52,21 @@ window.altSatir = function () {
   if (!document.getElementById("altSatirCss")) {
     const st = document.createElement("style");
     st.id = "altSatirCss";
-    st.textContent = ".ek-dock>.apk-btn,.ek-dock>.ar-adb,#altSatir>*{display:flex;align-items:center;justify-content:center;margin:0;padding:0 6px;border:2px solid #d4a63a;border-radius:14px;background:rgba(0,0,0,.3);color:#d4a63a;font:700 15px/1.1 system-ui,sans-serif;text-decoration:none;white-space:nowrap;cursor:pointer;position:static;box-sizing:border-box;height:52px;min-width:0}" +
-      ".ek-dock>.apk-btn.gizli,.ek-dock>.ar-adb.gizli,#altSatir>*.gizli{display:none}.ek-dock>.apk-btn:active,.ek-dock>.ar-adb:active,#altSatir>*:active{opacity:.7}" +
-      "#altSatir{position:fixed;left:0;right:0;bottom:calc(6px + env(safe-area-inset-bottom));z-index:60;display:flex;gap:8px;padding:0 max(14px,calc((100vw - 520px) / 2));pointer-events:none;box-sizing:border-box}#altSatir>*{flex:1 1 0;pointer-events:auto;min-width:0}#altSatir.gizli{display:none}" +
-      ".ek-dock.show{bottom:calc(66px + env(safe-area-inset-bottom))}";
+    st.textContent = ".ek-dock>#altSatir{order:2;display:flex;flex:0 0 100%;width:100%;gap:8px;position:static;box-sizing:border-box;padding:0;margin:0;z-index:auto;pointer-events:auto}" +
+      ".ek-dock>#altSatir>*{display:flex;align-items:center;justify-content:center;flex:1 1 0;min-width:0;height:50px;margin:0;padding:0 5px;border:2px solid #d4a63a;border-radius:14px;background:rgba(0,0,0,.3);color:#d4a63a;font:700 clamp(12px,3.5vw,15px)/1.1 system-ui,sans-serif;text-decoration:none;white-space:nowrap;cursor:pointer;box-sizing:border-box}" +
+      ".ek-dock>#altSatir>*.gizli{display:none}.ek-dock>#altSatir>*:active{opacity:.7}" +
+      ".ek-dock.show{bottom:calc(8px + env(safe-area-inset-bottom))}" +
+      "@media(max-width:380px){.ek-dock{gap:5px!important;padding-left:8px!important;padding-right:8px!important}.ek-dock>.ek-dk{height:70px;min-height:70px}.ek-dock>#altSatir{gap:5px}.ek-dock>#altSatir>*{font-size:12px}}";
     document.head.appendChild(st);
   }
   if (s) return s;
   const ana = document.getElementById("ana");
   s = document.createElement("div");
   s.id = "altSatir";
-  document.body.appendChild(s);
+  // Alt düğmeleri profil kartlarıyla aynı sabit kapsayıcıya al: tarayıcı araç
+  // çubukları açılıp kapansa bile iki ayrı fixed satır üst üste binmez.
+  const dock = document.querySelector(".ek-dock");
+  if (dock) dock.appendChild(s); else document.body.appendChild(s);
   if (ana) {
     const g = () => s.classList.toggle("gizli", ana.classList.contains("hidden") || ana.style.display === "none");
     new MutationObserver(g).observe(ana, { attributes: true, attributeFilter: ["class", "style"] });
