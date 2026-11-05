@@ -45,12 +45,18 @@
   function giris(ad) {
     var u = auth().currentUser;
     var p = saglayici(ad);
-    return kimlikAl(ad).then(function (cred) {
-      if (cred) return u ? u.linkWithCredential(cred) : auth().signInWithCredential(cred);
-      return u ? u.linkWithPopup(p) : auth().signInWithPopup(p);
-    }).then(function () {
+    var islem;
+    if (nativeApp) {
+      islem = kimlikAl(ad).then(function (cred) {
+        return u ? u.linkWithCredential(cred) : auth().signInWithCredential(cred);
+      });
+    } else {
+      // Popup doğrudan dokunma olayında çağrılır; Chrome/Samsung Internet kullanıcı hareketini kaybetmez.
+      islem = u ? u.linkWithPopup(p) : auth().signInWithPopup(p);
+    }
+    return islem.then(function () {
       toast("Giriş yapıldı ✅");
-      yenile();
+      kapat();
     }).catch(function (e) {
       var kod = e && e.code;
       if (kod === "auth/credential-already-in-use" && e.credential) {
@@ -75,68 +81,58 @@
     (pl ? pl.signOut().catch(function () {}) : Promise.resolve()).then(son).then(function () { location.reload(); });
   }
 
-  // ---------- arayüz ----------
+  // ---------- arayüz: yalnızca sol alttaki oyuncu kutusundan açılır ----------
   var stl = document.createElement("style");
   stl.textContent =
-    "#arGirBtn{position:fixed;top:calc(8px + env(safe-area-inset-top));right:10px;z-index:9000;height:40px;min-width:40px;padding:0 12px;border-radius:20px;border:1px solid #3b4a86;background:#111a3a;color:#fff;font:700 14px system-ui,sans-serif}" +
-    "#arGirBtn:active{opacity:.7}body:has(#ana.hidden) #arGirBtn{display:none}" +
-    "#arGirKutu{position:fixed;inset:0;z-index:100000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6)}" +
+    "#arGirKutu{position:fixed;inset:0;z-index:100100;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.72);padding:16px;box-sizing:border-box}" +
     "#arGirKutu.ac{display:flex}" +
-    "#arGirKutu .k{width:min(86vw,340px);background:#0e1633;color:#fff;border:1px solid #3b4a86;border-radius:20px;padding:20px;font-family:system-ui,sans-serif;text-align:center}" +
-    "#arGirKutu h3{margin:0 0 6px;font-size:20px}#arGirKutu p{margin:0 0 14px;font-size:13px;opacity:.75}" +
-    "#arGirKutu button{display:block;width:100%;margin-top:10px;height:48px;border-radius:14px;border:0;font:700 16px system-ui,sans-serif}" +
+    "#arGirKutu .k{width:min(100%,380px);max-height:calc(100% - 24px);overflow:auto;box-sizing:border-box;background:#0e1633;color:#fff;border:1px solid #3b4a86;border-radius:20px;padding:20px;font-family:system-ui,sans-serif;text-align:center}" +
+    "#arGirKutu h3{margin:0 0 8px;font-size:22px}#arGirKutu p{margin:0 0 14px;font-size:14px;line-height:1.4;opacity:.82;overflow-wrap:anywhere}" +
+    "#arGirKutu button{display:block;width:100%;margin-top:10px;min-height:48px;padding:10px;border-radius:14px;border:0;font:700 16px system-ui,sans-serif;cursor:pointer}" +
     "#arGirKutu .g{background:#fff;color:#222}#arGirKutu .f{background:#1877f2;color:#fff}" +
-    "#arGirKutu .c{background:#a33;color:#fff}#arGirKutu .x{background:transparent;color:#9fb0ff;height:36px}";
+    "#arGirKutu .e{background:#3b5bd6;color:#fff}#arGirKutu .c{background:#a33;color:#fff}#arGirKutu .x{background:transparent;color:#9fb0ff;min-height:38px}";
   document.head.appendChild(stl);
 
-  var btn = document.createElement("button");
-  btn.id = "arGirBtn";
-  btn.textContent = "👤 Giriş";
   var kutu = document.createElement("div");
   kutu.id = "arGirKutu";
-  document.body.appendChild(btn);
   document.body.appendChild(kutu);
-
   function kapat() { kutu.classList.remove("ac"); }
   kutu.addEventListener("click", function (e) { if (e.target === kutu) kapat(); });
 
-  function girisliMi() {
-    var u = auth().currentUser;
-    return !!(u && !u.isAnonymous);
-  }
-
-  function yenile() {
-    var u = auth().currentUser;
-    var gl = !!(u && !u.isAnonymous);
-    btn.textContent = gl ? "👤 " + (u.displayName ? u.displayName.split(" ")[0] : "Hesap") : "👤 Giriş";
-  }
-
   function ac() {
     var u = auth().currentUser;
-    if (girisliMi()) {
-      kutu.innerHTML = '<div class="k"><h3>Hesabın</h3><p>' + (u.displayName || "") + (u.email ? "<br>" + u.email : "") +
-        '</p><button class="c" id="arCik">Çıkış yap</button><button class="x" id="arKapa">Kapat</button></div>';
+    var bagli = !!(u && !u.isAnonymous);
+    if (bagli) {
+      kutu.innerHTML = '<div class="k"><h3>Hesabın</h3><p>' +
+        (u.displayName || "Hesap") + (u.email ? "<br>" + u.email : (u.phoneNumber ? "<br>" + u.phoneNumber : "")) +
+        '</p><button class="e" id="arProfil">Profil ve hesap ayarları</button><button class="c" id="arCik">Çıkış yap</button><button class="x" id="arKapa">Kapat</button></div>';
+      document.getElementById("arProfil").onclick = function () {
+        kapat(); if (window.Hesap && window.Hesap.ac) window.Hesap.ac();
+      };
       document.getElementById("arCik").onclick = function () { kapat(); cikis(); };
     } else {
-      kutu.innerHTML = '<div class="k"><h3>Giriş yap</h3><p>İlerlemen kaybolmaz, hesabına bağlanır. Başka telefonda da devam edebilirsin.</p>' +
+      kutu.innerHTML = '<div class="k"><h3>Hesabına bağlan</h3><p>İlerlemeni hesabına bağla; başka telefonda da devam et.</p>' +
         '<button class="g" id="arG">Google ile devam et</button><button class="f" id="arF">Facebook ile devam et</button>' +
+        '<button class="e" id="arE">E-posta ile kayıt / giriş</button>' +
         '<button class="x" id="arKapa">Şimdi değil</button></div>';
-      document.getElementById("arG").onclick = function () { kapat(); giris("google"); };
-      document.getElementById("arF").onclick = function () { kapat(); giris("facebook"); };
+      // Sağlayıcı işlemi doğrudan gerçek tıklama içinde başlatılır; mobil tarayıcı popup engelini azaltır.
+      document.getElementById("arG").onclick = function () { giris("google"); };
+      document.getElementById("arF").onclick = function () { giris("facebook"); };
+      document.getElementById("arE").onclick = function () {
+        kapat(); if (window.Hesap && window.Hesap.ac) window.Hesap.ac();
+        else toast("E-posta hesap ekranı yükleniyor. Birkaç saniye sonra tekrar dene.");
+      };
     }
     document.getElementById("arKapa").onclick = kapat;
     kutu.classList.add("ac");
   }
-  btn.onclick = ac;
+  window.ArenaAuth = { ac: ac, kapat: kapat };
 
-  // Firebase arena.js tarafından başlatılır; hazır olunca dinlemeye başla
+  // Firebase arena.js tarafından başlatılır; hazır olunca oturum değişikliklerini izle.
   var deneme = 0;
   (function bekle() {
     if (window.firebase && firebase.apps && firebase.apps.length) {
-      auth().onAuthStateChanged(yenile);
-      yenile();
-    } else if (deneme++ < 100) {
-      setTimeout(bekle, 200);
-    }
+      auth().onAuthStateChanged(function () { if (kutu.classList.contains("ac")) ac(); });
+    } else if (deneme++ < 100) setTimeout(bekle, 200);
   })();
 })();

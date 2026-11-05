@@ -47,18 +47,17 @@
 // ALT SATIR: ana sayfanın altındaki küçük butonlar (APK/Güncelle, İsimle istek) tek bir satırda, aynı boyutta ve aynı hizada durur.
 // Her buton kendi başına "fixed" olunca tarayıcı çubukları açılıp kapanınca birbirine göre kayıyordu; artık hepsi tek kapta.
 window.altSatir = function () {
-  // Önce alt bölüm (Fatih / Altın / Premium / Puan) varsa onun içine konur: 6 kutu, 3x2 ızgara, hepsi aynı boyut.
-  const dock = document.querySelector(".ek-dock");
+  // APK / Davet düğmeleri oyuncu-altın-premium-puan dock'undan ayrı satırda durur.
   let s = document.getElementById("altSatir");
   if (!document.getElementById("altSatirCss")) {
     const st = document.createElement("style");
     st.id = "altSatirCss";
     st.textContent = ".ek-dock>.apk-btn,.ek-dock>.ar-adb,#altSatir>*{display:flex;align-items:center;justify-content:center;margin:0;padding:0 6px;border:2px solid #d4a63a;border-radius:14px;background:rgba(0,0,0,.3);color:#d4a63a;font:700 15px/1.1 system-ui,sans-serif;text-decoration:none;white-space:nowrap;cursor:pointer;position:static;box-sizing:border-box;height:52px;min-width:0}" +
       ".ek-dock>.apk-btn.gizli,.ek-dock>.ar-adb.gizli,#altSatir>*.gizli{display:none}.ek-dock>.apk-btn:active,.ek-dock>.ar-adb:active,#altSatir>*:active{opacity:.7}" +
-      "#altSatir{position:fixed;left:0;right:0;bottom:calc(6px + env(safe-area-inset-bottom));z-index:5;display:flex;gap:8px;padding:0 max(14px,calc((100vw - 460px) / 2));pointer-events:none}#altSatir>*{flex:1 1 0;pointer-events:auto}#altSatir.gizli{display:none}";
+      "#altSatir{position:fixed;left:0;right:0;bottom:calc(6px + env(safe-area-inset-bottom));z-index:60;display:flex;gap:8px;padding:0 max(14px,calc((100vw - 520px) / 2));pointer-events:none;box-sizing:border-box}#altSatir>*{flex:1 1 0;pointer-events:auto;min-width:0}#altSatir.gizli{display:none}" +
+      ".ek-dock.show{bottom:calc(66px + env(safe-area-inset-bottom))}";
     document.head.appendChild(st);
   }
-  if (dock) return dock;
   if (s) return s;
   const ana = document.getElementById("ana");
   s = document.createElement("div");

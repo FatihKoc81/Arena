@@ -40,10 +40,11 @@
     ".ek-bp.g{border-color:#ffb300;color:#ffe27a}" +
     ".ek-bar.az .ek-bp{flex:1 1 0;max-width:none;text-align:center}" +
     ".ek-bar.az .ek-bp.ad{max-width:none}" +
-    ".ek-dock{position:fixed;left:0;right:0;bottom:62px;z-index:50;display:none;gap:6px;box-sizing:border-box;padding:0 12px}" +
+    ".ek-dock{position:fixed;left:0;right:0;bottom:calc(62px + env(safe-area-inset-bottom));z-index:50;display:none;gap:6px;box-sizing:border-box;padding:0 max(12px,calc((100vw - 520px)/2))}" +
     ".ek-dock.show{display:flex}" +
     ".ek-dk{all:unset;box-sizing:border-box;flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;padding:6px 3px;background:rgba(10,24,64,.85);border:2px solid rgba(255,255,255,.3);border-radius:14px;color:#fff;font-family:system-ui,sans-serif;text-align:center;cursor:pointer}" +
-    ".ek-dk b{display:block;max-width:100%;font-size:14px;font-weight:800;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}" +
+    ".ek-dk:first-child{flex:1.22 1 0}" +
+    ".ek-dk b{display:block;width:100%;max-width:100%;font-size:14px;font-weight:800;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}" +
     ".ek-dk i{display:block;max-width:100%;font-style:normal;font-size:10.5px;font-weight:600;opacity:.8;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}" +
     ".ek-dk.g{border-color:#ffb300;color:#ffe27a}" +
     ".ek-dk.p.on{border-color:#c79bff;color:#e6d2ff}" +
@@ -139,6 +140,7 @@
   // Alt çubuk: kullanıcı adı, altın, (isteğe bağlı) üçüncü bilgi. cls "in": kart içi (boşluksuz)
   function adDegistir() {
     // Firebase kurulu ise hesap/kullanıcı adı penceresi açılır (hesap.js)
+    if (window.ArenaAuth && window.ArenaAuth.ac) { window.ArenaAuth.ac(); return; }
     if (window.Hesap && window.Hesap.ac) { window.Hesap.ac(); return; }
     var v = null;
     try { v = prompt("Kullanıcı adın:", kullanici); } catch (e) {}
