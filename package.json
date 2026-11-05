@@ -1,3 +1,4 @@
+
 {
   "name": "arena",
   "version": "1.0.0",
@@ -6,10 +7,12 @@
     "@capacitor/android": "^6.2.0",
     "@capacitor/app": "^6.0.0",
     "@capacitor/core": "^6.2.0",
-    "@capacitor/push-notifications": "^6.0.2"
+    "@capacitor/push-notifications": "^6.0.2",
+    "@capacitor-firebase/authentication": "6.3.1"
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",
-    "@capacitor/cli": "^6.2.0"
+    "@capacitor/cli": "^6.2.0",
+    "esbuild": "^0.25.0"
   }
 }
