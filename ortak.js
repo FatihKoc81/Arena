@@ -44,34 +44,56 @@
   }
 })();
 
-// ANA MENÜ ALT ALANI: 4 profil kutusu üstte, Davet ve APK ayrı satırda.
-// Her iki satır sabit ölçülüdür; tarayıcı alt çubukları ve safe-area hesaba katılır.
+// ANA MENÜ ALT BÖLÜMÜ: profil kartları ve Davet/APK tek bir dikey kapsayıcıda.
+// İki ayrı fixed öğe kullanmak yerine aynı kapsayıcıda normal akışa alıyoruz;
+// böylece Chrome ve Samsung Internet araç çubukları açılıp kapansa da üst üste binmez.
 window.altSatir = function () {
-  let s = document.getElementById("altSatir");
-  if (!document.getElementById("altSatirCss")) {
-    const st = document.createElement("style");
-    st.id = "altSatirCss";
-    st.textContent =
-      ".ek-dock{position:fixed!important;left:0!important;right:0!important;bottom:calc(62px + env(safe-area-inset-bottom,0px))!important;z-index:50!important;display:none;gap:6px!important;box-sizing:border-box!important;padding:0 12px!important;height:84px!important;align-items:stretch!important}" +
-      ".ek-dock.show{display:flex!important}" +
-      ".ek-dock>.ek-dk{min-width:0!important;height:100%!important;flex:1 1 0!important}" +
-      "#altSatir{position:fixed!important;left:0!important;right:0!important;bottom:calc(6px + env(safe-area-inset-bottom,0px))!important;z-index:55!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:10px!important;box-sizing:border-box!important;padding:0 14px!important;height:46px!important;min-height:46px!important;pointer-events:none!important}" +
-      "#altSatir>.apk-btn,#altSatir>.ar-adb{position:static!important;display:flex!important;flex:1 1 0!important;align-items:center!important;justify-content:center!important;min-width:0!important;max-width:180px!important;width:auto!important;height:46px!important;min-height:46px!important;max-height:46px!important;margin:0!important;padding:0 8px!important;box-sizing:border-box!important;border:2px solid #d4a63a!important;border-radius:14px!important;background:rgba(10,18,45,.98)!important;color:#ffe08a!important;font:800 clamp(12px,3.5vw,15px)/1.1 system-ui,sans-serif!important;text-align:center!important;text-decoration:none!important;white-space:nowrap!important;overflow:hidden!important;cursor:pointer!important;pointer-events:auto!important}" +
-      "#altSatir>.gizli{display:none!important}#altSatir>*:active{opacity:.72}#altSatir.gizli{display:none!important}" +
-      "body:has(#ana.hidden) #altSatir{display:none!important}body:has(#ana.hidden) .ek-dock{display:none!important}";
-    document.head.appendChild(st);
+  let footer = document.getElementById("homeFooter");
+  if (!footer) {
+    footer = document.createElement("div");
+    footer.id = "homeFooter";
+    footer.className = "home-footer gizli";
+    document.body.appendChild(footer);
   }
+  let s = document.getElementById("altSatir");
   if (!s) {
     s = document.createElement("div");
     s.id = "altSatir";
-    document.body.appendChild(s);
-    const ana = document.getElementById("ana");
-    if (ana) {
-      const g = () => s.classList.toggle("gizli", ana.classList.contains("hidden") || getComputedStyle(ana).display === "none");
-      new MutationObserver(g).observe(ana, { attributes: true, attributeFilter: ["class", "style"] });
-      g();
-    }
+    footer.appendChild(s);
+  } else if (s.parentNode !== footer) {
+    footer.appendChild(s);
   }
+  // Ekonomi dock'u ön satıra al; APK ve Davet bunun altında kalır.
+  const dock = document.querySelector(".ek-dock");
+  if (dock && dock.parentNode !== footer) footer.insertBefore(dock, s);
+
+  if (!document.getElementById("homeFooterCss")) {
+    const st = document.createElement("style");
+    st.id = "homeFooterCss";
+    st.textContent =
+      ".home-footer{position:fixed!important;left:0!important;right:0!important;bottom:calc(8px + env(safe-area-inset-bottom))!important;z-index:80!important;display:flex;flex-direction:column;gap:8px;padding:0 12px;box-sizing:border-box;pointer-events:none}" +
+      ".home-footer.gizli{display:none!important}" +
+      ".home-footer>.ek-dock{position:static!important;inset:auto!important;width:100%!important;box-sizing:border-box!important;display:flex;gap:6px;padding:0!important;margin:0!important;z-index:auto!important;pointer-events:auto}" +
+      ".home-footer>.ek-dock:not(.show){display:none!important}" +
+      ".home-footer>.ek-dock>.ek-dk{height:76px!important;min-height:76px!important;max-height:76px!important;flex:1 1 0!important;min-width:0!important}" +
+      ".home-footer #altSatir{position:static!important;inset:auto!important;width:100%!important;display:flex;align-items:center;justify-content:center;gap:8px;padding:0!important;margin:0!important;box-sizing:border-box;pointer-events:none}" +
+      ".home-footer #altSatir.gizli{display:none!important}" +
+      ".home-footer #altSatir>.apk-btn,.home-footer #altSatir>.ar-adb{display:flex;flex:1 1 0;align-items:center;justify-content:center;min-width:0;max-width:180px;height:44px;min-height:44px;margin:0;padding:0 8px;box-sizing:border-box;border:2px solid #d4a63a;border-radius:14px;background:rgba(10,18,45,.97);color:#ffe08a;font:800 clamp(12px,3.5vw,15px)/1.1 system-ui,sans-serif;text-align:center;text-decoration:none;white-space:normal;overflow:hidden;cursor:pointer;pointer-events:auto}" +
+      ".home-footer #altSatir>.gizli{display:none!important}.home-footer #altSatir>*:active{opacity:.72}" +
+      "@media(max-height:620px){.home-footer{gap:5px}.home-footer>.ek-dock>.ek-dk{height:62px!important;min-height:62px!important;max-height:62px!important}.home-footer #altSatir>.apk-btn,.home-footer #altSatir>.ar-adb{height:38px;min-height:38px}}";
+    document.head.appendChild(st);
+  }
+  const ana = document.getElementById("ana");
+  function gorunurluk() {
+    const gor = !!(ana && !ana.classList.contains("hidden") && getComputedStyle(ana).display !== "none");
+    footer.classList.toggle("gizli", !gor);
+    s.classList.toggle("gizli", !gor);
+  }
+  if (ana && !footer._anaIzleyici) {
+    footer._anaIzleyici = new MutationObserver(gorunurluk);
+    footer._anaIzleyici.observe(ana, { attributes: true, attributeFilter: ["class", "style"] });
+  }
+  gorunurluk();
   return s;
 };
 

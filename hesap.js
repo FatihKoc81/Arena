@@ -11,6 +11,7 @@
   var GUN7 = 7 * 24 * 3600 * 1000, SAHIP = "fatihkoc7@gmail.com", SAHIP_ADLARI = ["estergon", "osmanli"];
   var REZERVE = ["fk1453", "fatih", "fatih_", "fatihkoc81", "fatihkoc7", "estergon", "osmanli", "hatice", "haticekoc81", "haticekoc1", "haticekoc7"];
   var ayar = false, kayit = null, hesapRef = null, el = null, sekme = "kayit", msg = "", msgOk = false, busy = false;
+  var smsOnay = null, smsVerifier = null, smsBekliyor = false;
 
   function noop() {}
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
@@ -48,7 +49,16 @@
       "auth/user-not-found": "Bu e-postayla kayıtlı hesap yok.",
       "auth/too-many-requests": "Çok fazla deneme yapıldı, biraz bekle.",
       "auth/network-request-failed": "İnternet bağlantısı yok.",
-      "auth/operation-not-allowed": "E-posta girişi Firebase'de kapalı: Authentication > Sign-in method > Email/Password'ü aç."
+      "auth/operation-not-allowed": "Bu giriş yöntemi Firebase'de etkin değil. Firebase Console > Authentication > Sign-in method bölümünden ilgili sağlayıcıyı aç.",
+      "auth/popup-blocked": "Giriş penceresi tarayıcı tarafından engellendi. Açılır pencerelere izin verip tekrar dene.",
+      "auth/popup-closed-by-user": "Giriş penceresi kapatıldı.",
+      "auth/unauthorized-domain": "fatihkoc81.github.io Firebase yetkili alan adlarına eklenmeli.",
+      "auth/credential-already-in-use": "Bu Google/Facebook/telefon bilgisi başka bir hesaba bağlı. O hesapla giriş yap.",
+      "auth/account-exists-with-different-credential": "Bu e-posta başka bir giriş yöntemiyle kayıtlı. Önce o yöntemle giriş yap.",
+      "auth/invalid-phone-number": "Telefon numarası geçersiz. +905XXXXXXXXX biçiminde yaz.",
+      "auth/missing-phone-number": "Telefon numaranı yaz.",
+      "auth/captcha-check-failed": "Güvenlik doğrulaması başarısız. Sayfayı yenileyip tekrar dene.",
+      "auth/quota-exceeded": "SMS gönderim sınırına ulaşıldı. Daha sonra tekrar dene."
     };
     if (t[c]) return t[c];
     if (/permission_denied/i.test(c + " " + m)) return "İzin verilmedi: ad alınmış olabilir ya da Firebase kuralları henüz yayınlanmamış.";
@@ -62,7 +72,7 @@
     var u = A.currentUser, lower = ad.toLowerCase(), sahip = sahipMi(A.currentUser);
     var eski = kayit && kayit.ad ? kayit.ad.toLowerCase() : null;
     var yeniAlindi = false;
-    if (!u || !u.email) return Promise.reject({ ozel: "Önce e-postayla kayıt ol." });
+    if (!u || u.isAnonymous) return Promise.reject({ ozel: "Önce bir hesapla devam et." });
     if (SAHIP_ADLARI.indexOf(lower) >= 0 && !sahip) return Promise.reject({ ozel: "“" + ad + "” rezerve edilmiş bir ad." + (u.emailVerified ? "" : " Sahibiysen önce e-postanı doğrula.") });
     if (kayit && kayit.ad === ad) return Promise.reject({ ozel: "Zaten bu adı kullanıyorsun." });
     if (!sahip && sonrakiTarih() > Date.now()) return Promise.reject({ ozel: "Adını " + new Date(sonrakiTarih()).toLocaleDateString("tr-TR") + " tarihinden sonra değiştirebilirsin." });
@@ -134,6 +144,62 @@
     }).then(function () { location.reload(); });
   }
 
+  // ---------- Google / Facebook ile misafir hesabını bağla ----------
+  // linkWithPopup kullanılır: anonim UID değişmez, puan ve oyun ilerlemesi korunur.
+  function sosyalBagla(tur) {
+    var u = A.currentUser;
+    if (!u || !u.isAnonymous) return Promise.reject({ ozel: "Önce misafir hesabına dönüp tekrar dene." });
+    var provider;
+    if (tur === "google") provider = new firebase.auth.GoogleAuthProvider();
+    else if (tur === "facebook") provider = new firebase.auth.FacebookAuthProvider();
+    else return Promise.reject({ ozel: "Bilinmeyen giriş yöntemi." });
+    if (tur === "google") provider.addScope("email");
+    if (tur === "facebook") provider.addScope("email");
+    return u.linkWithPopup(provider).then(function (c) {
+      msg = "Hesabın bağlandı. Puanların ve ilerlemen korundu."; msgOk = true;
+      return c.user.getIdToken(true);
+    }).then(function () { render(); }).catch(function (e) {
+      if (e && (e.code === "auth/credential-already-in-use" || e.code === "auth/account-exists-with-different-credential")) {
+        throw { ozel: "Bu Google/Facebook hesabı başka bir ARENA hesabına bağlı. Mevcut hesabınla giriş yapmalısın; misafir ilerlemen silinmedi." };
+      }
+      throw e;
+    });
+  }
+
+  // ---------- Telefon numarasıyla SMS doğrulama ve mevcut misafir UID'sine bağlama ----------
+  function telefonDuzelt(v) {
+    v = String(v || "").replace(/[\s()-]/g, "");
+    if (/^05\d{9}$/.test(v)) v = "+9" + v;
+    else if (/^5\d{9}$/.test(v)) v = "+90" + v;
+    else if (/^90\d{10}$/.test(v)) v = "+" + v;
+    return v;
+  }
+  function smsGonder() {
+    var u = A.currentUser, tel = telefonDuzelt(val("hs-tel"));
+    if (!u || !u.isAnonymous) return Promise.reject({ ozel: "Telefonu bağlamak için önce misafir hesabında olmalısın." });
+    if (!/^\+90[0-9]{10}$/.test(tel)) return Promise.reject({ ozel: "Telefonu 05XXXXXXXXX veya +905XXXXXXXXX biçiminde yaz." });
+    if (!smsVerifier) smsVerifier = new firebase.auth.RecaptchaVerifier("hs-recaptcha", { size: "normal" });
+    return u.linkWithPhoneNumber(tel, smsVerifier).then(function (sonuc) {
+      smsOnay = sonuc; smsBekliyor = true;
+      msg = "SMS kodu gönderildi. Telefonuna gelen 6 haneli kodu yaz."; msgOk = true;
+      render();
+    }).catch(function (e) {
+      if (smsVerifier) { try { smsVerifier.clear(); } catch (x) {} smsVerifier = null; }
+      throw e;
+    });
+  }
+  function smsDogrula() {
+    var kod = val("hs-kod").trim();
+    if (!smsOnay) return Promise.reject({ ozel: "Önce SMS kodu iste." });
+    if (!/^\d{6}$/.test(kod)) return Promise.reject({ ozel: "SMS kodu 6 rakam olmalı." });
+    return smsOnay.confirm(kod).then(function (c) {
+      smsOnay = null; smsBekliyor = false;
+      if (smsVerifier) { try { smsVerifier.clear(); } catch (e) {} smsVerifier = null; }
+      msg = "Telefon numaran doğrulandı. Puanların ve ilerlemen korundu."; msgOk = true;
+      return c.user.getIdToken(true);
+    }).then(function () { render(); });
+  }
+
   function cikisYap() {
     try { localStorage.removeItem(UYG() + "arenaEller"); localStorage.removeItem(UYG() + "cemberAd"); } catch (e) {}
     return A.signOut().then(function () { location.reload(); });
@@ -149,6 +215,7 @@
     ".hs-x{border:0;background:#222f45;color:#fff;border-radius:10px;width:36px;height:36px;font-size:17px;cursor:pointer}" +
     ".hs-body{padding:12px 14px 16px}" +
     ".hs-tabs{display:flex;gap:6px;margin-bottom:10px}" +
+    ".hs-soc{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0 12px}.hs-soc button{border:1px solid #53649e;border-radius:11px;background:#172447;color:#fff;padding:11px 5px;font:700 13px system-ui,sans-serif}.hs-ayir{display:flex;align-items:center;gap:8px;color:#8e9bc4;font-size:12px;margin:8px 0}.hs-ayir:before,.hs-ayir:after{content:'';height:1px;background:#34416c;flex:1}.hs-rec{min-height:70px;margin:8px 0;overflow:hidden}.hs-tel{margin-top:8px}" +
     ".hs-tab{flex:1;border:2px solid #4a5a9a;background:#0b1230;color:#8e9bc4;border-radius:12px;padding:9px 2px;font:700 14px system-ui,sans-serif;cursor:pointer}.hs-tab.on{background:#3b5bd6;color:#fff;border-color:#7d97ff}" +
     ".hs-in{display:block;width:100%;box-sizing:border-box;margin:6px 0;padding:12px;border-radius:12px;border:2px solid #2b3a72;background:#0b1230;color:#fff;font:16px system-ui,sans-serif}" +
     ".hs-bt{display:block;width:100%;border:0;border-radius:14px;padding:13px;margin:8px 0;font:800 16px system-ui,sans-serif;color:#fff;background:#3b5bd6;cursor:pointer}.hs-bt.gri{background:#6b7280}.hs-bt.kirmizi{background:#a3231c}.hs-bt[disabled]{opacity:.4}" +
@@ -162,20 +229,28 @@
 
   var KURAL = "3-18 karakter · ilk harf büyük · ilk harften sonra en fazla 1 büyük harf daha · sadece a-z, 0-9 ve _ (Türkçe karakter yok) · herkesin adı farklı olur · 15 günde bir değişir.";
 
+  function sosyalHtml() {
+    return '<div class="hs-soc"><button type="button" data-hs="google">🌐 Google ile devam et</button><button type="button" data-hs="facebook">f Facebook ile devam et</button></div><div class="hs-ayir">veya</div>';
+  }
   function misafirHtml() {
-    var h = '<div class="hs-tabs"><button class="hs-tab' + (sekme === "kayit" ? " on" : "") + '" data-hs="sekme-kayit">Kayıt ol</button><button class="hs-tab' + (sekme === "giris" ? " on" : "") + '" data-hs="sekme-giris">Giriş yap</button></div>';
+    var h = sosyalHtml() + '<div class="hs-tabs"><button class="hs-tab' + (sekme === "kayit" ? " on" : "") + '" data-hs="sekme-kayit">Kayıt ol</button><button class="hs-tab' + (sekme === "giris" ? " on" : "") + '" data-hs="sekme-giris">Giriş yap</button><button class="hs-tab' + (sekme === "telefon" ? " on" : "") + '" data-hs="sekme-telefon">Telefon</button></div>';
     if (sekme === "kayit") {
       h += '<div class="hs-k">E-postayla kayıt ol: puanların ve adın senin olur, başka telefondan da girebilirsin.</div>' +
         '<input class="hs-in" id="hs-e" type="email" autocomplete="email" placeholder="E-posta">' +
         '<input class="hs-in" id="hs-p" type="password" autocomplete="new-password" placeholder="Şifre (en az 6 karakter)">' +
         '<input class="hs-in" id="hs-a" maxlength="18" autocomplete="off" autocapitalize="words" autocorrect="off" spellcheck="false" placeholder="Kullanıcı adı">' +
         '<button class="hs-bt" data-hs="kayit">Kayıt Ol</button>';
-    } else {
+    } else if (sekme === "giris") {
       h += '<input class="hs-in" id="hs-e" type="email" autocomplete="email" placeholder="E-posta">' +
         '<input class="hs-in" id="hs-p" type="password" autocomplete="current-password" placeholder="Şifre">' +
         '<button class="hs-bt" data-hs="giris">Giriş Yap</button>' +
         '<button class="hs-l" data-hs="unuttum">Şifremi unuttum</button>' +
         '<div class="hs-k">Giriş yapınca bu cihazdaki misafir ilerlemesi hesabındaki ilerlemeyle birleşir (her oyunda yüksek olan kalır).</div>';
+    } else {
+      h += '<div class="hs-k">Telefon numaranı doğrula. Mevcut misafir hesabın korunarak telefonuna bağlanır.</div>' +
+        '<input class="hs-in hs-tel" id="hs-tel" type="tel" autocomplete="tel" placeholder="05XXXXXXXXX veya +905XXXXXXXXX">' +
+        '<div id="hs-recaptcha" class="hs-rec"></div>' +
+        (smsBekliyor ? '<input class="hs-in" id="hs-kod" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="SMS doğrulama kodu">' + '<button class="hs-bt" data-hs="sms-dogrula">Kodu doğrula</button>' : '<button class="hs-bt" data-hs="sms-gonder">SMS kodu gönder</button>');
     }
     return h;
   }
@@ -186,14 +261,14 @@
       .sort(function (a, b) { return b.p - a.p; })
       .forEach(function (x) { satir += '<div class="hs-r"><span>' + esc(x.ad) + "</span><b>" + x.p + "</b></div>"; });
     return '<div class="hs-pf"><div class="hs-av">' + esc(ad.charAt(0).toLocaleUpperCase("tr")) + '</div><div class="hs-pn">' + esc(ad) + "</div>" +
-      '<div class="hs-k">📧 ' + esc(u.email) + " " + (u.emailVerified ? "✓ doğrulandı" : "(doğrulanmadı)") + "</div></div>" +
+      (u.email ? '<div class="hs-k">📧 ' + esc(u.email) + " " + (u.emailVerified ? "✓ doğrulandı" : "(doğrulanmadı)") + "</div>" : (u.phoneNumber ? '<div class="hs-k">📱 ' + esc(u.phoneNumber) + " ✓ doğrulandı</div>" : '<div class="hs-k">Google/Facebook hesabı bağlı</div>')) + "</div>" +
       '<div class="hs-top">⭐ Toplam puan <b>' + (P ? P.toplam() : 0) + "</b></div>" + satir +
       '<button class="hs-bt gri" data-hs="ayar">⚙️ Hesap ayarları</button>';
   }
   function ayarHtml(u) {
-    var h = '<div class="hs-s">📧 <b>' + esc(u.email) + "</b> " + (u.emailVerified ? "✓ doğrulandı" : "(doğrulanmadı)") + "</div>" +
+    var h = (u.email ? '<div class="hs-s">📧 <b>' + esc(u.email) + "</b> " + (u.emailVerified ? "✓ doğrulandı" : "(doğrulanmadı)") + "</div>" : (u.phoneNumber ? '<div class="hs-s">📱 <b>' + esc(u.phoneNumber) + "</b> ✓ doğrulandı</div>" : '<div class="hs-s">Sosyal hesap bağlı</div>')) +
       '<div class="hs-s">👤 Kullanıcı adın: <b>' + esc(kayit && kayit.ad ? kayit.ad : "henüz seçilmedi") + "</b></div>";
-    if (!u.emailVerified) h += '<button class="hs-bt gri" data-hs="dogrula-gonder">Doğrulama mailini tekrar gönder</button><button class="hs-bt gri" data-hs="dogrula-kontrol">Doğruladım, kontrol et</button>';
+    if (u.email && !u.emailVerified) h += '<button class="hs-bt gri" data-hs="dogrula-gonder">Doğrulama mailini tekrar gönder</button><button class="hs-bt gri" data-hs="dogrula-kontrol">Doğruladım, kontrol et</button>';
     h += '<input class="hs-in" id="hs-a" maxlength="18" autocomplete="off" autocapitalize="words" autocorrect="off" spellcheck="false" placeholder="' + (kayit && kayit.ad ? "Yeni kullanıcı adı" : "Kullanıcı adı seç") + '">' +
       '<button class="hs-bt" data-hs="ad-kaydet">Adı Kaydet</button>';
     return h + '<button class="hs-bt kirmizi" data-hs="cikis">Çıkış yap</button>';
@@ -201,9 +276,9 @@
   function render() {
     if (!el || !el.classList.contains("show")) return;
     var u = A.currentUser, b = el.querySelector(".hs-body");
-    var eski = {}; ["hs-e", "hs-a"].forEach(function (id) { var x = document.getElementById(id); if (x) eski[id] = x.value; });
+    var eski = {}; ["hs-e", "hs-a", "hs-tel", "hs-kod"].forEach(function (id) { var x = document.getElementById(id); if (x) eski[id] = x.value; });
     var h = msg ? '<div class="hs-msg' + (msgOk ? " ok" : "") + '">' + esc(msg) + "</div>" : "";
-    h += !u ? '<div class="hs-k">Bağlanıyor…</div>' : !u.email ? misafirHtml() : hesapHtml(u);
+    h += !u ? '<div class="hs-k">Bağlanıyor…</div>' : u.isAnonymous ? misafirHtml() : hesapHtml(u);
     b.innerHTML = h;
     for (var id in eski) { var x = document.getElementById(id); if (x) x.value = eski[id]; }
   }
@@ -211,7 +286,8 @@
 
   function isle(p, okMsg) {
     if (busy) return;
-    busy = true; mesaj("");
+    busy = true; msg = ""; msgOk = false;
+    // İşlem başlarken formu yeniden çizme: SMS reCAPTCHA alanı DOM'da kalmalı.
     p.then(function () { if (okMsg) mesaj(okMsg, true); else render(); }, function (e) { mesaj(hataYaz(e), false); }).then(function () { busy = false; });
   }
   function val(id) { var x = document.getElementById(id); return x ? x.value : ""; }
@@ -223,6 +299,11 @@
     else if (a === "profil") { ayar = false; msg = ""; render(); }
     else if (a === "sekme-kayit") { sekme = "kayit"; msg = ""; render(); }
     else if (a === "sekme-giris") { sekme = "giris"; msg = ""; render(); }
+    else if (a === "sekme-telefon") { sekme = "telefon"; msg = ""; smsBekliyor = !!smsOnay; render(); }
+    else if (a === "google") isle(sosyalBagla("google"));
+    else if (a === "facebook") isle(sosyalBagla("facebook"));
+    else if (a === "sms-gonder") isle(smsGonder());
+    else if (a === "sms-dogrula") isle(smsDogrula());
     else if (a === "kayit") isle(kayitOl(val("hs-e").trim(), val("hs-p"), val("hs-a").trim()).then(function () { render(); }));
     else if (a === "giris") isle(girisYap(val("hs-e").trim(), val("hs-p")));
     else if (a === "unuttum") {
