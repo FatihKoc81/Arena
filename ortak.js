@@ -44,31 +44,56 @@
   }
 })();
 
-// ALT SATIR: Davet ve APK düğmeleri profil kutularından AYRI bir satırda durur.
-// Düğmeler .ek-dock içine eklenmez; böylece 4 profil kutusunun ölçüsü bozulmaz.
+// ALT BOLUM: Profil kutulari ve Davet/APK dugmeleri tek bir sabit kapsayicida,
+// ust uste binmeden alt alta durur. Sadece ana menude gorunur.
 window.altSatir = function () {
+  let footer = document.getElementById("arenaAltFooter");
   let s = document.getElementById("altSatir");
+
   if (!document.getElementById("altSatirCss")) {
     const st = document.createElement("style");
     st.id = "altSatirCss";
     st.textContent =
-      ".ek-dock{bottom:calc(66px + env(safe-area-inset-bottom))!important;z-index:50}" +
-      "#altSatir{position:fixed;left:0;right:0;bottom:calc(8px + env(safe-area-inset-bottom));z-index:55;display:flex;align-items:center;justify-content:center;gap:14px;box-sizing:border-box;padding:0 22px;pointer-events:none}" +
-      "#altSatir>.apk-btn,#altSatir>.ar-adb{display:flex;flex:1 1 0;align-items:center;justify-content:center;min-width:0;max-width:180px;height:44px;margin:0;padding:0 8px;box-sizing:border-box;border:2px solid #d4a63a;border-radius:14px;background:rgba(10,18,45,.96);color:#ffe08a;font:800 clamp(12px,3.5vw,15px)/1.1 system-ui,sans-serif;text-align:center;text-decoration:none;white-space:normal;overflow:hidden;cursor:pointer;pointer-events:auto}" +
+      "#arenaAltFooter{position:fixed;left:0;right:0;bottom:calc(8px + env(safe-area-inset-bottom,0px));z-index:60;display:flex;flex-direction:column;gap:8px;box-sizing:border-box;width:100%;max-width:620px;margin:0 auto;padding:0 12px;pointer-events:none}" +
+      "#arenaAltFooter.gizli{display:none!important}" +
+      "#arenaAltFooter .ek-dock{position:static!important;left:auto!important;right:auto!important;bottom:auto!important;z-index:auto!important;width:100%;box-sizing:border-box;margin:0;padding:0;gap:6px;pointer-events:auto}" +
+      "#arenaAltFooter .ek-dock.show{display:flex!important}" +
+      "#arenaAltFooter .ek-dk{min-width:0;min-height:76px;flex:1 1 0}" +
+      "#altSatir{position:static!important;left:auto!important;right:auto!important;bottom:auto!important;z-index:auto!important;display:flex;align-items:stretch;justify-content:center;gap:8px;width:100%;box-sizing:border-box;margin:0;padding:0;pointer-events:none}" +
+      "#altSatir>.apk-btn,#altSatir>.ar-adb{display:flex;flex:1 1 0;align-items:center;justify-content:center;min-width:0;max-width:none;height:48px;margin:0;padding:0 8px;box-sizing:border-box;border:2px solid #d4a63a;border-radius:16px;background:rgba(10,18,45,.97);color:#ffe08a;font:800 clamp(12px,3.6vw,15px)/1.1 system-ui,sans-serif;text-align:center;text-decoration:none;white-space:normal;overflow:hidden;cursor:pointer;pointer-events:auto}" +
       "#altSatir>.gizli{display:none!important}#altSatir>*:active{opacity:.72}" +
       "#altSatir.gizli{display:none!important}";
     document.head.appendChild(st);
   }
+
+  if (!footer) {
+    footer = document.createElement("div");
+    footer.id = "arenaAltFooter";
+    document.body.appendChild(footer);
+  }
   if (!s) {
     s = document.createElement("div");
     s.id = "altSatir";
-    document.body.appendChild(s);
-    const ana = document.getElementById("ana");
-    if (ana) {
-      const g = () => s.classList.toggle("gizli", ana.classList.contains("hidden") || getComputedStyle(ana).display === "none");
-      new MutationObserver(g).observe(ana, { attributes: true, attributeFilter: ["class", "style"] });
-      g();
-    }
+  }
+  if (s.parentNode !== footer) footer.appendChild(s);
+
+  // Ekonomi modulu dock'u sonradan olusturabilir; olusunca ayni kapsayiciya al.
+  function dockuTasi() {
+    const dock = document.querySelector("body > .ek-dock, .ek-dock:not(#arenaAltFooter .ek-dock)");
+    if (dock && dock.parentNode !== footer) footer.insertBefore(dock, s);
+  }
+  dockuTasi();
+  if (!footer._dockObserver) {
+    footer._dockObserver = new MutationObserver(dockuTasi);
+    footer._dockObserver.observe(document.body, { childList: true });
+  }
+
+  const ana = document.getElementById("ana");
+  if (ana && !footer._anaObserver) {
+    const g = () => footer.classList.toggle("gizli", ana.classList.contains("hidden") || getComputedStyle(ana).display === "none");
+    footer._anaObserver = new MutationObserver(g);
+    footer._anaObserver.observe(ana, { attributes: true, attributeFilter: ["class", "style"] });
+    g();
   }
   return s;
 };
