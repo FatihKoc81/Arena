@@ -191,6 +191,31 @@
     });
   }
 
+  // APK (Capacitor): Firebase popup/redirect harici tarayıcıda "missing initial state" hatası verir.
+  // Bu yüzden APK'da giriş native eklenti (@capacitor-firebase/authentication) ile yapılır.
+  function nativEklenti() {
+    var c = window.Capacitor;
+    return c && c.Plugins && c.Plugins.FirebaseAuthentication ? c.Plugins.FirebaseAuthentication : null;
+  }
+  function nativKimlik(tur) {
+    var pl = nativEklenti();
+    if (!pl) return Promise.reject({ ozel: "Bu giriş için uygulamayı en son sürüme güncellemen gerekiyor." });
+    var islem = tur === "google" ? pl.signInWithGoogle({ skipNativeAuth: true }) : pl.signInWithFacebook({ skipNativeAuth: true });
+    return islem.then(function (r) {
+      var c = (r && r.credential) || {};
+      if (tur === "google") {
+        if (!c.idToken && !c.accessToken) throw { code: "auth/popup-closed-by-user" };
+        return firebase.auth.GoogleAuthProvider.credential(c.idToken || null, c.accessToken || null);
+      }
+      if (!c.accessToken) throw { code: "auth/popup-closed-by-user" };
+      return firebase.auth.FacebookAuthProvider.credential(c.accessToken);
+    }, function (e) {
+      var m = String((e && (e.message || e.code)) || e || "");
+      if (/cancel|12501|user.*(closed|abort)|iptal/i.test(m)) throw { code: "auth/popup-closed-by-user" };
+      throw { ozel: "Giriş başarısız: " + m };
+    });
+  }
+
   function sosyalGiris(tur) {
     if (tur === "google" && webGoogleId() && !gsiHazir()) { gsiYukle(); return Promise.reject({ ozel: "Google yükleniyor. Birkaç saniye sonra tekrar dene. (Reklam/izleme engelleyici açıksa Google'ı engelliyor olabilir.)" }); }
     if (tur === "facebook" && fbId() && !fbHazir()) { fbYukle(); return Promise.reject({ ozel: "Facebook yükleniyor. Birkaç saniye sonra tekrar dene. (Reklam/izleme engelleyici açıksa Facebook'u engelliyor olabilir.)" }); }
@@ -200,7 +225,13 @@
     var gid = tur === "google" && gsiHazir() ? webGoogleId() : "";
     var kc = null;
     var fid = tur === "facebook" && fbHazir() ? fbId() : "";
-    var islem = gid
+    var nativ = !!window.Capacitor;
+    var islem = nativ
+      ? nativKimlik(tur).then(function (cred) {
+          kc = cred;
+          return misafir ? misafir.linkWithCredential(kc) : A.signInWithCredential(kc);
+        })
+      : gid
       ? googleTokenAl(gid).then(function (tok) {
           kc = firebase.auth.GoogleAuthProvider.credential(null, tok);
           return misafir ? misafir.linkWithCredential(kc) : A.signInWithCredential(kc);
@@ -260,7 +291,8 @@
 
   function cikisYap() {
     try { localStorage.removeItem(UYG() + "arenaEller"); localStorage.removeItem(UYG() + "cemberAd"); } catch (e) {}
-    return A.signOut().then(function () { location.reload(); });
+    var pl = nativEklenti();
+    return (pl && pl.signOut ? pl.signOut().catch(noop) : Promise.resolve()).then(function () { return A.signOut(); }).then(function () { location.reload(); });
   }
 
   // ---------- görünüm ----------

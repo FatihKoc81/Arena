@@ -4,5 +4,14 @@
   "webDir": "www",
   "server": {
     "url": "https://fatihkoc81.github.io/Arena/"
+  },
+  "plugins": {
+    "FirebaseAuthentication": {
+      "skipNativeAuth": true,
+      "providers": [
+        "facebook.com",
+        "google.com"
+      ]
+    }
   }
 }
