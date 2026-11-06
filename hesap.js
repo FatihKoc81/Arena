@@ -438,7 +438,7 @@
     izle(); setInterval(izle, 60000);
     oyunKancasi();
   }
-  // sayaç satırları (çevrimiçi / bugün / bu hafta) menüden kaldırıldı; oyun sayımı arka planda sürer
+  sayacKur();
 
   // ---------- hesap kaydını izle, adı oyuna yansıt ----------
   function esitle() {

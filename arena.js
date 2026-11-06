@@ -1028,7 +1028,7 @@
     if (!ana || document.getElementById("arAdBtn")) return;
     var b = document.createElement("div");
     b.id = "arAdBtn";
-    b.textContent = "👤 İsimle İstek";
+    b.textContent = "👤 Davet";
     b.className = "ar-adb";
     b.onclick = adPenAc;
     (window.altSatir ? window.altSatir() : document.body).appendChild(b);
@@ -1233,8 +1233,8 @@
       b.innerHTML = '<span class="ar-ik">' + ikon + "</span><b>" + ad + "</b>";
       b.onclick = fn; a.appendChild(b);
     }
-    mk("arMeydan", "⚔️", "Meydan Oku", "#a3231c", 6, meydanOku);
-    mk("arSiralama", "🏅", "Sıralama", "#7a5a00", 7, function () { ac("siralama"); });
+    mk("arMeydan", "⚔️", "Meydan Oku", "#732b26", 6, meydanOku);
+    mk("arSiralama", "🏅", "Sıralama", "#6b541e", 7, function () { ac("siralama"); });
   }
 
   window.onEkonomiAd = function () { kullaniciYaz(true); };

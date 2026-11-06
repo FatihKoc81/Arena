@@ -7,11 +7,11 @@
 
   // eşleşme sırası önemli: "Rotasyon" "Kelime"den önce bakılır
   const OYUNLAR = [
-    { re: /Milyoner/, ad: "Milyoner", renk: "#5a1818", simge: "m", sira: 1 },
-    { re: /Passaparola/, ad: "Passaparola", renk: "#0b6a52", simge: "p", sira: 2 },
-    { re: /Rotasyon/, ad: "Rotasyon", renk: "#8a3300", simge: "c", sira: 5, genis: true },
-    { re: /Kelime/, ad: "Kelime Oyunu", renk: "#0a3aa5", simge: "k", sira: 3 },
-    { re: /İşlem/, ad: "İşlem Oyunu", renk: "#52139a", simge: "o", sira: 4 }
+    { re: /Milyoner/, ad: "Milyoner", renk: "#68272f", simge: "m", sira: 1 },
+    { re: /Passaparola/, ad: "Passaparola", renk: "#256556", simge: "p", sira: 2 },
+    { re: /Rotasyon/, ad: "Rotasyon", renk: "#724222", simge: "c", sira: 5, genis: true },
+    { re: /Kelime/, ad: "Kelime Oyunu", renk: "#28416c", simge: "k", sira: 3 },
+    { re: /İşlem/, ad: "İşlem Oyunu", renk: "#422e6b", simge: "o", sira: 4 }
   ];
 
   const SIMGELER =
@@ -26,8 +26,8 @@
   const st = document.createElement("style");
   st.textContent =
     // Boyutlar tarayıcı çubuklarına göre zıplamasın diye "svh" (küçük ekran yüksekliği) ile hesaplanır; sabit eşik (media query) yok.
-    "#ana{--ch:92px;--ch:clamp(56px,calc((100svh - 420px) / 2.9),108px);display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:auto;margin-bottom:auto;position:relative;top:0}" +
-    "body:has(#ana:not(.hidden)){padding-top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top) + 14px)!important;padding-bottom:calc(var(--dock-yuk,116px) + 24px + env(safe-area-inset-bottom))!important}" +
+    "#ana{--ch:92px;--ch:clamp(56px,calc((100svh - 480px) / 2.9),108px);display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:auto;margin-bottom:auto;position:relative;top:0}" +
+    "body:has(#ana:not(.hidden)){padding-top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top) + 96px)!important;padding-bottom:calc(var(--dock-yuk,116px) + 24px + env(safe-area-inset-bottom))!important}" +
     "#ana.hidden{display:none!important}" +
     "#ana>.alt{grid-column:1/-1;margin-bottom:6px;order:0}" +
     "#ana>.pill{display:none}" +
@@ -39,7 +39,7 @@
     "#ana>.btn.kartB b{font-size:clamp(14px,4.2vw,16px);font-weight:700;display:block;white-space:nowrap}" +
     "#ana>.btn.kartB:active{opacity:.85;transform:none}" +
     // ALT BÖLÜM: kartın ALTINDA, ekranın en dibine yakın durur (eskiden 62px yukarıdaydı, kartın üstüne biniyordu).
-    // Üst sıra Fatih / Altın / Premium / Puan (4 eşit kutu), alt sıra yan yana İsimle istek + Güncelle (her biri 2 kutu genişliğinde).
+    // Üst sıra Fatih / Altın / Premium / Puan (4 eşit kutu), alt sıra yan yana Davet + Güncelle (her biri 2 kutu genişliğinde).
     // Sayfa alt boşluğu (padding-bottom) bu bölümün gerçek yüksekliğine göre ayarlanır (--dock-yuk), böylece kart asla altına girmez.
     "html body .ek-dock{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;grid-auto-rows:auto!important;gap:8px!important;align-items:stretch!important;bottom:calc(10px + env(safe-area-inset-bottom))!important}" +
     "html body .ek-dock:not(.show){display:none!important}" +
