@@ -9,4 +9,4 @@ window.FIREBASE_CONFIG = {
 window.GOOGLE_WEB_CLIENT_ID = "275840158100-8eunae91iudrqfj3vtc2tdpdre4cuij3.apps.googleusercontent.com";
 
 // Facebook ile web girişi için: developers.facebook.com > Uygulamam > Ayarlar > Temel > "Uygulama Kimliği" (App ID). Boş bırakılırsa eski popup yöntemi denenir.
-window.FACEBOOK_APP_ID = "";
+window.FACEBOOK_APP_ID = "1174079538471789";
