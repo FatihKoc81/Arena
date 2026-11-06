@@ -64,6 +64,34 @@ jobs:
           }
           console.log('AdMob app id:',process.env.ADMOB_APP_ID);"
 
+      - name: Google giriş SDK'sını etkinleştir
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const file = 'android/variables.gradle';
+          if (!fs.existsSync(file)) {
+            throw new Error('android/variables.gradle bulunamadı');
+          }
+          let content = fs.readFileSync(file, 'utf8');
+
+          function setGradleVariable(name, value) {
+            const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const expression = new RegExp('^\\s*' + escaped + '\\s*=.*$', 'm');
+            if (expression.test(content)) {
+              content = content.replace(expression, '    ' + name + ' = ' + value);
+            } else if (/ext\s*\{/.test(content)) {
+              content = content.replace(/ext\s*\{/, match => match + '\n    ' + name + ' = ' + value);
+            } else {
+              throw new Error('variables.gradle içinde ext bloğu bulunamadı');
+            }
+          }
+
+          setGradleVariable('rgcfaIncludeGoogle', 'true');
+          setGradleVariable('androidxCredentialsVersion', "'1.3.0'");
+          fs.writeFileSync(file, content);
+          console.log('Google giriş SDK ayarları etkinleştirildi.');
+          NODE
+
       - name: Firebase Android bildirim yapılandırması
         run: |
           if [ ! -f google-services.json ]; then echo "HATA: Depo kökünde google-services.json bulunamadı"; exit 1; fi
@@ -100,49 +128,6 @@ jobs:
           grep -q 'com.google.gms.google-services' android/app/build.gradle
           grep -i 'push-notifications' android/capacitor.settings.gradle || { echo 'HATA: Push Notifications eklentisi Android projesine eklenmedi'; exit 1; }
           test -f android/app/google-services.json
-
-      - name: Facebook girişi (native) yapılandırması
-        env:
-          FB_APP_ID: "1174079538471789"
-          FB_CLIENT_TOKEN: ${{ secrets.FACEBOOK_CLIENT_TOKEN }}
-        run: |
-          if [ -z "$FB_CLIENT_TOKEN" ]; then echo "HATA: FACEBOOK_CLIENT_TOKEN secret tanımlı değil (Facebook > Ayarlar > Gelişmiş > Client Token)"; exit 1; fi
-          grep -i "capacitor-firebase-authentication" android/capacitor.settings.gradle || { echo "HATA: Firebase Authentication eklentisi Android projesine eklenmedi"; exit 1; }
-          node <<'NODE'
-          const fs = require('fs');
-          const id = process.env.FB_APP_ID, tok = process.env.FB_CLIENT_TOKEN;
-
-          const vg = 'android/variables.gradle';
-          let v = fs.readFileSync(vg, 'utf8');
-          if (!v.includes('rgcfaIncludeFacebook')) v = v.replace(/ext\s*\{/, m => m + "\n    rgcfaIncludeFacebook = true");
-          fs.writeFileSync(vg, v);
-
-          const sf = 'android/app/src/main/res/values/strings.xml';
-          let s = fs.readFileSync(sf, 'utf8');
-          if (!s.includes('facebook_app_id')) {
-            s = s.replace('</resources>',
-              `    <string name="facebook_app_id">${id}</string>\n` +
-              `    <string name="fb_login_protocol_scheme">fb${id}</string>\n` +
-              `    <string name="facebook_client_token">${tok}</string>\n</resources>`);
-          }
-          fs.writeFileSync(sf, s);
-
-          const mf = 'android/app/src/main/AndroidManifest.xml';
-          let m = fs.readFileSync(mf, 'utf8');
-          if (!m.includes('com.facebook.sdk.ApplicationId')) {
-            m = m.replace('<application', '<queries>\n        <provider android:authorities="com.facebook.katana.provider.PlatformProvider" />\n    </queries>\n    <application');
-            m = m.replace('</application>',
-              '    <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>\n' +
-              '    <meta-data android:name="com.facebook.sdk.ClientToken" android:value="@string/facebook_client_token"/>\n' +
-              '    <activity android:name="com.facebook.FacebookActivity" android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation" android:label="@string/app_name" />\n' +
-              '    <activity android:name="com.facebook.CustomTabActivity" android:exported="true"><intent-filter><action android:name="android.intent.action.VIEW"/><category android:name="android.intent.category.DEFAULT"/><category android:name="android.intent.category.BROWSABLE"/><data android:scheme="@string/fb_login_protocol_scheme"/></intent-filter></activity>\n' +
-              '    </application>');
-          }
-          fs.writeFileSync(mf, m);
-          console.log('Facebook native yapılandırması tamam:', id);
-          NODE
-          grep -n rgcfaIncludeFacebook android/variables.gradle
-          grep -n facebook_app_id android/app/src/main/res/values/strings.xml
 
       - name: Ekranı dikeyde sabitle
         run: |
@@ -234,22 +219,6 @@ jobs:
           keytool -list -v -keystore ~/.android/release.keystore \
             -storetype PKCS12 -storepass "$KEYSTORE_PASS" \
             -alias "$ALIAS" | grep -E "SHA1:|SHA256:"
-
-      - name: Facebook Key Hash hesapla
-        env:
-          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
-        run: |
-          ALIAS=$(keytool -list -keystore ~/.android/release.keystore -storetype PKCS12 \
-            -storepass "$KEYSTORE_PASS" 2>/dev/null | grep -m1 PrivateKeyEntry | cut -d, -f1)
-          if [ -z "$ALIAS" ]; then
-            echo "HATA: İmza anahtarı bulunamadı"
-            exit 1
-          fi
-          echo "Facebook Android Key Hash:"
-          keytool -exportcert -alias "$ALIAS" \
-            -keystore ~/.android/release.keystore \
-            -storetype PKCS12 -storepass "$KEYSTORE_PASS" 2>/dev/null \
-            | openssl sha1 -binary | openssl base64
 
       - name: APK derle
         working-directory: android
