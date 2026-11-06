@@ -172,15 +172,40 @@
     });
   }
 
+  function fbId() { return !window.Capacitor && window.FACEBOOK_APP_ID ? String(window.FACEBOOK_APP_ID) : ""; }
+  function fbHazir() { return !!(window.FB && window.__fbBasladi); }
+  function fbYukle() {
+    if (!fbId() || fbHazir() || document.getElementById("hs-fbsdk")) return;
+    window.fbAsyncInit = function () {
+      try { FB.init({ appId: fbId(), cookie: false, xfbml: false, version: "v19.0" }); window.__fbBasladi = true; } catch (x) {}
+    };
+    var sc = document.createElement("script"); sc.id = "hs-fbsdk"; sc.src = "https://connect.facebook.net/tr_TR/sdk.js"; sc.async = true;
+    document.head.appendChild(sc);
+  }
+  fbYukle();
+  function facebookTokenAl() {
+    return new Promise(function (res, rej) {
+      FB.login(function (r) {
+        r && r.authResponse && r.authResponse.accessToken ? res(r.authResponse.accessToken) : rej({ code: "auth/popup-closed-by-user" });
+      }, { scope: "public_profile,email" });
+    });
+  }
+
   function sosyalGiris(tur) {
     var provider = tur === "google" ? new firebase.auth.GoogleAuthProvider() : new firebase.auth.FacebookAuthProvider();
     provider.setCustomParameters && tur === "facebook" && provider.setCustomParameters({ display: "popup" });
     var misafir = A.currentUser && A.currentUser.isAnonymous ? A.currentUser : null;
     var gid = tur === "google" && gsiHazir() ? webGoogleId() : "";
     var kc = null;
+    var fid = tur === "facebook" && fbHazir() ? fbId() : "";
     var islem = gid
       ? googleTokenAl(gid).then(function (tok) {
           kc = firebase.auth.GoogleAuthProvider.credential(null, tok);
+          return misafir ? misafir.linkWithCredential(kc) : A.signInWithCredential(kc);
+        })
+      : fid
+      ? facebookTokenAl().then(function (tok) {
+          kc = firebase.auth.FacebookAuthProvider.credential(tok);
           return misafir ? misafir.linkWithCredential(kc) : A.signInWithCredential(kc);
         })
       : (misafir ? misafir.linkWithPopup(provider) : A.signInWithPopup(provider));
