@@ -28,7 +28,7 @@
   const st = document.createElement("style");
   st.textContent =
     // Boyutlar tarayıcı çubuklarına göre zıplamasın diye "svh" (küçük ekran yüksekliği) ile hesaplanır; sabit eşik (media query) yok.
-    "#ana{--ch:92px;--ch:clamp(56px,calc((100svh - 480px) / 2.9),108px);display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0 18px!important;position:relative;top:0;width:100%;max-width:460px;background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:0 4px!important}" +
+    "#ana{--ch:92px;--ch:clamp(56px,calc((100svh - 480px) / 2.9),108px);display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:56px 0 12px!important;position:relative;top:0;width:100%;max-width:460px;background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:0 4px!important}" +
     "body:has(#ana:not(.hidden)){padding-top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top) + 96px)!important;padding-bottom:calc(var(--dock-yuk,116px) + 24px + env(safe-area-inset-bottom))!important}" +
     "#ana.hidden{display:none!important}" +
     "#ana>.alt{display:none!important}" +
