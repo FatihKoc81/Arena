@@ -150,11 +150,39 @@
     }).then(function () { location.reload(); });
   }
 
+  // Google (web): Firebase popup/redirect Samsung Internet / yeni Chrome'da "missing initial state" hatası veriyor
+  // (üçüncü taraf depolama engeli). Çözüm: Google Identity Services ile doğrudan erişim anahtarı al, Firebase'e kimlik bilgisi olarak ver.
+  // Kullanım: firebase-config.js içine  window.GOOGLE_WEB_CLIENT_ID = "....apps.googleusercontent.com";  yazılır. Boşsa eski popup yöntemi çalışır.
+  function webGoogleId() { return !window.Capacitor && window.GOOGLE_WEB_CLIENT_ID ? String(window.GOOGLE_WEB_CLIENT_ID) : ""; }
+  function gsiHazir() { return !!(window.google && google.accounts && google.accounts.oauth2); }
+  function gsiYukle() {
+    if (!webGoogleId() || gsiHazir() || document.getElementById("hs-gsi")) return;
+    var sc = document.createElement("script"); sc.id = "hs-gsi"; sc.src = "https://accounts.google.com/gsi/client"; sc.async = true;
+    document.head.appendChild(sc);
+  }
+  gsiYukle();
+  function googleTokenAl(id) {
+    return new Promise(function (res, rej) {
+      var tc = google.accounts.oauth2.initTokenClient({
+        client_id: id, scope: "openid email profile",
+        callback: function (r) { r && r.access_token ? res(r.access_token) : rej({ code: "auth/popup-closed-by-user" }); },
+        error_callback: function (e) { rej({ code: e && e.type === "popup_failed_to_open" ? "auth/popup-blocked" : "auth/popup-closed-by-user" }); }
+      });
+      tc.requestAccessToken();
+    });
+  }
+
   function sosyalGiris(tur) {
     var provider = tur === "google" ? new firebase.auth.GoogleAuthProvider() : new firebase.auth.FacebookAuthProvider();
     provider.setCustomParameters && tur === "facebook" && provider.setCustomParameters({ display: "popup" });
     var misafir = A.currentUser && A.currentUser.isAnonymous ? A.currentUser : null;
-    var islem = misafir ? misafir.linkWithPopup(provider) : A.signInWithPopup(provider);
+    var gid = tur === "google" && gsiHazir() ? webGoogleId() : "";
+    var islem = gid
+      ? googleTokenAl(gid).then(function (tok) {
+          var kc = firebase.auth.GoogleAuthProvider.credential(null, tok);
+          return misafir ? misafir.linkWithCredential(kc) : A.signInWithCredential(kc);
+        })
+      : (misafir ? misafir.linkWithPopup(provider) : A.signInWithPopup(provider));
     return islem.then(function (sonuc) {
       if (sonuc && sonuc.user) return birlestir(sonuc.user.uid);
     }).catch(function (e) {

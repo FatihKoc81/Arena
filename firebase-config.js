@@ -5,3 +5,5 @@ window.FIREBASE_CONFIG = {
   projectId: "estergon-8e8a4",
   appId: "1:275840158100:web:f92f051147dff75ee62781"
 };
+// Google ile web girişi için (Firebase > Authentication > Google > Web SDK yapılandırması > "Web client ID"). Boş bırakılırsa eski yöntem denenir.
+window.GOOGLE_WEB_CLIENT_ID = "275840158100-8eunae91iudrqfj3vtc2tdpdre4cuij3.apps.googleusercontent.com";
