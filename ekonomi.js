@@ -1,7 +1,7 @@
 // ekonomi.js: altın, premium, kullanıcı adı, reklam, mağaza ve diyalog penceresi. Tüm oyunlar bunu ortak kullanır.
 // index.html'de oyun script'lerinden ÖNCE yüklenmelidir: <script src="ekonomi.js"></script>
 (function () {
-  var TEST = true;          // true: gerçek reklam/ödeme bağlı değilse TEST reklamı çıkar, satın almalar ücretsiz simüle edilir. YAYINDA false YAP!
+  var TEST = false;         // Güvenli mod: gerçek reklam/ödeme doğrulanmadan altın veya Premium verilmez.
   var ODUL_ALTIN = 30;      // mağazada reklam izleyince kazanılan altın
   var URUNLER = [           // fiyatlar örnektir
     { id: "altin100", t: "🪙 100 Altın", f: "₺29,99", n: 100 },
