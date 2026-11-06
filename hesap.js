@@ -42,6 +42,7 @@
     var t = {
       "auth/email-already-in-use": "Bu e-posta zaten kayıtlı. “Giriş yap” sekmesini kullan.",
       "auth/credential-already-in-use": "Bu e-posta başka bir hesapta kayıtlı. “Giriş yap” sekmesini kullan.",
+      "auth/account-exists-with-different-credential": "Bu e-posta başka bir yöntemle (Google ya da e-posta/şifre) kayıtlı. O yöntemle giriş yap; Facebook otomatik bağlanacak.",
       "auth/invalid-email": "E-posta adresi geçersiz.",
       "auth/weak-password": "Şifre en az 6 karakter olmalı.",
       "auth/wrong-password": "E-posta ya da şifre hatalı.",
@@ -147,7 +148,7 @@
     var temizle = eskiUid ? db.ref("apps/" + APP + "/users/" + eskiUid).remove().catch(noop) : Promise.resolve();
     return temizle.then(function () { return A.signInWithEmailAndPassword(email, pw); }).then(function (c) {
       return birlestir(c.user.uid);
-    }).then(function () { location.reload(); });
+    }).then(function () { return bekleyeniBagla(); }).then(function () { location.reload(); });
   }
 
   // Google (web): Firebase popup/redirect Samsung Internet / yeni Chrome'da "missing initial state" hatası veriyor
@@ -216,6 +217,28 @@
     });
   }
 
+  // Facebook e-postası başka yöntemle (Google / e-posta-şifre) kayıtlıysa Firebase hata verir.
+  // Facebook kimliği bekletilir; kullanıcı o yöntemle girince bağlama tamamlanır, sonra sayfa yenilenir.
+  var bekleyenKimlik = null;
+  function yontemAdi(id) { return id === "google.com" ? "Google" : id === "facebook.com" ? "Facebook" : id === "password" ? "e-posta/şifre" : id === "phone" ? "telefon" : id; }
+  function bekleyenKaydet(e, cred, tur) {
+    var c = cred || (tur === "google" ? firebase.auth.GoogleAuthProvider.credentialFromError(e) : firebase.auth.FacebookAuthProvider.credentialFromError(e));
+    if (c) bekleyenKimlik = c;
+    var em = (e && e.customData && e.customData.email) || (e && e.email) || "";
+    var hedef = tur === "google" ? "Google" : "Facebook";
+    var yontem = em && A.fetchSignInMethodsForEmail ? A.fetchSignInMethodsForEmail(em).catch(function () { return []; }) : Promise.resolve([]);
+    return yontem.then(function (l) {
+      var ad = (l || []).map(yontemAdi).join(" / ");
+      throw { ozel: "Bu e-posta" + (em ? " (" + em + ")" : "") + " daha önce " + (ad ? ad + " ile" : "başka bir yöntemle (Google ya da e-posta/şifre)") + " kayıtlı. Önce o yöntemle giriş yap; " + hedef + " otomatik bağlanacak." };
+    });
+  }
+  function bekleyeniBagla() {
+    var pc = bekleyenKimlik, u = A.currentUser;
+    if (!pc || !u || u.isAnonymous) return Promise.resolve();
+    bekleyenKimlik = null;
+    return u.linkWithCredential(pc).catch(noop); // zaten bağlıysa ya da başka hesaptaysa sessizce geç
+  }
+
   function sosyalGiris(tur) {
     if (tur === "google" && webGoogleId() && !gsiHazir()) { gsiYukle(); return Promise.reject({ ozel: "Google yükleniyor. Birkaç saniye sonra tekrar dene. (Reklam/izleme engelleyici açıksa Google'ı engelliyor olabilir.)" }); }
     if (tur === "facebook" && fbId() && !fbHazir()) { fbYukle(); return Promise.reject({ ozel: "Facebook yükleniyor. Birkaç saniye sonra tekrar dene. (Reklam/izleme engelleyici açıksa Facebook'u engelliyor olabilir.)" }); }
@@ -246,15 +269,19 @@
       if (sonuc && sonuc.user) return birlestir(sonuc.user.uid);
     }).catch(function (e) {
       var kod = e && e.code;
-      if (misafir && (kod === "auth/credential-already-in-use" || kod === "auth/account-exists-with-different-credential" || kod === "auth/email-already-in-use")) {
-        // bu e-posta daha önce kayıtlı: misafir hesabı bağlamak yerine o hesaba giriş yap
+      if (kod === "auth/account-exists-with-different-credential") return bekleyenKaydet(e, kc, tur);
+      if (misafir && (kod === "auth/credential-already-in-use" || kod === "auth/email-already-in-use")) {
+        // bu hesap daha önce kayıtlı: misafir hesabı bağlamak yerine o hesaba giriş yap
         var cred = kc || (tur === "google" ? firebase.auth.GoogleAuthProvider.credentialFromError(e) : firebase.auth.FacebookAuthProvider.credentialFromError(e));
         if (!cred) throw e;
         var eskiUid = misafir.uid;
-        return db.ref("apps/" + APP + "/users/" + eskiUid).remove().catch(noop).then(function () { return A.signInWithCredential(cred); }).then(function (c) { return birlestir(c.user.uid); });
+        return db.ref("apps/" + APP + "/users/" + eskiUid).remove().catch(noop).then(function () { return A.signInWithCredential(cred); }).then(function (c) { return birlestir(c.user.uid); }, function (e2) {
+          if (e2 && e2.code === "auth/account-exists-with-different-credential") return bekleyenKaydet(e2, cred, tur);
+          throw e2;
+        });
       }
       throw e;
-    }).then(function () { location.reload(); });
+    }).then(function () { return bekleyeniBagla(); }).then(function () { location.reload(); });
   }
 
   function telefonFormatla(v) {
