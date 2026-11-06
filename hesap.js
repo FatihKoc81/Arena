@@ -177,9 +177,10 @@
     provider.setCustomParameters && tur === "facebook" && provider.setCustomParameters({ display: "popup" });
     var misafir = A.currentUser && A.currentUser.isAnonymous ? A.currentUser : null;
     var gid = tur === "google" && gsiHazir() ? webGoogleId() : "";
+    var kc = null;
     var islem = gid
       ? googleTokenAl(gid).then(function (tok) {
-          var kc = firebase.auth.GoogleAuthProvider.credential(null, tok);
+          kc = firebase.auth.GoogleAuthProvider.credential(null, tok);
           return misafir ? misafir.linkWithCredential(kc) : A.signInWithCredential(kc);
         })
       : (misafir ? misafir.linkWithPopup(provider) : A.signInWithPopup(provider));
@@ -187,8 +188,9 @@
       if (sonuc && sonuc.user) return birlestir(sonuc.user.uid);
     }).catch(function (e) {
       var kod = e && e.code;
-      if (misafir && (kod === "auth/credential-already-in-use" || kod === "auth/account-exists-with-different-credential")) {
-        var cred = tur === "google" ? firebase.auth.GoogleAuthProvider.credentialFromError(e) : firebase.auth.FacebookAuthProvider.credentialFromError(e);
+      if (misafir && (kod === "auth/credential-already-in-use" || kod === "auth/account-exists-with-different-credential" || kod === "auth/email-already-in-use")) {
+        // bu e-posta daha önce kayıtlı: misafir hesabı bağlamak yerine o hesaba giriş yap
+        var cred = kc || (tur === "google" ? firebase.auth.GoogleAuthProvider.credentialFromError(e) : firebase.auth.FacebookAuthProvider.credentialFromError(e));
         if (!cred) throw e;
         var eskiUid = misafir.uid;
         return db.ref("apps/" + APP + "/users/" + eskiUid).remove().catch(noop).then(function () { return A.signInWithCredential(cred); }).then(function (c) { return birlestir(c.user.uid); });
