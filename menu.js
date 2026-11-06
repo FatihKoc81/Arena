@@ -7,13 +7,11 @@
 
   // eşleşme sırası önemli: "Rotasyon" "Kelime"den önce bakılır
   const OYUNLAR = [
-    { re: /Milyoner/, ad: "Milyoner", renk: "linear-gradient(145deg,#8f263d,#54152f)", simge: "m", sira: 1 },
-    { re: /Passaparola/, ad: "Passaparola", renk: "linear-gradient(145deg,#087f78,#07504f)", simge: "p", sira: 2 },
-    { re: /Rotasyon/, ad: "Rotasyon", renk: "linear-gradient(145deg,#c05a20,#713018)", simge: "c", sira: 5, genis: true },
-    { re: /Kelime/, ad: "Kelime Oyunu", renk: "linear-gradient(145deg,#245fc7,#173477)", simge: "k", sira: 3 },
-    { re: /İşlem/, ad: "İşlem Oyunu", renk: "linear-gradient(145deg,#7844c9,#432477)", simge: "o", sira: 4 },
-    { re: /Meydan Oku/, ad: "Meydan Oku", renk: "linear-gradient(145deg,#c23c4a,#762538)", simge: "m", sira: 6 },
-    { re: /Sıralama/, ad: "Sıralama", renk: "linear-gradient(145deg,#b68a25,#705316)", simge: "p", sira: 7 }
+    { re: /Milyoner/, ad: "Milyoner", renk: "#5a1818", simge: "m", sira: 1 },
+    { re: /Passaparola/, ad: "Passaparola", renk: "#0b6a52", simge: "p", sira: 2 },
+    { re: /Rotasyon/, ad: "Rotasyon", renk: "#8a3300", simge: "c", sira: 5, genis: true },
+    { re: /Kelime/, ad: "Kelime Oyunu", renk: "#0a3aa5", simge: "k", sira: 3 },
+    { re: /İşlem/, ad: "İşlem Oyunu", renk: "#52139a", simge: "o", sira: 4 }
   ];
 
   const SIMGELER =
@@ -28,16 +26,16 @@
   const st = document.createElement("style");
   st.textContent =
     // Boyutlar tarayıcı çubuklarına göre zıplamasın diye "svh" (küçük ekran yüksekliği) ile hesaplanır; sabit eşik (media query) yok.
-    "#ana{--ch:92px;--ch:clamp(56px,calc((100svh - 480px) / 2.9),108px);display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0 12px!important;position:relative;top:0;width:100%;max-width:460px;background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:0 4px!important}" +
-    "body:has(#ana:not(.hidden)){padding-top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top) + 96px)!important;padding-bottom:calc(var(--dock-yuk,116px) + 24px + env(safe-area-inset-bottom))!important}" +
+    "#ana{--ch:92px;--ch:clamp(56px,calc((100svh - 420px) / 2.9),108px);display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:auto;margin-bottom:auto;position:relative;top:0}" +
+    "body:has(#ana:not(.hidden)){padding-top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top) + 14px)!important;padding-bottom:calc(var(--dock-yuk,116px) + 24px + env(safe-area-inset-bottom))!important}" +
     "#ana.hidden{display:none!important}" +
-    "#ana>.alt{display:none!important}" +
+    "#ana>.alt{grid-column:1/-1;margin-bottom:6px;order:0}" +
     "#ana>.pill{display:none}" +
     "#ana>.ek-bar{display:none}" +
     // Tüm oyun kartları (Milyoner dahil) birebir aynı: aynı kenarlık, aynı yükseklik, gölge yok
-    "#ana>.btn.kartB{order:var(--sira);margin:0!important;width:auto;height:var(--ch);padding:8px 6px;border-radius:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:16px;line-height:1.25;border:1px solid rgba(255,255,255,.34)!important;outline:0!important;box-shadow:0 7px 18px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.16)!important;transform:none;animation:none;background:var(--kc)!important;color:#fff!important}" +
+    "#ana>.btn.kartB{order:var(--sira);margin:0!important;width:auto;height:var(--ch);padding:8px 6px;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:16px;line-height:1.25;border:2px solid rgba(255,255,255,.2)!important;outline:0!important;box-shadow:none!important;transform:none;animation:none;background:var(--kc)!important;color:#fff!important}" +
     "#ana>.btn.kartB.genis{grid-column:1/-1;height:calc(var(--ch) * .9)}" +
-    "#ana>.btn.kartB .ic{width:clamp(30px,calc(var(--ch) * .48),52px);height:clamp(30px,calc(var(--ch) * .48),52px);display:block;margin-bottom:4px;flex:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.2))}" +
+    "#ana>.btn.kartB .ic{width:clamp(30px,calc(var(--ch) * .52),56px);height:clamp(30px,calc(var(--ch) * .52),56px);display:block;margin-bottom:4px;flex:none}" +
     "#ana>.btn.kartB b{font-size:clamp(14px,4.2vw,16px);font-weight:700;display:block;white-space:nowrap}" +
     "#ana>.btn.kartB:active{opacity:.85;transform:none}" +
     // ALT BÖLÜM: kartın ALTINDA, ekranın en dibine yakın durur (eskiden 62px yukarıdaydı, kartın üstüne biniyordu).
@@ -69,37 +67,6 @@
 
   function hepsi() { ana.querySelectorAll("button").forEach(kartla); }
   hepsi();
-
-  // Üst açıklama kaldırıldı; küçük ekranda oyun alanına yer açılır.
-  const yeniTasarim = document.createElement("style");
-  yeniTasarim.textContent =
-    "#ana{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:4px auto 6px!important;padding:9px 10px!important;width:100%;max-width:460px;background:linear-gradient(160deg,rgba(5,14,40,.98),rgba(3,7,25,.98))!important;border:2px solid #526fbd!important;border-radius:36px!important;box-shadow:0 0 22px rgba(55,112,255,.24),inset 0 0 24px rgba(28,68,150,.12)!important}" +
-    "#ana .arena-menu-aciklama{display:none!important}" +
-    "#ana>.btn.kartB{border-width:2px!important;border-radius:24px!important;box-shadow:0 5px 14px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.2)!important}" +
-    "#ana>.btn.kartB.genis{height:calc(var(--ch) * .9)}" +
-    "#ana>.btn.kartB[style*=--kc]{background:var(--kc)!important}" +
-    "html body .ek-dock>*:not(.ar-adb):not(.apk-btn){background:linear-gradient(145deg,#10254b,#09142e)!important;border:2px solid #315fae!important;border-radius:20px!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.12)!important}" +
-    "html body .ek-dock>.ek-dk.g{border-color:#ffbd27!important}" +
-    "html body .ek-dock>.ek-dk.p{border-color:#315fae!important}" +
-    "html body .ek-dock>.ek-dk.s{border-color:#315fae!important}" +
-    "html body .ek-dock>.ar-adb,html body .ek-dock>.apk-btn{background:rgba(5,13,34,.96)!important;border:2px solid #e5ad35!important;border-radius:22px!important;color:#ffd36a!important}" +
-    "body:has(#ana:not(.hidden)){position:fixed!important;inset:0!important;width:100%!important;height:100dvh!important;min-height:0!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;align-items:center!important;box-sizing:border-box!important;padding:env(safe-area-inset-top) 10px 0!important;overscroll-behavior:none!important}" +
-    "body:has(#ana:not(.hidden))>h1{flex:0 0 48px!important;width:100%!important;min-height:48px!important;height:48px!important;margin:0!important;padding:0!important;display:grid!important;align-items:center!important;font-size:clamp(24px,7vw,32px)!important;line-height:1!important}" +
-    "body:has(#ana:not(.hidden))>:not(h1):not(#ana):not(#arenaAltFooter):not(script):not(style):not(link){display:none!important}" +
-    "body:has(#ana:not(.hidden)) #ana{--ch:min(78px,calc((100dvh - 245px)/4))!important;flex:1 1 auto!important;min-height:0!important;max-height:none!important;align-content:center!important;grid-template-rows:repeat(2,var(--ch)) calc(var(--ch)*.9) var(--ch)!important;gap:7px!important;margin:4px auto 6px!important;padding:9px 10px!important;width:100%!important;max-width:460px!important;box-sizing:border-box!important;overflow:hidden!important}" +
-    "body:has(#ana:not(.hidden)) #ana>.btn.kartB{height:var(--ch)!important;min-height:0!important;padding:5px 4px!important;gap:2px!important;border-radius:20px!important}" +
-    "body:has(#ana:not(.hidden)) #ana>.btn.kartB.genis{height:calc(var(--ch)*.9)!important}" +
-    "body:has(#ana:not(.hidden)) #ana>.btn.kartB .ic{width:clamp(26px,calc(var(--ch)*.43),42px)!important;height:clamp(26px,calc(var(--ch)*.43),42px)!important;margin-bottom:1px!important}" +
-    "body:has(#ana:not(.hidden)) #ana>.btn.kartB b{font-size:clamp(13px,3.9vw,16px)!important}" +
-    "html body #arenaAltFooter{position:fixed!important;left:0!important;right:0!important;bottom:calc(5px + env(safe-area-inset-bottom))!important;z-index:999!important;width:100%!important;max-width:620px!important;margin:0 auto!important;padding:0 12px!important;box-sizing:border-box!important;display:flex!important;flex-direction:column!important;gap:6px!important;transform:none!important;pointer-events:none!important}" +
-    "html body #arenaAltFooter.gizli{display:none!important}" +
-    "html body #arenaAltFooter .ek-dock.show{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important}" +
-    "html body #arenaAltFooter .ek-dk{height:60px!important;min-height:60px!important;grid-column:span 1!important;border-radius:16px!important}" +
-    "html body #arenaAltFooter #altSatir{display:flex!important;gap:6px!important}" +
-    "html body #arenaAltFooter #altSatir>*{height:42px!important;border-radius:15px!important;font-size:clamp(12px,3.4vw,14px)!important}" +
-    "html.menu-kilit,html.menu-kilit body{overflow:hidden!important;overscroll-behavior:none!important;height:100%!important;touch-action:pan-x!important}" +
-    "html.menu-kilit body{position:fixed!important;inset:0!important;width:100%!important}";
-  document.head.appendChild(yeniTasarim);
 
   // sonradan eklenen düğmeler (Kelime Çemberi gibi) ve eski dosyaların geri koyduğu satır içi renkler
   new MutationObserver(function () {

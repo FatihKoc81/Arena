@@ -52,7 +52,6 @@
       "auth/operation-not-allowed": "Bu giriş yöntemi Firebase'de kapalı. Authentication > Sign-in method bölümünden ilgili sağlayıcıyı aç.",
       "auth/popup-blocked": "Tarayıcı açılır pencereyi engelledi. Bu site için açılır pencerelere izin ver.",
       "auth/popup-closed-by-user": "Giriş penceresi kapatıldı.",
-      "auth/cancelled-popup-request": "Başka bir giriş penceresi açıldığı için bu istek iptal edildi. Tekrar dene.",
       "auth/unauthorized-domain": "Bu site Firebase yetkili alan adlarında kayıtlı değil.",
       "auth/captcha-check-failed": "SMS doğrulaması başarısız. Sayfayı yenileyip tekrar dene.",
       "auth/invalid-phone-number": "Telefon numarası geçersiz. +905xxxxxxxxx biçiminde yaz.",
@@ -219,7 +218,7 @@
     ".hs-tabs{display:flex;gap:0;margin:0 0 18px;border:2px solid #647fca;border-radius:18px;overflow:hidden;background:#0b1731}" +
     ".hs-tab{flex:1;border:0;background:transparent;color:#b9c8ec;padding:13px 5px;font:800 17px system-ui,sans-serif;cursor:pointer}.hs-tab.on{background:linear-gradient(110deg,#075dff,#087bff);color:#fff;box-shadow:0 0 15px #087bff88}" +
     ".hs-kicker{display:flex;align-items:center;gap:10px;color:#b9d3ff;font-size:17px;font-weight:800;margin:10px 0 14px}.hs-kicker:before,.hs-kicker:after{content:'';height:2px;background:#6689d6;flex:1}" +
-    ".hs-social{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 18px}.hs-social button{min-width:0;min-height:58px;border-radius:16px;border:2px solid #6385d1;font:800 14px system-ui,sans-serif;cursor:pointer;padding:8px 6px;display:flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}.hs-social button svg{width:25px;height:25px;flex:0 0 25px}.hs-social button span{white-space:nowrap;letter-spacing:-.25px}.hs-google{background:#fff;color:#172033}.hs-facebook{background:linear-gradient(120deg,#0865ed,#0750d5);border-color:#1e9cff!important;color:#fff}" +
+    ".hs-social{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 18px}.hs-social button{min-width:0;min-height:58px;border-radius:16px;border:2px solid #6385d1;font:800 15px system-ui,sans-serif;cursor:pointer;padding:9px 7px}.hs-google{background:#fff;color:#172033}.hs-facebook{background:linear-gradient(120deg,#0865ed,#0750d5);border-color:#1e9cff!important;color:#fff}" +
     ".hs-in{display:block;width:100%;box-sizing:border-box;margin:10px 0;padding:15px 16px;border-radius:17px;border:2px solid #607fc7;background:#0a1833;color:#fff;font:17px system-ui,sans-serif;min-height:58px;outline:none}.hs-in:focus{border-color:#32c7ff;box-shadow:0 0 0 2px #168bff33}.hs-in::placeholder{color:#b5c2dc}" +
     ".hs-bt{display:block;width:100%;border:0;border-radius:17px;padding:16px;margin:14px 0 8px;font:900 19px system-ui,sans-serif;color:#fff;background:linear-gradient(110deg,#087cff,#073de8);box-shadow:0 0 14px #087bff66;cursor:pointer}.hs-bt.gri{background:#263958}.hs-bt.kirmizi{background:#a3231c}.hs-bt[disabled]{opacity:.4}" +
     ".hs-s{margin:8px 0;font-size:15px;word-break:break-all}.hs-k{font-size:14px;color:#aebfe0;line-height:1.5;margin:8px 0}.hs-msg{background:#3a1212;border:1px solid #a3231c;border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:14px;line-height:1.4}.hs-msg.ok{background:#0f2e25;border-color:#22b77a}" +
@@ -228,7 +227,7 @@
     ".hs-pf{text-align:center;margin:4px 0 10px}.hs-av{width:72px;height:72px;border-radius:50%;margin:0 auto 8px;background:linear-gradient(#f2b92e,#a86f0c);color:#101a38;font:900 34px/72px system-ui,sans-serif}.hs-pn{font-size:22px;font-weight:800}" +
     ".hs-top{background:#0b1230;border:2px solid #f2b92e;border-radius:14px;padding:11px;text-align:center;font-size:16px;margin:8px 0}.hs-top b{font-size:24px;color:#ffd35a;margin-left:6px}" +
     ".hs-r{display:flex;justify-content:space-between;padding:8px 4px;border-bottom:1px solid #1d2540;font-size:15px}.hs-r b{color:#ffd35a}" +
-    "@media(max-width:390px){.hs-body{padding:12px}.hs-social{gap:7px}.hs-social button{font-size:11.5px;padding:7px 4px;gap:4px}.hs-social button svg{width:22px;height:22px;flex-basis:22px}.hs-tab{font-size:15px}.hs-ph{font-size:21px}}";
+    "@media(max-width:390px){.hs-body{padding:12px}.hs-social button{font-size:13px}.hs-tab{font-size:15px}.hs-ph{font-size:21px}}";
   document.head.appendChild(css);
 
   var KURAL = "3-18 karakter · ilk harf büyük · ilk harften sonra en fazla 1 büyük harf daha · sadece a-z, 0-9 ve _ (Türkçe karakter yok) · herkesin adı farklı olur · 15 günde bir değişir.";
@@ -237,7 +236,7 @@
     var h = '<div class="hs-tabs"><button class="hs-tab' + (sekme === "kayit" ? " on" : "") + '" data-hs="sekme-kayit">Kayıt Ol</button><button class="hs-tab' + (sekme === "giris" ? " on" : "") + '" data-hs="sekme-giris">Giriş Yap</button></div>';
     if (sekme === "kayit") {
       h += '<div class="hs-kicker">Hızlı Kayıt (Önerilen)</div>' +
-        '<div class="hs-social"><button class="hs-google" data-hs="google"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M43.6 24.5c0-1.4-.1-2.8-.4-4.1H24v7.8h11a9.4 9.4 0 0 1-4.1 6.2v5.1h6.7c3.9-3.6 6-8.8 6-15z"/><path fill="#34A853" d="M24 44c5.5 0 10.1-1.8 13.5-4.9l-6.7-5.1c-1.8 1.2-4.1 2-6.8 2-5.2 0-9.6-3.5-11.2-8.2H5.9v5.3A20 20 0 0 0 24 44z"/><path fill="#FBBC05" d="M12.8 27.8a12 12 0 0 1 0-7.6v-5.3H5.9a20 20 0 0 0 0 18.2z"/><path fill="#EA4335" d="M24 12c3 0 5.7 1 7.8 3.1l5.8-5.8C34.1 6 29.5 4 24 4A20 20 0 0 0 5.9 14.9l6.9 5.3C14.4 15.5 18.8 12 24 12z"/></svg><span>Google ile devam et</span></button><button class="hs-facebook" data-hs="facebook"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" fill="#fff"/><path fill="#1877F2" d="M26.8 41V26.2h5l.8-5.8h-5.8v-3.7c0-1.7.5-2.9 2.9-2.9h3.1V8.6c-.5-.1-2.4-.2-4.5-.2-4.5 0-7.6 2.7-7.6 7.8v4.2h-5.1v5.8h5.1V41z"/></svg><span>Facebook ile devam et</span></button></div>' +
+        '<div class="hs-social"><button class="hs-google" data-hs="google">🌐 Google ile devam et</button><button class="hs-facebook" data-hs="facebook">f Facebook ile devam et</button></div>' +
         '<input class="hs-in" id="hs-e" type="text" autocomplete="email" placeholder="E-posta veya telefon">' +
         '<input class="hs-in" id="hs-p" type="password" autocomplete="new-password" placeholder="Şifre (en az 6 karakter)">' +
         '<input class="hs-in" id="hs-a" maxlength="18" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Kullanıcı adı">' +
@@ -245,7 +244,7 @@
         '<div class="hs-safe">🛡️ Hesabın güvende, puanların ve ilerlemen korunur.</div>';
     } else {
       h += '<div class="hs-kicker">Hesabına Giriş Yap</div>' +
-        '<div class="hs-social"><button class="hs-google" data-hs="google"><svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M43.6 24.5c0-1.4-.1-2.8-.4-4.1H24v7.8h11a9.4 9.4 0 0 1-4.1 6.2v5.1h6.7c3.9-3.6 6-8.8 6-15z"/><path fill="#34A853" d="M24 44c5.5 0 10.1-1.8 13.5-4.9l-6.7-5.1c-1.8 1.2-4.1 2-6.8 2-5.2 0-9.6-3.5-11.2-8.2H5.9v5.3A20 20 0 0 0 24 44z"/><path fill="#FBBC05" d="M12.8 27.8a12 12 0 0 1 0-7.6v-5.3H5.9a20 20 0 0 0 0 18.2z"/><path fill="#EA4335" d="M24 12c3 0 5.7 1 7.8 3.1l5.8-5.8C34.1 6 29.5 4 24 4A20 20 0 0 0 5.9 14.9l6.9 5.3C14.4 15.5 18.8 12 24 12z"/></svg><span>Google ile giriş yap</span></button><button class="hs-facebook" data-hs="facebook"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" fill="#fff"/><path fill="#1877F2" d="M26.8 41V26.2h5l.8-5.8h-5.8v-3.7c0-1.7.5-2.9 2.9-2.9h3.1V8.6c-.5-.1-2.4-.2-4.5-.2-4.5 0-7.6 2.7-7.6 7.8v4.2h-5.1v5.8h5.1V41z"/></svg><span>Facebook ile giriş yap</span></button></div>' +
+        '<div class="hs-social"><button class="hs-google" data-hs="google">🌐 Google ile giriş yap</button><button class="hs-facebook" data-hs="facebook">f Facebook ile giriş yap</button></div>' +
         '<div class="hs-kicker">veya</div>' +
         '<input class="hs-in" id="hs-e" type="text" autocomplete="username" placeholder="E-posta, telefon veya kullanıcı adı">' +
         '<input class="hs-in" id="hs-p" type="password" autocomplete="current-password" placeholder="Şifre">' +
@@ -294,15 +293,6 @@
   }
   function val(id) { var x = document.getElementById(id); return x ? x.value : ""; }
 
-  function sosyalGirisBaslat(tur) {
-    if (busy) return;
-    busy = true;
-    mesaj("");
-    Promise.resolve().then(function () { return sosyalGiris(tur); })
-      .catch(function (e) { mesaj(hataYaz(e), false); })
-      .then(function () { busy = false; });
-  }
-
   function tikla(e) {
     var b = e.target.closest("[data-hs]"); if (!b) return;
     var a = b.getAttribute("data-hs"), u = A.currentUser;
@@ -310,7 +300,7 @@
     else if (a === "profil") { ayar = false; msg = ""; render(); }
     else if (a === "sekme-kayit") { sekme = "kayit"; msg = ""; render(); }
     else if (a === "sekme-giris") { sekme = "giris"; telefonOnay = null; msg = ""; render(); }
-    else if (a === "google" || a === "facebook") sosyalGirisBaslat(a);
+    else if (a === "google" || a === "facebook") isle(sosyalGiris(a));
     else if (a === "kayit") {
       var regId = val("hs-e").trim();
       if (/^\+?[0-9 ()-]{8,}$/.test(regId)) isle(telefonKodGonder(regId, "kayit"));
@@ -448,7 +438,7 @@
     izle(); setInterval(izle, 60000);
     oyunKancasi();
   }
-  sayacKur();
+  // sayaç satırları (çevrimiçi / bugün / bu hafta) menüden kaldırıldı; oyun sayımı arka planda sürer
 
   // ---------- hesap kaydını izle, adı oyuna yansıt ----------
   function esitle() {
