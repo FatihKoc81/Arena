@@ -554,7 +554,7 @@ document.addEventListener("anasayfa", gKapat);
     // Ana menüde alt bölüm artık belge akışındadır; ekranı kilitlemek kaydırmayı engeller.
     // İçerik sığmıyorsa doğal sayfa kaydırmasıyla tüm oyun kartları ve alt butonlar görünür.
     if (gor) {
-      document.documentElement.classList.remove("menu-kilit");
+      document.documentElement.classList.add("menu-kilit");
       sonAnahtar = "";
       return;
     }

@@ -70,18 +70,11 @@
   function hepsi() { ana.querySelectorAll("button").forEach(kartla); }
   hepsi();
 
-  // Yeni ARENA ana sayfa görünümü: referans görseldeki çerçeveli panel ve açıklama satırı.
-  if (!ana.querySelector(".arena-menu-aciklama")) {
-    const aciklama = document.createElement("div");
-    aciklama.className = "arena-menu-aciklama";
-    aciklama.textContent = "Bilgini test et ve stratejini konuştur, zirvedeki büyük ödüle adım adım yaklaş!";
-    const ilkKart = ana.querySelector("button.kartB");
-    if (ilkKart) ana.insertBefore(aciklama, ilkKart);
-  }
+  // Üst açıklama kaldırıldı; küçük ekranda oyun alanına yer açılır.
   const yeniTasarim = document.createElement("style");
   yeniTasarim.textContent =
-    "#ana{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px auto 18px!important;padding:20px 16px 18px!important;width:100%;max-width:460px;background:linear-gradient(160deg,rgba(5,14,40,.98),rgba(3,7,25,.98))!important;border:2px solid #526fbd!important;border-radius:36px!important;box-shadow:0 0 22px rgba(55,112,255,.24),inset 0 0 24px rgba(28,68,150,.12)!important}" +
-    "#ana .arena-menu-aciklama{grid-column:1/-1;display:block;margin:4px 2px 14px;padding:0 4px;text-align:center;color:#b8c9f2;font-size:clamp(15px,4.3vw,19px);line-height:1.55;font-weight:500}" +
+    "#ana{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:4px auto 6px!important;padding:9px 10px!important;width:100%;max-width:460px;background:linear-gradient(160deg,rgba(5,14,40,.98),rgba(3,7,25,.98))!important;border:2px solid #526fbd!important;border-radius:36px!important;box-shadow:0 0 22px rgba(55,112,255,.24),inset 0 0 24px rgba(28,68,150,.12)!important}" +
+    "#ana .arena-menu-aciklama{display:none!important}" +
     "#ana>.btn.kartB{border-width:2px!important;border-radius:24px!important;box-shadow:0 5px 14px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.2)!important}" +
     "#ana>.btn.kartB.genis{height:calc(var(--ch) * .9)}" +
     "#ana>.btn.kartB[style*=--kc]{background:var(--kc)!important}" +
@@ -90,10 +83,22 @@
     "html body .ek-dock>.ek-dk.p{border-color:#315fae!important}" +
     "html body .ek-dock>.ek-dk.s{border-color:#315fae!important}" +
     "html body .ek-dock>.ar-adb,html body .ek-dock>.apk-btn{background:rgba(5,13,34,.96)!important;border:2px solid #e5ad35!important;border-radius:22px!important;color:#ffd36a!important}" +
-    "body:has(#ana:not(.hidden)){padding-bottom:calc(16px + env(safe-area-inset-bottom))!important}" +
-    "html body #arenaAltFooter{position:static!important;inset:auto!important;transform:none!important}" +
-    "html body #arenaAltFooter .ek-dock.show{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important}" +
-    "html body #arenaAltFooter .ek-dk{height:76px!important;min-height:76px!important;grid-column:span 1!important}";
+    "body:has(#ana:not(.hidden)){position:fixed!important;inset:0!important;width:100%!important;height:100dvh!important;min-height:0!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;align-items:center!important;box-sizing:border-box!important;padding:env(safe-area-inset-top) 10px 0!important;overscroll-behavior:none!important}" +
+    "body:has(#ana:not(.hidden))>h1{flex:0 0 48px!important;width:100%!important;min-height:48px!important;height:48px!important;margin:0!important;padding:0!important;display:grid!important;align-items:center!important;font-size:clamp(24px,7vw,32px)!important;line-height:1!important}" +
+    "body:has(#ana:not(.hidden))>:not(h1):not(#ana):not(#arenaAltFooter):not(script):not(style):not(link){display:none!important}" +
+    "body:has(#ana:not(.hidden)) #ana{--ch:min(78px,calc((100dvh - 245px)/4))!important;flex:1 1 auto!important;min-height:0!important;max-height:none!important;align-content:center!important;grid-template-rows:repeat(2,var(--ch)) calc(var(--ch)*.9) var(--ch)!important;gap:7px!important;margin:4px auto 6px!important;padding:9px 10px!important;width:100%!important;max-width:460px!important;box-sizing:border-box!important;overflow:hidden!important}" +
+    "body:has(#ana:not(.hidden)) #ana>.btn.kartB{height:var(--ch)!important;min-height:0!important;padding:5px 4px!important;gap:2px!important;border-radius:20px!important}" +
+    "body:has(#ana:not(.hidden)) #ana>.btn.kartB.genis{height:calc(var(--ch)*.9)!important}" +
+    "body:has(#ana:not(.hidden)) #ana>.btn.kartB .ic{width:clamp(26px,calc(var(--ch)*.43),42px)!important;height:clamp(26px,calc(var(--ch)*.43),42px)!important;margin-bottom:1px!important}" +
+    "body:has(#ana:not(.hidden)) #ana>.btn.kartB b{font-size:clamp(13px,3.9vw,16px)!important}" +
+    "html body #arenaAltFooter{position:fixed!important;left:0!important;right:0!important;bottom:calc(5px + env(safe-area-inset-bottom))!important;z-index:999!important;width:100%!important;max-width:620px!important;margin:0 auto!important;padding:0 12px!important;box-sizing:border-box!important;display:flex!important;flex-direction:column!important;gap:6px!important;transform:none!important;pointer-events:none!important}" +
+    "html body #arenaAltFooter.gizli{display:none!important}" +
+    "html body #arenaAltFooter .ek-dock.show{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important}" +
+    "html body #arenaAltFooter .ek-dk{height:60px!important;min-height:60px!important;grid-column:span 1!important;border-radius:16px!important}" +
+    "html body #arenaAltFooter #altSatir{display:flex!important;gap:6px!important}" +
+    "html body #arenaAltFooter #altSatir>*{height:42px!important;border-radius:15px!important;font-size:clamp(12px,3.4vw,14px)!important}" +
+    "html.menu-kilit,html.menu-kilit body{overflow:hidden!important;overscroll-behavior:none!important;height:100%!important;touch-action:pan-x!important}" +
+    "html.menu-kilit body{position:fixed!important;inset:0!important;width:100%!important}";
   document.head.appendChild(yeniTasarim);
 
   // sonradan eklenen düğmeler (Kelime Çemberi gibi) ve eski dosyaların geri koyduğu satır içi renkler
