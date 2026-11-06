@@ -28,7 +28,7 @@
   const st = document.createElement("style");
   st.textContent =
     // Boyutlar tarayıcı çubuklarına göre zıplamasın diye "svh" (küçük ekran yüksekliği) ile hesaplanır; sabit eşik (media query) yok.
-    "#ana{--ch:92px;--ch:clamp(58px,calc((100svh - 540px) / 3.2),94px);display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0 12px!important;position:relative;top:0;width:100%;max-width:460px;background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:0 4px!important}" +
+    "#ana{--ch:92px;--ch:clamp(56px,calc((100svh - 480px) / 2.9),108px);display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0 12px!important;position:relative;top:0;width:100%;max-width:460px;background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:0 4px!important}" +
     "body:has(#ana:not(.hidden)){padding-top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top) + 96px)!important;padding-bottom:calc(var(--dock-yuk,116px) + 24px + env(safe-area-inset-bottom))!important}" +
     "#ana.hidden{display:none!important}" +
     "#ana>.alt{display:none!important}" +
@@ -89,13 +89,11 @@
     "html body .ek-dock>.ek-dk.g{border-color:#ffbd27!important}" +
     "html body .ek-dock>.ek-dk.p{border-color:#315fae!important}" +
     "html body .ek-dock>.ek-dk.s{border-color:#315fae!important}" +
-    "html body .ek-dock>.ar-adb,html body .ek-dock>.apk-btn{background:rgba(5,13,34,.96)!important;border:2px solid #e5ad35!important;border-radius:22px!important;color:#ffd36a!important}";
-  yeniTasarim.textContent +=
-    // Ana sayfada alt sabit dock oyun kartlarının üstüne binmesin: ekran gerektiğinde doğal kaydırılsın.
-    "html.menu-kilit:has(body #ana:not(.hidden)){height:auto!important;overflow-y:auto!important}" +
-    "html.menu-kilit body:has(#ana:not(.hidden)){position:relative!important;top:auto!important;height:auto!important;min-height:100%!important;overflow-y:visible!important}" +
-    "body:has(#ana:not(.hidden)){padding-bottom:calc(var(--dock-yuk,116px) + 42px + env(safe-area-inset-bottom))!important;overflow-y:auto!important}" +
-    "#ana{box-sizing:border-box!important;height:auto!important;min-height:0!important;align-content:start!important}";
+    "html body .ek-dock>.ar-adb,html body .ek-dock>.apk-btn{background:rgba(5,13,34,.96)!important;border:2px solid #e5ad35!important;border-radius:22px!important;color:#ffd36a!important}" +
+    "body:has(#ana:not(.hidden)){padding-bottom:calc(16px + env(safe-area-inset-bottom))!important}" +
+    "html body #arenaAltFooter{position:static!important;inset:auto!important;transform:none!important}" +
+    "html body #arenaAltFooter .ek-dock.show{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important}" +
+    "html body #arenaAltFooter .ek-dk{height:76px!important;min-height:76px!important;grid-column:span 1!important}";
   document.head.appendChild(yeniTasarim);
 
   // sonradan eklenen düğmeler (Kelime Çemberi gibi) ve eski dosyaların geri koyduğu satır içi renkler

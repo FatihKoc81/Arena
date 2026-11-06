@@ -476,14 +476,14 @@ $("gDevam").onclick = () => { gKapat(); guvenliBaslat(); };
 $("gMenu").onclick = () => { gKapat(); menu(); };
 document.addEventListener("anasayfa", gKapat);
 </script>
-<script src="ortak.js?v=20261105c"></script>
+<script src="ortak.js?v=20261106d"></script>
 <script src="passaparola.js?v=20261104a"></script>
 <script src="kelime.js?v=20261104a"></script>
 <script src="kelimelerim.js?v=20261104a"></script>
 <script src="islem.js?v=20261104a"></script>
 <script src="ads.js?v=20261104a"></script>
 <script src="rotasyon.js?v=20261104a"></script>
-<script src="menu.js?v=20261106c"></script>
+<script src="menu.js?v=20261106d"></script>
 <script>window.ARENA_APP="arena";</script><!-- sıralama/düello verileri bu adla ayrı tutulur -->
 <script src="firebase-config.js?v=20261104a"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -551,6 +551,13 @@ document.addEventListener("anasayfa", gKapat);
     var ana = document.getElementById("ana");
     var gor = !!(ana && !ana.classList.contains("hidden") && getComputedStyle(ana).display !== "none");
     if (a) a.classList.toggle("gizli", !gor);
+    // Ana menüde alt bölüm artık belge akışındadır; ekranı kilitlemek kaydırmayı engeller.
+    // İçerik sığmıyorsa doğal sayfa kaydırmasıyla tüm oyun kartları ve alt butonlar görünür.
+    if (gor) {
+      document.documentElement.classList.remove("menu-kilit");
+      sonAnahtar = "";
+      return;
+    }
     var gorunen = [];
     document.querySelectorAll(".kart").forEach(function (k) {
       if (k.classList.contains("hidden") || getComputedStyle(k).display === "none") return;

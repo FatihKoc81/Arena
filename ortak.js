@@ -54,11 +54,11 @@ window.altSatir = function () {
     const st = document.createElement("style");
     st.id = "altSatirCss";
     st.textContent =
-      "#arenaAltFooter{position:fixed;left:0;right:0;bottom:calc(8px + env(safe-area-inset-bottom,0px));z-index:60;display:flex;flex-direction:column;gap:8px;box-sizing:border-box;width:100%;max-width:620px;margin:0 auto;padding:0 12px;pointer-events:none}" +
+      "#arenaAltFooter{position:static!important;left:auto!important;right:auto!important;bottom:auto!important;z-index:60;display:flex;flex-direction:column;gap:8px;box-sizing:border-box;width:100%;max-width:620px;margin:10px auto 18px;padding:0 12px;pointer-events:none}" +
       "#arenaAltFooter.gizli{display:none!important}" +
-      "#arenaAltFooter .ek-dock{position:static!important;left:auto!important;right:auto!important;bottom:auto!important;z-index:auto!important;width:100%;box-sizing:border-box;margin:0;padding:0;gap:6px;pointer-events:auto}" +
-      "#arenaAltFooter .ek-dock.show{display:flex!important}" +
-      "#arenaAltFooter .ek-dk{min-width:0;min-height:76px;flex:1 1 0}" +
+      "#arenaAltFooter .ek-dock{position:static!important;left:auto!important;right:auto!important;bottom:auto!important;z-index:auto!important;display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;width:100%;box-sizing:border-box;margin:0;padding:0;gap:8px;pointer-events:auto}" +
+      "#arenaAltFooter .ek-dock.show{display:grid!important}" +
+      "#arenaAltFooter .ek-dk{min-width:0;min-height:76px;height:76px!important;flex:none;grid-column:span 1!important}" +
       "#altSatir{position:static!important;left:auto!important;right:auto!important;bottom:auto!important;z-index:auto!important;display:flex;align-items:stretch;justify-content:center;gap:8px;width:100%;box-sizing:border-box;margin:0;padding:0;pointer-events:none}" +
       "#altSatir>.apk-btn,#altSatir>.ar-adb{display:flex;flex:1 1 0;align-items:center;justify-content:center;min-width:0;max-width:none;height:48px;margin:0;padding:0 8px;box-sizing:border-box;border:2px solid #d4a63a;border-radius:16px;background:rgba(10,18,45,.97);color:#ffe08a;font:800 clamp(12px,3.6vw,15px)/1.1 system-ui,sans-serif;text-align:center;text-decoration:none;white-space:normal;overflow:hidden;cursor:pointer;pointer-events:auto}" +
       "#altSatir>.gizli{display:none!important}#altSatir>*:active{opacity:.72}" +
