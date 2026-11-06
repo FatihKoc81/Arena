@@ -101,6 +101,49 @@ jobs:
           grep -i 'push-notifications' android/capacitor.settings.gradle || { echo 'HATA: Push Notifications eklentisi Android projesine eklenmedi'; exit 1; }
           test -f android/app/google-services.json
 
+      - name: Facebook girişi (native) yapılandırması
+        env:
+          FB_APP_ID: "1174079538471789"
+          FB_CLIENT_TOKEN: ${{ secrets.FACEBOOK_CLIENT_TOKEN }}
+        run: |
+          if [ -z "$FB_CLIENT_TOKEN" ]; then echo "HATA: FACEBOOK_CLIENT_TOKEN secret tanımlı değil (Facebook > Ayarlar > Gelişmiş > Client Token)"; exit 1; fi
+          grep -i "capacitor-firebase-authentication" android/capacitor.settings.gradle || { echo "HATA: Firebase Authentication eklentisi Android projesine eklenmedi"; exit 1; }
+          node <<'NODE'
+          const fs = require('fs');
+          const id = process.env.FB_APP_ID, tok = process.env.FB_CLIENT_TOKEN;
+
+          const vg = 'android/variables.gradle';
+          let v = fs.readFileSync(vg, 'utf8');
+          if (!v.includes('rgcfaIncludeFacebook')) v = v.replace(/ext\s*\{/, m => m + "\n    rgcfaIncludeFacebook = true");
+          fs.writeFileSync(vg, v);
+
+          const sf = 'android/app/src/main/res/values/strings.xml';
+          let s = fs.readFileSync(sf, 'utf8');
+          if (!s.includes('facebook_app_id')) {
+            s = s.replace('</resources>',
+              `    <string name="facebook_app_id">${id}</string>\n` +
+              `    <string name="fb_login_protocol_scheme">fb${id}</string>\n` +
+              `    <string name="facebook_client_token">${tok}</string>\n</resources>`);
+          }
+          fs.writeFileSync(sf, s);
+
+          const mf = 'android/app/src/main/AndroidManifest.xml';
+          let m = fs.readFileSync(mf, 'utf8');
+          if (!m.includes('com.facebook.sdk.ApplicationId')) {
+            m = m.replace('<application', '<queries>\n        <provider android:authorities="com.facebook.katana.provider.PlatformProvider" />\n    </queries>\n    <application');
+            m = m.replace('</application>',
+              '    <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>\n' +
+              '    <meta-data android:name="com.facebook.sdk.ClientToken" android:value="@string/facebook_client_token"/>\n' +
+              '    <activity android:name="com.facebook.FacebookActivity" android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation" android:label="@string/app_name" />\n' +
+              '    <activity android:name="com.facebook.CustomTabActivity" android:exported="true"><intent-filter><action android:name="android.intent.action.VIEW"/><category android:name="android.intent.category.DEFAULT"/><category android:name="android.intent.category.BROWSABLE"/><data android:scheme="@string/fb_login_protocol_scheme"/></intent-filter></activity>\n' +
+              '    </application>');
+          }
+          fs.writeFileSync(mf, m);
+          console.log('Facebook native yapılandırması tamam:', id);
+          NODE
+          grep -n rgcfaIncludeFacebook android/variables.gradle
+          grep -n facebook_app_id android/app/src/main/res/values/strings.xml
+
       - name: Ekranı dikeyde sabitle
         run: |
           node -e "
