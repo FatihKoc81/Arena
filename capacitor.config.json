@@ -1,4 +1,3 @@
-
 {
   "appId": "com.fatihkoc.arena",
   "appName": "ARENA",
@@ -7,6 +6,7 @@
     "FirebaseAuthentication": {
       "skipNativeAuth": true,
       "providers": [
+        "facebook.com",
         "google.com"
       ]
     }
