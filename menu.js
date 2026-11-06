@@ -28,7 +28,7 @@
   const st = document.createElement("style");
   st.textContent =
     // Boyutlar tarayıcı çubuklarına göre zıplamasın diye "svh" (küçük ekran yüksekliği) ile hesaplanır; sabit eşik (media query) yok.
-    "#ana{--ch:92px;--ch:clamp(56px,calc((100svh - 480px) / 2.9),108px);display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:56px 0 12px!important;position:relative;top:0;width:100%;max-width:460px;background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:0 4px!important}" +
+    "#ana{--ch:92px;--ch:clamp(56px,calc((100svh - 480px) / 2.9),108px);display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0 12px!important;position:relative;top:0;width:100%;max-width:460px;background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:0 4px!important}" +
     "body:has(#ana:not(.hidden)){padding-top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top) + 96px)!important;padding-bottom:calc(var(--dock-yuk,116px) + 24px + env(safe-area-inset-bottom))!important}" +
     "#ana.hidden{display:none!important}" +
     "#ana>.alt{display:none!important}" +
@@ -69,6 +69,28 @@
 
   function hepsi() { ana.querySelectorAll("button").forEach(kartla); }
   hepsi();
+
+  // Yeni ARENA ana sayfa görünümü: referans görseldeki çerçeveli panel ve açıklama satırı.
+  if (!ana.querySelector(".arena-menu-aciklama")) {
+    const aciklama = document.createElement("div");
+    aciklama.className = "arena-menu-aciklama";
+    aciklama.textContent = "Bilgini test et ve stratejini konuştur, zirvedeki büyük ödüle adım adım yaklaş!";
+    const ilkKart = ana.querySelector("button.kartB");
+    if (ilkKart) ana.insertBefore(aciklama, ilkKart);
+  }
+  const yeniTasarim = document.createElement("style");
+  yeniTasarim.textContent =
+    "#ana{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px auto 18px!important;padding:20px 16px 18px!important;width:100%;max-width:460px;background:linear-gradient(160deg,rgba(5,14,40,.98),rgba(3,7,25,.98))!important;border:2px solid #526fbd!important;border-radius:36px!important;box-shadow:0 0 22px rgba(55,112,255,.24),inset 0 0 24px rgba(28,68,150,.12)!important}" +
+    "#ana .arena-menu-aciklama{grid-column:1/-1;display:block;margin:4px 2px 14px;padding:0 4px;text-align:center;color:#b8c9f2;font-size:clamp(15px,4.3vw,19px);line-height:1.55;font-weight:500}" +
+    "#ana>.btn.kartB{border-width:2px!important;border-radius:24px!important;box-shadow:0 5px 14px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.2)!important}" +
+    "#ana>.btn.kartB.genis{height:calc(var(--ch) * .9)}" +
+    "#ana>.btn.kartB[style*=--kc]{background:var(--kc)!important}" +
+    "html body .ek-dock>*:not(.ar-adb):not(.apk-btn){background:linear-gradient(145deg,#10254b,#09142e)!important;border:2px solid #315fae!important;border-radius:20px!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.12)!important}" +
+    "html body .ek-dock>.ek-dk.g{border-color:#ffbd27!important}" +
+    "html body .ek-dock>.ek-dk.p{border-color:#315fae!important}" +
+    "html body .ek-dock>.ek-dk.s{border-color:#315fae!important}" +
+    "html body .ek-dock>.ar-adb,html body .ek-dock>.apk-btn{background:rgba(5,13,34,.96)!important;border:2px solid #e5ad35!important;border-radius:22px!important;color:#ffd36a!important}";
+  document.head.appendChild(yeniTasarim);
 
   // sonradan eklenen düğmeler (Kelime Çemberi gibi) ve eski dosyaların geri koyduğu satır içi renkler
   new MutationObserver(function () {
