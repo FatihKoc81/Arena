@@ -153,7 +153,7 @@
   // Google (web): Firebase popup/redirect Samsung Internet / yeni Chrome'da "missing initial state" hatası veriyor
   // (üçüncü taraf depolama engeli). Çözüm: Google Identity Services ile doğrudan erişim anahtarı al, Firebase'e kimlik bilgisi olarak ver.
   // Kullanım: firebase-config.js içine  window.GOOGLE_WEB_CLIENT_ID = "....apps.googleusercontent.com";  yazılır. Boşsa eski popup yöntemi çalışır.
-  function webGoogleId() { return !window.Capacitor && window.GOOGLE_WEB_CLIENT_ID ? String(window.GOOGLE_WEB_CLIENT_ID) : ""; }
+  function webGoogleId() { return !window.Capacitor ? String(window.GOOGLE_WEB_CLIENT_ID || "275840158100-8eunae91iudrqfj3vtc2tdpdre4cuij3.apps.googleusercontent.com") : ""; }
   function gsiHazir() { return !!(window.google && google.accounts && google.accounts.oauth2); }
   function gsiYukle() {
     if (!webGoogleId() || gsiHazir() || document.getElementById("hs-gsi")) return;
@@ -172,7 +172,7 @@
     });
   }
 
-  function fbId() { return !window.Capacitor && window.FACEBOOK_APP_ID ? String(window.FACEBOOK_APP_ID) : ""; }
+  function fbId() { return !window.Capacitor ? String(window.FACEBOOK_APP_ID || "1174079538471789") : ""; }
   function fbHazir() { return !!(window.FB && window.__fbBasladi); }
   function fbYukle() {
     if (!fbId() || fbHazir() || document.getElementById("hs-fbsdk")) return;
