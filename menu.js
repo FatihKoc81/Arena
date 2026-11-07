@@ -65,6 +65,10 @@ body{padding-top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top))!important;
 #ana{padding:0 12px 18px!important;max-width:720px!important;overflow:visible!important}
 body>h1{background-image:url("arena-header.webp")!important;background-size:100% 100%!important;background-position:center!important;background-repeat:no-repeat!important;background-color:#020b21!important}
 body>h1 .arena-logo{display:none!important}
+body>h1 .ar-header-hotspot{position:absolute;top:10%;height:80%;padding:0;border:0;background:transparent;z-index:52;min-height:0!important;cursor:pointer}
+body>h1 .ar-header-hotspot.left{left:1%;width:12%}
+body>h1 .ar-header-hotspot.bell{right:11%;width:9%}
+body>h1 .ar-header-hotspot.gear{right:1%;width:9%}
 #arenaHubHome .ar-profile{grid-template-columns:100px minmax(0,1fr) 92px 158px!important;gap:7px!important;padding:0 7px!important;margin:0 0 14px!important;height:100px!important;min-height:100px!important;border-radius:18px!important}
 #arenaHubHome .ar-avatar{width:96px!important;height:96px!important;display:block!important;overflow:visible!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
 #arenaHubHome .ar-avatar img{width:100%!important;height:100%!important;object-fit:contain!important}
@@ -120,6 +124,11 @@ body>h1 .arena-logo{display:none!important}
 `;
 document.head.appendChild(fit);
 
+const unlock=document.createElement('style');
+unlock.textContent='html.menu-kilit,html.menu-kilit body{height:auto!important;min-height:100%!important;overflow-y:auto!important;overflow-x:hidden!important;position:relative!important;top:auto!important;left:auto!important;right:auto!important}';
+window.addEventListener('load',()=>document.head.appendChild(unlock),{once:true});
+
+
 
 /* Reference icon sprite: six category icons + six featured game icons */
 const artStyle=document.createElement('style');
@@ -132,7 +141,7 @@ document.head.appendChild(artStyle);
 
 
 
-if(title){title.innerHTML='';title.setAttribute('role','button');title.setAttribute('aria-label','ARENA ana sayfaya dön');}
+if(title){title.innerHTML='<button class="ar-header-hotspot left" data-header-hotspot="menu" aria-label="Menü"></button><button class="ar-header-hotspot bell" data-header-hotspot="notifications" aria-label="Bildirimler"></button><button class="ar-header-hotspot gear" data-header-hotspot="settings" aria-label="Ayarlar"></button>';title.setAttribute('role','group');title.setAttribute('aria-label','ARENA üst menü');}
 const home=document.createElement('div');home.id='arenaHubHome';
 const view=document.createElement('div');view.id='arenaHubCategory';view.hidden=true;
 home.innerHTML='<div class="ar-top"><button class="ar-top-btn" data-action="menu">☷</button><div class="ar-brand">ARENA<small>OYUN PLATFORMU</small></div><button class="ar-top-btn" data-action="settings">⚙</button></div>'+
@@ -160,7 +169,7 @@ function soon(n){if(window.Ekonomi&&Ekonomi.sor)Ekonomi.sor(n,'Bu bölüm sonrak
 home.addEventListener('click',e=>{const c=e.target.closest('[data-category]');if(c){category(c.dataset.category,true);return;}const a=e.target.closest('[data-action]');if(a){const k=a.dataset.action;if(k==='allgames'){navActive('games');document.querySelector('#arenaHubHome .ar-categories').scrollIntoView({behavior:'smooth',block:'start'});return;}if(k==='league')return league();if(k==='friends'||k==='settings'||k==='menu')return account();const names={reward:'Günlük Ödül',tasks:'Günlük Görevler',achievements:'Başarılar',season:'Sezon'};return soon(names[k]||'ARENA');}const f=e.target.closest('[data-feature]');if(f){if(f.dataset.feature==='kelime'&&found.kelime)found.kelime.click();else soon(f.textContent.replace(/\\s+/g,' ').trim());}});
 view.addEventListener('click',e=>{const b=e.target.closest('.ar-back');if(b){e.preventDefault();view.hidden=true;home.hidden=false;navActive('home');ana.scrollTop=0;try{history.replaceState({arenaHome:true},'',location.pathname+location.search);}catch(_){}return;}const l=e.target.closest('[data-launch]');if(l&&found[l.dataset.launch])found[l.dataset.launch].click();});
 if(!document.getElementById('arenaNeonNav')){const nav=document.createElement('nav');nav.id='arenaNeonNav';nav.innerHTML='<button class="active" data-nav="home"><i>⌂</i>Ana Sayfa</button><button data-nav="games"><i>🎮</i>Oyunlar</button><button data-nav="league"><i>🏆</i>Lig</button><button data-nav="challenge"><i>⚔️</i>Meydan Oku</button><button data-nav="friends"><i>👥</i>Arkadaşlar</button><button data-nav="profile"><i>♟</i>Profil</button>';document.body.appendChild(nav);nav.addEventListener('click',e=>{const b=e.target.closest('[data-nav]');if(!b)return;const k=b.dataset.nav;if(k==='home')return goHome();if(k==='games'){view.hidden=true;home.hidden=false;navActive('games');document.querySelector('#arenaHubHome .ar-categories').scrollIntoView({behavior:'smooth',block:'start'});return;}navActive(k);if(k==='league')league();else if(k==='challenge')challenge();else account();});}
-if(title)title.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();goHome();},true);
+if(title)title.addEventListener('click',e=>{const hs=e.target.closest('[data-header-hotspot]');if(hs){e.preventDefault();e.stopImmediatePropagation();const k=hs.dataset.headerHotspot;if(k==='settings')account();else if(k==='notifications')soon('Bildirimler');else soon('Menü');return;}e.preventDefault();e.stopImmediatePropagation();goHome();},true);
 home.querySelector('.ar-brand').addEventListener('click',goHome);
 findGames();new MutationObserver(findGames).observe(ana,{childList:true,subtree:true});
 window.addEventListener('load',()=>{findGames();profile();});window.addEventListener('focus',profile);window.addEventListener('arena:home',goHome);window.addEventListener('anasayfa',goHome);window.addEventListener('popstate',()=>{if(!view.hidden)goHome();});if(window.Puan&&Puan.degisti)Puan.degisti(profile);setTimeout(profile,300);setTimeout(profile,1200);
