@@ -105,7 +105,7 @@ body>h1 .ar-header-hotspot.gear{right:1%;width:9%}
 #arenaNeonNav button{min-height:100px!important;height:100px!important;padding:5px 1px!important;gap:5px!important;font-size:clamp(9px,2.7vw,12px)!important}
 #arenaNeonNav button i{font-size:32px!important}
 @media(max-width:390px){
-#arenaHubHome .ar-profile{grid-template-columns:52px minmax(0,1fr) 48px 84px!important;gap:4px!important;padding:1px 4px!important;height:54px!important;min-height:54px!important}
+#arenaHubHome .ar-profile{grid-template-columns:52px minmax(0,1fr) 48px 84px!important;gap:4px!important;padding:1px 4px!important;margin-bottom:8px!important;height:54px!important;min-height:54px!important}
 #arenaHubHome .ar-avatar{width:52px!important;height:52px!important}
 #arenaHubHome .ar-league{width:48px!important;height:52px!important}
 #arenaHubHome .ar-league img{width:48px!important;height:50px!important}
