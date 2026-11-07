@@ -105,21 +105,39 @@ body>h1 .ar-header-hotspot.gear{right:1%;width:9%}
 #arenaNeonNav button{min-height:100px!important;height:100px!important;padding:5px 1px!important;gap:5px!important;font-size:clamp(9px,2.7vw,12px)!important}
 #arenaNeonNav button i{font-size:32px!important}
 @media(max-width:390px){
-#arenaHubHome .ar-profile{grid-template-columns:82px minmax(0,1fr) 72px 132px!important;gap:5px!important}
-#arenaHubHome .ar-avatar{width:80px!important;height:80px!important}
-#arenaHubHome .ar-league{width:70px!important;height:86px!important}
-#arenaHubHome .ar-league img{width:70px!important;height:82px!important}
-#arenaHubHome .ar-wallet-row{height:38px!important;min-height:38px!important;padding:3px 6px!important}
-#arenaHubHome .ar-short{min-height:94px!important;height:94px!important;font-size:10px!important}
-#arenaHubHome .ar-cat{grid-template-columns:94px minmax(0,1fr)!important;height:130px!important;min-height:130px!important}
-#arenaHubHome .ar-cat-icon{width:92px!important;height:112px!important}
-#arenaHubHome .ar-cat-copy strong{font-size:16px!important}
-#arenaHubHome .ar-daily{grid-template-columns:58px minmax(0,1fr) 92px!important}
-#arenaHubHome .ar-daily-target{font-size:45px!important}
-#arenaHubHome .ar-daily-reward{font-size:14px!important}
-#arenaHubHome .ar-feature i{height:78px!important}
-#arenaNeonNav button{height:88px!important;min-height:88px!important;font-size:9px!important}
-#arenaNeonNav button i{font-size:28px!important}
+#arenaHubHome .ar-profile{grid-template-columns:52px minmax(0,1fr) 48px 84px!important;gap:4px!important;padding:1px 4px!important;height:54px!important;min-height:54px!important}
+#arenaHubHome .ar-avatar{width:52px!important;height:52px!important}
+#arenaHubHome .ar-league{width:48px!important;height:52px!important}
+#arenaHubHome .ar-league img{width:48px!important;height:50px!important}
+#arenaHubHome .ar-player-name{font-size:10px!important}
+#arenaHubHome .ar-level-line{gap:4px!important;margin-top:3px!important}
+#arenaHubHome .ar-level-pill{font-size:9px!important;padding:2px 5px!important}
+#arenaHubHome .ar-xp{font-size:8px!important}
+#arenaHubHome .ar-xpbar{height:4px!important;margin-top:3px!important}
+#arenaHubHome .ar-wallet{gap:3px!important}
+#arenaHubHome .ar-wallet-row{height:22px!important;min-height:22px!important;padding:1px 3px!important;font-size:8px!important;line-height:1!important;border-radius:8px!important;gap:2px!important}
+#arenaHubHome .ar-wallet-row b{font-size:11px!important}
+#arenaHubHome .ar-shortcuts{gap:4px!important;margin-bottom:12px!important}
+#arenaHubHome .ar-short{min-height:52px!important;height:52px!important;padding:3px 1px!important;gap:3px!important;font-size:8px!important}
+#arenaHubHome .ar-short i{font-size:20px!important}
+#arenaHubHome .ar-categories{gap:6px!important}
+#arenaHubHome .ar-cat{grid-template-columns:58px minmax(0,1fr)!important;height:72px!important;min-height:72px!important;padding:4px!important;gap:3px!important;border-radius:12px!important}
+#arenaHubHome .ar-cat-icon{width:56px!important;height:64px!important}
+#arenaHubHome .ar-cat-copy strong{font-size:11px!important;line-height:1.1!important}
+#arenaHubHome .ar-cat-copy small{font-size:9px!important;margin-top:3px!important}
+#arenaHubHome .ar-daily{grid-template-columns:42px minmax(0,1fr) 58px!important;min-height:48px!important;height:48px!important;margin-top:10px!important;padding:4px 5px!important;gap:3px!important}
+#arenaHubHome .ar-daily-target{font-size:30px!important}
+#arenaHubHome .ar-daily-copy strong{font-size:11px!important}
+#arenaHubHome .ar-daily-copy small{font-size:8px!important;margin-top:2px!important}
+#arenaHubHome .ar-progress{height:5px!important;margin-top:4px!important}
+#arenaHubHome .ar-daily-reward{padding:4px!important;font-size:10px!important;border-radius:8px!important}
+#arenaHubHome .ar-section-title:has(+.ar-featured){font-size:13px!important;margin:8px 2px 6px!important}
+#arenaHubHome .ar-featured{gap:4px!important;padding:0 0 3px!important}
+#arenaHubHome .ar-feature i{height:48px!important;margin-bottom:3px!important;border-radius:9px!important}
+#arenaHubHome .ar-feature{font-size:8px!important;line-height:1.05!important}
+#arenaNeonNav{bottom:calc(3px + env(safe-area-inset-bottom))!important;padding:3px 2px!important;gap:1px!important}
+#arenaNeonNav button{height:54px!important;min-height:54px!important;padding:2px 0!important;gap:2px!important;font-size:7px!important}
+#arenaNeonNav button i{font-size:20px!important}
 }
 `;
 document.head.appendChild(fit);
