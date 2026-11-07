@@ -9,7 +9,7 @@
     { id: 'milyoner', re: /Milyoner/i, name: 'Milyoner', cat: 'bilgi', icon: '🏆', desc: 'Genel kültür ve bilgi yarışması' },
     { id: 'passaparola', re: /Passaparola/i, name: 'Passaparola', cat: 'bilgi', icon: '🔤', desc: 'Harf harf cevapla, süreye karşı yarış' },
     { id: 'kelime', re: /Kelime Oyunu/i, name: 'Kelime Oyunu', cat: 'kelime', icon: '🧩', desc: 'İpuçlarından kelimeleri bul' },
-    { id: 'islem', re: /İşlem Oyunu/i, name: 'İşlem Oyunu', cat: 'zeka', icon: '➗', desc: 'Sayılarla hedefe ulaş' },
+    { id: 'islem', re: /İşlem Oyunu/i, name: 'İşlem Oyunu', cat: 'mantik', icon: '➗', desc: 'Sayılarla hedefe ulaş' },
     { id: 'rotasyon', re: /Rotasyon/i, name: 'Rotasyon', cat: 'kelime', icon: '🔄', desc: 'Harfleri birleştir, kelimeleri keşfet' }
   ];
   const kategoriler = [
@@ -100,8 +100,9 @@
     catView.innerHTML = `<button class="ah-back" type="button">← Kategorilere Dön</button><div class="ah-cat-head"><i>${cat.icon}</i><span><strong>${cat.name}</strong><small>${cat.desc}</small></span></div><div class="ah-game-list">${cards}${planned}</div>`;
   }
   home.addEventListener('click', e=>{
-    const c=e.target.closest('[data-category]'); if(c) showCategory(c.dataset.category);
-    const s=e.target.closest('[data-short]'); if(s) { const labels={reward:'Günlük ödül sistemi sonraki geliştirme aşamasında açılacak.',tasks:'Günlük görevler sonraki geliştirme aşamasında açılacak.',league:'Lig sistemi sonraki geliştirme aşamasında açılacak.',friends:'Arkadaş sistemi sonraki geliştirme aşamasında açılacak.'}; alert(labels[s.dataset.short]); }
+    const s=e.target.closest('[data-short]'); if(!s) return;
+    const labels={reward:'Günlük ödül sistemi sonraki geliştirme aşamasında açılacak.',tasks:'Günlük görevler sonraki geliştirme aşamasında açılacak.',league:'Lig sistemi sonraki geliştirme aşamasında açılacak.',friends:'Arkadaş sistemi sonraki geliştirme aşamasında açılacak.',achievements:'Başarılar bölümü sonraki geliştirme aşamasında açılacak.',season:'Sezon bölümü sonraki geliştirme aşamasında açılacak.'};
+    alert(labels[s.dataset.short] || 'Bu bölüm sonraki geliştirme aşamasında açılacak.');
   });
   function anaSayfayaDon() {
     catView.hidden = true;
@@ -154,4 +155,67 @@
   observer.observe(ana,{childList:true,subtree:true});
   window.addEventListener('load',findButtons);
   window.addEventListener('arena:home',()=>{catView.hidden=true;home.hidden=false;});
+})();
+
+/* ARENA NEON HOME PATCH
+   Existing game logic is retained; visual layer and home navigation enhancement. */
+(function () {
+  'use strict';
+  const ana = document.getElementById('ana');
+  const home = document.getElementById('arenaHubHome');
+  const category = document.getElementById('arenaHubCategory');
+  if (!ana || !home || document.getElementById('arenaNeonFinish')) return;
+
+  const css = document.createElement('style');
+  css.id = 'arenaNeonFinish';
+  css.textContent = `
+    body { background:#020611!important; color:#f7f9ff!important; }
+    body>h1 { cursor:pointer!important; background:radial-gradient(ellipse at 50% 100%,#12396d 0%,#06142d 55%,#020611 100%)!important; border-bottom:1px solid #183d70!important; box-shadow:0 5px 24px #087bff30!important; color:#fff!important; }
+    #ana { width:100%!important; max-width:700px!important; max-height:calc(100dvh - var(--bas-yuk,58px) - env(safe-area-inset-top) - 8px)!important; height:auto!important; overflow-y:auto!important; overscroll-behavior:contain!important; margin:0 auto!important; padding:10px 12px 112px!important; border:0!important; border-radius:0!important; background:linear-gradient(180deg,#061329 0%,#030917 100%)!important; box-shadow:none!important; }
+    #arenaHubHome { padding:0 0 14px!important; }
+    .ah-top { gap:8px!important; margin:0 0 12px!important; }
+    .ah-round { width:42px!important;height:42px!important;border-radius:13px!important;background:linear-gradient(145deg,#173d70,#081a38)!important;border:1px solid #3c70ac!important;box-shadow:0 0 12px #138cff35!important; }
+    .ah-brand { font-size:clamp(27px,7vw,36px)!important;letter-spacing:1px!important;text-shadow:0 0 12px #3e9dff,0 0 24px #1356b5!important; }
+    .ah-brand:before,.ah-brand:after { content:'👑 ';font-size:.78em; }
+    .ah-brand small {font-size:9px!important;letter-spacing:2px!important;color:#9dcaff!important;}
+    .ah-profile { grid-template-columns:58px minmax(0,1fr) 88px!important;gap:9px!important;padding:10px!important;min-height:86px!important;border:1px solid #2674bb!important;border-radius:17px!important;background:linear-gradient(110deg,#102d55,#071a39 62%,#102a52)!important;box-shadow:0 0 18px #168bff2b,inset 0 1px #ffffff20!important; }
+    .ah-avatar { width:52px!important;height:52px!important;font-size:29px!important;border:3px solid #ffd45b!important;box-shadow:0 0 12px #ffbd3c99!important; }
+    .ah-name {font-size:15px!important;color:#fff!important;} .ah-sub {font-size:11px!important;color:#c1d5f5!important;} .ah-level {height:8px!important;background:#101d43!important;border:1px solid #5864a7!important;}
+    .ah-shortcuts { grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:6px!important;margin:0 0 14px!important; }
+    .ah-short { min-width:0!important;min-height:74px!important;padding:7px 2px!important;border-radius:14px!important;border:1px solid #315e9a!important;background:linear-gradient(155deg,#15345e,#07152d)!important;box-shadow:inset 0 1px #ffffff20,0 4px 12px #0008!important;font-size:clamp(8px,2.4vw,10px)!important;line-height:1.15!important; }
+    .ah-short b {font-size:clamp(20px,6vw,27px)!important;}
+    .ah-section-title {font-size:clamp(16px,4.7vw,20px)!important;margin:15px 3px 9px!important;color:#fff!important;} .ah-section-title small {font-size:10px!important;color:#a9c9f7!important;}
+    .ah-categories {gap:10px!important;}
+    .ah-cat { min-height:112px!important;grid-template-columns:68px minmax(0,1fr)!important;gap:8px!important;padding:10px!important;border:2px solid var(--edge)!important;border-radius:20px!important;background:linear-gradient(135deg,var(--bg1),var(--bg2))!important;box-shadow:inset 0 1px 0 #ffffff35,0 0 14px #0005!important; }
+    .ah-cat-icon {font-size:43px!important;filter:drop-shadow(0 4px 5px #000b)!important;} .ah-cat strong {font-size:15px!important;line-height:1.12!important;} .ah-cat small {font-size:11px!important;color:#edf4ff!important;line-height:1.25!important;margin-top:7px!important;}
+    .ah-cat.violet {--bg1:#7a21c6;--bg2:#25105b;--edge:#d67aff;} .ah-cat.blue {--bg1:#087ed1;--bg2:#082f78;--edge:#35caff;} .ah-cat.green {--bg1:#08a35d;--bg2:#064235;--edge:#31ff91;} .ah-cat.orange {--bg1:#d47708;--bg2:#59210b;--edge:#ffb42d;} .ah-cat.pink {--bg1:#c32970;--bg2:#50143d;--edge:#ff61ad;} .ah-cat.cyan {--bg1:#079a9a;--bg2:#073b50;--edge:#32f1e8;}
+    .ah-daily {margin:14px 0 0!important;padding:12px!important;min-height:70px!important;border:1px solid #596bd1!important;border-radius:15px!important;background:linear-gradient(100deg,#172d68,#34205e)!important;box-shadow:0 0 13px #6557d044!important;} .ah-daily .ah-target {font-size:36px!important;} .ah-daily strong {font-size:15px!important;} .ah-daily small {font-size:11px!important;color:#d9e5ff!important;}
+    .ah-featured {gap:8px!important;padding:2px 1px 8px!important;} .ah-feature {min-width:80px!important;max-width:94px!important;font-size:11px!important;line-height:1.15!important;} .ah-feature i {height:82px!important;border-radius:17px!important;border:2px solid #5375b5!important;background:linear-gradient(145deg,#193d73,#251343)!important;font-size:36px!important;box-shadow:0 0 12px #168bff3b!important;}
+    #arenaHubCategory {padding:4px 0 110px!important;} .ah-back {width:auto!important;min-width:180px!important;min-height:54px!important;margin:0 0 13px!important;border-radius:14px!important;background:linear-gradient(145deg,#173d70,#0b1d3b)!important;border:1px solid #4775ad!important;font-size:17px!important;} .ah-cat-head {min-height:94px!important;border:1px solid #2b5d9b!important;background:linear-gradient(110deg,#17345f,#111d40)!important;} .ah-game-card {min-height:116px!important;border-radius:17px!important;border:1px solid #3b6094!important;background:linear-gradient(145deg,#18365f,#0a1731)!important;}
+    #arenaNeonNav {position:fixed;left:8px;right:8px;bottom:calc(7px + env(safe-area-inset-bottom));z-index:10050;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:3px;padding:6px 4px 5px;border:1px solid #314d83;border-radius:22px;background:linear-gradient(180deg,rgba(16,29,58,.97),rgba(4,10,25,.99));box-shadow:0 -5px 22px #000b,0 0 16px #176bca35;backdrop-filter:blur(12px);}
+    #arenaNeonNav button {min-width:0;min-height:62px;padding:4px 1px;border:0;border-radius:14px;background:transparent;color:#e0eaff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:clamp(8px,2.4vw,11px);line-height:1.1;font-weight:750;white-space:nowrap;}
+    #arenaNeonNav button i {font-style:normal;font-size:25px;line-height:1;} #arenaNeonNav button.active {background:linear-gradient(145deg,#5523a0,#171b50);box-shadow:inset 0 0 15px #c18aff55;color:#fff;}
+    body:has(#ana.hidden) #arenaNeonNav {display:none!important;} .ek-dock,.apk-btn,#altSatir {display:none!important;}
+    @media(max-width:360px){.ah-profile{grid-template-columns:52px minmax(0,1fr) 80px!important;}.ah-avatar{width:46px!important;height:46px!important;}.ah-cat{grid-template-columns:58px minmax(0,1fr)!important;min-height:104px!important;}.ah-cat-icon{font-size:38px!important;}.ah-cat strong{font-size:13px!important;}.ah-cat small{font-size:10px!important;}#arenaNeonNav button{font-size:8px!important;}}
+  `;
+  document.head.appendChild(css);
+  const shortcuts=home.querySelector('.ah-shortcuts');
+  if(shortcuts) shortcuts.innerHTML=`<button class="ah-short" data-short="reward"><b>🎁</b>Günlük Ödül</button><button class="ah-short" data-short="tasks"><b>📋</b>Günlük Görevler</button><button class="ah-short" data-short="league"><b>🏆</b>Lig Sıralaması</button><button class="ah-short" data-short="friends"><b>👥</b>Arkadaşlar</button><button class="ah-short" data-short="achievements"><b>🛡️</b>Başarılar</button><button class="ah-short" data-short="season"><b>🗓️</b>Sezon</button>`;
+  const counts={bilgi:'5 Oyun',kelime:'3 Oyun',masa:'3 Oyun',mantik:'5 Oyun',bulmaca:'4 Oyun',renk:'3 Oyun'};
+  home.querySelectorAll('.ah-cat').forEach(button=>{const small=button.querySelector('small');if(small)small.textContent=counts[button.dataset.category]||small.textContent;});
+  const daily=home.querySelector('.ah-daily');
+  if(daily)daily.innerHTML='<span class="ah-target">🎯</span><span><strong>Günün Görevi</strong><small>3 farklı oyun oyna.</small></span><span style="margin-left:auto;font-weight:900;color:#ffe27a">+150 🪙</span>';
+  const featured=home.querySelector('.ah-featured');
+  if(featured)featured.innerHTML=`<div class="ah-feature"><i>🟪</i>Renkli Bloklar</div><div class="ah-feature"><i>🎲</i>Tavla</div><div class="ah-feature"><i>🔤</i>Kelime Lik</div><div class="ah-feature"><i>🧪</i>Top Sıralama</div><div class="ah-feature"><i>⬇️</i>Okları Çöz</div><div class="ah-feature"><i>🧱</i>Blok Kaçış</div>`;
+  const title=document.querySelector('body>h1');
+  if(title){title.setAttribute('role','button');title.setAttribute('aria-label','ARENA ana sayfaya dön');}
+  if(!document.getElementById('arenaNeonNav')){
+    const nav=document.createElement('nav');nav.id='arenaNeonNav';
+    nav.innerHTML=`<button class="active" data-nav="home"><i>⌂</i>Ana Sayfa</button><button data-nav="games"><i>🎮</i>Oyunlar</button><button data-nav="league"><i>🏆</i>Lig</button><button data-nav="challenge"><i>⚔️</i>Meydan Oku</button><button data-nav="friends"><i>👥</i>Arkadaşlar</button><button data-nav="profile"><i>♟</i>Profil</button>`;
+    document.body.appendChild(nav);
+    nav.addEventListener('click',event=>{const button=event.target.closest('[data-nav]');if(!button)return;nav.querySelectorAll('button').forEach(item=>item.classList.toggle('active',item===button));if(button.dataset.nav==='home'||button.dataset.nav==='games'){window.dispatchEvent(new Event('arena:home'));ana.scrollTop=0;return;}const shortcut=button.dataset.nav==='league'?'league':button.dataset.nav==='friends'?'friends':null;if(shortcut){const item=home.querySelector('[data-short="'+shortcut+'"]');if(item)item.click();}else alert('Bu bölüm sonraki geliştirme aşamasında açılacak.');});
+  }
+  function goHome(){window.dispatchEvent(new Event('arena:home'));ana.scrollTop=0;}
+  document.addEventListener('click',event=>{if(event.target.closest('body>h1')||event.target.closest('.ah-brand')){event.preventDefault();goHome();}},true);
+  window.addEventListener('arena:home',()=>{if(category)category.hidden=true;home.hidden=false;const nav=document.getElementById('arenaNeonNav');if(nav)nav.querySelectorAll('button').forEach(item=>item.classList.toggle('active',item.dataset.nav==='home'));});
 })();
