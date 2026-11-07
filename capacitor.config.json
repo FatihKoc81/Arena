@@ -1,5 +1,5 @@
 {
   "appId": "com.fatihkoc.arena.mobile",
   "appName": "ARENA",
-  "webDir": "."
+  "webDir": "www"
 }
