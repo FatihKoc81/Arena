@@ -9,7 +9,9 @@ const cats=[
 {id:'masa',name:'Masa Oyunları',icon:'🎲',desc:'Klasik oyunlarda rakiplerini yen',count:'3 Oyun',color:'green',games:[],planned:['Tavla','Dama','Domino']},
 {id:'mantik',name:'Mantık Oyunları',icon:'🧊',desc:'Planla, çöz ve doğru yolu bul',count:'5 Oyun',color:'orange',games:['islem'],planned:['Okları Çöz','Blok Kaçış','Labirent','Trafik Ustası']},
 {id:'bulmaca',name:'Bulmaca Oyunları',icon:'🧩',desc:'Her bölümde yeni bir meydan okuma',count:'4 Oyun',color:'pink',games:[],planned:['Sudoku','Matematik Bulmacası','Görsel Avı','Sıradaki Ne?']},
-{id:'renk',name:'Renk ve Sıralama',icon:'🧪',desc:'Renkleri ayır, parçaları yerleştir',count:'3 Oyun',color:'cyan',games:[],planned:['Top Sıralama','Su Sıralama','Renkli Bloklar']}
+{id:'renk',name:'Renk ve Sıralama',icon:'🧪',desc:'Renkleri ayır, parçaları yerleştir',count:'3 Oyun',color:'cyan',games:[],planned:['Top Sıralama','Su Sıralama','Renkli Bloklar']},
+{id:'strateji',name:'Strateji Oyunları',icon:'🧠',desc:'Planını kur, hamleni doğru yap',count:'3 Oyun',color:'indigo',games:[],planned:['Satranç','2048','Kule Savunması']},
+{id:'refleks',name:'Hız ve Refleks',icon:'⚡',desc:'Hızını ve dikkatini test et',count:'3 Oyun',color:'red',games:[],planned:['Refleks Testi','Hızlı Dokun','Renk Tepkisi']}
 ];
 const defs={
 milyoner:{name:'Milyoner',icon:'🏆',desc:'Genel kültür ve bilgi yarışması',re:/milyoner|oyuna başla/i},
@@ -157,6 +159,16 @@ artStyle.textContent=`
 `;
 document.head.appendChild(artStyle);
 
+/* Two additional category accents; first six continue using the approved sprite artwork. */
+const eightCategoriesStyle=document.createElement('style');
+eightCategoriesStyle.textContent=`
+#arenaHubHome .ar-cat.indigo{--c1:#5852d9;--c2:#1c225b;--edge:#8d8bff;--glow:#6461ff55}
+#arenaHubHome .ar-cat.red{--c1:#ed4b4b;--c2:#681b32;--edge:#ff8888;--glow:#ff4f6555}
+#arenaHubHome .ar-cat:nth-child(n+7) .ar-cat-icon{background-image:none!important;text-align:center!important}
+`;
+document.head.appendChild(eightCategoriesStyle);
+
+
 /* APK home screen: fill the usable device height without hiding Android system bars. */
 const fullPage=document.createElement('style');
 fullPage.id='arenaApkFullPage';
@@ -195,7 +207,7 @@ home.innerHTML='<div class="ar-top"><button class="ar-top-btn" data-action="menu
 '<div class="ar-section-title">🔥 Öne Çıkan Oyunlar <small data-action="allgames">Tümünü Gör ›</small></div><div class="ar-featured"><button class="ar-feature" data-feature="renkli"><i>🟪</i>Renkli<br>Bloklar</button><button class="ar-feature" data-feature="tavla"><i>🎲</i>Tavla</button><button class="ar-feature" data-feature="kelime"><i>🔤</i>Kelime<br>Lik</button><button class="ar-feature" data-feature="top"><i>🧪</i>Top<br>Sıralama</button><button class="ar-feature" data-feature="oklar"><i>⬇️</i>Okları<br>Çöz</button><button class="ar-feature" data-feature="blok"><i>🧱</i>Blok<br>Kaçış</button></div>';
 ana.insertBefore(home,ana.firstChild);ana.appendChild(view);
 
-home.querySelectorAll('.ar-cat-icon').forEach((el,i)=>{el.textContent='';el.style.setProperty('background-position',(i*20)+'% 0%','important');});
+home.querySelectorAll('.ar-cat-icon').forEach((el,i)=>{if(i<6){el.textContent='';el.style.setProperty('background-position',(i*20)+'% 0%','important');}else{el.style.setProperty('background-image','none','important');el.style.setProperty('font-size','clamp(36px,9vw,48px)','important');el.style.setProperty('display','grid','important');el.style.setProperty('place-items','center','important');}});
 home.querySelectorAll('.ar-feature i').forEach((el,i)=>{el.textContent='';el.style.setProperty('background-position',(i*20)+'% 50%','important');});
 
 const found={};
