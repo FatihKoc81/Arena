@@ -61,59 +61,72 @@ body:has(#ana.hidden) #arenaNeonNav{display:none!important}.ek-dock,.apk-btn,#al
 const fit=document.createElement('style');
 fit.id='arenaReferenceFit';
 fit.textContent=`
-body{padding-top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top))!important;padding-bottom:calc(60px + env(safe-area-inset-bottom))!important}
-#ana{padding-top:0!important}
-#arenaHubHome .ar-profile{grid-template-columns:54px minmax(0,1fr) 50px 94px!important;gap:4px!important;padding:2px 6px!important;margin-bottom:8px!important;min-height:0!important}
-#arenaHubHome .ar-avatar{width:54px!important;height:54px!important;font-size:28px!important;overflow:visible!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}\n#arenaHubHome .ar-avatar img{width:100%!important;height:100%!important;object-fit:contain!important}\n#arenaHubHome .ar-league{display:grid!important;place-items:center!important;width:50px!important;height:54px!important}\n#arenaHubHome .ar-league img{display:block!important;width:50px!important;height:50px!important;object-fit:contain!important}
-#arenaHubHome .ar-player-name{font-size:16px!important}
-#arenaHubHome .ar-level-line{gap:5px!important;margin-top:4px!important}
-#arenaHubHome .ar-level-pill{padding:3px 7px!important;font-size:11px!important}
-#arenaHubHome .ar-xp{font-size:9px!important}
-#arenaHubHome .ar-xpbar{height:5px!important;margin-top:3px!important}
-#arenaHubHome .ar-wallet{gap:3px!important}
-#arenaHubHome .ar-wallet-row{min-height:0!important;padding:1px 4px!important;font-size:11px!important;line-height:18px!important;border-radius:10px!important;gap:3px!important}
-#arenaHubHome .ar-wallet-row b{font-size:16px!important;line-height:18px!important}
-#arenaHubHome .ar-shortcuts{gap:4px!important;margin-bottom:9px!important}
-#arenaHubHome .ar-short{min-height:56px!important;height:56px!important;padding:4px 1px!important;gap:3px!important;font-size:9px!important;border-radius:14px!important}
-#arenaHubHome .ar-short i{font-size:22px!important}
-#arenaHubHome .ar-section-title{font-size:19px!important;margin:9px 3px 6px!important}
-#arenaHubHome .ar-categories{gap:7px!important}
-#arenaHubHome .ar-cat{grid-template-columns:66px minmax(0,1fr)!important;min-height:76px!important;height:76px!important;padding:6px!important;gap:5px!important;border-radius:19px!important}
-#arenaHubHome .ar-cat-icon{font-size:47px!important}
-#arenaHubHome .ar-cat-copy strong{font-size:15px!important;line-height:1.1!important}
-#arenaHubHome .ar-cat-copy small{font-size:10px!important;margin-top:4px!important}
-#arenaHubHome .ar-daily{grid-template-columns:42px minmax(0,1fr) auto!important;min-height:52px!important;height:52px!important;margin-top:9px!important;padding:5px 7px!important;gap:5px!important}
-#arenaHubHome .ar-daily-target{font-size:31px!important}
-#arenaHubHome .ar-daily-copy strong{font-size:13px!important}
-#arenaHubHome .ar-daily-copy small{font-size:10px!important;margin-top:2px!important}
-#arenaHubHome .ar-progress{height:6px!important;margin-top:5px!important}
-#arenaHubHome .ar-daily-reward{padding:5px 7px!important;font-size:13px!important;border-radius:10px!important}
-#arenaHubHome .ar-section-title:has(+.ar-featured){margin-top:10px!important;margin-bottom:6px!important}
-#arenaHubHome .ar-featured{gap:6px!important;padding:0 0 5px!important}
-#arenaHubHome .ar-feature i{height:52px!important;margin-bottom:4px!important;border-radius:13px!important;font-size:27px!important}
-#arenaHubHome .ar-feature{font-size:9px!important;line-height:1.1!important}
-#arenaNeonNav{bottom:calc(64px + env(safe-area-inset-bottom))!important;padding:4px 3px!important;gap:2px!important;border-radius:21px!important}
-#arenaNeonNav button{min-height:52px!important;height:52px!important;padding:3px 1px!important;gap:3px!important;font-size:9px!important}
-#arenaNeonNav button i{font-size:23px!important}
-@media(max-width:350px){
-#arenaHubHome .ar-profile{grid-template-columns:50px minmax(0,1fr) 42px 84px!important}\n#arenaHubHome .ar-league{width:42px!important}\n#arenaHubHome .ar-league img{width:42px!important;height:46px!important}
-#arenaHubHome .ar-avatar{width:50px!important;height:50px!important}
-#arenaHubHome .ar-cat{grid-template-columns:58px minmax(0,1fr)!important;height:72px!important;min-height:72px!important}
-#arenaHubHome .ar-cat-icon{font-size:40px!important}
-#arenaHubHome .ar-cat-copy strong{font-size:13px!important}
+body{padding-top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top))!important;padding-bottom:calc(110px + env(safe-area-inset-bottom))!important;background:#020713!important}
+#ana{padding:0 12px 18px!important;max-width:720px!important;overflow:visible!important}
+body>h1{background-image:url("arena-header.webp")!important;background-size:100% 100%!important;background-position:center!important;background-repeat:no-repeat!important;background-color:#020b21!important}
+body>h1 .arena-logo{display:none!important}
+#arenaHubHome .ar-profile{grid-template-columns:100px minmax(0,1fr) 92px 158px!important;gap:7px!important;padding:0 7px!important;margin:0 0 14px!important;height:100px!important;min-height:100px!important;border-radius:18px!important}
+#arenaHubHome .ar-avatar{width:96px!important;height:96px!important;display:block!important;overflow:visible!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+#arenaHubHome .ar-avatar img{width:100%!important;height:100%!important;object-fit:contain!important}
+#arenaHubHome .ar-league{display:grid!important;place-items:center!important;width:92px!important;height:94px!important}
+#arenaHubHome .ar-league img{display:block!important;width:92px!important;height:90px!important;object-fit:contain!important}
+#arenaHubHome .ar-player-name{font-size:clamp(15px,4vw,20px)!important}
+#arenaHubHome .ar-level-line{gap:7px!important;margin-top:6px!important}
+#arenaHubHome .ar-level-pill{padding:5px 9px!important;font-size:12px!important}
+#arenaHubHome .ar-xp{font-size:10px!important}
+#arenaHubHome .ar-xpbar{height:7px!important;margin-top:5px!important}
+#arenaHubHome .ar-wallet{gap:6px!important}
+#arenaHubHome .ar-wallet-row{height:42px!important;min-height:42px!important;padding:4px 8px!important;font-size:13px!important;line-height:1!important;border-radius:13px!important;gap:5px!important}
+#arenaHubHome .ar-wallet-row b{font-size:19px!important;line-height:1!important}
+#arenaHubHome .ar-shortcuts{gap:7px!important;margin:0 0 22px!important}
+#arenaHubHome .ar-short{min-height:100px!important;height:100px!important;padding:8px 2px!important;gap:6px!important;font-size:11px!important;border-radius:18px!important}
+#arenaHubHome .ar-short i{font-size:30px!important}
+#arenaHubHome #arCategoryTitle{display:none!important}
+#arenaHubHome .ar-categories{gap:12px!important;margin-top:0!important}
+#arenaHubHome .ar-cat{grid-template-columns:112px minmax(0,1fr)!important;min-height:137px!important;height:137px!important;padding:8px 9px!important;gap:6px!important;border-radius:21px!important}
+#arenaHubHome .ar-cat-icon{width:108px!important;height:118px!important;display:block!important;font-size:0!important;background-size:600% 200%!important;background-repeat:no-repeat!important}
+#arenaHubHome .ar-cat-copy strong{font-size:clamp(16px,4.4vw,21px)!important;line-height:1.12!important}
+#arenaHubHome .ar-cat-copy small{font-size:13px!important;margin-top:7px!important}
+#arenaHubHome .ar-daily{grid-template-columns:84px minmax(0,1fr) 112px!important;min-height:92px!important;height:92px!important;margin-top:18px!important;padding:8px 12px!important;gap:8px!important;border-radius:17px!important}
+#arenaHubHome .ar-daily-target{font-size:58px!important}
+#arenaHubHome .ar-daily-copy strong{font-size:18px!important}
+#arenaHubHome .ar-daily-copy small{font-size:14px!important;margin-top:4px!important}
+#arenaHubHome .ar-progress{height:9px!important;margin-top:8px!important}
+#arenaHubHome .ar-daily-reward{padding:7px 8px!important;font-size:17px!important;border-radius:13px!important}
+#arenaHubHome .ar-section-title:has(+.ar-featured){margin:14px 3px 10px!important;font-size:20px!important}
+#arenaHubHome .ar-featured{gap:8px!important;padding:0 0 4px!important}
+#arenaHubHome .ar-feature{font-size:12px!important;line-height:1.15!important}
+#arenaHubHome .ar-feature i{height:92px!important;margin-bottom:7px!important;border-radius:17px!important;font-size:0!important;background-size:600% 200%!important;background-repeat:no-repeat!important;border:0!important;box-shadow:none!important}
+#arenaNeonNav{left:9px!important;right:9px!important;bottom:calc(5px + env(safe-area-inset-bottom))!important;padding:6px 4px 5px!important;gap:3px!important;border-radius:22px!important}
+#arenaNeonNav button{min-height:100px!important;height:100px!important;padding:5px 1px!important;gap:5px!important;font-size:clamp(9px,2.7vw,12px)!important}
+#arenaNeonNav button i{font-size:32px!important}
+@media(max-width:390px){
+#arenaHubHome .ar-profile{grid-template-columns:82px minmax(0,1fr) 72px 132px!important;gap:5px!important}
+#arenaHubHome .ar-avatar{width:80px!important;height:80px!important}
+#arenaHubHome .ar-league{width:70px!important;height:86px!important}
+#arenaHubHome .ar-league img{width:70px!important;height:82px!important}
+#arenaHubHome .ar-wallet-row{height:38px!important;min-height:38px!important;padding:3px 6px!important}
+#arenaHubHome .ar-short{min-height:94px!important;height:94px!important;font-size:10px!important}
+#arenaHubHome .ar-cat{grid-template-columns:94px minmax(0,1fr)!important;height:130px!important;min-height:130px!important}
+#arenaHubHome .ar-cat-icon{width:92px!important;height:112px!important}
+#arenaHubHome .ar-cat-copy strong{font-size:16px!important}
+#arenaHubHome .ar-daily{grid-template-columns:58px minmax(0,1fr) 92px!important}
+#arenaHubHome .ar-daily-target{font-size:45px!important}
+#arenaHubHome .ar-daily-reward{font-size:14px!important}
+#arenaHubHome .ar-feature i{height:78px!important}
+#arenaNeonNav button{height:88px!important;min-height:88px!important;font-size:9px!important}
+#arenaNeonNav button i{font-size:28px!important}
 }
 `;
 document.head.appendChild(fit);
 
 
-/* Use the real cropped artwork from the supplied ARENA reference. */
+/* Reference icon sprite: six category icons + six featured game icons */
 const artStyle=document.createElement('style');
 artStyle.id='arenaReferenceSprite';
 artStyle.textContent=`
-body>h1{background-image:url("arena-reference.webp")!important;background-size:100vw auto!important;background-position:center bottom!important;background-repeat:no-repeat!important;background-color:#020b21!important}
-body>h1 .arena-logo{display:none!important}
-#arenaHubHome .ar-cat-icon{width:60px!important;height:60px!important;font-size:0!important;background-image:url("arena-reference.webp")!important;background-size:600% 292%!important;background-repeat:no-repeat!important}
-#arenaHubHome .ar-feature i{width:100%!important;height:52px!important;font-size:0!important;text-indent:-9999px!important;background-image:url("arena-reference.webp")!important;background-size:600% 292%!important;background-repeat:no-repeat!important;border:0!important;box-shadow:none!important}
+#arenaHubHome .ar-cat-icon{background-image:url("arena-reference.webp")!important;background-size:600% 200%!important;background-repeat:no-repeat!important}
+#arenaHubHome .ar-feature i{background-image:url("arena-reference.webp")!important;background-size:600% 200%!important;background-repeat:no-repeat!important}
 `;
 document.head.appendChild(artStyle);
 
@@ -125,18 +138,18 @@ const view=document.createElement('div');view.id='arenaHubCategory';view.hidden=
 home.innerHTML='<div class="ar-top"><button class="ar-top-btn" data-action="menu">☷</button><div class="ar-brand">ARENA<small>OYUN PLATFORMU</small></div><button class="ar-top-btn" data-action="settings">⚙</button></div>'+
 '<div class="ar-profile"><div class="ar-avatar" id="arAvatar"><img src="arena-avatar.webp" alt=""></div><div class="ar-player"><div class="ar-player-name" id="arPlayerName">ARENA Oyuncusu ⭐</div><div class="ar-level-line"><span class="ar-level-pill" id="arLevel">Seviye 1</span><span class="ar-xp" id="arXp">0 XP</span></div><div class="ar-xpbar"><i id="arXpBar"></i></div></div><div class="ar-league"><img src="arena-league.webp" alt="Altın Lig"></div><div class="ar-wallet"><div class="ar-wallet-row"><span>🪙</span><b id="arGold">100</b><span>＋</span></div><div class="ar-wallet-row"><span>❤️</span><b id="arLives">3 / 3</b><span>＋</span></div></div></div>'+
 '<div class="ar-shortcuts"><button class="ar-short" data-action="reward"><i>🎁</i>Günlük<br>Ödül</button><button class="ar-short" data-action="tasks"><i>📋</i>Günlük<br>Görevler</button><button class="ar-short" data-action="league"><i>🏆</i>Lig<br>Sıralaması</button><button class="ar-short" data-action="friends"><i>👥</i>Arkadaşlar</button><button class="ar-short" data-action="achievements"><i>🛡️</i>Başarılar</button><button class="ar-short" data-action="season"><i>🗓️</i>Sezon</button></div>'+
-'<div class="ar-section-title" id="arCategoryTitle">Oyun Kategorileri <small>6 KATEGORİ</small></div><div class="ar-categories">'+cats.map(c=>'<button class="ar-cat '+c.color+'" data-category="'+c.id+'"><span class="ar-cat-icon">'+c.icon+'</span><span class="ar-cat-copy"><strong>'+c.name+'</strong><small>'+c.count+'</small></span></button>').join('')+'</div>'+
+'<div class="ar-categories">'+cats.map(c=>'<button class="ar-cat '+c.color+'" data-category="'+c.id+'"><span class="ar-cat-icon">'+c.icon+'</span><span class="ar-cat-copy"><strong>'+c.name+'</strong><small>'+c.count+'</small></span></button>').join('')+'</div>'+
 '<div class="ar-daily"><span class="ar-daily-target">🎯</span><span class="ar-daily-copy"><strong>Günün Görevi</strong><small>3 farklı oyun oyna.</small><span class="ar-progress"><i></i></span></span><span class="ar-daily-reward">🪙 +150</span></div>'+
 '<div class="ar-section-title">🔥 Öne Çıkan Oyunlar <small data-action="allgames">Tümünü Gör ›</small></div><div class="ar-featured"><button class="ar-feature" data-feature="renkli"><i>🟪</i>Renkli<br>Bloklar</button><button class="ar-feature" data-feature="tavla"><i>🎲</i>Tavla</button><button class="ar-feature" data-feature="kelime"><i>🔤</i>Kelime<br>Lik</button><button class="ar-feature" data-feature="top"><i>🧪</i>Top<br>Sıralama</button><button class="ar-feature" data-feature="oklar"><i>⬇️</i>Okları<br>Çöz</button><button class="ar-feature" data-feature="blok"><i>🧱</i>Blok<br>Kaçış</button></div>';
 ana.insertBefore(home,ana.firstChild);ana.appendChild(view);
 
 home.querySelectorAll('.ar-cat-icon').forEach((el,i)=>{el.textContent='';el.style.setProperty('background-position',(i*20)+'% 0%','important');});
-home.querySelectorAll('.ar-feature i').forEach((el,i)=>{el.textContent='';el.style.setProperty('background-position',(i*20)+'% 50%','important');});
+home.querySelectorAll('.ar-feature i').forEach((el,i)=>{el.textContent='';el.style.setProperty('background-position',(i*20)+'% 100%','important');});
 
 const found={};
 function findGames(){const candidates=Array.from(ana.querySelectorAll('button')).filter(b=>!home.contains(b)&&!view.contains(b));Object.keys(defs).forEach(id=>{if(found[id]&&document.contains(found[id]))return;const d=defs[id],b=candidates.find(x=>d.re.test((x.id==='basla'?'Milyoner ':'')+(x.textContent||'').replace(/\\s+/g,' ')));if(b){found[id]=b;b.classList.add('arena-original-game');}});}
 const hide=document.createElement('style');hide.textContent='#ana .arena-original-game{position:absolute!important;left:-10000px!important;top:auto!important;width:1px!important;height:1px!important;overflow:hidden!important;opacity:0!important;pointer-events:none!important}';document.head.appendChild(hide);
-function profile(){try{const E=window.Ekonomi,P=window.Puan,user=E&&E.ad?E.ad():'ARENA Oyuncusu',gold=E&&E.altin?E.altin():100,total=P&&P.toplam?P.toplam():0;let level=1;try{level=Math.max(1,Number(JSON.parse(localStorage.getItem('arenaMobileProgress')||'{}').seviye)||1);}catch(_){}const el=id=>document.getElementById(id);if(el('arPlayerName'))el('arPlayerName').textContent=user+' ⭐';if(el('arLevel'))el('arLevel').textContent='Seviye '+level;if(el('arXp'))el('arXp').textContent=total.toLocaleString('tr-TR')+' XP';if(el('arGold'))el('arGold').textContent=Number(gold).toLocaleString('tr-TR');if(el('arXpBar'))el('arXpBar').style.width=(total%1000)/10+'%';const av=el('arAvatar'),u=window.firebase&&firebase.auth&&firebase.auth().currentUser;if(av&&u&&u.photoURL)av.innerHTML='<img alt="" src="'+String(u.photoURL).replace(/["<>]/g,'')+'">';}catch(_){}}
+function profile(){try{const E=window.Ekonomi,P=window.Puan,user=E&&E.ad?E.ad():'ARENA Oyuncusu',gold=E&&E.altin?E.altin():100,total=P&&P.toplam?P.toplam():0;let level=1;try{level=Math.max(1,Number(JSON.parse(localStorage.getItem('arenaMobileProgress')||'{}').seviye)||1);}catch(_){}const el=id=>document.getElementById(id);if(el('arPlayerName'))el('arPlayerName').textContent=user+' ⭐';if(el('arLevel'))el('arLevel').textContent='Seviye '+level;if(el('arXp'))el('arXp').textContent=total.toLocaleString('tr-TR')+' / '+(level*1000).toLocaleString('tr-TR')+' XP';if(el('arGold'))el('arGold').textContent=Number(gold).toLocaleString('tr-TR');if(el('arXpBar'))el('arXpBar').style.width=(total%1000)/10+'%';const av=el('arAvatar'),u=window.firebase&&firebase.auth&&firebase.auth().currentUser;if(av&&u&&u.photoURL)av.innerHTML='<img alt="" src="'+String(u.photoURL).replace(/["<>]/g,'')+'">';}catch(_){}}
 function navActive(key){const n=document.getElementById('arenaNeonNav');if(n)n.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.nav===key));}
 function goHome(){view.hidden=true;home.hidden=false;ana.classList.remove('hidden');document.querySelectorAll('section.kart').forEach(s=>s.classList.add('hidden'));try{document.dispatchEvent(new Event('anasayfa'));}catch(_){}try{if(typeof menu==='function')menu();}catch(_){}navActive('home');ana.scrollTop=0;window.scrollTo(0,0);}
 function category(id,push){const c=cats.find(x=>x.id===id);if(!c)return;findGames();home.hidden=true;view.hidden=false;const live=c.games.filter(k=>found[k]).map(k=>({id:k,...defs[k]}));const cards=live.map(g=>'<button class="ar-game-card" data-launch="'+g.id+'"><i>'+g.icon+'</i><span><strong>'+g.name+'</strong><small>'+g.desc+'</small></span></button>').join('');const planned=c.planned.map(n=>'<div class="ar-game-card soon"><i>🔒</i><span><strong>'+n+'</strong><small>Yakında eklenecek</small></span></div>').join('');view.innerHTML='<button class="ar-back" type="button">← Kategorilere Dön</button><div class="ar-cat-head"><i>'+c.icon+'</i><span><strong>'+c.name+'</strong><small>'+c.desc+'</small></span></div><div class="ar-game-list">'+cards+planned+'</div>';navActive('games');ana.scrollTop=0;if(push)try{history.pushState({arenaCategory:id},'','#kategori-'+id);}catch(_){}}
@@ -144,9 +157,9 @@ function league(){if(window.Arena&&Arena.ac)Arena.ac('siralama');else alert('Lig
 function challenge(){if(window.Arena&&Arena.meydanOku)Arena.meydanOku();else alert('Meydan Oku bölümü yüklenemedi.');}
 function account(){if(window.Hesap&&Hesap.ac)Hesap.ac();else if(window.ArenaAuth&&ArenaAuth.ac)ArenaAuth.ac();else alert('Profil bölümü yüklenemedi.');}
 function soon(n){if(window.Ekonomi&&Ekonomi.sor)Ekonomi.sor(n,'Bu bölüm sonraki geliştirme aşamasında açılacak.',[{t:'Tamam',c:'gri'}]);else alert(n+' bölümü yakında açılacak.');}
-home.addEventListener('click',e=>{const c=e.target.closest('[data-category]');if(c){category(c.dataset.category,true);return;}const a=e.target.closest('[data-action]');if(a){const k=a.dataset.action;if(k==='allgames'){navActive('games');document.getElementById('arCategoryTitle').scrollIntoView({behavior:'smooth',block:'start'});return;}if(k==='league')return league();if(k==='friends'||k==='settings'||k==='menu')return account();const names={reward:'Günlük Ödül',tasks:'Günlük Görevler',achievements:'Başarılar',season:'Sezon'};return soon(names[k]||'ARENA');}const f=e.target.closest('[data-feature]');if(f){if(f.dataset.feature==='kelime'&&found.kelime)found.kelime.click();else soon(f.textContent.replace(/\\s+/g,' ').trim());}});
+home.addEventListener('click',e=>{const c=e.target.closest('[data-category]');if(c){category(c.dataset.category,true);return;}const a=e.target.closest('[data-action]');if(a){const k=a.dataset.action;if(k==='allgames'){navActive('games');document.querySelector('#arenaHubHome .ar-categories').scrollIntoView({behavior:'smooth',block:'start'});return;}if(k==='league')return league();if(k==='friends'||k==='settings'||k==='menu')return account();const names={reward:'Günlük Ödül',tasks:'Günlük Görevler',achievements:'Başarılar',season:'Sezon'};return soon(names[k]||'ARENA');}const f=e.target.closest('[data-feature]');if(f){if(f.dataset.feature==='kelime'&&found.kelime)found.kelime.click();else soon(f.textContent.replace(/\\s+/g,' ').trim());}});
 view.addEventListener('click',e=>{const b=e.target.closest('.ar-back');if(b){e.preventDefault();view.hidden=true;home.hidden=false;navActive('home');ana.scrollTop=0;try{history.replaceState({arenaHome:true},'',location.pathname+location.search);}catch(_){}return;}const l=e.target.closest('[data-launch]');if(l&&found[l.dataset.launch])found[l.dataset.launch].click();});
-if(!document.getElementById('arenaNeonNav')){const nav=document.createElement('nav');nav.id='arenaNeonNav';nav.innerHTML='<button class="active" data-nav="home"><i>⌂</i>Ana Sayfa</button><button data-nav="games"><i>🎮</i>Oyunlar</button><button data-nav="league"><i>🏆</i>Lig</button><button data-nav="challenge"><i>⚔️</i>Meydan Oku</button><button data-nav="friends"><i>👥</i>Arkadaşlar</button><button data-nav="profile"><i>♟</i>Profil</button>';document.body.appendChild(nav);nav.addEventListener('click',e=>{const b=e.target.closest('[data-nav]');if(!b)return;const k=b.dataset.nav;if(k==='home')return goHome();if(k==='games'){view.hidden=true;home.hidden=false;navActive('games');document.getElementById('arCategoryTitle').scrollIntoView({behavior:'smooth',block:'start'});return;}navActive(k);if(k==='league')league();else if(k==='challenge')challenge();else account();});}
+if(!document.getElementById('arenaNeonNav')){const nav=document.createElement('nav');nav.id='arenaNeonNav';nav.innerHTML='<button class="active" data-nav="home"><i>⌂</i>Ana Sayfa</button><button data-nav="games"><i>🎮</i>Oyunlar</button><button data-nav="league"><i>🏆</i>Lig</button><button data-nav="challenge"><i>⚔️</i>Meydan Oku</button><button data-nav="friends"><i>👥</i>Arkadaşlar</button><button data-nav="profile"><i>♟</i>Profil</button>';document.body.appendChild(nav);nav.addEventListener('click',e=>{const b=e.target.closest('[data-nav]');if(!b)return;const k=b.dataset.nav;if(k==='home')return goHome();if(k==='games'){view.hidden=true;home.hidden=false;navActive('games');document.querySelector('#arenaHubHome .ar-categories').scrollIntoView({behavior:'smooth',block:'start'});return;}navActive(k);if(k==='league')league();else if(k==='challenge')challenge();else account();});}
 if(title)title.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();goHome();},true);
 home.querySelector('.ar-brand').addEventListener('click',goHome);
 findGames();new MutationObserver(findGames).observe(ana,{childList:true,subtree:true});
