@@ -24,7 +24,7 @@ html.menu-kilit,html.menu-kilit body{height:auto!important;min-height:100%!impor
 body>h1{height:calc(var(--bas-yuk,58px) + env(safe-area-inset-top))!important;background:linear-gradient(180deg,#06142b,#030918)!important;border-bottom:1px solid #14345f!important;box-shadow:0 5px 24px #087bff30!important;display:flex!important;align-items:center!important;justify-content:center!important}
 body>h1 .hl{display:none!important}
 body>h1 .arena-logo{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:.9;font:1000 clamp(27px,7vw,37px)/.9 Georgia,serif;letter-spacing:1px;color:#fff;text-shadow:0 2px 0 #76521b,0 0 13px #3d9dff}
-body>h1 .arena-logo:before{content:'♛';position:absolute;top:-10px;font-size:16px;color:#ffd34f;text-shadow:0 0 10px #ffb300}
+body>h1 .arena-logo:before{content:'♛';position:absolute;top:-2px;font-size:15px;color:#ffd34f;text-shadow:0 0 10px #ffb300}
 body>h1 .arena-logo:after{content:'OYUN PLATFORMU';font:700 8px/1.4 system-ui,sans-serif;letter-spacing:2px;color:#d7e7ff;margin-top:4px;text-shadow:none}
 body>h1 .arena-wreath{position:absolute;top:0;font:26px/1 Georgia,serif;color:#f5c84d;text-shadow:0 0 9px #ffae00}
 body>h1 .arena-wreath.left{right:calc(100% + 8px)}body>h1 .arena-wreath.right{left:calc(100% + 8px);transform:scaleX(-1)}
