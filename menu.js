@@ -88,7 +88,7 @@ body>h1 .ar-header-hotspot.gear{right:1%;width:9%}
 #arenaHubHome #arCategoryTitle{display:none!important}
 #arenaHubHome .ar-categories{gap:12px!important;margin-top:0!important}
 #arenaHubHome .ar-cat{grid-template-columns:112px minmax(0,1fr)!important;min-height:137px!important;height:137px!important;padding:8px 9px!important;gap:6px!important;border-radius:21px!important}
-#arenaHubHome .ar-cat-icon{width:108px!important;height:118px!important;display:block!important;font-size:0!important;background-size:600% 200%!important;background-repeat:no-repeat!important}
+#arenaHubHome .ar-cat-icon{width:108px!important;height:118px!important;display:block!important;font-size:0!important;background-size:600% 300%!important;background-repeat:no-repeat!important}
 #arenaHubHome .ar-cat-copy strong{font-size:clamp(16px,4.4vw,21px)!important;line-height:1.12!important}
 #arenaHubHome .ar-cat-copy small{font-size:13px!important;margin-top:7px!important}
 #arenaHubHome .ar-daily{grid-template-columns:84px minmax(0,1fr) 112px!important;min-height:92px!important;height:92px!important;margin-top:18px!important;padding:8px 12px!important;gap:8px!important;border-radius:17px!important}
@@ -100,7 +100,7 @@ body>h1 .ar-header-hotspot.gear{right:1%;width:9%}
 #arenaHubHome .ar-section-title:has(+.ar-featured){margin:14px 3px 10px!important;font-size:20px!important}
 #arenaHubHome .ar-featured{gap:8px!important;padding:0 0 4px!important}
 #arenaHubHome .ar-feature{font-size:12px!important;line-height:1.15!important}
-#arenaHubHome .ar-feature i{height:92px!important;margin-bottom:7px!important;border-radius:17px!important;font-size:0!important;background-size:600% 200%!important;background-repeat:no-repeat!important;border:0!important;box-shadow:none!important}
+#arenaHubHome .ar-feature i{height:92px!important;margin-bottom:7px!important;border-radius:17px!important;font-size:0!important;background-size:600% 300%!important;background-repeat:no-repeat!important;border:0!important;box-shadow:none!important}
 #arenaNeonNav{left:9px!important;right:9px!important;bottom:calc(5px + env(safe-area-inset-bottom))!important;padding:6px 4px 5px!important;gap:3px!important;border-radius:22px!important}
 #arenaNeonNav button{min-height:100px!important;height:100px!important;padding:5px 1px!important;gap:5px!important;font-size:clamp(9px,2.7vw,12px)!important}
 #arenaNeonNav button i{font-size:32px!important}
@@ -152,8 +152,8 @@ window.addEventListener('load',()=>document.head.appendChild(unlock),{once:true}
 const artStyle=document.createElement('style');
 artStyle.id='arenaReferenceSprite';
 artStyle.textContent=`
-#arenaHubHome .ar-cat-icon{background-image:url("arena-reference.webp")!important;background-size:600% 200%!important;background-repeat:no-repeat!important}
-#arenaHubHome .ar-feature i{background-image:url("arena-reference.webp")!important;background-size:600% 200%!important;background-repeat:no-repeat!important}
+#arenaHubHome .ar-cat-icon{background-image:url("arena-reference.webp")!important;background-size:600% 300%!important;background-repeat:no-repeat!important}
+#arenaHubHome .ar-feature i{background-image:url("arena-reference.webp")!important;background-size:600% 300%!important;background-repeat:no-repeat!important}
 `;
 document.head.appendChild(artStyle);
 
@@ -171,7 +171,7 @@ home.innerHTML='<div class="ar-top"><button class="ar-top-btn" data-action="menu
 ana.insertBefore(home,ana.firstChild);ana.appendChild(view);
 
 home.querySelectorAll('.ar-cat-icon').forEach((el,i)=>{el.textContent='';el.style.setProperty('background-position',(i*20)+'% 0%','important');});
-home.querySelectorAll('.ar-feature i').forEach((el,i)=>{el.textContent='';el.style.setProperty('background-position',(i*20)+'% 100%','important');});
+home.querySelectorAll('.ar-feature i').forEach((el,i)=>{el.textContent='';el.style.setProperty('background-position',(i*20)+'% 50%','important');});
 
 const found={};
 function findGames(){const candidates=Array.from(ana.querySelectorAll('button')).filter(b=>!home.contains(b)&&!view.contains(b));Object.keys(defs).forEach(id=>{if(found[id]&&document.contains(found[id]))return;const d=defs[id],b=candidates.find(x=>d.re.test((x.id==='basla'?'Milyoner ':'')+(x.textContent||'').replace(/\\s+/g,' ')));if(b){found[id]=b;b.classList.add('arena-original-game');}});}
