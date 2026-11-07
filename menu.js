@@ -197,6 +197,27 @@ document.head.appendChild(fullPage);
 
 
 if(title){title.innerHTML='<button class="ar-header-hotspot left" data-header-hotspot="menu" aria-label="Menü"></button><button class="ar-header-hotspot bell" data-header-hotspot="notifications" aria-label="Bildirimler"></button><button class="ar-header-hotspot gear" data-header-hotspot="settings" aria-label="Ayarlar"></button>';title.setAttribute('role','group');title.setAttribute('aria-label','ARENA üst menü');}
+/* Platform-specific home: featured mini-game strip is reserved for the native app. */
+(function(){
+  let nativeApp=false;
+  try{
+    nativeApp=!!(window.Capacitor&&typeof window.Capacitor.isNativePlatform==='function'&&window.Capacitor.isNativePlatform());
+    if(!nativeApp&&window.Capacitor&&typeof window.Capacitor.getPlatform==='function')nativeApp=window.Capacitor.getPlatform()!=='web';
+    if(!nativeApp&&window.AndroidBridge)nativeApp=true;
+  }catch(_){}
+  document.documentElement.classList.toggle('arena-native-app',nativeApp);
+  document.documentElement.classList.toggle('arena-web-app',!nativeApp);
+  const platformStyle=document.createElement('style');
+  platformStyle.textContent=`
+    html.arena-web-app #arenaHubHome .ar-section-title,
+    html.arena-web-app #arenaHubHome .ar-featured{display:none!important}
+    html.arena-web-app #arenaHubHome{padding-bottom:20px!important}
+    html.arena-native-app #arenaHubHome .ar-section-title,
+    html.arena-native-app #arenaHubHome .ar-featured{display:flex}
+  `;
+  document.head.appendChild(platformStyle);
+})();
+
 const home=document.createElement('div');home.id='arenaHubHome';
 const view=document.createElement('div');view.id='arenaHubCategory';view.hidden=true;
 home.innerHTML='<div class="ar-top"><button class="ar-top-btn" data-action="menu">☷</button><div class="ar-brand">ARENA<small>OYUN PLATFORMU</small></div><button class="ar-top-btn" data-action="settings">⚙</button></div>'+
