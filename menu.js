@@ -61,8 +61,8 @@ body:has(#ana.hidden) #arenaNeonNav{display:none!important}.ek-dock,.apk-btn,#al
 const fit=document.createElement('style');
 fit.id='arenaReferenceFit';
 fit.textContent=`
-body{padding-top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top))!important;padding-bottom:calc(110px + env(safe-area-inset-bottom))!important;background:#020713!important}
-#ana{padding:0 12px 18px!important;max-width:720px!important;overflow:visible!important}
+body{padding-top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top))!important;padding-bottom:calc(60px + env(safe-area-inset-bottom))!important;background:#020713!important}
+#ana{padding:0 6px 12px!important;max-width:720px!important;overflow:visible!important}
 body>h1{background-image:url("arena-header.webp")!important;background-size:100% 100%!important;background-position:center!important;background-repeat:no-repeat!important;background-color:#020b21!important}
 body>h1 .arena-logo{display:none!important}
 body>h1 .ar-header-hotspot{position:absolute;top:10%;height:80%;padding:0;border:0;background:transparent;z-index:52;min-height:0!important;cursor:pointer}
@@ -123,8 +123,8 @@ body>h1 .ar-header-hotspot.gear{right:1%;width:9%}
 #arenaHubHome .ar-categories{gap:6px!important}
 #arenaHubHome .ar-cat{grid-template-columns:58px minmax(0,1fr)!important;height:72px!important;min-height:72px!important;padding:4px!important;gap:3px!important;border-radius:12px!important}
 #arenaHubHome .ar-cat-icon{width:56px!important;height:64px!important}
-#arenaHubHome .ar-cat-copy strong{font-size:11px!important;line-height:1.1!important}
-#arenaHubHome .ar-cat-copy small{font-size:9px!important;margin-top:3px!important}
+#arenaHubHome .ar-cat-copy strong{font-size:13px!important;line-height:1.1!important}
+#arenaHubHome .ar-cat-copy small{font-size:10px!important;margin-top:3px!important}
 #arenaHubHome .ar-daily{grid-template-columns:42px minmax(0,1fr) 58px!important;min-height:48px!important;height:48px!important;margin-top:10px!important;padding:4px 5px!important;gap:3px!important}
 #arenaHubHome .ar-daily-target{font-size:30px!important}
 #arenaHubHome .ar-daily-copy strong{font-size:11px!important}
@@ -135,8 +135,8 @@ body>h1 .ar-header-hotspot.gear{right:1%;width:9%}
 #arenaHubHome .ar-featured{gap:4px!important;padding:0 0 3px!important}
 #arenaHubHome .ar-feature i{height:48px!important;margin-bottom:3px!important;border-radius:9px!important}
 #arenaHubHome .ar-feature{font-size:8px!important;line-height:1.05!important}
-#arenaNeonNav{bottom:calc(3px + env(safe-area-inset-bottom))!important;padding:3px 2px!important;gap:1px!important}
-#arenaNeonNav button{height:54px!important;min-height:54px!important;padding:2px 0!important;gap:2px!important;font-size:7px!important}
+#arenaNeonNav{left:5px!important;right:5px!important;bottom:calc(3px + env(safe-area-inset-bottom))!important;padding:3px 2px!important;gap:1px!important}
+#arenaNeonNav button{height:54px!important;min-height:54px!important;padding:2px 0!important;gap:2px!important;font-size:9px!important}
 #arenaNeonNav button i{font-size:20px!important}
 }
 `;
