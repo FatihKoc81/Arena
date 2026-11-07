@@ -4,14 +4,14 @@
 const ana=document.getElementById('ana'),title=document.querySelector('body>h1');
 if(!ana||ana.dataset.arenaReference==='1')return;ana.dataset.arenaReference='1';
 const cats=[
-{id:'bilgi',name:'Bilgi Oyunları',icon:'🏆',desc:'Bilgini sına ve zirveye çık',count:'5 Oyun',color:'violet',games:['milyoner','passaparola'],planned:['Hızlı Karar','Bilgi Düellosu','Genel Kültür']},
-{id:'kelime',name:'Kelime Oyunları',icon:'🔠',desc:'Harfler, kelimeler ve sözcükler',count:'3 Oyun',color:'blue',games:['kelime','rotasyon'],planned:['Kelime Zinciri']},
-{id:'masa',name:'Masa ve Strateji',icon:'🎲',desc:'Hamleni planla, rakibini yen',count:'5 Oyun',color:'green',games:[],planned:['Tavla','Dama','Domino','Satranç','Reversi']},
-{id:'sayi',name:'Sayı ve İşlem',icon:'➗',desc:'Sayıları birleştir, işlemleri çöz',count:'5 Oyun',color:'orange',games:['islem'],planned:['İşlem Bulmacası','Sayı Çaprazı','Matematik Bulmacası','2048']},
-{id:'sudoku',name:'Sudoku ve Mantık',icon:'🧩',desc:'Sayı, şekil ve mantıkla çözüme ulaş',count:'5 Oyun',color:'pink',games:[],planned:['Sudoku','Kakuro','Nonogram','Mantık Izgarası','Şekil Dizileri']},
-{id:'dikkat',name:'Dikkat ve Görsel',icon:'👁️',desc:'Gözlemle, karşılaştır ve ayrıntıyı yakala',count:'5 Oyun',color:'cyan',games:[],planned:['7 Fark Bul','Görsel Hafıza','Nesneyi Bul','Hızlı Tarama','Dikkat Testi']},
-{id:'renk',name:'Renk ve Sıralama',icon:'🧪',desc:'Renkleri ayır, parçaları doğru sıraya koy',count:'3 Oyun',color:'indigo',games:[],planned:['Top Sıralama','Su Sıralama','Renkli Bloklar']},
-{id:'refleks',name:'Hız ve Refleks',icon:'⚡',desc:'Hızını ve tepki süreni test et',count:'4 Oyun',color:'red',games:[],planned:['Refleks Testi','Hızlı Dokun','Renk Tepkisi','Hızlı Eşleştirme']}
+{id:'bilgi',name:'Bilgi',icon:'🏆',desc:'Bilgini sına, zirveye çık',count:'5 Oyun',color:'violet',games:['milyoner','passaparola'],planned:['Hızlı Karar','Bilgi Düellosu','Genel Kültür']},
+{id:'kelime',name:'Kelime',icon:'🔠',desc:'Harflerle kelimeler üret',count:'3 Oyun',color:'blue',games:['kelime','rotasyon'],planned:['Kelime Zinciri']},
+{id:'masa',name:'Klasik',icon:'🎲',desc:'Sevilen masa oyunları bir arada',count:'8 Oyun',color:'green',games:[],planned:['Okey','101','Batak','Poker','Tavla','Dama','Satranç','Reversi']},
+{id:'sayi',name:'Sayı',icon:'➗',desc:'Sayıları birleştir, işlemleri çöz',count:'5 Oyun',color:'orange',games:['islem'],planned:['İşlem Bulmacası','Sayı Çaprazı','Matematik Bulmacası','2048']},
+{id:'sudoku',name:'Mantık',icon:'🧩',desc:'Akıl yürüt, desenleri çöz',count:'5 Oyun',color:'pink',games:[],planned:['Sudoku','Kakuro','Nonogram','Mantık Izgarası','Şekil Dizileri']},
+{id:'dikkat',name:'Dikkat',icon:'👁️',desc:'Ayrıntıları fark et, hafızanı sına',count:'5 Oyun',color:'cyan',games:[],planned:['7 Fark Bul','Görsel Hafıza','Nesneyi Bul','Hızlı Tarama','Dikkat Testi']},
+{id:'renk',name:'Renk',icon:'🧪',desc:'Renkleri ayır, doğru sıraya diz',count:'3 Oyun',color:'indigo',games:[],planned:['Top Sıralama','Su Sıralama','Renkli Bloklar']},
+{id:'refleks',name:'Refleks',icon:'⚡',desc:'Hızını ve tepkini test et',count:'4 Oyun',color:'red',games:[],planned:['Refleks Testi','Hızlı Dokun','Renk Tepkisi','Hızlı Eşleştirme']}
 ];
 const defs={
 milyoner:{name:'Milyoner',icon:'🏆',desc:'Genel kültür ve bilgi yarışması',re:/milyoner|oyuna başla/i},
