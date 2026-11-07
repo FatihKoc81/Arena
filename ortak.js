@@ -617,7 +617,8 @@ window.altSatir = function () {
   // Geri tuşuna basılınca yapılacak iş (tus: true = Capacitor'dan geldi, geçmiş kaydı eklemeye gerek yok)
   let sonBasis = 0;
   const rotAcik = () => { const c = document.getElementById("cm"); return !!c && c.style.display === "flex"; };
-  const anaMi = () => !ana.classList.contains("hidden") && !rotAcik();
+  const kategoriAcik = () => { const v = document.getElementById("arenaHubCategory"); return !!v && !v.hidden; };
+  const anaMi = () => !ana.classList.contains("hidden") && !kategoriAcik() && !rotAcik();
   function geri(tus, gecmis) {
     // Aynı basış hem Capacitor hem "backbutton" olayından gelirse iki kez çalışmasın
     const t = Date.now(); if (t - sonBasis < 350) return; sonBasis = t;
