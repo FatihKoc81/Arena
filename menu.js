@@ -162,7 +162,7 @@ document.head.appendChild(artStyle);
 /* Three final category accents; first five continue using the approved sprite artwork. */
 const eightCategoriesStyle=document.createElement('style');
 eightCategoriesStyle.textContent=`
-#arenaHubHome .ar-cat.indigo{--c1:#078d9b;--c2:#073447;--edge:#38e4ed;--glow:#18d6dc55}
+#arenaHubHome .ar-cat.indigo{--c1:#5852d9;--c2:#1c225b;--edge:#8d8bff;--glow:#6461ff55}
 #arenaHubHome .ar-cat.red{--c1:#ed4b4b;--c2:#681b32;--edge:#ff8888;--glow:#ff4f6555}
 #arenaHubHome .ar-cat.cyan{--c1:#078d9b;--c2:#073447;--edge:#38e4ed;--glow:#18d6dc55}
 #arenaHubHome .ar-cat:nth-child(n+6) .ar-cat-icon{background-image:none!important;text-align:center!important}
