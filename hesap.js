@@ -93,7 +93,7 @@
     });
   }
 
-  // ---------- kayıt / giriş / çıkış ----------
+  // ---------- Google hesabına bağlanma / misafir oturumu ----------
   function kayitOl(email, pw, ad) {
     var h = adDogrula(ad);
     if (h) return Promise.reject({ ozel: h });
@@ -229,17 +229,11 @@
   var KURAL = "3-18 karakter · ilk harf büyük · ilk harften sonra en fazla 1 büyük harf daha · sadece a-z, 0-9 ve _ (Türkçe karakter yok) · herkesin adı farklı olur · 15 günde bir değişir.";
 
   function misafirHtml() {
-    var h = '<div class="hs-kicker">ARENA hesabına giriş</div>' +
+    var h = '<div class="hs-kicker">ARENA\'ya hoş geldin!</div>' +
       '<div class="hs-social" style="grid-template-columns:1fr">' +
-      '<button class="hs-google" data-hs="google">🌐 Google ile giriş</button>' +
-      '<button class="hs-google" data-hs="telefon-ekran" style="background:linear-gradient(110deg,#087cff,#073de8);color:#fff;border:0">📱 Telefonla giriş</button></div>' +
-      '<div class="hs-safe">Giriş onaylandıktan sonra kullanıcı adını seçeceksin.</div>' +
-      '<div id="hs-recaptcha" class="hs-recaptcha"></div>';
-    if (telefonEkrani) {
-      h += '<input class="hs-in" id="hs-tel" type="tel" autocomplete="tel" placeholder="+90 5xx xxx xx xx">' +
-        '<button class="hs-bt" data-hs="telefon-gonder">SMS kodu gönder</button>';
-    }
-    if (telefonOnay) h += '<input class="hs-in" id="hs-kod" inputmode="numeric" autocomplete="one-time-code" placeholder="SMS doğrulama kodu"><button class="hs-bt" data-hs="telefon-kod">Kodu doğrula</button>';
+      '<button class="hs-google" data-hs="google"><span style="font-size:20px">G</span> Google ile giriş</button></div>' +
+      '<div class="hs-safe"><b>Misafir olarak oynuyorsun.</b><br>Hesap açmadan tüm oyunları deneyebilirsin. İlerlemeni başka cihazda korumak ve bölüm başına 3 can kazanmak için Google hesabını bağlayabilirsin.</div>' +
+      '<button class="hs-bt gri" data-hs="misafir-devam">Misafir olarak devam et</button>';
     return h;
   }
   function hesapHtml(u) { return ayar ? '<button class="hs-l" data-hs="profil">← Profile dön</button>' + ayarHtml(u) : profilHtml(u); }
@@ -292,6 +286,7 @@
     else if (a === "sekme-kayit") { sekme = "kayit"; msg = ""; render(); }
     else if (a === "sekme-giris") { sekme = "giris"; telefonOnay = null; msg = ""; render(); }
     else if (a === "google") isle(sosyalGiris("google"));
+    else if (a === "misafir-devam") { if (el) el.classList.remove("show"); }
     else if (a === "telefon-ekran") { telefonEkrani = true; render(); }
     else if (a === "telefon-gonder") isle(telefonKodGonder(val("hs-tel"), "giris"));
     else if (a === "kayit") {
@@ -325,6 +320,16 @@
   }
 
   function ac() {
+    if (A.currentUser && A.currentUser.isAnonymous) {
+      var hatirlatmaAnahtari = "arena_google_hatirlatma";
+      var sonHatirlatma = 0;
+      try { sonHatirlatma = Number(localStorage.getItem(hatirlatmaAnahtari) || 0); } catch (e) {}
+      if (!sonHatirlatma || Date.now() - sonHatirlatma >= 10 * 24 * 60 * 60 * 1000) {
+        msg = "Google ile giriş yaparak ilerlemeni hesabına kaydedebilir ve bölüm başına 3 can kazanabilirsin.";
+        msgOk = false;
+        try { localStorage.setItem(hatirlatmaAnahtari, String(Date.now())); } catch (e) {}
+      }
+    }
     if (!el) {
       el = document.createElement("div"); el.className = "hs-ov";
       el.innerHTML = '<div class="hs-kt"><div class="hs-ph"><b>👤 Profil</b><button class="hs-x">✕</button></div><div class="hs-body"></div></div>';

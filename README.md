@@ -32,10 +32,13 @@ Eski APK ve eski şifreli imza anahtarı bu pakete dahil edilmemiştir. Eski imz
 Bu paket kaynak kodu güncellemesidir; Android APK derlemesi ve gerçek Google/SMS giriş testi yapılmış değildir. SMS doğrulaması Firebase sağlayıcısının etkin olmasına, reCAPTCHA ve kota/ülke ayarlarına bağlıdır.
 
 
-## Bu hazırlık paketinde yapılan düzenlemeler
-- Kullanılmayan, ikinci bir giriş penceresi oluşturan `auth.js` kaldırıldı. Giriş arayüzü `hesap.js` üzerinden yüklenir; `ekonomi.js` bu dosyayı dinamik olarak çağırır.
-- Capacitor `webDir` değeri `www` yapıldı. GitHub Actions iş akışı web dosyalarını `www` içine kopyalar ve Android debug APK üretmeyi dener.
-- `.github/workflows/android-debug.yml` eklendi.
+## 7 Kasım 2026 - Kategori ana sayfası güncellemesi
 
-## Önemli test sınırı
-Bu iş akışı Android debug APK üretimini otomatikleştirir; başarılı derleme, Google ile yerel Android girişi veya gerçek SMS doğrulaması bu ortamda çalıştırılıp doğrulanmış değildir. Mevcut `hesap.js` Google girişinde Firebase Web `signInWithPopup`, telefon girişinde Firebase Web `RecaptchaVerifier` kullanır. Bunların Android WebView/Capacitor içinde sorunsuz çalışacağı garanti edilemez. Google için Android SHA-1/SHA-256 ve Firebase'den yeniden indirilmiş Android OAuth içeren `google-services.json` gerekir. Bu nedenle ilk APK yalnızca kurulum/arayüz kontrolü içindir; giriş sistemi test edilmeden yayına alınmamalıdır.
+- Ana ekran kategori merkezli olarak yenilendi: Bilgi, Kelime, Masa, Mantık, Bulmaca, Renk ve Sıralama.
+- Kategoriye dokunulduğunda o kategorinin oyun listesi açılır; geri düğmesi ana kategori ekranına döner.
+- Mevcut beş oyunun mevcut butonları ve click handler'ları korunur; Milyoner, Passaparola, Kelime Oyunu, İşlem Oyunu ve Rotasyon ilgili kategorilerde açılır.
+- Henüz geliştirilmemiş oyunlar açıkça “Yakında eklenecek” olarak gösterilir; çalışır oyun gibi sunulmaz.
+- Ana sayfada profil/ödül/görev/lig/arkadaş alanları için görsel yer tutucular bulunur. Bunlar henüz gerçek hesap veya Firebase verisine bağlanmış özellikler değildir.
+- Service worker ve menu.js sürüm numaraları yenilendi.
+
+**Test durumu:** JavaScript sözdizimi `node --check` ile kontrol edildi. Gerçek Android cihazda görünüm ve mevcut beş oyunun kategori kartlarından açılması henüz kullanıcı cihazında test edilmelidir. Bu ZIP tek başına APK değildir. GitHub'a yüklemeden önce önceki Firebase giriş ve imzalama yapılandırmaları ayrıca doğrulanmalıdır.
