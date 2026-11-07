@@ -157,6 +157,31 @@ artStyle.textContent=`
 `;
 document.head.appendChild(artStyle);
 
+/* APK home screen: fill the usable device height without hiding Android system bars. */
+const fullPage=document.createElement('style');
+fullPage.id='arenaApkFullPage';
+fullPage.textContent=`
+html,body{min-height:100%!important}
+body{min-height:100dvh!important;min-height:100svh!important;box-sizing:border-box!important}
+#ana{display:flex!important;flex-direction:column!important;min-height:calc(100dvh - var(--bas-yuk,58px) - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important;min-height:calc(100svh - var(--bas-yuk,58px) - 60px - env(safe-area-inset-top) - env(safe-area-inset-bottom))!important}
+#arenaHubHome{display:flex!important;flex:1 0 auto!important;flex-direction:column!important;justify-content:space-between!important;min-height:inherit!important;padding-top:2px!important;padding-bottom:12px!important;gap:0!important}
+#arenaHubHome .ar-profile{flex:none!important;margin-bottom:0!important}
+#arenaHubHome .ar-shortcuts{flex:none!important;margin-top:0!important;margin-bottom:0!important}
+#arenaHubHome .ar-categories{flex:none!important}
+#arenaHubHome .ar-daily{flex:none!important;margin-top:0!important}
+#arenaHubHome .ar-section-title{flex:none!important;margin-top:0!important;margin-bottom:0!important}
+#arenaHubHome .ar-featured{flex:none!important;margin-top:0!important;padding-bottom:0!important}
+#arenaNeonNav{bottom:calc(3px + env(safe-area-inset-bottom))!important}
+@media(max-height:760px){
+ #arenaHubHome{justify-content:flex-start!important;gap:8px!important}
+ #arenaHubHome .ar-profile{margin-bottom:0!important}
+ #arenaHubHome .ar-shortcuts{margin-bottom:0!important}
+ #arenaHubHome .ar-daily{margin-top:0!important}
+}
+`;
+document.head.appendChild(fullPage);
+
+
 
 
 if(title){title.innerHTML='<button class="ar-header-hotspot left" data-header-hotspot="menu" aria-label="Menü"></button><button class="ar-header-hotspot bell" data-header-hotspot="notifications" aria-label="Bildirimler"></button><button class="ar-header-hotspot gear" data-header-hotspot="settings" aria-label="Ayarlar"></button>';title.setAttribute('role','group');title.setAttribute('aria-label','ARENA üst menü');}
