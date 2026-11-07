@@ -63,8 +63,8 @@ fit.id='arenaReferenceFit';
 fit.textContent=`
 body{padding-top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top))!important;padding-bottom:calc(60px + env(safe-area-inset-bottom))!important}
 #ana{padding-top:0!important}
-#arenaHubHome .ar-profile{grid-template-columns:54px minmax(0,1fr) 94px!important;gap:4px!important;padding:2px 6px!important;margin-bottom:8px!important;min-height:0!important}
-#arenaHubHome .ar-avatar{width:54px!important;height:54px!important;font-size:28px!important}
+#arenaHubHome .ar-profile{grid-template-columns:54px minmax(0,1fr) 50px 94px!important;gap:4px!important;padding:2px 6px!important;margin-bottom:8px!important;min-height:0!important}
+#arenaHubHome .ar-avatar{width:54px!important;height:54px!important;font-size:28px!important;overflow:visible!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}\n#arenaHubHome .ar-avatar img{width:100%!important;height:100%!important;object-fit:contain!important}\n#arenaHubHome .ar-league{display:grid!important;place-items:center!important;width:50px!important;height:54px!important}\n#arenaHubHome .ar-league img{display:block!important;width:50px!important;height:50px!important;object-fit:contain!important}
 #arenaHubHome .ar-player-name{font-size:16px!important}
 #arenaHubHome .ar-level-line{gap:5px!important;margin-top:4px!important}
 #arenaHubHome .ar-level-pill{padding:3px 7px!important;font-size:11px!important}
@@ -96,7 +96,7 @@ body{padding-top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top))!important;
 #arenaNeonNav button{min-height:52px!important;height:52px!important;padding:3px 1px!important;gap:3px!important;font-size:9px!important}
 #arenaNeonNav button i{font-size:23px!important}
 @media(max-width:350px){
-#arenaHubHome .ar-profile{grid-template-columns:50px minmax(0,1fr) 84px!important}
+#arenaHubHome .ar-profile{grid-template-columns:50px minmax(0,1fr) 42px 84px!important}\n#arenaHubHome .ar-league{width:42px!important}\n#arenaHubHome .ar-league img{width:42px!important;height:46px!important}
 #arenaHubHome .ar-avatar{width:50px!important;height:50px!important}
 #arenaHubHome .ar-cat{grid-template-columns:58px minmax(0,1fr)!important;height:72px!important;min-height:72px!important}
 #arenaHubHome .ar-cat-icon{font-size:40px!important}
@@ -123,7 +123,7 @@ if(title){title.innerHTML='';title.setAttribute('role','button');title.setAttrib
 const home=document.createElement('div');home.id='arenaHubHome';
 const view=document.createElement('div');view.id='arenaHubCategory';view.hidden=true;
 home.innerHTML='<div class="ar-top"><button class="ar-top-btn" data-action="menu">☷</button><div class="ar-brand">ARENA<small>OYUN PLATFORMU</small></div><button class="ar-top-btn" data-action="settings">⚙</button></div>'+
-'<div class="ar-profile"><div class="ar-avatar" id="arAvatar">👤</div><div class="ar-player"><div class="ar-player-name" id="arPlayerName">ARENA Oyuncusu ⭐</div><div class="ar-level-line"><span class="ar-level-pill" id="arLevel">Seviye 1</span><span class="ar-xp" id="arXp">0 XP</span></div><div class="ar-xpbar"><i id="arXpBar"></i></div></div><div class="ar-wallet"><div class="ar-wallet-row"><span>🪙</span><b id="arGold">100</b><span>＋</span></div><div class="ar-wallet-row"><span>❤️</span><b id="arLives">3 / 3</b><span>＋</span></div></div></div>'+
+'<div class="ar-profile"><div class="ar-avatar" id="arAvatar"><img src="arena-avatar.webp" alt=""></div><div class="ar-player"><div class="ar-player-name" id="arPlayerName">ARENA Oyuncusu ⭐</div><div class="ar-level-line"><span class="ar-level-pill" id="arLevel">Seviye 1</span><span class="ar-xp" id="arXp">0 XP</span></div><div class="ar-xpbar"><i id="arXpBar"></i></div></div><div class="ar-league"><img src="arena-league.webp" alt="Altın Lig"></div><div class="ar-wallet"><div class="ar-wallet-row"><span>🪙</span><b id="arGold">100</b><span>＋</span></div><div class="ar-wallet-row"><span>❤️</span><b id="arLives">3 / 3</b><span>＋</span></div></div></div>'+
 '<div class="ar-shortcuts"><button class="ar-short" data-action="reward"><i>🎁</i>Günlük<br>Ödül</button><button class="ar-short" data-action="tasks"><i>📋</i>Günlük<br>Görevler</button><button class="ar-short" data-action="league"><i>🏆</i>Lig<br>Sıralaması</button><button class="ar-short" data-action="friends"><i>👥</i>Arkadaşlar</button><button class="ar-short" data-action="achievements"><i>🛡️</i>Başarılar</button><button class="ar-short" data-action="season"><i>🗓️</i>Sezon</button></div>'+
 '<div class="ar-section-title" id="arCategoryTitle">Oyun Kategorileri <small>6 KATEGORİ</small></div><div class="ar-categories">'+cats.map(c=>'<button class="ar-cat '+c.color+'" data-category="'+c.id+'"><span class="ar-cat-icon">'+c.icon+'</span><span class="ar-cat-copy"><strong>'+c.name+'</strong><small>'+c.count+'</small></span></button>').join('')+'</div>'+
 '<div class="ar-daily"><span class="ar-daily-target">🎯</span><span class="ar-daily-copy"><strong>Günün Görevi</strong><small>3 farklı oyun oyna.</small><span class="ar-progress"><i></i></span></span><span class="ar-daily-reward">🪙 +150</span></div>'+
