@@ -11,7 +11,7 @@
   var GUN7 = 7 * 24 * 3600 * 1000, SAHIP = "fatihkoc7@gmail.com", SAHIP_ADLARI = ["estergon", "osmanli"];
   var REZERVE = ["fk1453", "fatih", "fatih_", "fatihkoc81", "fatihkoc7", "estergon", "osmanli", "hatice", "haticekoc81", "haticekoc1", "haticekoc7"];
   var ayar = false, kayit = null, hesapRef = null, el = null, sekme = "kayit", msg = "", msgOk = false, busy = false;
-  var telefonOnay = null, telefonNumara = "", telefonIslem = "", recaptcha = null;
+  var telefonOnay = null, telefonNumara = "", telefonIslem = "", recaptcha = null, telefonEkrani = false;
 
   function noop() {}
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
@@ -150,74 +150,17 @@
     }).then(function () { location.reload(); });
   }
 
-  // Google (web): Firebase popup/redirect Samsung Internet / yeni Chrome'da "missing initial state" hatası veriyor
-  // (üçüncü taraf depolama engeli). Çözüm: Google Identity Services ile doğrudan erişim anahtarı al, Firebase'e kimlik bilgisi olarak ver.
-  // Kullanım: firebase-config.js içine  window.GOOGLE_WEB_CLIENT_ID = "....apps.googleusercontent.com";  yazılır. Boşsa eski popup yöntemi çalışır.
-  function webGoogleId() { return !window.Capacitor ? String(window.GOOGLE_WEB_CLIENT_ID || "275840158100-8eunae91iudrqfj3vtc2tdpdre4cuij3.apps.googleusercontent.com") : ""; }
-  function gsiHazir() { return !!(window.google && google.accounts && google.accounts.oauth2); }
-  function gsiYukle() {
-    if (!webGoogleId() || gsiHazir() || document.getElementById("hs-gsi")) return;
-    var sc = document.createElement("script"); sc.id = "hs-gsi"; sc.src = "https://accounts.google.com/gsi/client"; sc.async = true;
-    document.head.appendChild(sc);
-  }
-  gsiYukle();
-  function googleTokenAl(id) {
-    return new Promise(function (res, rej) {
-      var tc = google.accounts.oauth2.initTokenClient({
-        client_id: id, scope: "openid email profile",
-        callback: function (r) { r && r.access_token ? res(r.access_token) : rej({ code: "auth/popup-closed-by-user" }); },
-        error_callback: function (e) { rej({ code: e && e.type === "popup_failed_to_open" ? "auth/popup-blocked" : "auth/popup-closed-by-user" }); }
-      });
-      tc.requestAccessToken();
-    });
-  }
-
-  function fbId() { return !window.Capacitor ? String(window.FACEBOOK_APP_ID || "1174079538471789") : ""; }
-  function fbHazir() { return !!(window.FB && window.__fbBasladi); }
-  function fbYukle() {
-    if (!fbId() || fbHazir() || document.getElementById("hs-fbsdk")) return;
-    window.fbAsyncInit = function () {
-      try { FB.init({ appId: fbId(), cookie: false, xfbml: false, version: "v19.0" }); window.__fbBasladi = true; } catch (x) {}
-    };
-    var sc = document.createElement("script"); sc.id = "hs-fbsdk"; sc.src = "https://connect.facebook.net/tr_TR/sdk.js"; sc.async = true;
-    document.head.appendChild(sc);
-  }
-  fbYukle();
-  function facebookTokenAl() {
-    return new Promise(function (res, rej) {
-      FB.login(function (r) {
-        r && r.authResponse && r.authResponse.accessToken ? res(r.authResponse.accessToken) : rej({ code: "auth/popup-closed-by-user" });
-      }, { scope: "public_profile,email" });
-    });
-  }
-
   function sosyalGiris(tur) {
-    if (tur === "google" && webGoogleId() && !gsiHazir()) { gsiYukle(); return Promise.reject({ ozel: "Google yükleniyor. Birkaç saniye sonra tekrar dene. (Reklam/izleme engelleyici açıksa Google'ı engelliyor olabilir.)" }); }
-    if (tur === "facebook" && fbId() && !fbHazir()) { fbYukle(); return Promise.reject({ ozel: "Facebook yükleniyor. Birkaç saniye sonra tekrar dene. (Reklam/izleme engelleyici açıksa Facebook'u engelliyor olabilir.)" }); }
-    var provider = tur === "google" ? new firebase.auth.GoogleAuthProvider() : new firebase.auth.FacebookAuthProvider();
-    provider.setCustomParameters && tur === "facebook" && provider.setCustomParameters({ display: "popup" });
+    var provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: "select_account" });
     var misafir = A.currentUser && A.currentUser.isAnonymous ? A.currentUser : null;
-    var gid = tur === "google" && gsiHazir() ? webGoogleId() : "";
-    var kc = null;
-    var fid = tur === "facebook" && fbHazir() ? fbId() : "";
-    var islem = gid
-      ? googleTokenAl(gid).then(function (tok) {
-          kc = firebase.auth.GoogleAuthProvider.credential(null, tok);
-          return misafir ? misafir.linkWithCredential(kc) : A.signInWithCredential(kc);
-        })
-      : fid
-      ? facebookTokenAl().then(function (tok) {
-          kc = firebase.auth.FacebookAuthProvider.credential(tok);
-          return misafir ? misafir.linkWithCredential(kc) : A.signInWithCredential(kc);
-        })
-      : (misafir ? misafir.linkWithPopup(provider) : A.signInWithPopup(provider));
+    var islem = misafir ? misafir.linkWithPopup(provider) : A.signInWithPopup(provider);
     return islem.then(function (sonuc) {
       if (sonuc && sonuc.user) return birlestir(sonuc.user.uid);
     }).catch(function (e) {
       var kod = e && e.code;
-      if (misafir && (kod === "auth/credential-already-in-use" || kod === "auth/account-exists-with-different-credential" || kod === "auth/email-already-in-use")) {
-        // bu e-posta daha önce kayıtlı: misafir hesabı bağlamak yerine o hesaba giriş yap
-        var cred = kc || (tur === "google" ? firebase.auth.GoogleAuthProvider.credentialFromError(e) : firebase.auth.FacebookAuthProvider.credentialFromError(e));
+      if (misafir && (kod === "auth/credential-already-in-use" || kod === "auth/account-exists-with-different-credential")) {
+        var cred = firebase.auth.GoogleAuthProvider.credentialFromError(e);
         if (!cred) throw e;
         var eskiUid = misafir.uid;
         return db.ref("apps/" + APP + "/users/" + eskiUid).remove().catch(noop).then(function () { return A.signInWithCredential(cred); }).then(function (c) { return birlestir(c.user.uid); });
@@ -249,11 +192,7 @@
     var eski = A.currentUser && A.currentUser.isAnonymous ? A.currentUser.uid : null;
     return telefonOnay.confirm(String(kod || "").trim()).then(function (c) {
       return (eski ? birlestir(c.user.uid) : Promise.resolve()).then(function () {
-        if (telefonIslem === "kayit") {
-          var ad = val("hs-a").trim(), h = adDogrula(ad);
-          if (h) throw { ozel: h };
-          return adAl(ad);
-        }
+        
       });
     }).then(function () { telefonOnay = null; location.reload(); });
   }
@@ -275,7 +214,7 @@
     ".hs-tabs{display:flex;gap:0;margin:0 0 18px;border:2px solid #647fca;border-radius:18px;overflow:hidden;background:#0b1731}" +
     ".hs-tab{flex:1;border:0;background:transparent;color:#b9c8ec;padding:13px 5px;font:800 17px system-ui,sans-serif;cursor:pointer}.hs-tab.on{background:linear-gradient(110deg,#075dff,#087bff);color:#fff;box-shadow:0 0 15px #087bff88}" +
     ".hs-kicker{display:flex;align-items:center;gap:10px;color:#b9d3ff;font-size:17px;font-weight:800;margin:10px 0 14px}.hs-kicker:before,.hs-kicker:after{content:'';height:2px;background:#6689d6;flex:1}" +
-    ".hs-social{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 18px}.hs-social button{min-width:0;min-height:58px;border-radius:16px;border:2px solid #6385d1;font:800 15px system-ui,sans-serif;cursor:pointer;padding:9px 7px}.hs-social button{display:flex;align-items:center;justify-content:center;gap:8px;font:700 13px/1.15 system-ui,sans-serif!important;white-space:nowrap;text-align:center;overflow:hidden;letter-spacing:-.2px;padding:9px 5px;gap:5px;font-size:clamp(10px,3.1vw,13px)!important}.hs-social button .hs-lg{flex:0 0 auto;width:20px;height:20px}.hs-social button span{display:block;min-width:0}.hs-lg{width:26px;height:26px;flex:none}.hs-google{background:#fff;color:#172033;border-color:#b9c4ee!important}.hs-facebook{background:linear-gradient(120deg,#0a7cff,#0866ff);border-color:#35b4ff!important;color:#fff;box-shadow:0 0 10px rgba(30,156,255,.55)}" +
+    ".hs-social{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 18px}.hs-social button{min-width:0;min-height:58px;border-radius:16px;border:2px solid #6385d1;font:800 15px system-ui,sans-serif;cursor:pointer;padding:9px 7px}.hs-social button{display:flex;align-items:center;justify-content:center;gap:8px;font:700 13px/1.15 system-ui,sans-serif!important;white-space:nowrap;letter-spacing:-.2px}.hs-lg{width:26px;height:26px;flex:none}.hs-google{background:#fff;color:#172033;border-color:#b9c4ee!important}.hs-facebook{background:linear-gradient(120deg,#0a7cff,#0866ff);border-color:#35b4ff!important;color:#fff;box-shadow:0 0 10px rgba(30,156,255,.55)}" +
     ".hs-in{display:block;width:100%;box-sizing:border-box;margin:10px 0;padding:15px 16px;border-radius:17px;border:2px solid #607fc7;background:#0a1833;color:#fff;font:17px system-ui,sans-serif;min-height:58px;outline:none}.hs-in:focus{border-color:#32c7ff;box-shadow:0 0 0 2px #168bff33}.hs-in::placeholder{color:#b5c2dc}" +
     ".hs-bt{display:block;width:100%;border:0;border-radius:17px;padding:16px;margin:14px 0 8px;font:900 19px system-ui,sans-serif;color:#fff;background:linear-gradient(110deg,#087cff,#073de8);box-shadow:0 0 14px #087bff66;cursor:pointer}.hs-bt.gri{background:#263958}.hs-bt.kirmizi{background:#a3231c}.hs-bt[disabled]{opacity:.4}" +
     ".hs-s{margin:8px 0;font-size:15px;word-break:break-all}.hs-k{font-size:14px;color:#aebfe0;line-height:1.5;margin:8px 0}.hs-msg{background:#3a1212;border:1px solid #a3231c;border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:14px;line-height:1.4}.hs-msg.ok{background:#0f2e25;border-color:#22b77a}" +
@@ -284,32 +223,22 @@
     ".hs-pf{text-align:center;margin:4px 0 10px}.hs-av{width:72px;height:72px;border-radius:50%;margin:0 auto 8px;background:linear-gradient(#f2b92e,#a86f0c);color:#101a38;font:900 34px/72px system-ui,sans-serif}.hs-pn{font-size:22px;font-weight:800}" +
     ".hs-top{background:#0b1230;border:2px solid #f2b92e;border-radius:14px;padding:11px;text-align:center;font-size:16px;margin:8px 0}.hs-top b{font-size:24px;color:#ffd35a;margin-left:6px}" +
     ".hs-r{display:flex;justify-content:space-between;padding:8px 4px;border-bottom:1px solid #1d2540;font-size:15px}.hs-r b{color:#ffd35a}" +
-    "@media(max-width:390px){.hs-body{padding:12px}.hs-tab{font-size:15px}.hs-ph{font-size:21px}}";
+    "@media(max-width:390px){.hs-body{padding:12px}.hs-social button{font-size:13px}.hs-tab{font-size:15px}.hs-ph{font-size:21px}}";
   document.head.appendChild(css);
 
   var KURAL = "3-18 karakter · ilk harf büyük · ilk harften sonra en fazla 1 büyük harf daha · sadece a-z, 0-9 ve _ (Türkçe karakter yok) · herkesin adı farklı olur · 15 günde bir değişir.";
 
   function misafirHtml() {
-    var h = '<div class="hs-tabs"><button class="hs-tab' + (sekme === "kayit" ? " on" : "") + '" data-hs="sekme-kayit">Kayıt Ol</button><button class="hs-tab' + (sekme === "giris" ? " on" : "") + '" data-hs="sekme-giris">Giriş Yap</button></div>';
-    if (sekme === "kayit") {
-      h += '<div class="hs-kicker">Hızlı Kayıt (Önerilen)</div>' +
-        '<div class="hs-social"><button class="hs-google" data-hs="google"><svg class=\"hs-lg\" viewBox=\"0 0 48 48\" aria-hidden=\"true\"><path fill=\"#EA4335\" d=\"M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z\"/><path fill=\"#4285F4\" d=\"M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z\"/><path fill=\"#FBBC05\" d=\"M10.5 28.7c-.5-1.5-.8-3.1-.8-4.7s.3-3.2.8-4.7l-7.9-6.1C.9 16.5 0 20.1 0 24s.9 7.5 2.6 10.8l7.9-6.1z\"/><path fill=\"#34A853\" d=\"M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z\"/></svg><span>Google<br>ile giriş yap</span></button><button class="hs-facebook" data-hs="facebook"><svg class=\"hs-lg\" viewBox=\"0 0 48 48\" aria-hidden=\"true\"><circle cx=\"24\" cy=\"24\" r=\"24\" fill=\"#fff\"/><path fill=\"#0866ff\" d=\"M33.3 30.9l1.1-6.9h-6.6v-4.5c0-1.9.9-3.7 3.9-3.7h3V10c0 0-2.7-.5-5.3-.5-5.4 0-8.9 3.3-8.9 9.3V24h-6v6.9h6V48c1.2.2 2.4.3 3.7.3s2.5-.1 3.7-.3V30.9h5.4z\"/></svg><span>Facebook<br>ile giriş yap</span></button></div>' +
-        '<input class="hs-in" id="hs-e" type="text" autocomplete="email" placeholder="E-posta veya telefon">' +
-        '<input class="hs-in" id="hs-p" type="password" autocomplete="new-password" placeholder="Şifre (en az 6 karakter)">' +
-        '<input class="hs-in" id="hs-a" maxlength="18" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Kullanıcı adı">' +
-        '<button class="hs-bt" data-hs="kayit">Kayıt Ol</button>' +
-        '<div class="hs-safe">🛡️ Hesabın güvende, puanların ve ilerlemen korunur.</div>';
-    } else {
-      h += '<div class="hs-kicker">Hesabına Giriş Yap</div>' +
-        '<div class="hs-social"><button class="hs-google" data-hs="google"><svg class=\"hs-lg\" viewBox=\"0 0 48 48\" aria-hidden=\"true\"><path fill=\"#EA4335\" d=\"M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z\"/><path fill=\"#4285F4\" d=\"M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z\"/><path fill=\"#FBBC05\" d=\"M10.5 28.7c-.5-1.5-.8-3.1-.8-4.7s.3-3.2.8-4.7l-7.9-6.1C.9 16.5 0 20.1 0 24s.9 7.5 2.6 10.8l7.9-6.1z\"/><path fill=\"#34A853\" d=\"M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z\"/></svg><span>Google<br>ile giriş yap</span></button><button class="hs-facebook" data-hs="facebook"><svg class=\"hs-lg\" viewBox=\"0 0 48 48\" aria-hidden=\"true\"><circle cx=\"24\" cy=\"24\" r=\"24\" fill=\"#fff\"/><path fill=\"#0866ff\" d=\"M33.3 30.9l1.1-6.9h-6.6v-4.5c0-1.9.9-3.7 3.9-3.7h3V10c0 0-2.7-.5-5.3-.5-5.4 0-8.9 3.3-8.9 9.3V24h-6v6.9h6V48c1.2.2 2.4.3 3.7.3s2.5-.1 3.7-.3V30.9h5.4z\"/></svg><span>Facebook<br>ile giriş yap</span></button></div>' +
-        '<div class="hs-kicker">veya</div>' +
-        '<input class="hs-in" id="hs-e" type="text" autocomplete="username" placeholder="E-posta, telefon veya kullanıcı adı">' +
-        '<input class="hs-in" id="hs-p" type="password" autocomplete="current-password" placeholder="Şifre">' +
-        '<div class="hs-loginrow"><label class="hs-remember"><input type="checkbox" id="hs-remember"> Beni hatırla</label><button class="hs-l" data-hs="unuttum">Şifremi unuttum?</button></div>' +
-        '<button class="hs-bt" data-hs="giris">Giriş Yap</button>' +
-        '<div class="hs-safe">🛡️ Hesabın güvende, puanların ve ilerlemen korunur.</div>';
+    var h = '<div class="hs-kicker">ARENA hesabına giriş</div>' +
+      '<div class="hs-social" style="grid-template-columns:1fr">' +
+      '<button class="hs-google" data-hs="google">🌐 Google ile giriş</button>' +
+      '<button class="hs-google" data-hs="telefon-ekran" style="background:linear-gradient(110deg,#087cff,#073de8);color:#fff;border:0">📱 Telefonla giriş</button></div>' +
+      '<div class="hs-safe">Giriş onaylandıktan sonra kullanıcı adını seçeceksin.</div>' +
+      '<div id="hs-recaptcha" class="hs-recaptcha"></div>';
+    if (telefonEkrani) {
+      h += '<input class="hs-in" id="hs-tel" type="tel" autocomplete="tel" placeholder="+90 5xx xxx xx xx">' +
+        '<button class="hs-bt" data-hs="telefon-gonder">SMS kodu gönder</button>';
     }
-    h += '<div id="hs-recaptcha" class="hs-recaptcha"></div>';
     if (telefonOnay) h += '<input class="hs-in" id="hs-kod" inputmode="numeric" autocomplete="one-time-code" placeholder="SMS doğrulama kodu"><button class="hs-bt" data-hs="telefon-kod">Kodu doğrula</button>';
     return h;
   }
@@ -332,12 +261,17 @@
       '<button class="hs-bt" data-hs="ad-kaydet">Adı Kaydet</button>';
     return h + '<button class="hs-bt kirmizi" data-hs="cikis">Çıkış yap</button>';
   }
+  function ilkKullaniciAdiHtml() {
+    return '<div class="hs-kicker">Hoş geldin!</div><div class="hs-safe">Hesabın doğrulandı. Şimdi ARENA kullanıcı adını seç.</div>' +
+      '<input class="hs-in" id="hs-a" maxlength="18" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Kullanıcı adı seç">' +
+      '<button class="hs-bt" data-hs="ad-kaydet">Kullanıcı adını kaydet</button>';
+  }
   function render() {
     if (!el || !el.classList.contains("show")) return;
     var u = A.currentUser, b = el.querySelector(".hs-body");
     var eski = {}; ["hs-e", "hs-a", "hs-kod"].forEach(function (id) { var x = document.getElementById(id); if (x) eski[id] = x.value; });
     var h = msg ? '<div class="hs-msg' + (msgOk ? " ok" : "") + '">' + esc(msg) + "</div>" : "";
-    h += !u ? '<div class="hs-k">Bağlanıyor…</div>' : u.isAnonymous ? misafirHtml() : hesapHtml(u);
+    h += !u ? '<div class="hs-k">Bağlanıyor…</div>' : u.isAnonymous ? misafirHtml() : (kayit && kayit.ad ? hesapHtml(u) : ilkKullaniciAdiHtml());
     b.innerHTML = h;
     for (var id in eski) { var x = document.getElementById(id); if (x) x.value = eski[id]; }
   }
@@ -357,7 +291,9 @@
     else if (a === "profil") { ayar = false; msg = ""; render(); }
     else if (a === "sekme-kayit") { sekme = "kayit"; msg = ""; render(); }
     else if (a === "sekme-giris") { sekme = "giris"; telefonOnay = null; msg = ""; render(); }
-    else if (a === "google" || a === "facebook") isle(sosyalGiris(a));
+    else if (a === "google") isle(sosyalGiris("google"));
+    else if (a === "telefon-ekran") { telefonEkrani = true; render(); }
+    else if (a === "telefon-gonder") isle(telefonKodGonder(val("hs-tel"), "giris"));
     else if (a === "kayit") {
       var regId = val("hs-e").trim();
       if (/^\+?[0-9 ()-]{8,}$/.test(regId)) isle(telefonKodGonder(regId, "kayit"));
@@ -495,7 +431,7 @@
     izle(); setInterval(izle, 60000);
     oyunKancasi();
   }
-  sayacKur();
+  // sayaç satırları (çevrimiçi / bugün / bu hafta) menüden kaldırıldı; oyun sayımı arka planda sürer
 
   // ---------- hesap kaydını izle, adı oyuna yansıt ----------
   function esitle() {

@@ -3,45 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<script>
-(function () {
-  var hatalar = [];
-
-  function hata(m) {
-    hatalar.push(String(m));
-    var goster = function () {
-      var kutu = document.getElementById("arena-hata");
-      if (!kutu) {
-        kutu = document.createElement("div");
-        kutu.id = "arena-hata";
-        kutu.style.cssText =
-          "position:fixed;inset:0;z-index:999999;background:#160b12;color:#fff;padding:24px;font:15px monospace;overflow:auto;white-space:pre-wrap";
-        document.body.appendChild(kutu);
-      }
-      kutu.textContent = "ARENA AÇILIŞ HATASI\n\n" + hatalar.join("\n\n");
-    };
-    if (document.body) goster();
-    else document.addEventListener("DOMContentLoaded", goster);
-  }
-
-  window.addEventListener("error", function (e) {
-    hata(
-      e.message || "Kaynak yüklenemedi: " +
-      (e.target && (e.target.src || e.target.href) || "bilinmeyen")
-    );
-  }, true);
-
-  window.addEventListener("unhandledrejection", function (e) {
-    hata("Promise hatası: " + (e.reason && (e.reason.stack || e.reason.message) || e.reason));
-  });
-})();
-</script>
 <meta name="color-scheme" content="only light">
 <meta name="supported-color-schemes" content="light">
 <style>:root,html,body,#cm{color-scheme:only light!important}</style>
 <script>window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();});</script>
 <title>ARENA</title>
-<link rel="stylesheet" href="style.css?v=20261106i">
+<link rel="stylesheet" href="style.css?v=20261104a">
 <style id="acilisGizle">#ana{visibility:hidden}</style><!-- ana menü, butonlar tamamlanana kadar gizli (eski başlangıç ekranı görünmesin) -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#080c20">
@@ -76,13 +43,14 @@ h1{display:grid!important;grid-template-columns:1fr auto 1fr;justify-content:nor
 @keyframes gNab{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
 .g-ev{width:68px;height:68px;flex:none;border-radius:50%;border:3px solid #44627f;background:rgba(0,0,0,.35);font-size:32px}
 </style>
+
 </head>
 <body>
 <h1><i class="hl">⚡</i><span>ARENA</span><i class="hl hs">⚡</i></h1>
 
 <main class="kart" id="ana">
 <div class="pill" id="seviye">Seviye 1</div>
-<p class="alt"><span>Zihinler çarpışır, efsane doğar!</span></p>
+
 <button class="btn" id="basla">🎯 Oyuna Başla</button>
 <button class="btn ikinci" id="sifirla">🔄 İlerlemeyi Sıfırla</button>
 </main>
@@ -107,10 +75,10 @@ h1{display:grid!important;grid-template-columns:1fr auto 1fr;justify-content:nor
 <button class="btn ikinci" id="sMenu">Ana menü</button>
 </section>
 
-<script src="sorular.js?v=20261106i"></script>
-<script src="seriler.js?v=20261106i"></script>
-<script src="ekonomi.js?v=20261106i"></script>
-<script src="puan.js?v=20261106i"></script>
+<script src="sorular.js?v=20261104a"></script>
+<script src="seriler.js?v=20261104a"></script>
+<script src="ekonomi.js?v=20261104a"></script>
+<script src="puan.js?v=20261104a"></script>
 <script>
 // milyonerSorulari {seviye1:[{soru,secenekler,cevap}]} -> SORULAR [[soru,[secenekler],dogruIndex]]
 var SORULAR = (function () {
@@ -135,7 +103,7 @@ function seviyeSorulari(seri, seviye) {
 }
 </script>
 <script>
-const KEY = "beyinFirtinasi";
+const KEY = "arenaMobileProgress";
 const $ = id => document.getElementById(id);
 let st = { seviye: 1, seri: 0 };
 try { st = JSON.parse(localStorage.getItem(KEY)) || st; } catch (e) {}
@@ -508,21 +476,21 @@ $("gDevam").onclick = () => { gKapat(); guvenliBaslat(); };
 $("gMenu").onclick = () => { gKapat(); menu(); };
 document.addEventListener("anasayfa", gKapat);
 </script>
-<script src="ortak.js?v=20261105c"></script>
-<script src="passaparola.js?v=20261106i"></script>
-<script src="kelime.js?v=20261106i"></script>
-<script src="kelimelerim.js?v=20261106i"></script>
-<script src="islem.js?v=20261106i"></script>
-<script src="ads.js?v=20261106i"></script>
-<script src="rotasyon.js?v=20261106i"></script>
-<script src="menu.js?v=20261106i"></script>
+<script src="ortak.js?v=20261106d"></script>
+<script src="passaparola.js?v=20261104a"></script>
+<script src="kelime.js?v=20261104a"></script>
+<script src="kelimelerim.js?v=20261104a"></script>
+<script src="islem.js?v=20261104a"></script>
+<script src="ads.js?v=20261104a"></script>
+<script src="rotasyon.js?v=20261104a"></script>
+<script src="menu.js?v=20261106d"></script>
 <script>window.ARENA_APP="arena";</script><!-- sıralama/düello verileri bu adla ayrı tutulur -->
-<script src="firebase-config.js?v=20261106i"></script>
+<script src="firebase-config.js?v=20261104a"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
-<script src="arena.js?v=20261106i"></script>
+<script src="arena.js?v=20261105c"></script>
 <script>
 // Sayfa kaymasın (menü, oyun, sonuç ekranları) + sol alta APK indirme / güncelleme butonu
 // Tarayıcıda "⬇ APK", uygulamanın içinde aynı yerde "⬇ Güncelle" yazar.
@@ -583,6 +551,13 @@ document.addEventListener("anasayfa", gKapat);
     var ana = document.getElementById("ana");
     var gor = !!(ana && !ana.classList.contains("hidden") && getComputedStyle(ana).display !== "none");
     if (a) a.classList.toggle("gizli", !gor);
+    // Ana menüde alt bölüm artık belge akışındadır; ekranı kilitlemek kaydırmayı engeller.
+    // İçerik sığmıyorsa doğal sayfa kaydırmasıyla tüm oyun kartları ve alt butonlar görünür.
+    if (gor) {
+      document.documentElement.classList.add("menu-kilit");
+      sonAnahtar = "";
+      return;
+    }
     var gorunen = [];
     document.querySelectorAll(".kart").forEach(function (k) {
       if (k.classList.contains("hidden") || getComputedStyle(k).display === "none") return;

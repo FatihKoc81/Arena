@@ -1,27 +1,37 @@
 {
   "project_info": {
-    "project_number": "275840158100",
-    "firebase_url": "https://estergon-8e8a4-default-rtdb.europe-west1.firebasedatabase.app",
-    "project_id": "estergon-8e8a4",
-    "storage_bucket": "estergon-8e8a4.firebasestorage.app"
+    "project_number": "869287234944",
+    "firebase_url": "https://arena-mobile-1453-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "arena-mobile-1453",
+    "storage_bucket": "arena-mobile-1453.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:275840158100:android:a3cec3ef1dab5a14e62781",
+        "mobilesdk_app_id": "1:869287234944:android:3f565ec16e4210307ac565",
         "android_client_info": {
-          "package_name": "com.fatihkoc.arena"
+          "package_name": "com.fatihkoc.arena.mobile"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "869287234944-32gm5tbgg5l57589efjf527k0qncs7uk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyBZw0zopxgT1bZrRoMxzowA4LEIHlrg0cQ"
+          "current_key": "AIzaSyDMpwjW6V9RscX91l0lQHZPgwrgZQnPor4"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "869287234944-32gm5tbgg5l57589efjf527k0qncs7uk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

@@ -1,6 +1,6 @@
 
-const PROJECT_ID = "estergon-8e8a4";
-const DATABASE_URL = "https://estergon-8e8a4-default-rtdb.europe-west1.firebasedatabase.app";
+const PROJECT_ID = "arena-mobile-1453";
+const DATABASE_URL = "https://arena-mobile-1453-default-rtdb.europe-west1.firebasedatabase.app";
 const APP_NODE = "arena";
 
 const ALLOWED_ORIGINS = new Set([

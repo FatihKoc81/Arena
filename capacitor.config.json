@@ -1,14 +1,5 @@
 {
-  "appId": "com.fatihkoc.arena",
+  "appId": "com.fatihkoc.arena.mobile",
   "appName": "ARENA",
-  "webDir": "www",
-  "plugins": {
-    "FirebaseAuthentication": {
-      "skipNativeAuth": true,
-      "providers": [
-        "facebook.com",
-        "google.com"
-      ]
-    }
-  }
+  "webDir": "www"
 }

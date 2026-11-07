@@ -187,7 +187,7 @@
 
   // ESKİ KLASÖRLERDEN TAŞIMA (her oyuncu için tek seferlik, otomatik):
   // Eski klasörlerdeki puan / turnuva puanı / lig bu oyuncunun yeni klasördeki kaydıyla birleştirilir (büyük olan kalır).
-  var ESKI_APPLER = ["beyinfirtinasi", "bilgiarenasi"];
+  var ESKI_APPLER = []; // Yeni ARENA eski uygulamalardan veri aktarmaz
   function eskiTasi() {
     var bayrak = "arena_tasindi_" + APP + "_" + uid;
     try { if (localStorage.getItem(bayrak)) return Promise.resolve(); } catch (e) {}
@@ -233,7 +233,7 @@
       kullaniciYaz(true);
     });
     // turnuva puanı / lig bilgisini sunucudan al (başka cihazdaki değerle birleştir), sonra sezonu kontrol et
-    eskiTasi().then(function () { return kok.child("users/" + uid).once("value"); }).then(function (s) {
+    Promise.resolve().then(function () { return kok.child("users/" + uid).once("value"); }).then(function (s) {
       var v = s.val() || {};
       if ((v.tp || 0) > L.tp) L.tp = v.tp;
       if ((v.tz || 0) > L.tz) L.tz = v.tz;
@@ -1028,7 +1028,7 @@
     if (!ana || document.getElementById("arAdBtn")) return;
     var b = document.createElement("div");
     b.id = "arAdBtn";
-    b.textContent = "👤 Davet";
+    b.textContent = "👤 İsimle İstek";
     b.className = "ar-adb";
     b.onclick = adPenAc;
     (window.altSatir ? window.altSatir() : document.body).appendChild(b);
@@ -1233,8 +1233,8 @@
       b.innerHTML = '<span class="ar-ik">' + ikon + "</span><b>" + ad + "</b>";
       b.onclick = fn; a.appendChild(b);
     }
-    mk("arMeydan", "⚔️", "Meydan Oku", "#732b26", 6, meydanOku);
-    mk("arSiralama", "🏅", "Sıralama", "#6b541e", 7, function () { ac("siralama"); });
+    mk("arMeydan", "⚔️", "Meydan Oku", "#a3231c", 6, meydanOku);
+    mk("arSiralama", "🏅", "Sıralama", "#7a5a00", 7, function () { ac("siralama"); });
   }
 
   window.onEkonomiAd = function () { kullaniciYaz(true); };
