@@ -3,6 +3,39 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>
+(function () {
+  var hatalar = [];
+
+  function hata(m) {
+    hatalar.push(String(m));
+    var goster = function () {
+      var kutu = document.getElementById("arena-hata");
+      if (!kutu) {
+        kutu = document.createElement("div");
+        kutu.id = "arena-hata";
+        kutu.style.cssText =
+          "position:fixed;inset:0;z-index:999999;background:#160b12;color:#fff;padding:24px;font:15px monospace;overflow:auto;white-space:pre-wrap";
+        document.body.appendChild(kutu);
+      }
+      kutu.textContent = "ARENA AÇILIŞ HATASI\n\n" + hatalar.join("\n\n");
+    };
+    if (document.body) goster();
+    else document.addEventListener("DOMContentLoaded", goster);
+  }
+
+  window.addEventListener("error", function (e) {
+    hata(
+      e.message || "Kaynak yüklenemedi: " +
+      (e.target && (e.target.src || e.target.href) || "bilinmeyen")
+    );
+  }, true);
+
+  window.addEventListener("unhandledrejection", function (e) {
+    hata("Promise hatası: " + (e.reason && (e.reason.stack || e.reason.message) || e.reason));
+  });
+})();
+</script>
 <meta name="color-scheme" content="only light">
 <meta name="supported-color-schemes" content="light">
 <style>:root,html,body,#cm{color-scheme:only light!important}</style>
