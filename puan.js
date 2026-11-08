@@ -13,7 +13,11 @@
     islem:       { ad: "İşlem",           el: 30,  kat: 2.0 },  // el = bulunan hedef
     rotasyon:    { ad: "Kelime Çemberi",  el: 25,  kat: 1.5 },  // el = çözülen çember
     duello:      { ad: "Düello Zaferi",   el: 50,  kat: 1.0 },  // el = kazanılan düello
-    turnuva:     { ad: "Turnuva Zaferi",  el: 250, kat: 1.0 }   // el = kazanılan turnuva
+    turnuva:     { ad: "Turnuva Zaferi",  el: 250, kat: 1.0 },
+    okey:        { ad: "Okey",             el: 35,  kat: 1.0 },
+    yuzbir:      { ad: "101",              el: 45,  kat: 1.0 },
+    batak:       { ad: "Batak",            el: 50,  kat: 1.0 },
+    poker:       { ad: "Poker",            el: 30,  kat: 1.0 }   // el = kazanılan turnuva
   };
 
   var UYG = (window.Ekonomi && window.Ekonomi.UYG) || "";
