@@ -5,7 +5,7 @@ const ana=document.getElementById('ana'),title=document.querySelector('body>h1')
 if(!ana||ana.dataset.arenaReference==='1')return;ana.dataset.arenaReference='1';
 const cats=[
 {id:'bilgi',name:'Bilgi Oyunları',icon:'🏆',desc:'Bilgini sına, zirveye çık',count:'2 Hazır',color:'violet',games:['milyoner','passaparola'],planned:['Hızlı Karar','Bilgi Düellosu','Genel Kültür']},
-{id:'kelime',name:'Kelime Oyunları',icon:'🔠',desc:'Harflerle kelimeler üret',count:'3 Hazır',color:'blue',games:['kelime','rotasyon','wordScramble'],planned:['Kelime Zinciri']},
+{id:'kelime',name:'Harfler',icon:'🔠',desc:'Harflerle kelimeler üret',count:'3 Hazır',color:'blue',games:['kelime','rotasyon','wordScramble'],planned:['Kelime Zinciri']},
 {id:'masa',name:'Masa Oyunları',icon:'🎲',desc:'Sevilen masa oyunları bir arada',count:'4 Hazır',color:'green',games:['okey','yuzbir','batak','poker'],planned:['Tavla','Dama','Satranç']},
 {id:'sudoku',name:'Mantık Oyunları',icon:'🧩',desc:'Akıl yürüt, desenleri çöz',count:'1 Hazır',color:'orange',games:['miniSudoku'],planned:['Kakuro','Nonogram','Mantık Izgarası','Şekil Dizileri']},
 {id:'sayi',name:'Bulmaca Oyunları',icon:'🧩',desc:'Zekânı kullan, bulmacaları çöz',count:'2 Hazır',color:'pink',games:['islem','mathSprint'],planned:['Sayı Çaprazı','2048']},
