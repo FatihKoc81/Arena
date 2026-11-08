@@ -1231,3 +1231,38 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
  `;
  document.head.appendChild(s);
 })();
+
+
+/* Final visual consistency: featured-game tiles share one neutral navy treatment;
+   update control is vertically centered and the same height as the hamburger hit area. */
+(function(){
+ const s=document.createElement('style');s.id='arenaFeaturedUniformAndHeaderAlign';
+ s.textContent=`
+ #arenaHubHome .ar-feature{background:transparent!important;background-image:none!important}
+ #arenaHubHome .ar-feature i,
+ #arenaHubHome .ar-feature:nth-child(1) i,
+ #arenaHubHome .ar-feature:nth-child(2) i,
+ #arenaHubHome .ar-feature:nth-child(3) i,
+ #arenaHubHome .ar-feature:nth-child(4) i,
+ #arenaHubHome .ar-feature:nth-child(5) i,
+ #arenaHubHome .ar-feature:nth-child(6) i{
+   background:#07152d!important;
+   background-image:linear-gradient(155deg,#142b50 0%,#09172e 55%,#050d20 100%)!important;
+   background-color:#07152d!important;
+   border:1px solid #527db8!important;
+   border-radius:14px!important;
+   box-shadow:inset 0 1px #ffffff20,0 4px 10px #0008!important;
+ }
+ body>h1 .ar-header-update{
+   left:calc(12% + 7px)!important;
+   top:calc(env(safe-area-inset-top) + var(--bas-yuk,58px)/2)!important;
+   transform:translateY(-50%)!important;
+   width:52px!important;height:52px!important;min-height:52px!important;
+   border-radius:14px!important;padding:0!important;
+   display:grid!important;place-items:center!important;
+   font-size:27px!important;line-height:1!important;
+ }
+ body>h1 .ar-header-update:active{transform:translateY(-50%)!important}
+ `;
+ document.head.appendChild(s);
+})();
