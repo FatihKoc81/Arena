@@ -1000,3 +1000,85 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
  `;
  document.head.appendChild(s);
 })();
+
+
+/* Correct seven direct home rows: the category grid is row 4, not row 3.
+   Earlier six-row templates left categories in an implicit auto row, so height changes had no effect. */
+(function(){
+ const s=document.createElement('style');
+ s.id='arenaCategoryGridRowFix';
+ s.textContent=`
+ html.arena-home-fixed #arenaHubHome{
+   display:grid!important;
+   grid-template-columns:minmax(0,1fr)!important;
+   grid-template-rows:
+     auto
+     clamp(66px,8vh,76px)
+     clamp(54px,6.5vh,62px)
+     minmax(0,1fr)
+     clamp(52px,6.2vh,60px)
+     24px
+     clamp(72px,9vh,84px)!important;
+   align-content:stretch!important;
+   align-items:stretch!important;
+   gap:clamp(4px,.55vh,6px)!important;
+   height:100%!important;min-height:0!important;max-height:100%!important;
+   overflow:hidden!important;
+ }
+ html.arena-home-fixed #arenaHubHome>.ar-top,
+ html.arena-home-fixed #arenaHubHome>.ar-profile,
+ html.arena-home-fixed #arenaHubHome>.ar-shortcuts,
+ html.arena-home-fixed #arenaHubHome>.ar-categories,
+ html.arena-home-fixed #arenaHubHome>.ar-daily,
+ html.arena-home-fixed #arenaHubHome>.ar-section-title,
+ html.arena-home-fixed #arenaHubHome>.ar-featured{
+   min-height:0!important;max-height:100%!important;margin-top:0!important;margin-bottom:0!important;
+ }
+ html.arena-home-fixed #arenaHubHome .ar-categories{
+   display:grid!important;
+   grid-template-columns:repeat(2,minmax(0,1fr))!important;
+   grid-template-rows:repeat(4,minmax(0,1fr))!important;
+   align-content:stretch!important;align-items:stretch!important;
+   width:100%!important;height:100%!important;min-height:0!important;
+   gap:clamp(6px,.8vh,9px)!important;overflow:hidden!important;
+ }
+ html.arena-home-fixed #arenaHubHome .ar-cat{
+   display:grid!important;width:100%!important;height:100%!important;
+   min-height:0!important;max-height:none!important;
+   grid-template-columns:clamp(48px,14vw,70px) minmax(0,1fr) 22px!important;
+   align-items:center!important;gap:clamp(4px,1vw,7px)!important;
+   padding:6px clamp(6px,1.5vw,10px)!important;box-sizing:border-box!important;
+ }
+ html.arena-home-fixed #arenaHubHome .ar-cat-icon{
+   width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;
+   background-size:600% 300%!important;background-repeat:no-repeat!important;
+ }
+ html.arena-home-fixed #arenaHubHome .ar-cat-copy strong{
+   font-size:clamp(12px,3.5vw,17px)!important;line-height:1.08!important;
+ }
+ html.arena-home-fixed #arenaHubHome .ar-cat-copy small{
+   font-size:clamp(9px,2.6vw,12px)!important;line-height:1.1!important;margin-top:4px!important;
+ }
+ html.arena-home-fixed #arenaHubHome .ar-daily{
+   height:100%!important;min-height:0!important;margin:0!important;padding:4px 7px!important;
+ }
+ html.arena-home-fixed #arenaHubHome .ar-section-title{
+   height:100%!important;min-height:0!important;margin:0 3px!important;
+ }
+ html.arena-home-fixed #arenaHubHome .ar-featured{
+   display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;
+   grid-template-rows:minmax(0,1fr)!important;width:100%!important;height:100%!important;
+   min-height:0!important;max-height:100%!important;overflow:hidden!important;margin:0!important;padding:0 0 2px!important;
+ }
+ html.arena-home-fixed #arenaHubHome .ar-feature{height:100%!important;min-height:0!important;overflow:hidden!important}
+ html.arena-home-fixed #arenaHubHome .ar-feature i{height:auto!important;min-height:0!important;flex:1 1 auto!important}
+ @media(max-height:760px){
+   html.arena-home-fixed #arenaHubHome{
+     grid-template-rows:auto 60px 50px minmax(0,1fr) 48px 21px 68px!important;
+     gap:4px!important;
+   }
+   html.arena-home-fixed #arenaHubHome .ar-categories{gap:5px!important}
+ }
+ `;
+ document.head.appendChild(s);
+})();
