@@ -1589,3 +1589,53 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
     }
   });
 })();
+
+
+/* Hard reset featured game text strips and force a fresh menu stylesheet execution. */
+(function(){
+  const css=document.createElement('style');
+  css.id='arenaFeaturedStripHardReset';
+  css.textContent=`
+    #arenaHubHome .ar-feature > .ar-feature-label,
+    #arenaHubHome .ar-feature > .ar-feature-label *{
+      background:transparent!important;
+      background-color:transparent!important;
+      background-image:none!important;
+      border:0!important;
+      box-shadow:none!important;
+      outline:0!important;
+      filter:none!important;
+    }
+    #arenaHubHome .ar-feature > .ar-feature-label{
+      display:block!important;
+      width:100%!important;
+      padding:0!important;
+      margin:0!important;
+      color:#fff!important;
+      text-align:center!important;
+    }
+    #arenaHubHome .ar-feature{
+      background:transparent!important;
+      background-color:transparent!important;
+      background-image:none!important;
+      border:0!important;
+      box-shadow:none!important;
+    }
+  `;
+  document.head.appendChild(css);
+  function reset(){
+    document.querySelectorAll('#arenaHubHome .ar-feature').forEach(function(card){
+      const label=card.querySelector(':scope > .ar-feature-label');
+      if(label){
+        ['background','background-color','background-image','border','box-shadow','outline','filter'].forEach(function(p){
+          label.style.setProperty(p,p==='background'||p==='background-color'?'transparent':(p==='background-image'?'none':'0'),'important');
+        });
+      }
+      ['background','background-color','background-image','border','box-shadow'].forEach(function(p){
+        card.style.setProperty(p,p==='background'||p==='background-color'?'transparent':(p==='background-image'?'none':'0'),'important');
+      });
+    });
+  }
+  reset();
+  document.addEventListener('DOMContentLoaded',reset,{once:true});
+})();
