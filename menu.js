@@ -2419,3 +2419,45 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
    }
  },true);
 })();
+
+
+/* 2026-11-09: category heading flow fix; keep back button in its grid column. */
+(function(){
+ const style=document.createElement('style');
+ style.id='arenaCategoryHeadingFlowFix20261109';
+ style.textContent=`
+  html.arena-home-fixed body #arenaHubHome .ar-inline-category-head{
+    display:grid!important;
+    grid-template-columns:52px minmax(0,1fr)!important;
+    grid-template-rows:minmax(0,1fr)!important;
+    align-items:center!important;justify-content:stretch!important;
+    gap:8px!important;width:100%!important;
+    height:54px!important;min-height:54px!important;
+    padding:3px 9px!important;box-sizing:border-box!important;
+    overflow:hidden!important;
+  }
+  html.arena-home-fixed body #arenaHubHome .ar-inline-category-head>.ar-inline-back{
+    position:relative!important;inset:auto!important;
+    transform:none!important;grid-column:1!important;grid-row:1!important;
+    display:grid!important;place-items:center!important;
+    width:46px!important;height:44px!important;min-height:44px!important;
+    max-height:44px!important;margin:0!important;padding:0!important;
+    flex:none!important;align-self:center!important;justify-self:start!important;
+    z-index:5!important;pointer-events:auto!important;
+  }
+  html.arena-home-fixed body #arenaHubHome .ar-inline-category-head>span{
+    position:relative!important;inset:auto!important;transform:none!important;
+    display:block!important;grid-column:2!important;grid-row:1!important;
+    width:100%!important;min-width:0!important;margin:0!important;padding:0!important;
+    text-align:center!important;white-space:normal!important;
+    overflow-wrap:anywhere!important;line-height:1.1!important;
+    font-size:clamp(16px,4.6vw,22px)!important;
+  }
+  @media(max-width:390px){
+    html.arena-home-fixed body #arenaHubHome .ar-inline-category-head{grid-template-columns:48px minmax(0,1fr)!important;gap:5px!important}
+    html.arena-home-fixed body #arenaHubHome .ar-inline-category-head>.ar-inline-back{width:42px!important;height:42px!important;min-height:42px!important;max-height:42px!important}
+    html.arena-home-fixed body #arenaHubHome .ar-inline-category-head>span{font-size:clamp(15px,4.4vw,19px)!important}
+  }
+ `;
+ document.head.appendChild(style);
+})();
