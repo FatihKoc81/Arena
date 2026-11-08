@@ -1,5 +1,5 @@
 /* Arena servis çalışanı: her zaman önce ağdan/dosyadan taze içerik alır, eski önbellekleri siler (güncellemeler takılı kalmasın). */
-const SURUM = "arena-20261108-category-grid-rowfix";
+const SURUM = "arena-20261108-home-grid-final";
 self.addEventListener("install", () => { self.skipWaiting(); });
 self.addEventListener("activate", (e) => {
   e.waitUntil(
