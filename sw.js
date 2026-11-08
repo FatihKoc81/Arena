@@ -1,5 +1,5 @@
 /* Arena servis çalışanı: her zaman önce ağdan/dosyadan taze içerik alır, eski önbellekleri siler (güncellemeler takılı kalmasın). */
-const SURUM = "arena-20261108-featured-ranking-fix";
+const SURUM = "arena-20261108-google-auth-native-fix1";
 self.addEventListener("install", () => { self.skipWaiting(); });
 self.addEventListener("activate", (e) => {
   e.waitUntil(
