@@ -1400,3 +1400,18 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
  normalizeFeatured();
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',normalizeFeatured,{once:true});
 })();
+
+/* Four upper quick actions after duplicate League/Friends shortcuts are removed. */
+(function(){
+ const css=document.createElement('style');
+ css.id='arenaFourUpperShortcuts';
+ css.textContent=`
+ #arenaHubHome .ar-shortcuts{
+   display:grid!important;
+   grid-template-columns:repeat(4,minmax(0,1fr))!important;
+   gap:7px!important;
+ }
+ #arenaHubHome .ar-short{width:100%!important;min-width:0!important}
+ `;
+ document.head.appendChild(css);
+})();
