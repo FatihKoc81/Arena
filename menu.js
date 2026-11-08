@@ -922,3 +922,43 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
  `;
  document.head.appendChild(s);
 })();
+
+
+/* Give the eight category buttons more vertical room */
+(function(){
+ const s=document.createElement('style');
+ s.id='arenaCategoryHeightFinal';
+ s.textContent=`
+ html.arena-home-fixed #arenaHubHome{
+   grid-template-rows:
+     clamp(72px,8.5vh,88px)
+     clamp(56px,6.5vh,70px)
+     minmax(0,1fr)
+     clamp(52px,6.2vh,64px)
+     22px
+     clamp(76px,10vh,96px)!important;
+   gap:clamp(4px,.55vh,6px)!important;
+ }
+ html.arena-home-fixed #arenaHubHome .ar-categories{
+   grid-template-rows:repeat(4,minmax(0,1fr))!important;
+   gap:clamp(7px,1vh,10px)!important;
+   min-height:0!important;
+ }
+ html.arena-home-fixed #arenaHubHome .ar-cat{
+   height:100%!important;
+   min-height:0!important;
+   padding:7px clamp(7px,1.7vw,13px)!important;
+ }
+ @media(max-height:760px){
+   html.arena-home-fixed #arenaHubHome{
+     grid-template-rows:62px 52px minmax(0,1fr) 48px 20px 72px!important;
+     gap:4px!important;
+   }
+   html.arena-home-fixed #arenaHubHome .ar-categories{
+     grid-template-rows:repeat(4,minmax(0,1fr))!important;
+     gap:5px!important;
+   }
+ }
+ `;
+ document.head.appendChild(s);
+})();
