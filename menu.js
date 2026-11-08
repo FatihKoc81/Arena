@@ -679,3 +679,81 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
   `;
   document.head.appendChild(fixedHome);
 })();
+
+
+/* Home viewport fill + remove stray gold arc */
+(function(){
+  const s=document.createElement('style');
+  s.id='arenaHomeViewportBalance';
+  s.textContent=`
+  html.arena-home-fixed body{
+    position:fixed!important;inset:0!important;width:100%!important;height:100dvh!important;
+    min-height:0!important;overflow:hidden!important;box-sizing:border-box!important;
+    padding:0!important;margin:0!important;
+  }
+  html.arena-home-fixed #ana{
+    position:fixed!important;
+    top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top))!important;
+    bottom:calc(70px + env(safe-area-inset-bottom))!important;
+    left:0!important;right:0!important;width:100%!important;height:auto!important;
+    min-height:0!important;max-height:none!important;overflow:hidden!important;
+    margin:0 auto!important;padding:4px 7px 5px!important;box-sizing:border-box!important;
+  }
+  html.arena-home-fixed #arenaHubHome{
+    display:grid!important;
+    grid-template-rows:auto auto minmax(0,1fr) auto auto minmax(94px,.62fr)!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    align-content:stretch!important;align-items:stretch!important;justify-content:stretch!important;
+    width:100%!important;height:100%!important;min-height:0!important;max-height:100%!important;
+    gap:clamp(3px,.55vh,6px)!important;padding:0!important;margin:0!important;overflow:hidden!important;
+  }
+  html.arena-home-fixed #arenaHubHome .ar-profile,
+  html.arena-home-fixed #arenaHubHome .ar-profile::before,
+  html.arena-home-fixed #arenaHubHome .ar-profile::after{
+    transform:none!important;animation:none!important;
+  }
+  html.arena-home-fixed #arenaHubHome .ar-profile::before,
+  html.arena-home-fixed #arenaHubHome .ar-profile::after{content:none!important;display:none!important}
+  html.arena-home-fixed #arenaHubHome .ar-avatar{
+    width:42px!important;height:42px!important;min-width:42px!important;max-width:42px!important;
+    min-height:42px!important;max-height:42px!important;position:relative!important;
+    inset:auto!important;transform:none!important;overflow:hidden!important;
+    border:1px solid #547eaa!important;border-radius:50%!important;
+    background:linear-gradient(145deg,#294b79,#101d38)!important;
+    box-shadow:0 0 7px #168bff45!important;
+  }
+  html.arena-home-fixed #arenaHubHome .ar-avatar::before,
+  html.arena-home-fixed #arenaHubHome .ar-avatar::after{content:none!important;display:none!important}
+  html.arena-home-fixed #arenaHubHome .ar-featured{
+    display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;
+    grid-template-rows:minmax(0,1fr)!important;align-items:stretch!important;align-content:stretch!important;
+    justify-items:stretch!important;align-self:stretch!important;
+    width:100%!important;height:100%!important;min-height:94px!important;max-height:none!important;
+    gap:5px!important;margin:0!important;padding:0 0 2px!important;overflow:hidden!important;
+  }
+  html.arena-home-fixed #arenaHubHome .ar-feature{
+    display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;
+    min-width:0!important;min-height:0!important;height:100%!important;overflow:hidden!important;
+    padding:0!important;font-size:clamp(8px,2.3vw,10px)!important;line-height:1.08!important;
+  }
+  html.arena-home-fixed #arenaHubHome .ar-feature i{
+    display:grid!important;place-items:center!important;flex:1 1 auto!important;
+    width:100%!important;height:auto!important;min-height:68px!important;max-height:none!important;
+    margin:0 0 4px!important;border-radius:12px!important;font-size:clamp(20px,5vw,28px)!important;
+    background:linear-gradient(145deg,#193d73,#251343)!important;
+    border:1px solid #5876b4!important;box-shadow:0 4px 10px #0007!important;
+  }
+  html.arena-home-fixed #arenaHubHome .ar-feature br{display:none!important}
+  @media(max-height:760px){
+    html.arena-home-fixed #arenaHubHome{
+      grid-template-rows:auto auto minmax(0,1fr) auto auto minmax(82px,.48fr)!important;
+    }
+    html.arena-home-fixed #arenaHubHome .ar-feature i{min-height:58px!important}
+  }
+  @media(max-width:350px){
+    html.arena-home-fixed #arenaHubHome .ar-feature{font-size:7px!important}
+    html.arena-home-fixed #arenaHubHome .ar-feature i{min-height:54px!important}
+  }
+  `;
+  document.head.appendChild(s);
+})();
