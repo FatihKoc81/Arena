@@ -2500,3 +2500,105 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
  `;
  document.head.appendChild(style);
 })();
+
+
+/* 2026-11-09 FINAL FIX: pin profile + shortcuts; stable shortcut icons; reliable category back. */
+(function(){
+  if(document.getElementById('arenaPinnedHeaderAndBackFix')) return;
+  const style=document.createElement('style');
+  style.id='arenaPinnedHeaderAndBackFix';
+  style.textContent=`
+    html.arena-home-fixed body #arenaHubHome>.ar-profile{
+      position:fixed!important;
+      top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top) + 5px)!important;
+      left:50%!important;right:auto!important;
+      transform:translateX(-50%)!important;
+      width:min(calc(100vw - 14px),706px)!important;
+      height:80px!important;min-height:80px!important;max-height:80px!important;
+      margin:0!important;flex:none!important;align-self:auto!important;
+      z-index:10020!important;box-sizing:border-box!important;
+      transition:none!important;animation:none!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts{
+      position:fixed!important;
+      top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top) + 91px)!important;
+      left:50%!important;right:auto!important;
+      transform:translateX(-50%)!important;
+      width:min(calc(100vw - 14px),706px)!important;
+      height:72px!important;min-height:72px!important;max-height:72px!important;
+      margin:0!important;flex:none!important;align-self:auto!important;
+      z-index:10020!important;box-sizing:border-box!important;
+      transition:none!important;animation:none!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts>.ar-short{
+      width:100%!important;height:72px!important;min-height:72px!important;max-height:72px!important;
+      margin:0!important;padding:4px 1px!important;box-sizing:border-box!important;
+      transform:none!important;translate:none!important;rotate:none!important;scale:none!important;
+      transition:none!important;animation:none!important;will-change:auto!important;
+      touch-action:manipulation!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts>.ar-short:active,
+    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts>.ar-short:focus,
+    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts>.ar-short:focus-visible{
+      transform:none!important;filter:none!important;outline:none!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts>.ar-short>i{
+      display:block!important;position:static!important;flex:none!important;
+      width:auto!important;height:auto!important;margin:0!important;padding:0!important;
+      transform:none!important;translate:none!important;rotate:none!important;scale:none!important;
+      transition:none!important;animation:none!important;will-change:auto!important;
+      line-height:1!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-profile,
+    html.arena-home-fixed body #arenaHubHome>.ar-profile *{
+      transition:none!important;animation:none!important;
+    }
+    @media(max-height:720px){
+      html.arena-home-fixed body #arenaHubHome>.ar-profile{
+        top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top) + 5px)!important;
+        height:74px!important;min-height:74px!important;max-height:74px!important;
+      }
+      html.arena-home-fixed body #arenaHubHome>.ar-shortcuts{
+        top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top) + 85px)!important;
+        height:64px!important;min-height:64px!important;max-height:64px!important;
+      }
+      html.arena-home-fixed body #arenaHubHome>.ar-shortcuts>.ar-short{
+        height:64px!important;min-height:64px!important;max-height:64px!important;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+
+  function categoryOpen(){
+    const p=document.querySelector('#arenaHubHome>.ar-categories');
+    return !!(p&&p.classList.contains('is-open'));
+  }
+  function closeCategory(e){
+    if(!categoryOpen()) return false;
+    if(e){e.preventDefault();e.stopImmediatePropagation();}
+    try{restoreCategories();}catch(err){
+      const b=document.querySelector('#arenaHubHome [data-category-back]');
+      if(b) b.click();
+    }
+    try{history.replaceState({arenaHome:true},'',location.pathname+location.search);}catch(_){}
+    return true;
+  }
+  /* Capture before any older delegated handlers or transparent overlays. */
+  document.addEventListener('click',function(e){
+    const b=e.target&&e.target.closest&&e.target.closest('#arenaHubHome [data-category-back]');
+    if(b) closeCategory(e);
+  },true);
+  window.addEventListener('popstate',function(e){closeCategory(e);},true);
+  document.addEventListener('backbutton',function(e){closeCategory(e);},true);
+  window.addEventListener('backbutton',function(e){closeCategory(e);},true);
+  document.addEventListener('keydown',function(e){
+    if((e.key==='Escape'||e.key==='Backspace')&&closeCategory(e)) return;
+  },true);
+  /* Capacitor Android hardware-back event, when the App plugin is present. */
+  try{
+    const app=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.App;
+    if(app&&typeof app.addListener==='function'){
+      app.addListener('backButton',function(){closeCategory();});
+    }
+  }catch(_){}
+})();
