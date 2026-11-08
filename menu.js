@@ -2569,16 +2569,18 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
   `;
   document.head.appendChild(style);
 
+  let closingCategory=false;
   function categoryOpen(){
     const p=document.querySelector('#arenaHubHome>.ar-categories');
     return !!(p&&p.classList.contains('is-open'));
   }
   function closeCategory(e){
-    if(!categoryOpen()) return false;
+    if(closingCategory||!categoryOpen()) return false;
     if(e){e.preventDefault();e.stopImmediatePropagation();}
-    try{restoreCategories();}catch(err){
-      const b=document.querySelector('#arenaHubHome [data-category-back]');
-      if(b) b.click();
+    const b=document.querySelector('#arenaHubHome [data-category-back]');
+    if(b){
+      closingCategory=true;
+      try{b.click();}finally{closingCategory=false;}
     }
     try{history.replaceState({arenaHome:true},'',location.pathname+location.search);}catch(_){}
     return true;
