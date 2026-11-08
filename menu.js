@@ -2221,3 +2221,64 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
  `;
  document.head.appendChild(fix);
 })();
+
+
+/* FIXED PROFILE + SHORTCUT RAIL AND CLEARER XP PROGRESS */
+(function(){
+ const css=document.createElement('style');
+ css.id='arenaFixedHeaderRowsXp';
+ css.textContent=`
+  html.arena-home-fixed body #arenaHubHome{
+    grid-template-columns:minmax(0,1fr)!important;
+    grid-auto-flow:row!important;
+    align-content:start!important;
+  }
+  html.arena-home-fixed body #arenaHubHome>.ar-profile{
+    grid-column:1!important;grid-row:1!important;
+    flex:0 0 86px!important;height:86px!important;min-height:86px!important;max-height:86px!important;
+    margin:0!important;align-self:start!important;box-sizing:border-box!important;
+    transform:none!important;transition:none!important;animation:none!important;
+  }
+  html.arena-home-fixed body #arenaHubHome>.ar-shortcuts{
+    grid-column:1!important;grid-row:2!important;
+    flex:0 0 82px!important;height:82px!important;min-height:82px!important;max-height:82px!important;
+    margin:0!important;align-self:start!important;box-sizing:border-box!important;
+    transform:none!important;transition:none!important;animation:none!important;
+  }
+  html.arena-home-fixed body #arenaHubHome>.ar-shortcuts>.ar-short{
+    height:100%!important;min-height:0!important;max-height:100%!important;
+    transform:none!important;transition:none!important;animation:none!important;
+  }
+  html.arena-home-fixed body #arenaHubHome>.ar-profile,
+  html.arena-home-fixed body #arenaHubHome>.ar-shortcuts{
+    position:relative!important;top:0!important;left:0!important;right:0!important;
+  }
+  html.arena-home-fixed body #arenaHubHome .ar-xpbar{
+    display:block!important;position:relative!important;width:100%!important;
+    height:10px!important;min-height:10px!important;margin-top:7px!important;
+    overflow:hidden!important;border:1px solid #7196c9!important;border-radius:20px!important;
+    background:linear-gradient(90deg,#07152d,#142b4d)!important;
+    box-shadow:inset 0 1px 3px #000c,0 0 7px #168bff55!important;
+  }
+  html.arena-home-fixed body #arenaHubHome .ar-xpbar i{
+    display:block!important;height:100%!important;min-width:3px!important;
+    border-radius:20px!important;
+    background:linear-gradient(90deg,#20e6a2 0%,#20c9ff 55%,#8a72ff 100%)!important;
+    box-shadow:0 0 8px #25d9ff,0 0 13px #27c7ff99!important;
+    transition:width .35s ease!important;
+  }
+  html.arena-home-fixed body #arenaHubHome .ar-xp{
+    color:#eaf5ff!important;font-size:11px!important;font-weight:800!important;
+    text-shadow:0 0 7px #58bfff88!important;
+  }
+  @media(max-width:390px){
+    html.arena-home-fixed body #arenaHubHome>.ar-profile{
+      flex-basis:82px!important;height:82px!important;min-height:82px!important;max-height:82px!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts{
+      flex-basis:72px!important;height:72px!important;min-height:72px!important;max-height:72px!important;
+    }
+  }
+ `;
+ document.head.appendChild(css);
+})();
