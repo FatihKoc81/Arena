@@ -12,7 +12,7 @@
             ".write": "auth != null && auth.uid === $uid",
             ".validate": "newData.hasChildren(['ad','puan'])",
             "ad": {
-              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 18 && (newData.val() === root.child('hesap').child($uid).child('ad').val() || (!root.child('hesap').child($uid).exists() && newData.val().matches(/^Oyuncu[0-9]{4}$/)))"
+              ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 18 && (newData.val() === 'Oyuncu' || newData.val() === root.child('hesap').child($uid).child('ad').val() || (!root.child('hesap').child($uid).exists() && newData.val().matches(/^Oyuncu[0-9]{4}$/)))"
             },
             "puan": {
               ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() < 100000000"
