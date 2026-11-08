@@ -4,14 +4,14 @@
 const ana=document.getElementById('ana'),title=document.querySelector('body>h1');
 if(!ana||ana.dataset.arenaReference==='1')return;ana.dataset.arenaReference='1';
 const cats=[
-{id:'bilgi',name:'Bilgi',icon:'🏆',desc:'Bilgini sına, zirveye çık',count:'5 Oyun',color:'violet',games:['milyoner','passaparola'],planned:['Hızlı Karar','Bilgi Düellosu','Genel Kültür']},
-{id:'kelime',name:'Kelime',icon:'🔠',desc:'Harflerle kelimeler üret',count:'3 Oyun',color:'blue',games:['kelime','rotasyon'],planned:['Kelime Zinciri']},
-{id:'masa',name:'Klasik',icon:'🎲',desc:'Sevilen masa oyunları bir arada',count:'8 Oyun',color:'green',games:['okey','yuzbir','batak','poker'],planned:['Tavla','Dama','Satranç','Reversi']},
-{id:'sayi',name:'Sayı',icon:'➗',desc:'Sayıları birleştir, işlemleri çöz',count:'5 Oyun',color:'orange',games:['islem'],planned:['İşlem Bulmacası','Sayı Çaprazı','Matematik Bulmacası','2048']},
-{id:'sudoku',name:'Mantık',icon:'🧩',desc:'Akıl yürüt, desenleri çöz',count:'5 Oyun',color:'pink',games:[],planned:['Sudoku','Kakuro','Nonogram','Mantık Izgarası','Şekil Dizileri']},
-{id:'dikkat',name:'Dikkat',icon:'👁️',desc:'Ayrıntıları fark et, hafızanı sına',count:'5 Oyun',color:'cyan',games:[],planned:['7 Fark Bul','Görsel Hafıza','Nesneyi Bul','Hızlı Tarama','Dikkat Testi']},
-{id:'renk',name:'Renk',icon:'🧪',desc:'Renkleri ayır, doğru sıraya diz',count:'3 Oyun',color:'indigo',games:[],planned:['Top Sıralama','Su Sıralama','Renkli Bloklar']},
-{id:'refleks',name:'Refleks',icon:'⚡',desc:'Hızını ve tepkini test et',count:'4 Oyun',color:'red',games:[],planned:['Refleks Testi','Hızlı Dokun','Renk Tepkisi','Hızlı Eşleştirme']}
+{id:'bilgi',name:'Bilgi',icon:'🏆',desc:'Bilgini sına, zirveye çık',count:'2 Hazır',color:'violet',games:['milyoner','passaparola'],planned:['Hızlı Karar','Bilgi Düellosu','Genel Kültür']},
+{id:'kelime',name:'Kelime',icon:'🔠',desc:'Harflerle kelimeler üret',count:'2 Hazır',color:'blue',games:['kelime','rotasyon'],planned:['Kelime Zinciri']},
+{id:'masa',name:'Klasik',icon:'🎲',desc:'Sevilen masa oyunları bir arada',count:'4 Hazır',color:'green',games:['okey','yuzbir','batak','poker'],planned:['Tavla','Dama','Satranç','Reversi']},
+{id:'sayi',name:'Sayı',icon:'➗',desc:'Sayıları birleştir, işlemleri çöz',count:'1 Hazır',color:'orange',games:['islem'],planned:['İşlem Bulmacası','Sayı Çaprazı','Matematik Bulmacası','2048']},
+{id:'sudoku',name:'Mantık',icon:'🧩',desc:'Akıl yürüt, desenleri çöz',count:'Yakında',color:'pink',games:[],planned:['Sudoku','Kakuro','Nonogram','Mantık Izgarası','Şekil Dizileri']},
+{id:'dikkat',name:'Dikkat',icon:'👁️',desc:'Ayrıntıları fark et, hafızanı sına',count:'Yakında',color:'cyan',games:[],planned:['7 Fark Bul','Görsel Hafıza','Nesneyi Bul','Hızlı Tarama','Dikkat Testi']},
+{id:'renk',name:'Renk',icon:'🧪',desc:'Renkleri ayır, doğru sıraya diz',count:'Yakında',color:'indigo',games:[],planned:['Top Sıralama','Su Sıralama','Renkli Bloklar']},
+{id:'refleks',name:'Refleks',icon:'⚡',desc:'Hızını ve tepkini test et',count:'Yakında',color:'red',games:[],planned:['Refleks Testi','Hızlı Dokun','Renk Tepkisi','Hızlı Eşleştirme']}
 ];
 const defs={
 okey:{name:'Okey',icon:'🀄',desc:'Taşlarını diz, elini tamamla',re:/__arena_okey_never__/i},
@@ -197,6 +197,20 @@ body{min-height:100dvh!important;min-height:100svh!important;box-sizing:border-b
 }
 `;
 document.head.appendChild(fullPage);
+const arenaHomePolish=document.createElement('style');arenaHomePolish.id='arenaHomePolish';arenaHomePolish.textContent=`
+#arenaHubHome .ar-cat{min-height:88px;border-radius:19px;transition:transform .16s ease,filter .16s ease;}
+#arenaHubHome .ar-cat:active,#arenaHubHome .ar-feature:active,#arenaHubHome .ar-short:active{transform:scale(.97);filter:brightness(1.16)}
+#arenaHubHome .ar-cat-copy small{font-weight:800;letter-spacing:.15px}
+#arenaHubHome .ar-daily{cursor:default;position:relative;overflow:hidden}
+#arenaHubHome .ar-progress i{transition:width .35s ease}
+#arenaHubHome .ar-feature i{border-radius:16px;background:linear-gradient(145deg,#1c477e,#21134b);border-color:#5c8bd0;box-shadow:0 5px 14px #0007,inset 0 1px #ffffff25}
+#arenaHubHome .ar-section-title{letter-spacing:.15px;text-shadow:0 2px 8px #0009}
+#arenaHubHome .ar-profile{box-shadow:0 5px 18px #0005,0 0 15px #168bff22,inset 0 1px #ffffff22}
+#arenaHubHome .ar-wallet-row{min-height:29px}
+#arenaHubHome .ar-short{min-height:62px}
+@media(max-width:360px){#arenaHubHome .ar-cat{grid-template-columns:62px minmax(0,1fr);min-height:78px;padding:6px}#arenaHubHome .ar-cat-icon{font-size:34px}#arenaHubHome .ar-short{font-size:8px}}
+`;document.head.appendChild(arenaHomePolish);
+
 
 
 
@@ -245,7 +259,7 @@ function goHome(){view.hidden=true;home.hidden=false;ana.classList.remove('hidde
 function category(id,push){const c=cats.find(x=>x.id===id);if(!c)return;findGames();home.hidden=true;view.hidden=false;const live=c.games.filter(k=>found[k]||(['okey','yuzbir','batak','poker'].includes(k)&&window.ArenaMasaOyunlari)).map(k=>({id:k,...defs[k]}));const cards=live.map(g=>'<button class="ar-game-card" data-launch="'+g.id+'"><i>'+g.icon+'</i><span><strong>'+g.name+'</strong><small>'+g.desc+'</small></span></button>').join('');const planned=c.planned.map(n=>'<div class="ar-game-card soon"><i>🔒</i><span><strong>'+n+'</strong><small>Yakında eklenecek</small></span></div>').join('');view.innerHTML='<button class="ar-back" type="button">← Kategorilere Dön</button><div class="ar-cat-head"><i>'+c.icon+'</i><span><strong>'+c.name+'</strong><small>'+c.desc+'</small></span></div><div class="ar-game-list">'+cards+planned+'</div>';navActive('games');ana.scrollTop=0;if(push)try{history.pushState({arenaCategory:id},'','#kategori-'+id);}catch(_){}}
 function launchGame(id){try{window.dispatchEvent(new CustomEvent('arena:game-start',{detail:{id:id}}));}catch(_){}if(found[id]){found[id].click();return;}if(window.ArenaMasaOyunlari&&window.ArenaMasaOyunlari.ac){window.ArenaMasaOyunlari.ac(id);return;}soon('Bu oyun henüz hazır değil');}
 function dailyMission(){const el=document.querySelector('#arenaHubHome .ar-daily');if(!el)return;let key='arenaDailyGames_'+new Date().getFullYear()+'-'+(new Date().getMonth()+1)+'-'+new Date().getDate(),data={games:[],claimed:false};try{data=JSON.parse(localStorage.getItem(key)||'null')||data;}catch(_){}const count=Math.min(3,(data.games||[]).length),small=el.querySelector('.ar-daily-copy small'),bar=el.querySelector('.ar-progress i'),reward=el.querySelector('.ar-daily-reward');if(small)small.textContent=count>=3?'Görev tamamlandı! Günlük ödülünü kazandın.':count+'/3 farklı oyun oynadın.';if(bar)bar.style.width=(count/3*100)+'%';if(reward)reward.textContent=count>=3?'✓ Tamamlandı':'🪙 +150';}
-window.addEventListener('arena:game-start',e=>{const id=e.detail&&e.detail.id;if(!id)return;let key='arenaDailyGames_'+new Date().getFullYear()+'-'+(new Date().getMonth()+1)+'-'+new Date().getDate(),data={games:[],claimed:false};try{data=JSON.parse(localStorage.getItem(key)||'null')||data;}catch(_){}data.games=Array.from(new Set([...(data.games||[]),id]));if(data.games.length>=3&&!data.claimed){data.claimed=true;try{if(window.Ekonomi&&Ekonomi.ekle)Ekonomi.ekle(150);}catch(_){}}try{localStorage.setItem(key,JSON.stringify(data));}catch(_){}dailyMission();});
+window.addEventListener('arena:game-start',e=>{const id=e.detail&&e.detail.id;if(!id)return;let key='arenaDailyGames_'+new Date().getFullYear()+'-'+(new Date().getMonth()+1)+'-'+new Date().getDate(),data={games:[],claimed:false};try{data=JSON.parse(localStorage.getItem(key)||'null')||data;}catch(_){}data.games=Array.from(new Set([...(data.games||[]),id]));if(data.games.length>=3&&!data.claimed){data.claimed=true;try{if(window.Ekonomi&&Ekonomi.ekle){Ekonomi.ekle(150);profile();}}catch(_){}}try{localStorage.setItem(key,JSON.stringify(data));}catch(_){}dailyMission();});
 function league(){if(window.Arena&&Arena.ac)Arena.ac('siralama');else alert('Lig sıralaması yüklenemedi.');}
 function challenge(){if(window.Arena&&Arena.meydanOku)Arena.meydanOku();else alert('Meydan Oku bölümü yüklenemedi.');}
 function account(){if(window.Hesap&&Hesap.ac)Hesap.ac();else if(window.ArenaAuth&&ArenaAuth.ac)ArenaAuth.ac();else alert('Profil bölümü yüklenemedi.');}
