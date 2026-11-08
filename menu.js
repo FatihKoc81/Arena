@@ -401,7 +401,7 @@ body>h1 .ar-header-hotspot.gear{right:1%!important;width:9%!important}
 #arenaHubHome .ar-level-pill{padding:4px 7px!important;border-radius:10px!important;background:linear-gradient(90deg,#087fe8,#3b50c8)!important;font-size:10px!important;font-weight:900!important}
 #arenaHubHome .ar-xp{font-size:9px!important;color:#e5edff!important;white-space:nowrap!important}
 #arenaHubHome .ar-xpbar{height:5px!important;margin-top:4px!important;border-radius:8px!important;background:#18284b!important;overflow:hidden!important}
-#arenaHubHome .ar-xpbar i{height:100%!important;border-radius:8px!important;background:linear-gradient(90deg,#7d4dff,#35c8ff)!important}
+#arenaHubHome .ar-xpbar i{height:100%!important;border-radius:8px!important;background:linear-gradient(90deg,#a66bff,#55dcff)!important;box-shadow:0 0 5px rgba(85,220,255,.45)!important}
 #arenaHubHome .ar-league{display:grid!important;place-items:center!important;width:52px!important;height:54px!important;min-width:0!important;overflow:hidden!important}
 #arenaHubHome .ar-league img{display:block!important;width:52px!important;height:52px!important;max-width:100%!important;object-fit:contain!important}
 #arenaHubHome .ar-wallet{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:4px!important;min-width:0!important}
