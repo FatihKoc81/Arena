@@ -757,3 +757,42 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
   `;
   document.head.appendChild(s);
 })();
+
+
+/* Increase category card height by reallocating home viewport space */
+(function(){
+ const s=document.createElement('style');
+ s.id='arenaCategoryHeightBoost';
+ s.textContent=`
+ html.arena-home-fixed #arenaHubHome{
+   grid-template-rows:auto auto minmax(0,1fr) auto auto minmax(76px,.34fr)!important;
+ }
+ html.arena-home-fixed #arenaHubHome .ar-categories{
+   grid-template-rows:repeat(4,minmax(58px,1fr))!important;
+   gap:6px!important;
+ }
+ html.arena-home-fixed #arenaHubHome .ar-cat{
+   min-height:0!important;
+   padding:6px 7px!important;
+ }
+ html.arena-home-fixed #arenaHubHome .ar-cat-icon{
+   min-height:0!important;
+ }
+ html.arena-home-fixed #arenaHubHome .ar-featured{
+   min-height:76px!important;
+ }
+ html.arena-home-fixed #arenaHubHome .ar-feature i{
+   min-height:50px!important;
+ }
+ @media(max-height:760px){
+   html.arena-home-fixed #arenaHubHome{
+     grid-template-rows:auto auto minmax(0,1fr) auto auto minmax(68px,.25fr)!important;
+   }
+   html.arena-home-fixed #arenaHubHome .ar-categories{
+     grid-template-rows:repeat(4,minmax(54px,1fr))!important;
+   }
+   html.arena-home-fixed #arenaHubHome .ar-feature i{min-height:44px!important}
+ }
+ `;
+ document.head.appendChild(s);
+})();
