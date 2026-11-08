@@ -4,14 +4,14 @@
 const ana=document.getElementById('ana'),title=document.querySelector('body>h1');
 if(!ana||ana.dataset.arenaReference==='1')return;ana.dataset.arenaReference='1';
 const cats=[
-{id:'bilgi',name:'Bilgi',icon:'🏆',desc:'Bilgini sına, zirveye çık',count:'2 Hazır',color:'violet',games:['milyoner','passaparola'],planned:['Hızlı Karar','Bilgi Düellosu','Genel Kültür']},
-{id:'kelime',name:'Kelime',icon:'🔠',desc:'Harflerle kelimeler üret',count:'2 Hazır',color:'blue',games:['kelime','rotasyon'],planned:['Kelime Zinciri']},
-{id:'masa',name:'Klasik',icon:'🎲',desc:'Sevilen masa oyunları bir arada',count:'4 Hazır',color:'green',games:['okey','yuzbir','batak','poker'],planned:['Tavla','Dama','Satranç','Reversi']},
-{id:'sayi',name:'Sayı',icon:'➗',desc:'Sayıları birleştir, işlemleri çöz',count:'1 Hazır',color:'orange',games:['islem'],planned:['İşlem Bulmacası','Sayı Çaprazı','Matematik Bulmacası','2048']},
-{id:'sudoku',name:'Mantık',icon:'🧩',desc:'Akıl yürüt, desenleri çöz',count:'Yakında',color:'pink',games:[],planned:['Sudoku','Kakuro','Nonogram','Mantık Izgarası','Şekil Dizileri']},
-{id:'dikkat',name:'Dikkat',icon:'👁️',desc:'Ayrıntıları fark et, hafızanı sına',count:'Yakında',color:'cyan',games:[],planned:['7 Fark Bul','Görsel Hafıza','Nesneyi Bul','Hızlı Tarama','Dikkat Testi']},
-{id:'renk',name:'Renk',icon:'🧪',desc:'Renkleri ayır, doğru sıraya diz',count:'Yakında',color:'indigo',games:[],planned:['Top Sıralama','Su Sıralama','Renkli Bloklar']},
-{id:'refleks',name:'Refleks',icon:'⚡',desc:'Hızını ve tepkini test et',count:'Yakında',color:'red',games:[],planned:['Refleks Testi','Hızlı Dokun','Renk Tepkisi','Hızlı Eşleştirme']}
+{id:'bilgi',name:'Bilgi Oyunları',icon:'🏆',desc:'Bilgini sına, zirveye çık',count:'5 Oyun',color:'violet',games:['milyoner','passaparola'],planned:['Hızlı Karar','Bilgi Düellosu','Genel Kültür']},
+{id:'kelime',name:'Kelime Oyunları',icon:'🔠',desc:'Harflerle kelimeler üret',count:'3 Oyun',color:'blue',games:['kelime','rotasyon'],planned:['Kelime Zinciri']},
+{id:'masa',name:'Masa Oyunları',icon:'🎲',desc:'Sevilen masa oyunları bir arada',count:'4 Oyun',color:'green',games:['okey','yuzbir','batak','poker'],planned:['Tavla','Dama','Satranç']},
+{id:'sudoku',name:'Mantık Oyunları',icon:'🧩',desc:'Akıl yürüt, desenleri çöz',count:'5 Oyun',color:'orange',games:[],planned:['Sudoku','Kakuro','Nonogram','Mantık Izgarası','Şekil Dizileri']},
+{id:'sayi',name:'Bulmaca Oyunları',icon:'🧩',desc:'Zekânı kullan, bulmacaları çöz',count:'4 Oyun',color:'pink',games:['islem'],planned:['Sayı Çaprazı','Matematik Bulmacası','2048']},
+{id:'renk',name:'Renk ve Sıralama',icon:'🧪',desc:'Renkleri ayır, doğru sıraya diz',count:'3 Oyun',color:'cyan',games:[],planned:['Top Sıralama','Su Sıralama','Renkli Bloklar']},
+{id:'dikkat',name:'Hafıza Oyunları',icon:'👁️',desc:'Ayrıntıları fark et, hafızanı sına',count:'4 Oyun',color:'indigo',games:[],planned:['Görsel Hafıza','Nesneyi Bul','7 Fark Bul','Hafıza Kartları']},
+{id:'refleks',name:'Refleks Oyunları',icon:'⚡',desc:'Hızını ve tepkini test et',count:'4 Oyun',color:'red',games:[],planned:['Refleks Testi','Hızlı Dokun','Renk Tepkisi','Hızlı Eşleştirme']}
 ];
 const defs={
 okey:{name:'Okey',icon:'🀄',desc:'Taşlarını diz, elini tamamla',re:/__arena_okey_never__/i},
@@ -233,12 +233,12 @@ const view=document.createElement('div');view.id='arenaHubCategory';view.hidden=
 home.innerHTML='<div class="ar-top"><button class="ar-top-btn" data-action="menu">☷</button><div class="ar-brand">ARENA<small>OYUN PLATFORMU</small></div><button class="ar-top-btn" data-action="settings">⚙</button></div>'+
 '<div class="ar-profile"><div class="ar-avatar" id="arAvatar"><img src="arena-avatar.webp" alt=""></div><div class="ar-player"><div class="ar-player-name" id="arPlayerName">ARENA Oyuncusu ⭐</div><div class="ar-level-line"><span class="ar-level-pill" id="arLevel">Seviye 1</span><span class="ar-xp" id="arXp">0 XP</span></div><div class="ar-xpbar"><i id="arXpBar"></i></div></div><div class="ar-league"><img src="arena-league.webp" alt="Altın Lig"></div><div class="ar-wallet"><div class="ar-wallet-row"><span>🪙</span><b id="arGold">100</b><span>＋</span></div><div class="ar-wallet-row"><span>❤️</span><b id="arLives">3 / 3</b><span>＋</span></div></div></div>'+
 '<div class="ar-shortcuts"><button class="ar-short" data-action="reward"><i>🎁</i>Günlük<br>Ödül</button><button class="ar-short" data-action="tasks"><i>📋</i>Günlük<br>Görevler</button><button class="ar-short" data-action="league"><i>🏆</i>Lig<br>Sıralaması</button><button class="ar-short" data-action="friends"><i>👥</i>Arkadaşlar</button><button class="ar-short" data-action="achievements"><i>🛡️</i>Başarılar</button><button class="ar-short" data-action="season"><i>🗓️</i>Sezon</button></div>'+
-'<div class="ar-categories">'+cats.map(c=>'<button class="ar-cat '+c.color+'" data-category="'+c.id+'"><span class="ar-cat-icon">'+c.icon+'</span><span class="ar-cat-copy"><strong>'+c.name+'</strong><small>'+c.count+'</small></span></button>').join('')+'</div>'+
+'<div class="ar-categories">'+cats.map(c=>'<button class="ar-cat '+c.color+'" data-category="'+c.id+'"><span class="ar-cat-icon">'+c.icon+'</span><span class="ar-cat-copy"><strong>'+c.name+'</strong><small>'+c.count+'</small></span><span class="ar-cat-arrow">›</span></button>').join('')+'</div>'+
 '<div class="ar-daily"><span class="ar-daily-target">🎯</span><span class="ar-daily-copy"><strong>Günün Görevi</strong><small>3 farklı oyun oyna.</small><span class="ar-progress"><i></i></span></span><span class="ar-daily-reward">🪙 +150</span></div>'+
 '<div class="ar-section-title">🔥 Öne Çıkan Oyunlar <small data-action="allgames">Tümünü Gör ›</small></div><div class="ar-featured"><button class="ar-feature" data-feature="milyoner"><i>🏆</i>Milyoner</button><button class="ar-feature" data-feature="passaparola"><i>🔤</i>Passaparola</button><button class="ar-feature" data-feature="kelime"><i>🧩</i>Kelime<br>Oyunu</button><button class="ar-feature" data-feature="rotasyon"><i>🔠</i>Rotasyon</button><button class="ar-feature" data-feature="islem"><i>➗</i>İşlem</button><button class="ar-feature" data-feature="okey"><i>🀄</i>Okey</button></div>';
 ana.insertBefore(home,ana.firstChild);ana.appendChild(view);
 
-home.querySelectorAll('.ar-cat-icon').forEach((el,i)=>{if(i<5){el.textContent='';el.style.setProperty('background-position',(i*20)+'% 0%','important');}else{el.style.setProperty('background-image','none','important');el.style.setProperty('background-position','center','important');el.style.setProperty('font-size','clamp(36px,9vw,48px)','important');el.style.setProperty('display','grid','important');el.style.setProperty('place-items','center','important');}});
+home.querySelectorAll('.ar-cat-icon').forEach((el,i)=>{const positions=['0% 0%','20% 0%','40% 0%','60% 0%','80% 0%','100% 0%','0% 50%','20% 50%'];el.textContent='';el.style.setProperty('background-position',positions[i]||'0% 0%','important');el.style.setProperty('background-size','600% 300%','important');el.style.setProperty('background-repeat','no-repeat','important');});
 home.querySelectorAll('.ar-feature i').forEach(el=>{el.style.setProperty('background-image','none','important');el.style.setProperty('background-position','center','important');});
 
 const found={};
@@ -335,5 +335,115 @@ body{padding-bottom:calc(86px + env(safe-area-inset-bottom))!important}
 }
 `;
 document.head.appendChild(unifiedHome);
+
+
+/* One reference-matched design across browser, PWA and APK. */
+const arenaReferenceFinal=document.createElement('style');
+arenaReferenceFinal.id='arenaReferenceFinal';
+arenaReferenceFinal.textContent=`
+html,body{width:100%!important;min-height:100%!important;overflow-x:hidden!important;background:#020919!important;color:#fff!important}
+body{box-sizing:border-box!important;padding-top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top))!important;padding-bottom:calc(82px + env(safe-area-inset-bottom))!important;background:radial-gradient(ellipse at 50% 34%,#061b3b 0%,#020b1f 55%,#010713 100%)!important}
+body>h1{height:calc(var(--bas-yuk,58px) + env(safe-area-inset-top))!important;background-image:url("arena-header.webp")!important;background-size:100% 100%!important;background-position:center!important;background-repeat:no-repeat!important;background-color:#020b21!important;border:0!important;box-shadow:0 4px 18px #001b4b88!important}
+body>h1 .hl,body>h1 .arena-logo{display:none!important}
+body>h1 .ar-header-hotspot{position:absolute!important;top:10%!important;height:80%!important;padding:0!important;border:0!important;background:transparent!important;z-index:52!important;min-height:0!important;cursor:pointer!important}
+body>h1 .ar-header-hotspot.left{left:1%!important;width:12%!important}
+body>h1 .ar-header-hotspot.bell{right:11%!important;width:9%!important}
+body>h1 .ar-header-hotspot.gear{right:1%!important;width:9%!important}
+#ana{display:block!important;position:relative!important;width:100%!important;max-width:720px!important;min-width:0!important;min-height:0!important;height:auto!important;max-height:none!important;overflow:visible!important;margin:0 auto!important;padding:0 6px 20px!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;text-align:left!important}
+#ana.hidden{display:none!important}
+#ana>#seviye,#ana>.btn,#ana>.pill,#ana>.ek-bar,#ana>.arKart{display:none!important}
+#arenaHubHome{display:block!important;width:100%!important;min-height:0!important;height:auto!important;max-height:none!important;overflow:visible!important;padding:0 0 16px!important;margin:0!important}
+#arenaHubHome .ar-profile{display:grid!important;grid-template-columns:56px minmax(0,1fr) 54px 90px!important;align-items:center!important;gap:5px!important;width:100%!important;height:auto!important;min-height:62px!important;box-sizing:border-box!important;padding:3px 6px!important;margin:0 0 10px!important;border:1px solid #315a99!important;border-radius:17px!important;background:linear-gradient(105deg,#102c59 0%,#07172f 58%,#10284f 100%)!important;box-shadow:0 0 16px #168bff2a,inset 0 1px #ffffff20!important}
+#arenaHubHome .ar-avatar{position:relative!important;width:52px!important;height:52px!important;min-width:52px!important;display:block!important;overflow:hidden!important;border:3px solid #ffd154!important;border-radius:50%!important;background:#182b4d!important;box-shadow:0 0 10px #ffbd3c88!important;box-sizing:border-box!important}
+#arenaHubHome .ar-avatar img{display:block!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important;border-radius:50%!important}
+#arenaHubHome .ar-avatar:after{content:'🇹🇷';position:absolute;right:-3px;bottom:-3px;width:17px;height:17px;display:grid;place-items:center;border:1px solid #e7c45b;border-radius:50%;background:#b31c2f;font-size:10px;line-height:1;box-shadow:0 1px 4px #0009}
+#arenaHubHome .ar-player{min-width:0!important}
+#arenaHubHome .ar-player-name{font-size:clamp(13px,3.8vw,18px)!important;font-weight:900!important;line-height:1.15!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+#arenaHubHome .ar-level-line{display:flex!important;align-items:center!important;gap:6px!important;margin-top:5px!important;min-width:0!important}
+#arenaHubHome .ar-level-pill{padding:4px 7px!important;border-radius:10px!important;background:linear-gradient(90deg,#087fe8,#3b50c8)!important;font-size:10px!important;font-weight:900!important}
+#arenaHubHome .ar-xp{font-size:9px!important;color:#e5edff!important;white-space:nowrap!important}
+#arenaHubHome .ar-xpbar{height:5px!important;margin-top:4px!important;border-radius:8px!important;background:#18284b!important;overflow:hidden!important}
+#arenaHubHome .ar-xpbar i{height:100%!important;border-radius:8px!important;background:linear-gradient(90deg,#7d4dff,#35c8ff)!important}
+#arenaHubHome .ar-league{display:grid!important;place-items:center!important;width:52px!important;height:54px!important;min-width:0!important;overflow:hidden!important}
+#arenaHubHome .ar-league img{display:block!important;width:52px!important;height:52px!important;max-width:100%!important;object-fit:contain!important}
+#arenaHubHome .ar-wallet{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:4px!important;min-width:0!important}
+#arenaHubHome .ar-wallet-row{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:3px!important;width:100%!important;height:25px!important;min-height:25px!important;box-sizing:border-box!important;padding:2px 5px!important;border:1px solid #33598d!important;border-radius:10px!important;background:#06152f!important;font-size:10px!important;font-weight:850!important;line-height:1!important}
+#arenaHubHome .ar-wallet-row b{font-size:14px!important;line-height:1!important}
+#arenaHubHome .ar-wallet-row span:last-child{color:#fff!important;font-size:15px!important}
+#arenaHubHome .ar-shortcuts{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:6px!important;width:100%!important;margin:0 0 12px!important;padding:0!important}
+#arenaHubHome .ar-short{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:4px!important;min-width:0!important;width:100%!important;height:54px!important;min-height:54px!important;box-sizing:border-box!important;padding:4px 1px!important;border:1px solid #355e9d!important;border-radius:15px!important;background:linear-gradient(155deg,#172e58,#07152d)!important;box-shadow:inset 0 1px #ffffff24,0 4px 10px #0007!important;color:#fff!important;text-align:center!important;font-size:clamp(8px,2.35vw,10px)!important;font-weight:850!important;line-height:1.08!important;white-space:normal!important}
+#arenaHubHome .ar-short i{font-style:normal!important;font-size:23px!important;line-height:1!important}
+#arenaHubHome .ar-categories{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;width:100%!important;margin:0!important;padding:0!important}
+#arenaHubHome .ar-cat{position:relative!important;isolation:isolate!important;display:grid!important;grid-template-columns:62px minmax(0,1fr) 22px!important;align-items:center!important;gap:4px!important;width:100%!important;height:72px!important;min-height:72px!important;box-sizing:border-box!important;padding:5px 7px!important;border:2px solid var(--edge)!important;border-radius:19px!important;color:#fff!important;text-align:left!important;background:linear-gradient(135deg,var(--c1),var(--c2))!important;box-shadow:inset 0 1px 0 #ffffff45,0 0 13px var(--glow)!important;overflow:hidden!important;transition:transform .15s ease,filter .15s ease!important}
+#arenaHubHome .ar-cat:before{content:''!important;position:absolute!important;z-index:-1!important;right:-18px!important;top:-28px!important;width:100px!important;height:100px!important;border-radius:50%!important;background:#ffffff13!important}
+#arenaHubHome .ar-cat:after{content:''!important;position:absolute!important;z-index:-1!important;inset:0!important;background:linear-gradient(135deg,#ffffff12,transparent 52%,#0002)!important}
+#arenaHubHome .ar-cat.violet{--c1:#9128d9;--c2:#35105f;--edge:#d77aff;--glow:#bb45ff55}
+#arenaHubHome .ar-cat.blue{--c1:#087bdc;--c2:#092c70;--edge:#31c7ff;--glow:#00aaff55}
+#arenaHubHome .ar-cat.green{--c1:#07b968;--c2:#064331;--edge:#35ff91;--glow:#00ff7755}
+#arenaHubHome .ar-cat.orange{--c1:#f28b08;--c2:#71300b;--edge:#ffc02d;--glow:#ff9a0055}
+#arenaHubHome .ar-cat.pink{--c1:#df2878;--c2:#64143c;--edge:#ff65b1;--glow:#ff2d9155}
+#arenaHubHome .ar-cat.cyan{--c1:#05b6b6;--c2:#064657;--edge:#38f5ed;--glow:#00d9e655}
+#arenaHubHome .ar-cat.indigo{--c1:#554fd3;--c2:#1c225b;--edge:#938fff;--glow:#6461ff55}
+#arenaHubHome .ar-cat.red{--c1:#e94248;--c2:#641a32;--edge:#ff8888;--glow:#ff4f6555}
+#arenaHubHome .ar-cat-icon{display:block!important;width:60px!important;height:60px!important;background-image:url("arena-reference.webp")!important;background-size:600% 300%!important;background-repeat:no-repeat!important;background-position:center!important;font-size:0!important;filter:drop-shadow(0 4px 4px #000b)!important}
+#arenaHubHome .ar-cat:nth-child(n+7) .ar-cat-icon{background-image:url("arena-reference.webp")!important}
+#arenaHubHome .ar-cat-copy{display:block!important;min-width:0!important}
+#arenaHubHome .ar-cat-copy strong{display:block!important;font-size:clamp(12px,3.55vw,16px)!important;font-weight:950!important;line-height:1.08!important;overflow-wrap:anywhere!important}
+#arenaHubHome .ar-cat-copy small{display:block!important;margin-top:5px!important;font-size:clamp(9px,2.6vw,11px)!important;line-height:1.1!important;color:#f0f5ff!important;font-weight:600!important}
+#arenaHubHome .ar-cat-arrow{display:grid!important;place-items:center!important;width:21px!important;height:21px!important;border:1px solid #ffffff75!important;border-radius:50%!important;background:#ffffff16!important;font:900 21px/1 system-ui!important;color:#fff!important}
+#arenaHubHome .ar-daily{display:grid!important;grid-template-columns:48px minmax(0,1fr) auto!important;align-items:center!important;gap:6px!important;width:100%!important;min-height:60px!important;height:auto!important;box-sizing:border-box!important;margin:12px 0 0!important;padding:7px 9px!important;border:1px solid #586bc9!important;border-radius:17px!important;background:linear-gradient(100deg,#182d67,#30205b)!important;box-shadow:0 0 13px #6557d044!important}
+#arenaHubHome .ar-daily-target{font-size:35px!important;text-align:center!important}
+#arenaHubHome .ar-daily-copy{min-width:0!important}
+#arenaHubHome .ar-daily-copy strong{display:block!important;font-size:14px!important;font-weight:900!important}
+#arenaHubHome .ar-daily-copy small{display:block!important;margin-top:3px!important;color:#d9e5ff!important;font-size:10px!important;line-height:1.15!important}
+#arenaHubHome .ar-progress{height:7px!important;margin-top:7px!important;border-radius:10px!important;background:#06122d!important;overflow:hidden!important}
+#arenaHubHome .ar-progress i{display:block!important;height:100%!important;border-radius:10px!important;background:linear-gradient(90deg,#2bdc37,#7df52b)!important;transition:width .3s ease!important}
+#arenaHubHome .ar-daily-reward{padding:7px 9px!important;border:2px solid #f9c443!important;border-radius:13px!important;background:linear-gradient(#573a09,#1b1631)!important;color:#ffe27a!important;font-size:13px!important;font-weight:950!important;white-space:nowrap!important}
+#arenaHubHome .ar-section-title{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important;margin:12px 3px 7px!important;color:#fff!important;font-size:clamp(16px,4.8vw,20px)!important;font-weight:950!important;letter-spacing:.1px!important;text-shadow:0 2px 8px #0009!important}
+#arenaHubHome .ar-section-title small{font-size:10px!important;color:#c1d6ff!important;font-weight:800!important}
+#arenaHubHome .ar-featured{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:5px!important;padding:0 0 12px!important;margin:0!important}
+#arenaHubHome .ar-feature{display:block!important;min-width:0!important;padding:0!important;background:transparent!important;color:#fff!important;text-align:center!important;font-size:clamp(8px,2.7vw,10px)!important;font-weight:900!important;line-height:1.12!important}
+#arenaHubHome .ar-feature i{display:grid!important;place-items:center!important;width:100%!important;height:clamp(48px,14vw,58px)!important;margin:0 0 5px!important;border:2px solid #5876b4!important;border-radius:14px!important;background:linear-gradient(145deg,#193d73,#251343)!important;box-shadow:0 4px 12px #0007,inset 0 1px #ffffff25!important;font-size:clamp(20px,5.5vw,27px)!important;font-style:normal!important}
+#arenaNeonNav{position:fixed!important;left:6px!important;right:6px!important;bottom:calc(4px + env(safe-area-inset-bottom))!important;z-index:10050!important;display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:2px!important;padding:5px 3px!important;border:1px solid #314d83!important;border-radius:22px!important;background:linear-gradient(180deg,rgba(16,29,58,.98),rgba(4,10,25,.99))!important;box-shadow:0 -5px 22px #000b,0 0 16px #176bca35!important;backdrop-filter:blur(12px)!important}
+#arenaNeonNav button{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:4px!important;min-width:0!important;min-height:60px!important;height:60px!important;padding:3px 1px!important;border:0!important;border-radius:14px!important;background:transparent!important;color:#e0eaff!important;font-size:clamp(8px,2.6vw,10px)!important;line-height:1.05!important;font-weight:850!important;white-space:nowrap!important}
+#arenaNeonNav button i{font-style:normal!important;font-size:26px!important;line-height:1!important}
+#arenaNeonNav button.active{background:linear-gradient(145deg,#5523a0,#171b50)!important;box-shadow:inset 0 0 15px #c18aff55!important;color:#fff!important}
+body:has(#ana.hidden) #arenaNeonNav{display:none!important}
+#arenaHubHome .ar-cat:active,#arenaHubHome .ar-feature:active,#arenaHubHome .ar-short:active{transform:scale(.975)!important;filter:brightness(1.14)!important}
+@media(min-width:600px){
+#arenaHubHome .ar-profile{grid-template-columns:88px minmax(0,1fr) 78px 136px!important;min-height:88px!important;padding:4px 10px!important}
+#arenaHubHome .ar-avatar{width:78px!important;height:78px!important}
+#arenaHubHome .ar-league{width:74px!important;height:78px!important}
+#arenaHubHome .ar-league img{width:74px!important;height:74px!important}
+#arenaHubHome .ar-wallet-row{height:34px!important;min-height:34px!important;font-size:13px!important}
+#arenaHubHome .ar-wallet-row b{font-size:18px!important}
+#arenaHubHome .ar-short{height:84px!important;min-height:84px!important;font-size:12px!important}
+#arenaHubHome .ar-short i{font-size:32px!important}
+#arenaHubHome .ar-cat{height:126px!important;min-height:126px!important;grid-template-columns:102px minmax(0,1fr) 30px!important;padding:8px 12px!important;gap:8px!important;border-radius:24px!important}
+#arenaHubHome .ar-cat-icon{width:96px!important;height:104px!important}
+#arenaHubHome .ar-cat-copy strong{font-size:clamp(18px,3.5vw,24px)!important}
+#arenaHubHome .ar-cat-copy small{font-size:15px!important;margin-top:8px!important}
+#arenaHubHome .ar-cat-arrow{width:32px!important;height:32px!important;font-size:27px!important}
+#arenaHubHome .ar-daily{min-height:90px!important;grid-template-columns:76px minmax(0,1fr) auto!important;padding:10px 14px!important}
+#arenaHubHome .ar-daily-target{font-size:52px!important}
+#arenaHubHome .ar-daily-copy strong{font-size:19px!important}
+#arenaHubHome .ar-daily-copy small{font-size:14px!important}
+#arenaHubHome .ar-daily-reward{font-size:17px!important;padding:9px 13px!important}
+#arenaHubHome .ar-feature i{height:90px!important;border-radius:18px!important;font-size:34px!important}
+#arenaHubHome .ar-feature{font-size:12px!important}
+#arenaNeonNav button{height:82px!important;min-height:82px!important;font-size:12px!important}
+#arenaNeonNav button i{font-size:34px!important}
+}
+@media(max-width:350px){
+#arenaHubHome .ar-profile{grid-template-columns:49px minmax(0,1fr) 42px 78px!important;gap:3px!important}
+#arenaHubHome .ar-avatar{width:46px!important;height:46px!important;min-width:46px!important}
+#arenaHubHome .ar-league,#arenaHubHome .ar-league img{width:42px!important;height:46px!important}
+#arenaHubHome .ar-cat{grid-template-columns:54px minmax(0,1fr) 18px!important;padding:4px!important}
+#arenaHubHome .ar-cat-icon{width:52px!important;height:54px!important}
+#arenaHubHome .ar-cat-copy strong{font-size:11px!important}
+#arenaHubHome .ar-cat-arrow{width:18px!important;height:18px!important;font-size:16px!important}
+}
+`;
+document.head.appendChild(arenaReferenceFinal);
 
 })();
