@@ -185,7 +185,14 @@
       });
     }
 
-    var nativeAuth = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.FirebaseAuthentication;
+    // Native Google eklentisini yalnızca gerçek Android/iOS uygulamasında kullan.
+    // GitHub Pages / normal tarayıcıda Firebase Web SDK popup akışı çalışmalı.
+    var cap = window.Capacitor;
+    var nativePlatform = !!(cap && (
+      (typeof cap.isNativePlatform === "function" && cap.isNativePlatform()) ||
+      (typeof cap.getPlatform === "function" && cap.getPlatform() !== "web")
+    ));
+    var nativeAuth = nativePlatform && cap && cap.Plugins && cap.Plugins.FirebaseAuthentication;
     if (nativeAuth && typeof nativeAuth.signInWithGoogle === "function") {
       return nativeAuth.signInWithGoogle().then(function (r) {
         var d = (r && r.credential) || r || {};
