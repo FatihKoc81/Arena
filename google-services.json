@@ -15,13 +15,21 @@
       },
       "oauth_client": [
         {
+          "client_id": "869287234944-g1m9c1tt19a564ausn6jocuermhb9k66.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.fatihkoc.arena.mobile",
+            "certificate_hash": "20854fecd1a17eb498bf7cce5e48987f341accc2"
+          }
+        },
+        {
           "client_id": "869287234944-32gm5tbgg5l57589efjf527k0qncs7uk.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDMpwjW6V9RscX91l0lQHZPgwrgZQnPor4"
+          "current_key": "AIzaSyAXtNOl_IgYvyOLp3HW90lG5e1qxkgF1iQ"
         }
       ],
       "services": {
