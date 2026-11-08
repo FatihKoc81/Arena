@@ -1905,7 +1905,7 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
  style.id='arenaFinalCategoryAndShortcutLayout';
  style.textContent=`
   /* Five shortcuts occupy the full row evenly, including narrow phones. */
-  html body #arenaHubHome .ar-shortcuts{
+  html body #arenaHubHome .ar-shortcuts,\n  html.arena-home-fixed body #arenaHubHome .ar-shortcuts{
     display:grid!important;
     grid-template-columns:repeat(5,minmax(0,1fr))!important;
     gap:clamp(4px,1.1vw,8px)!important;
