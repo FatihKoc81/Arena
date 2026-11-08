@@ -150,6 +150,20 @@
     }).then(function () { location.reload(); });
   }
 
+  function googleProfiliniEsitle() {
+    var u = A.currentUser;
+    if (!u) return Promise.resolve();
+    return u.reload().catch(noop).then(function () {
+      var cur = A.currentUser || u;
+      var googleData = (cur.providerData || []).filter(function (p) { return p.providerId === "google.com"; })[0];
+      if (!googleData || typeof cur.updateProfile !== "function") return;
+      var changes = {};
+      if (!cur.displayName && googleData.displayName) changes.displayName = googleData.displayName;
+      if (!cur.photoURL && googleData.photoURL) changes.photoURL = googleData.photoURL;
+      if (Object.keys(changes).length) return cur.updateProfile(changes);
+    });
+  }
+
   function sosyalGiris(tur) {
     var provider = new firebase.auth.GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" });
@@ -179,7 +193,7 @@
         var accessToken = d.accessToken || (r && r.accessToken) || null;
         if (!idToken && !accessToken) throw { ozel: "Google girişinden güvenli kimlik bilgisi alınamadı. Tekrar dene." };
         return hesapla(firebase.auth.GoogleAuthProvider.credential(idToken, accessToken));
-      }).then(function () { location.reload(); });
+      }).then(googleProfiliniEsitle).then(function () { location.reload(); });
     }
 
     var islem = misafir ? misafir.linkWithPopup(provider) : A.signInWithPopup(provider);
@@ -197,7 +211,7 @@
       }
       if (misafir && kod === "auth/provider-already-linked") return birlestir(misafir.uid);
       throw e;
-    }).then(function () { location.reload(); });
+    }).then(googleProfiliniEsitle).then(function () { location.reload(); });
   }
 
   function telefonFormatla(v) {
@@ -262,7 +276,7 @@
     ".hs-s{margin:8px 0;font-size:15px;word-break:break-all}.hs-k{font-size:14px;color:#aebfe0;line-height:1.5;margin:8px 0}.hs-msg{background:#3a1212;border:1px solid #a3231c;border-radius:12px;padding:10px 12px;margin-bottom:12px;font-size:14px;line-height:1.4}.hs-msg.ok{background:#0f2e25;border-color:#22b77a}" +
     ".hs-l{background:none;border:0;color:#8fc6ff;font:600 15px system-ui,sans-serif;padding:8px 0;cursor:pointer;text-decoration:underline}.hs-loginrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 2px}.hs-remember{display:flex;align-items:center;gap:7px;font-size:14px;color:#d5e0f6}.hs-remember input{width:18px;height:18px;accent-color:#176bff}" +
     ".hs-safe{margin-top:15px;padding:12px;border:1px solid #526da9;border-radius:16px;background:#142541;text-align:center;color:#dce7ff;font-size:14px}.hs-recaptcha{height:1px;overflow:hidden}" +
-    ".hs-pf{text-align:center;margin:4px 0 10px}.hs-av{width:72px;height:72px;border-radius:50%;margin:0 auto 8px;background:linear-gradient(#f2b92e,#a86f0c);color:#101a38;font:900 34px/72px system-ui,sans-serif}.hs-pn{font-size:22px;font-weight:800}" +
+    ".hs-pf{text-align:center;margin:4px 0 10px}.hs-av{width:72px;height:72px;border-radius:50%;margin:0 auto 8px;overflow:hidden;background:linear-gradient(#f2b92e,#a86f0c);color:#101a38;font:900 34px/72px system-ui,sans-serif}.hs-av img{display:block;width:100%;height:100%;object-fit:cover;border-radius:50%}.hs-pn{font-size:22px;font-weight:800}" +
     ".hs-top{background:#0b1230;border:2px solid #f2b92e;border-radius:14px;padding:11px;text-align:center;font-size:16px;margin:8px 0}.hs-top b{font-size:24px;color:#ffd35a;margin-left:6px}" +
     ".hs-r{display:flex;justify-content:space-between;padding:8px 4px;border-bottom:1px solid #1d2540;font-size:15px}.hs-r b{color:#ffd35a}" +
     "@media(max-width:390px){.hs-body{padding:12px}.hs-social button{font-size:13px}.hs-tab{font-size:15px}.hs-ph{font-size:21px}}";
@@ -292,12 +306,14 @@
   }
   function hesapHtml(u) { return ayar ? '<button class="hs-l" data-hs="profil">← Profile dön</button>' + ayarHtml(u) : profilHtml(u); }
   function profilHtml(u) {
-    var ad = (u && u.displayName) || (kayit && kayit.ad) || "Oyuncu", P = window.Puan, satir = "";
-    var googleHesabi = !!(u && u.providerData && u.providerData.some(function (p) { return p.providerId === "google.com"; }));
+    var googleProfil = u && u.providerData ? u.providerData.filter(function (p) { return p.providerId === "google.com"; })[0] : null;
+    var ad = (u && u.displayName) || (googleProfil && googleProfil.displayName) || (kayit && kayit.ad) || "Oyuncu", P = window.Puan, satir = "";
+    var googleHesabi = !!googleProfil, fotograf = u && (u.photoURL || (googleProfil && googleProfil.photoURL));
+    var avatar = fotograf ? '<img alt="Profil fotoğrafı" src="' + esc(fotograf) + '">' : esc(ad.charAt(0).toLocaleUpperCase("tr"));
     if (P) Object.keys(P.tablo).map(function (o) { return { ad: P.tablo[o].ad, p: P.oyunPuani(o) }; })
       .sort(function (a, b) { return b.p - a.p; })
       .forEach(function (x) { satir += '<div class="hs-r"><span>' + esc(x.ad) + "</span><b>" + x.p + "</b></div>"; });
-    return '<div class="hs-pf"><div class="hs-av">' + esc(ad.charAt(0).toLocaleUpperCase("tr")) + '</div><div class="hs-pn">' + esc(ad) + "</div>" +
+    return '<div class="hs-pf"><div class="hs-av">' + avatar + '</div><div class="hs-pn">' + esc(ad) + "</div>" +
       '<div class="hs-k">' + (u.email ? '📧 ' + esc(u.email) + (u.emailVerified ? ' ✓ doğrulandı' : ' (doğrulanmadı)') : '📱 ' + esc(u.phoneNumber || '')) + "</div>" +
       (kayit && kayit.ad ? '<div class="hs-k">ARENA kullanıcı adı: <b>' + esc(kayit.ad) + '</b></div>' : '<div class="hs-k">' + (googleHesabi ? 'Google hesabınla giriş yaptın.' : 'Hesabınla giriş yaptın.') + '</div>') + "</div>" +
       '<div class="hs-top">⭐ Toplam puan <b>' + (P ? P.toplam() : 0) + "</b></div>" + satir +
@@ -500,9 +516,11 @@
   // ---------- hesap kaydını izle, adı oyuna yansıt ----------
   function esitle() {
     var E = window.Ekonomi; if (!E || !E.adAyarla) return;
+    var u = A.currentUser, gp = u && u.providerData ? u.providerData.filter(function (p) { return p.providerId === "google.com"; })[0] : null;
+    var googleAd = u && !u.isAnonymous ? (u.displayName || (gp && gp.displayName)) : "";
     if (kayit && kayit.ad) { if (E.ad() !== kayit.ad) E.adAyarla(kayit.ad); }
-    else if (A.currentUser && !A.currentUser.isAnonymous && A.currentUser.displayName) E.adAyarla(A.currentUser.displayName);
-    else if (!/^Oyuncu[0-9]{4}$/.test(E.ad())) E.adAyarla("Oyuncu" + (1000 + Math.floor(Math.random() * 9000))); // misafir için eski serbest adlar geçersiz
+    else if (googleAd) { if (E.ad() !== googleAd) E.adAyarla(googleAd); }
+    else if (!/^Oyuncu[0-9]{4}$/.test(E.ad())) E.adAyarla("Oyuncu" + (1000 + Math.floor(Math.random() * 9000)));
   }
   A.onAuthStateChanged(function (u) {
     if (hesapRef) { hesapRef.off(); hesapRef = null; }
