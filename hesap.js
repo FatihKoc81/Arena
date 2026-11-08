@@ -275,9 +275,20 @@
       '<div class="hs-social" style="grid-template-columns:1fr">' +
       '<button class="hs-google" data-hs="google"><span style="font-size:20px">G</span> Google ile giriş</button></div>' +
       '<div class="hs-safe"><b>Misafir olarak oynuyorsun.</b><br>Hesap açmadan tüm oyunları deneyebilirsin. İlerlemeni başka cihazda korumak ve bölüm başına 3 can kazanmak için Google hesabını bağlayabilirsin.</div>' +
+      '<button class="hs-bt gri" data-hs="telefon-ekran">📱 Telefonla giriş</button>' +
       '<button class="hs-bt gri" data-hs="misafir-devam">Misafir olarak devam et</button>' +
       '<button class="hs-bt gri" data-hs="guncelle">⬇ ARENA Güncelle</button>';
     return h;
+  }
+  function telefonHtml() {
+    var icerik = telefonOnay
+      ? '<input class="hs-in" id="hs-kod" type="tel" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="SMS doğrulama kodu">' +
+        '<button class="hs-bt" data-hs="telefon-kod">Kodu doğrula</button>'
+      : '<input class="hs-in" id="hs-tel" type="tel" inputmode="tel" autocomplete="tel" placeholder="+905xxxxxxxxx">' +
+        '<button class="hs-bt" data-hs="telefon-gonder">SMS kodu gönder</button>';
+    return '<div class="hs-kicker">Telefonla giriş</div><div class="hs-safe">Telefon numaranı ülke koduyla yaz. Örnek: +905xxxxxxxxx</div>' +
+      icerik + '<div id="hs-recaptcha" class="hs-recaptcha"></div>' +
+      '<button class="hs-l" data-hs="telefon-vazgec">← Giriş seçeneklerine dön</button>';
   }
   function hesapHtml(u) { return ayar ? '<button class="hs-l" data-hs="profil">← Profile dön</button>' + ayarHtml(u) : profilHtml(u); }
   function profilHtml(u) {
@@ -310,7 +321,7 @@
     var u = A.currentUser, b = el.querySelector(".hs-body");
     var eski = {}; ["hs-e", "hs-a", "hs-kod"].forEach(function (id) { var x = document.getElementById(id); if (x) eski[id] = x.value; });
     var h = msg ? '<div class="hs-msg' + (msgOk ? " ok" : "") + '">' + esc(msg) + "</div>" : "";
-    h += !u ? '<div class="hs-k">Bağlanıyor…</div>' : u.isAnonymous ? misafirHtml() : (kayit && kayit.ad ? hesapHtml(u) : ilkKullaniciAdiHtml());
+    h += !u ? '<div class="hs-k">Bağlanıyor…</div>' : u.isAnonymous ? (telefonEkrani ? telefonHtml() : misafirHtml()) : (kayit && kayit.ad ? hesapHtml(u) : ilkKullaniciAdiHtml());
     b.innerHTML = h;
     for (var id in eski) { var x = document.getElementById(id); if (x) x.value = eski[id]; }
   }
@@ -333,7 +344,8 @@
     else if (a === "google") isle(sosyalGiris("google"));
     else if (a === "guncelle") uygulamaGuncelle();
     else if (a === "misafir-devam") { if (el) el.classList.remove("show"); }
-    else if (a === "telefon-ekran") { telefonEkrani = true; render(); }
+    else if (a === "telefon-ekran") { telefonEkrani = true; telefonOnay = null; msg = ""; render(); }
+    else if (a === "telefon-vazgec") { telefonEkrani = false; telefonOnay = null; msg = ""; render(); }
     else if (a === "telefon-gonder") isle(telefonKodGonder(val("hs-tel"), "giris"));
     else if (a === "kayit") {
       var regId = val("hs-e").trim();
