@@ -254,6 +254,12 @@ const hide=document.createElement('style');hide.textContent='#ana .arena-origina
 function profile(authUser){try{const E=window.Ekonomi,P=window.Puan,current=window.firebase&&firebase.auth?firebase.auth().currentUser:null,u=authUser&&typeof authUser.uid==='string'?authUser:current,signed=!!(u&&!u.isAnonymous),google=u&&u.providerData?u.providerData.find(p=>p.providerId==='google.com'):null,display=signed?(u.displayName||(google&&google.displayName)||(u.email?u.email.split('@')[0]:'Üyemiz')):'Misafir',gold=E&&E.altin?E.altin():100,total=P&&P.toplam?P.toplam():0;let level=1;try{level=Math.max(1,Number(JSON.parse(localStorage.getItem('arenaMobileProgress')||'{}').seviye)||1);}catch(_){}const el=id=>document.getElementById(id);if(el('arPlayerName'))el('arPlayerName').textContent=signed?display+' ⭐':'Misafir';if(el('arLoginState')){el('arLoginState').textContent='Google ile giriş yap';el('arLoginState').style.display=signed?'none':'inline-flex';}if(el('arLevel'))el('arLevel').textContent='Seviye '+level;if(el('arXp'))el('arXp').textContent=total.toLocaleString('tr-TR')+' / '+(level*1000).toLocaleString('tr-TR')+' XP';if(el('arGold'))el('arGold').textContent=Number(gold).toLocaleString('tr-TR');if(el('arXpBar'))el('arXpBar').style.width=(total%1000)/10+'%';const av=el('arAvatar');if(av){const initial=signed?String(display).trim().charAt(0).toLocaleUpperCase('tr'):'👤';const photo=signed&&((google&&google.photoURL)||u.photoURL);if(photo){let img=av.querySelector('img');if(!img){av.innerHTML='';img=document.createElement('img');img.alt='Profil fotoğrafı';img.referrerPolicy='no-referrer';img.decoding='async';img.onerror=function(){av.innerHTML='<span class="ar-guest-avatar">'+initial+'</span>';};av.appendChild(img);}if(img.getAttribute('src')!==photo)img.src=photo;}else{av.innerHTML='<span class="ar-guest-avatar">'+initial+'</span>';}}}catch(e){console.warn('ARENA profil güncellemesi:',e);}}
 function navActive(key){const n=document.getElementById('arenaNeonNav');if(n)n.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.nav===key));}
 function goHome(){document.documentElement.classList.add('arena-home-fixed');view.hidden=true;home.hidden=false;ana.classList.remove('hidden');document.querySelectorAll('section.kart').forEach(s=>s.classList.add('hidden'));try{document.dispatchEvent(new Event('anasayfa'));}catch(_){}try{if(typeof menu==='function')menu();}catch(_){}navActive('home');ana.scrollTop=0;window.scrollTo(0,0);}
+home.addEventListener('click',function(e){
+  const back=e.target.closest('[data-category-back]');
+  if(!back)return;
+  e.preventDefault();e.stopImmediatePropagation();
+  restoreCategories();
+ },true);
 function restoreCategories(){
  const panel=home.querySelector('.ar-categories');if(!panel)return;
  panel.classList.remove('is-open');delete panel.dataset.openCategory;
@@ -278,9 +284,7 @@ function category(id,push){
  const planned=c.planned.map(n=>'<div class="ar-game-card soon"><i>🔒</i><span><strong>'+n+'</strong><small>Yakında eklenecek</small></span></div>').join('');
  panel.classList.add('is-open');panel.dataset.openCategory=id;
  panel.innerHTML='<div class="ar-inline-category-head"><button type="button" class="ar-inline-back" data-category-back aria-label="Kategorilere dön">←</button><span>'+c.icon+' '+c.name+'</span></div><div class="ar-inline-game-list">'+(cards+planned)+'</div>';
- const backButton=panel.querySelector('[data-category-back]');
- if(backButton)backButton.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();restoreCategories();});
- panel.querySelectorAll('[data-launch]').forEach(function(card){
+panel.querySelectorAll('[data-launch]').forEach(function(card){
    card.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();launchGame(card.dataset.launch);});
  });
  view.hidden=true;home.hidden=false;document.documentElement.classList.add('arena-home-fixed');navActive('games');
@@ -300,7 +304,7 @@ if(title)title.addEventListener('click',e=>{const hs=e.target.closest('[data-hea
 home.querySelector('.ar-brand').addEventListener('click',goHome);
 findGames();new MutationObserver(findGames).observe(ana,{childList:true,subtree:true});
 window.addEventListener('load',()=>{findGames();profile();dailyMission();});window.addEventListener('focus',profile);
-(function bindProfileAuth(){let tries=0;function bind(){if(!window.firebase||!firebase.apps||!firebase.apps.length||!firebase.auth){if(tries++<100)setTimeout(bind,200);return;}try{firebase.auth().onAuthStateChanged(u=>profile(u));}catch(e){console.warn('ARENA profil oturumu:',e);}}bind();})();window.addEventListener('arena:home',goHome);window.addEventListener('anasayfa',goHome);window.addEventListener('popstate',e=>{const panel=home.querySelector('.ar-categories');if(panel&&panel.classList.contains('is-open')){const back=home.querySelector('[data-category-back]');if(back)back.click();}else if(!view.hidden)goHome();});if(window.Puan&&Puan.degisti)Puan.degisti(profile);setTimeout(profile,300);setTimeout(profile,1200);
+(function bindProfileAuth(){let tries=0;function bind(){if(!window.firebase||!firebase.apps||!firebase.apps.length||!firebase.auth){if(tries++<100)setTimeout(bind,200);return;}try{firebase.auth().onAuthStateChanged(u=>profile(u));}catch(e){console.warn('ARENA profil oturumu:',e);}}bind();})();window.addEventListener('arena:home',goHome);window.addEventListener('anasayfa',goHome);window.addEventListener('popstate',e=>{const panel=home.querySelector('.ar-categories');if(panel&&panel.classList.contains('is-open')){restoreCategories();}else if(!view.hidden)goHome();});if(window.Puan&&Puan.degisti)Puan.degisti(profile);setTimeout(profile,300);setTimeout(profile,1200);
 /* Unified responsive home layout: identical on web and APK. */
 const unifiedHome=document.createElement('style');
 unifiedHome.id='arenaUnifiedResponsiveHome';
@@ -2220,4 +2224,50 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
   }
  `;
  document.head.appendChild(fix);
+})();
+
+/* 2026-11-09: lock the profile and shortcut rows in both home and category views. */
+(function(){
+ const lock=document.createElement('style');
+ lock.id='arenaLockTopRowsAndCategoryBack';
+ lock.textContent=`
+  html.arena-home-fixed body #arenaHubHome{
+    grid-template-rows:60px 82px minmax(0,1fr) 45px 18px minmax(94px,.62fr)!important;
+    gap:clamp(3px,.55vh,6px)!important;
+  }
+  html.arena-home-fixed body #arenaHubHome:has(.ar-categories.is-open){
+    grid-template-rows:60px 82px minmax(0,1fr)!important;
+    grid-auto-rows:initial!important;
+    gap:clamp(3px,.55vh,6px)!important;
+  }
+  html.arena-home-fixed body #arenaHubHome>.ar-profile{
+    grid-column:1!important;grid-row:1!important;
+    height:60px!important;min-height:60px!important;max-height:60px!important;
+    align-self:start!important;flex:none!important;transform:none!important;animation:none!important;
+  }
+  html.arena-home-fixed body #arenaHubHome>.ar-shortcuts{
+    grid-column:1!important;grid-row:2!important;
+    display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    width:100%!important;height:82px!important;min-height:82px!important;max-height:82px!important;
+    margin:0!important;align-self:start!important;transform:none!important;animation:none!important;
+  }
+  html.arena-home-fixed body #arenaHubHome>.ar-shortcuts>.ar-short{
+    height:100%!important;min-height:0!important;max-height:100%!important;
+  }
+  html.arena-home-fixed body #arenaHubHome>.ar-categories.is-open{
+    grid-column:1!important;grid-row:3!important;min-height:0!important;
+  }
+  html.arena-home-fixed body #arenaHubHome .ar-inline-back{
+    z-index:20!important;pointer-events:auto!important;touch-action:manipulation!important;cursor:pointer!important;
+  }
+  @media(max-width:390px){
+    html.arena-home-fixed body #arenaHubHome{
+      grid-template-rows:60px 82px minmax(0,1fr) 41px 18px minmax(82px,.48fr)!important;
+    }
+    html.arena-home-fixed body #arenaHubHome:has(.ar-categories.is-open){
+      grid-template-rows:60px 82px minmax(0,1fr)!important;
+    }
+  }
+ `;
+ document.head.appendChild(lock);
 })();
