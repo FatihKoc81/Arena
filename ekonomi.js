@@ -213,6 +213,6 @@
   };
 
   // hesap.js (e-posta hesabı + benzersiz kullanıcı adı) sayfa yüklenince, arena.js'den SONRA eklenir
-  function hesapYukle() { var sc = document.createElement("script"); sc.src = "hesap.js?v=20261108-google1"; document.head.appendChild(sc); }
+  function hesapYukle() { var sc = document.createElement("script"); sc.src = "hesap.js?v=20261108-google2"; document.head.appendChild(sc); }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", hesapYukle); else hesapYukle();
 })();
