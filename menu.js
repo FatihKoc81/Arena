@@ -1757,3 +1757,38 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
     new MutationObserver(removeCaptionBands).observe(root,{childList:true,subtree:true});
   }
 })();
+
+
+/* Last-resort layout fix: remove the caption box itself so no colored strip can render. */
+(function(){
+  const s=document.createElement('style');
+  s.id='arenaFeaturedCaptionDisplayContents';
+  s.textContent=`
+    html body #arenaHubHome .ar-feature,
+    html body #arenaHubHome .ar-feature[data-feature]{
+      display:flex!important;flex-direction:column!important;align-items:center!important;
+      justify-content:flex-start!important;gap:0!important;
+      background:#09172e!important;background-color:#09172e!important;
+      background-image:linear-gradient(180deg,#142b50 0%,#09172e 100%)!important;
+      border:1px solid #527db8!important;border-radius:14px!important;
+      box-shadow:inset 0 1px #ffffff20,0 4px 10px #0008!important;
+      overflow:hidden!important;padding:0 0 3px!important;
+    }
+    html body #arenaHubHome .ar-feature > .ar-feature-label{
+      display:contents!important;
+      background:none!important;background-color:transparent!important;background-image:none!important;
+      border:0!important;box-shadow:none!important;padding:0!important;margin:0!important;
+    }
+    html body #arenaHubHome .ar-feature > i{
+      display:grid!important;place-items:center!important;flex:1 1 auto!important;
+      width:100%!important;min-height:0!important;margin:0!important;
+      background:transparent!important;background-color:transparent!important;background-image:none!important;
+      border:0!important;border-radius:0!important;box-shadow:none!important;
+    }
+    html body #arenaHubHome .ar-feature::before,
+    html body #arenaHubHome .ar-feature::after,
+    html body #arenaHubHome .ar-feature-label::before,
+    html body #arenaHubHome .ar-feature-label::after{content:none!important;display:none!important}
+  `;
+  document.head.appendChild(s);
+})();
