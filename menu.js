@@ -386,7 +386,7 @@ body>h1 .ar-header-hotspot.gear{right:1%!important;width:9%!important}
 #arenaHubHome .ar-cat.indigo{--c1:#554fd3;--c2:#1c225b;--edge:#938fff;--glow:#6461ff55}
 #arenaHubHome .ar-cat.red{--c1:#e94248;--c2:#641a32;--edge:#ff8888;--glow:#ff4f6555}
 #arenaHubHome .ar-cat-icon{display:block!important;width:60px!important;height:60px!important;background-image:url("arena-reference.webp")!important;background-size:600% 300%!important;background-repeat:no-repeat!important;background-position:center!important;font-size:0!important;filter:drop-shadow(0 4px 4px #000b)!important}
-#arenaHubHome .ar-cat:nth-child(n+7) .ar-cat-icon{background-image:url("arena-reference.webp")!important}
+#arenaHubHome .ar-cat:nth-child(n+6) .ar-cat-icon{background-image:url("arena-reference.webp")!important}
 #arenaHubHome .ar-cat-copy{display:block!important;min-width:0!important}
 #arenaHubHome .ar-cat-copy strong{display:block!important;font-size:clamp(12px,3.55vw,16px)!important;font-weight:950!important;line-height:1.08!important;overflow-wrap:anywhere!important}
 #arenaHubHome .ar-cat-copy small{display:block!important;margin-top:5px!important;font-size:clamp(9px,2.6vw,11px)!important;line-height:1.1!important;color:#f0f5ff!important;font-weight:600!important}
