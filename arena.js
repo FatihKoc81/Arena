@@ -39,6 +39,7 @@
   var L = { tp: 0, tz: 0, lig: 0, hafta: "", hp: 0, grup: -1 };    // tp: turnuva puanı, tz: turnuva zaferi, hp: bu haftaki puan
   try { var lh = localStorage.getItem(LK); if (lh) { var lo = JSON.parse(lh) || {}; for (var lk in L) if (lo[lk] != null) L[lk] = lo[lk]; } } catch (e) {}
   var tpYuklendi = false, ligHazir = false, bekleyenTp = 0, ligRef = null, ligGrup = [], siraTp = [], siraTur = "genel";
+  var siraYuklendi = false, siraTpYuklendi = false, siraHata = "", siraTpHata = "";
   function ligAd(i) { i = Math.max(0, Math.min(LIG_MAX, i | 0)); return LIGLER[Math.floor(i / 3)] + " " + new Array(i % 3 + 2).join("★"); }
   function sehirAd(lig, g) {
     if (g < 0) return "";
@@ -246,14 +247,18 @@
     kok.child("users").orderByChild("tp").limitToLast(100).on("value", function (s) {
       var a = [];
       s.forEach(function (c) { var v = c.val() || {}; if ((v.tp || 0) > 0) a.push({ uid: c.key, ad: v.ad || "Oyuncu", tp: v.tp || 0, lig: v.lig | 0 }); });
-      a.reverse(); siraTp = a; yenile();
-    });
-    // sıralama (ilk 100, gerçek zamanlı)
+      a.reverse(); siraTp = a; siraTpYuklendi = true; siraTpHata = ""; yenile();
+    }, function (err) { siraTpYuklendi = true; siraTpHata = err && err.message || "Turnuva sıralaması okunamadı"; console.warn("ARENA turnuva sıralaması:", err); yenile(); });
+    // Genel sıralama (ilk 100, gerçek zamanlı). Hata halinde sonsuz yükleniyor yerine açıklama göster.
     kok.child("users").orderByChild("puan").limitToLast(100).on("value", function (s) {
       var a = [];
       s.forEach(function (c) { var v = c.val() || {}; a.push({ uid: c.key, ad: v.ad || "Oyuncu", puan: v.puan || 0, lig: v.lig | 0 }); });
-      a.reverse(); sira = a; siraHesapla();
-    });
+      a.reverse(); sira = a; siraYuklendi = true; siraHata = ""; siraHesapla();
+    }, function (err) { siraYuklendi = true; siraHata = err && err.message || "Genel sıralama okunamadı"; console.warn("ARENA genel sıralama:", err); yenile(); });
+    setTimeout(function () {
+      if (!siraYuklendi) { siraYuklendi = true; siraHata = "Sunucudan sıralama yanıtı alınamadı. Firebase veritabanı kurallarını kontrol edin."; yenile(); }
+      if (!siraTpYuklendi) { siraTpYuklendi = true; siraTpHata = "Turnuva sıralaması henüz yanıt vermedi."; yenile(); }
+    }, 9000);
     // gelen davetler
     kok.child("invites/" + uid).on("child_added", davetGeldi);
     istekDinle();
@@ -1138,16 +1143,25 @@
     h += '<div class="ar-tabs" style="padding:2px 0 0"><button class="ar-alt' + (tpMod ? "" : " on") + '" data-st="genel">⭐ Genel Puan</button><button class="ar-alt' + (tpMod ? " on" : "") + '" data-st="turnuva">🏆 Turnuva Puanı</button></div>';
     h += '<button class="ar-bt kirmizi" data-act="meydan" style="margin:6px 0;padding:11px">⚔️ Meydan Oku</button>';
     h += htmlIstekler();
-    if (!liste.length) h += '<div class="ar-bos">' + (!db ? "Çevrimiçi sıralama için firebase-config.js doldurulmalı." : tpMod ? "Henüz turnuva puanı olan yok. İlk sen ol!" : "Yükleniyor…") + "</div>";
+    var yuklendi = tpMod ? siraTpYuklendi : siraYuklendi;
+    var hata = tpMod ? siraTpHata : siraHata;
+    if (!liste.length) {
+      var mesaj = !db ? "Çevrimiçi sıralama için Firebase bağlantısı gerekli."
+        : !yuklendi ? "Sıralama yükleniyor…"
+        : hata ? "Sıralama sunucudan alınamadı: " + hata
+        : tpMod ? "Henüz turnuva puanı olan oyuncu yok. İlk sırayı sen al!"
+        : "Henüz sıralamaya kayıtlı oyuncu yok. İlk sırayı sen al!";
+      h += '<div class="ar-bos">' + esc(mesaj) + "</div>";
+    }
     var madal = ["🥇", "🥈", "🥉"];
-    // İlk 100 görünür. Oyuncu ilk 100'de değilse 99 oyuncu + en altta kendisi görünür.
+    // İlk 100 görünür. İlk 100'de olmayan kullanıcı kendi gerçek puanıyla listenin sonunda gösterilir.
     var benIdx = -1;
     liste.forEach(function (x, i) { if (x.uid === uid) benIdx = i; });
     var gosterim = liste.slice(0, 100).map(function (x, i) { return { x: x, no: i + 1 }; });
-    if (benIdx < 0 && liste.length && uid && (!tpMod || L.tp > 0)) {
+    if (benIdx < 0 && uid && (!tpMod || L.tp > 0)) {
       var benNo = tpMod ? "100+" : String(benYazi || "").replace("#", "");
-      gosterim = liste.slice(0, 99).map(function (x, i) { return { x: x, no: i + 1 }; });
-      gosterim.push({ x: { uid: uid, ad: adim(), puan: Puan.toplam(), tp: L.tp, lig: L.lig }, no: benNo || "…" });
+      gosterim = liste.slice(0, liste.length >= 100 ? 99 : 100).map(function (x, i) { return { x: x, no: i + 1 }; });
+      gosterim.push({ x: { uid: uid, ad: adim(), puan: Puan.toplam(), tp: L.tp, lig: L.lig }, no: benNo || (liste.length + 1) });
     }
     gosterim.forEach(function (g) {
       var x = g.x, i = typeof g.no === "number" ? g.no - 1 : 99;
