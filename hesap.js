@@ -154,6 +154,34 @@
     var provider = new firebase.auth.GoogleAuthProvider();
     provider.setCustomParameters({ prompt: "select_account" });
     var misafir = A.currentUser && A.currentUser.isAnonymous ? A.currentUser : null;
+
+    function hesapla(cred) {
+      var op = misafir ? misafir.linkWithCredential(cred) : A.signInWithCredential(cred);
+      return op.catch(function (e) {
+        var kod = e && e.code;
+        if (misafir && (kod === "auth/credential-already-in-use" || kod === "auth/account-exists-with-different-credential")) {
+          var eskiUid = misafir.uid;
+          return db.ref("apps/" + APP + "/users/" + eskiUid).remove().catch(noop)
+            .then(function () { return A.signInWithCredential(cred); });
+        }
+        if (misafir && kod === "auth/provider-already-linked") return { user: A.currentUser };
+        throw e;
+      }).then(function (c) {
+        if (c && c.user) return birlestir(c.user.uid);
+      });
+    }
+
+    var nativeAuth = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.FirebaseAuthentication;
+    if (nativeAuth && typeof nativeAuth.signInWithGoogle === "function") {
+      return nativeAuth.signInWithGoogle().then(function (r) {
+        var d = (r && r.credential) || r || {};
+        var idToken = d.idToken || (r && r.idToken) || null;
+        var accessToken = d.accessToken || (r && r.accessToken) || null;
+        if (!idToken && !accessToken) throw { ozel: "Google girişinden güvenli kimlik bilgisi alınamadı. Tekrar dene." };
+        return hesapla(firebase.auth.GoogleAuthProvider.credential(idToken, accessToken));
+      }).then(function () { location.reload(); });
+    }
+
     var islem = misafir ? misafir.linkWithPopup(provider) : A.signInWithPopup(provider);
     return islem.then(function (sonuc) {
       if (sonuc && sonuc.user) return birlestir(sonuc.user.uid);
@@ -163,8 +191,11 @@
         var cred = firebase.auth.GoogleAuthProvider.credentialFromError(e);
         if (!cred) throw e;
         var eskiUid = misafir.uid;
-        return db.ref("apps/" + APP + "/users/" + eskiUid).remove().catch(noop).then(function () { return A.signInWithCredential(cred); }).then(function (c) { return birlestir(c.user.uid); });
+        return db.ref("apps/" + APP + "/users/" + eskiUid).remove().catch(noop)
+          .then(function () { return A.signInWithCredential(cred); })
+          .then(function (c) { return birlestir(c.user.uid); });
       }
+      if (misafir && kod === "auth/provider-already-linked") return birlestir(misafir.uid);
       throw e;
     }).then(function () { location.reload(); });
   }
@@ -202,6 +233,17 @@
     return A.signOut().then(function () { location.reload(); });
   }
 
+  function uygulamaGuncelle() {
+    var url = "https://github.com/FatihKoc81/Arena/releases/latest/download/Arena.apk";
+    var a = document.createElement("a");
+    a.href = url; a.target = "_blank"; a.rel = "noopener";
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    mesaj("En son ARENA APK sürümü indiriliyor. İndirme bitince dosyayı açıp Güncelle / Yükle seçeneğine bas.", true);
+  }
+
   // ---------- görünüm ----------
   var css = document.createElement("style");
   css.textContent =
@@ -233,19 +275,22 @@
       '<div class="hs-social" style="grid-template-columns:1fr">' +
       '<button class="hs-google" data-hs="google"><span style="font-size:20px">G</span> Google ile giriş</button></div>' +
       '<div class="hs-safe"><b>Misafir olarak oynuyorsun.</b><br>Hesap açmadan tüm oyunları deneyebilirsin. İlerlemeni başka cihazda korumak ve bölüm başına 3 can kazanmak için Google hesabını bağlayabilirsin.</div>' +
-      '<button class="hs-bt gri" data-hs="misafir-devam">Misafir olarak devam et</button>';
+      '<button class="hs-bt gri" data-hs="misafir-devam">Misafir olarak devam et</button>' +
+      '<button class="hs-bt gri" data-hs="guncelle">⬇ ARENA Güncelle</button>';
     return h;
   }
   function hesapHtml(u) { return ayar ? '<button class="hs-l" data-hs="profil">← Profile dön</button>' + ayarHtml(u) : profilHtml(u); }
   function profilHtml(u) {
-    var ad = kayit && kayit.ad ? kayit.ad : "Oyuncu", P = window.Puan, satir = "";
+    var ad = (u && u.displayName) || (kayit && kayit.ad) || "Oyuncu", P = window.Puan, satir = "";
     if (P) Object.keys(P.tablo).map(function (o) { return { ad: P.tablo[o].ad, p: P.oyunPuani(o) }; })
       .sort(function (a, b) { return b.p - a.p; })
       .forEach(function (x) { satir += '<div class="hs-r"><span>' + esc(x.ad) + "</span><b>" + x.p + "</b></div>"; });
     return '<div class="hs-pf"><div class="hs-av">' + esc(ad.charAt(0).toLocaleUpperCase("tr")) + '</div><div class="hs-pn">' + esc(ad) + "</div>" +
-      '<div class="hs-k">' + (u.email ? '📧 ' + esc(u.email) + (u.emailVerified ? ' ✓ doğrulandı' : ' (doğrulanmadı)') : '📱 ' + esc(u.phoneNumber || '')) + "</div></div>" +
+      '<div class="hs-k">' + (u.email ? '📧 ' + esc(u.email) + (u.emailVerified ? ' ✓ doğrulandı' : ' (doğrulanmadı)') : '📱 ' + esc(u.phoneNumber || '')) + "</div>" +
+      (kayit && kayit.ad ? '<div class="hs-k">ARENA kullanıcı adı: <b>' + esc(kayit.ad) + '</b></div>' : '<div class="hs-k">Google profilinle giriş yaptın.</div>') + "</div>" +
       '<div class="hs-top">⭐ Toplam puan <b>' + (P ? P.toplam() : 0) + "</b></div>" + satir +
-      '<button class="hs-bt gri" data-hs="ayar">⚙️ Hesap ayarları</button>';
+      '<button class="hs-bt gri" data-hs="ayar">⚙️ Hesap ayarları</button>' +
+      '<button class="hs-bt gri" data-hs="guncelle">⬇ ARENA Güncelle</button>';
   }
   function ayarHtml(u) {
     var h = (u.email ? '<div class="hs-s">📧 <b>' + esc(u.email) + '</b> ' + (u.emailVerified ? '✓ doğrulandı' : '(doğrulanmadı)') + '</div>' : '<div class="hs-s">📱 <b>' + esc(u.phoneNumber || '') + '</b> ✓ doğrulandı</div>') +
@@ -286,6 +331,7 @@
     else if (a === "sekme-kayit") { sekme = "kayit"; msg = ""; render(); }
     else if (a === "sekme-giris") { sekme = "giris"; telefonOnay = null; msg = ""; render(); }
     else if (a === "google") isle(sosyalGiris("google"));
+    else if (a === "guncelle") uygulamaGuncelle();
     else if (a === "misafir-devam") { if (el) el.classList.remove("show"); }
     else if (a === "telefon-ekran") { telefonEkrani = true; render(); }
     else if (a === "telefon-gonder") isle(telefonKodGonder(val("hs-tel"), "giris"));
@@ -442,7 +488,8 @@
   function esitle() {
     var E = window.Ekonomi; if (!E || !E.adAyarla) return;
     if (kayit && kayit.ad) { if (E.ad() !== kayit.ad) E.adAyarla(kayit.ad); }
-    else if (!/^Oyuncu[0-9]{4}$/.test(E.ad())) E.adAyarla("Oyuncu" + (1000 + Math.floor(Math.random() * 9000))); // eski serbest adlar geçersiz
+    else if (A.currentUser && !A.currentUser.isAnonymous && A.currentUser.displayName) E.adAyarla(A.currentUser.displayName);
+    else if (!/^Oyuncu[0-9]{4}$/.test(E.ad())) E.adAyarla("Oyuncu" + (1000 + Math.floor(Math.random() * 9000))); // misafir için eski serbest adlar geçersiz
   }
   A.onAuthStateChanged(function (u) {
     if (hesapRef) { hesapRef.off(); hesapRef = null; }
@@ -453,5 +500,5 @@
     hesapRef.on("value", function (s) { kayit = s.val(); esitle(); render(); }, noop);
   });
 
-  window.Hesap = { ac: ac, adDogrula: adDogrula };
+  window.Hesap = { ac: ac, adDogrula: adDogrula, googleGiris: function () { return sosyalGiris("google"); } };
 })();
