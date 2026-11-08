@@ -1704,3 +1704,56 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
   paintWholeCards();
   document.addEventListener('DOMContentLoaded',paintWholeCards,{once:true});
 })();
+
+
+/* Remove game-specific color bands from the featured-game caption strips. */
+(function(){
+  const css=document.createElement('style');
+  css.id='arenaFeaturedCaptionBandRemoval';
+  css.textContent=`
+    #arenaHubHome .ar-feature[data-feature] > .ar-feature-label,
+    #arenaHubHome .ar-feature[data-feature] > span.ar-feature-label,
+    #arenaHubHome .ar-feature[data-feature] > *:not(i){
+      background:#09172e!important;
+      background-color:#09172e!important;
+      background-image:none!important;
+      border:0!important;
+      box-shadow:none!important;
+      outline:0!important;
+      filter:none!important;
+      color:#fff!important;
+      border-radius:0!important;
+      -webkit-background-clip:padding-box!important;
+      background-clip:padding-box!important;
+    }
+    #arenaHubHome .ar-feature[data-feature]{
+      background:linear-gradient(180deg,#142b50 0%,#0b1b36 52%,#071329 100%)!important;
+      background-color:#09172e!important;
+      background-image:linear-gradient(180deg,#142b50 0%,#0b1b36 52%,#071329 100%)!important;
+      border:1px solid #527db8!important;
+      border-radius:14px!important;
+      box-shadow:inset 0 1px #ffffff20,0 4px 10px #0008!important;
+    }
+  `;
+  document.head.appendChild(css);
+  function removeCaptionBands(){
+    document.querySelectorAll('#arenaHubHome .ar-feature[data-feature]').forEach(function(card){
+      const label=card.querySelector(':scope > .ar-feature-label');
+      if(label){
+        label.style.setProperty('background','#09172e','important');
+        label.style.setProperty('background-color','#09172e','important');
+        label.style.setProperty('background-image','none','important');
+        label.style.setProperty('border','0','important');
+        label.style.setProperty('box-shadow','none','important');
+        label.style.setProperty('filter','none','important');
+        label.style.setProperty('color','#fff','important');
+      }
+    });
+  }
+  removeCaptionBands();
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',removeCaptionBands,{once:true});
+  const root=document.getElementById('arenaHubHome');
+  if(root&&window.MutationObserver){
+    new MutationObserver(removeCaptionBands).observe(root,{childList:true,subtree:true});
+  }
+})();
