@@ -254,7 +254,18 @@ const hide=document.createElement('style');hide.textContent='#ana .arena-origina
 function profile(authUser){try{const E=window.Ekonomi,P=window.Puan,current=window.firebase&&firebase.auth?firebase.auth().currentUser:null,u=authUser&&typeof authUser.uid==='string'?authUser:current,signed=!!(u&&!u.isAnonymous),google=u&&u.providerData?u.providerData.find(p=>p.providerId==='google.com'):null,display=signed?(u.displayName||(google&&google.displayName)||(u.email?u.email.split('@')[0]:'Üyemiz')):'Misafir',gold=E&&E.altin?E.altin():100,total=P&&P.toplam?P.toplam():0;let level=1;try{level=Math.max(1,Number(JSON.parse(localStorage.getItem('arenaMobileProgress')||'{}').seviye)||1);}catch(_){}const el=id=>document.getElementById(id);if(el('arPlayerName'))el('arPlayerName').textContent=signed?display+' ⭐':'Misafir';if(el('arLoginState')){el('arLoginState').textContent='Google ile giriş yap';el('arLoginState').style.display=signed?'none':'inline-flex';}if(el('arLevel'))el('arLevel').textContent='Seviye '+level;if(el('arXp'))el('arXp').textContent=total.toLocaleString('tr-TR')+' / '+(level*1000).toLocaleString('tr-TR')+' XP';if(el('arGold'))el('arGold').textContent=Number(gold).toLocaleString('tr-TR');if(el('arXpBar'))el('arXpBar').style.width=(total%1000)/10+'%';const av=el('arAvatar');if(av){const photo=signed&&(u.photoURL||(google&&google.photoURL));if(photo){let img=av.querySelector('img');if(!img){av.innerHTML='';img=document.createElement('img');img.alt='Profil fotoğrafı';av.appendChild(img);}if(img.getAttribute('src')!==photo)img.src=photo;}else{av.innerHTML='<span class="ar-guest-avatar">'+(signed?String(display).trim().charAt(0).toLocaleUpperCase('tr'):'👤')+'</span>';}}}catch(e){console.warn('ARENA profil güncellemesi:',e);}}
 function navActive(key){const n=document.getElementById('arenaNeonNav');if(n)n.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.nav===key));}
 function goHome(){document.documentElement.classList.add('arena-home-fixed');view.hidden=true;home.hidden=false;ana.classList.remove('hidden');document.querySelectorAll('section.kart').forEach(s=>s.classList.add('hidden'));try{document.dispatchEvent(new Event('anasayfa'));}catch(_){}try{if(typeof menu==='function')menu();}catch(_){}navActive('home');ana.scrollTop=0;window.scrollTo(0,0);}
-function category(id,push){document.documentElement.classList.remove('arena-home-fixed');const c=cats.find(x=>x.id===id);if(!c)return;findGames();home.hidden=true;view.hidden=false;const live=c.games.filter(k=>found[k]||(['okey','yuzbir','batak','poker'].includes(k)&&window.ArenaMasaOyunlari)||(window.ArenaMiniOyunlar&&window.ArenaMiniOyunlar.varMi(k))).map(k=>({id:k,...defs[k]}));const cards=live.map(g=>'<button class="ar-game-card" data-launch="'+g.id+'"><i>'+g.icon+'</i><span><strong>'+g.name+'</strong><small>'+g.desc+'</small></span></button>').join('');const planned=c.planned.map(n=>'<div class="ar-game-card soon"><i>🔒</i><span><strong>'+n+'</strong><small>Yakında eklenecek</small></span></div>').join('');view.innerHTML='<button class="ar-back" type="button">← Kategorilere Dön</button><div class="ar-cat-head"><i>'+c.icon+'</i><span><strong>'+c.name+'</strong><small>'+c.desc+'</small></span></div><div class="ar-game-list">'+cards+planned+'</div>';navActive('games');ana.scrollTop=0;if(push)try{history.pushState({arenaCategory:id},'','#kategori-'+id);}catch(_){}}
+function category(id,push){
+ const c=cats.find(x=>x.id===id);if(!c)return;
+ findGames();
+ const panel=home.querySelector('.ar-categories');if(!panel)return;
+ const live=c.games.filter(k=>found[k]||(['okey','yuzbir','batak','poker'].includes(k)&&window.ArenaMasaOyunlari)||(window.ArenaMiniOyunlar&&window.ArenaMiniOyunlar.varMi(k))).map(k=>({id:k,...defs[k]}));
+ const cards=live.map(g=>'<button class="ar-game-card" data-launch="'+g.id+'"><i>'+g.icon+'</i><span><strong>'+g.name+'</strong><small>'+g.desc+'</small></span></button>').join('');
+ const planned=c.planned.map(n=>'<div class="ar-game-card soon"><i>🔒</i><span><strong>'+n+'</strong><small>Yakında eklenecek</small></span></div>').join('');
+ panel.classList.add('is-open');panel.dataset.openCategory=id;
+ panel.innerHTML='<div class="ar-inline-category-head"><button type="button" class="ar-inline-back" data-category-back aria-label="Kategorilere dön">←</button><span>'+c.icon+' '+c.name+'</span></div><div class="ar-inline-game-list">'+(cards+planned)+'</div>';
+ view.hidden=true;home.hidden=false;document.documentElement.classList.add('arena-home-fixed');navActive('games');
+ if(push)try{history.pushState({arenaCategory:id},'','#kategori-'+id);}catch(_){}
+}
 function launchGame(id){document.documentElement.classList.remove('arena-home-fixed');let opened=false;try{if(['okey','yuzbir','batak','poker'].includes(id)&&window.ArenaMasaOyunlari&&typeof window.ArenaMasaOyunlari.ac==='function'){window.ArenaMasaOyunlari.ac(id);opened=true;}else if(window.ArenaMiniOyunlar&&window.ArenaMiniOyunlar.varMi(id)){opened=window.ArenaMiniOyunlar.ac(id)!==false;}else{findGames();let b=found[id];if(!b||!document.contains(b)){const d=defs[id];if(d){b=Array.from(ana.querySelectorAll('button')).find(x=>!home.contains(x)&&!view.contains(x)&&d.re.test((x.id==='basla'?'Milyoner ':'')+(x.textContent||'').replace(/\\s+/g,' ')));if(b)found[id]=b;}}if(b&&typeof b.click==='function'&&!b.disabled){b.click();opened=true;}}}catch(err){console.error('ARENA oyun başlatma hatası:',id,err);}if(opened){try{window.dispatchEvent(new CustomEvent('arena:game-start',{detail:{id:id}}));}catch(_){}return;}soon('Bu oyun şu anda açılamadı: '+(defs[id]?.name||id));}
 function dailyMission(){const el=document.querySelector('#arenaHubHome .ar-daily');if(!el)return;let key='arenaDailyGames_'+new Date().getFullYear()+'-'+(new Date().getMonth()+1)+'-'+new Date().getDate(),data={games:[],claimed:false};try{data=JSON.parse(localStorage.getItem(key)||'null')||data;}catch(_){}const count=Math.min(3,(data.games||[]).length),small=el.querySelector('.ar-daily-copy small'),bar=el.querySelector('.ar-progress i'),reward=el.querySelector('.ar-daily-reward');if(small)small.textContent=count>=3?'Görev tamamlandı! Günlük ödülünü kazandın.':count+'/3 farklı oyun oynadın.';if(bar)bar.style.width=(count/3*100)+'%';if(reward)reward.textContent=count>=3?'✓ Tamamlandı':'🪙 +150';}
 window.addEventListener('arena:game-start',e=>{const id=e.detail&&e.detail.id;if(!id)return;let key='arenaDailyGames_'+new Date().getFullYear()+'-'+(new Date().getMonth()+1)+'-'+new Date().getDate(),data={games:[],claimed:false};try{data=JSON.parse(localStorage.getItem(key)||'null')||data;}catch(_){}data.games=Array.from(new Set([...(data.games||[]),id]));if(data.games.length>=3&&!data.claimed){data.claimed=true;try{if(window.Ekonomi&&Ekonomi.ekle){Ekonomi.ekle(150);profile();}}catch(_){}}try{localStorage.setItem(key,JSON.stringify(data));}catch(_){}dailyMission();});
@@ -262,14 +273,14 @@ function league(){if(window.Arena&&Arena.ac)Arena.ac('siralama');else alert('Lig
 function challenge(){if(window.Arena&&Arena.meydanOku)Arena.meydanOku();else alert('Meydan Oku bölümü yüklenemedi.');}
 function account(){if(window.Hesap&&Hesap.ac)Hesap.ac();else if(window.ArenaAuth&&ArenaAuth.ac)ArenaAuth.ac();else alert('Profil bölümü yüklenemedi.');}
 function soon(n){if(window.Ekonomi&&Ekonomi.sor)Ekonomi.sor(n,'Bu bölüm sonraki geliştirme aşamasında açılacak.',[{t:'Tamam',c:'gri'}]);else alert(n+' bölümü yakında açılacak.');}
-home.addEventListener('click',e=>{const c=e.target.closest('[data-category]');if(c){category(c.dataset.category,true);return;}const a=e.target.closest('[data-action]');if(a){const k=a.dataset.action;if(k==='update'){const a=document.createElement('a');a.href='https://github.com/FatihKoc81/Arena/releases/latest/download/Arena.apk';a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();return;}if(k==='allgames'){navActive('games');document.querySelector('#arenaHubHome .ar-categories').scrollIntoView({behavior:'smooth',block:'start'});return;}if(k==='league')return league();if(k==='friends')return soon('Arkadaşlar');if(k==='settings'||k==='menu'||k==='profile'||k==='login')return account();const names={reward:'Günlük Ödül',tasks:'Günlük Görevler',achievements:'Başarılar',season:'Sezon'};return soon(names[k]||'ARENA');}const f=e.target.closest('[data-feature]');if(f){launchGame(f.dataset.feature);}});
+home.addEventListener('click',e=>{const back=e.target.closest('[data-category-back]');if(back){const panel=home.querySelector('.ar-categories');if(panel){panel.classList.remove('is-open');delete panel.dataset.openCategory;panel.innerHTML=cats.map(c=>'<button class="ar-cat '+c.color+'" data-category="'+c.id+'"><span class="ar-cat-icon">'+c.icon+'</span><span class="ar-cat-copy"><strong>'+c.name+'</strong><small>'+categoryCount(c)+'</small></span><span class="ar-cat-arrow">›</span></button>').join('');panel.querySelectorAll('.ar-cat-icon').forEach((el,i)=>{if(i>=6){el.textContent=i===6?'👁️':'⚡';return;}const positions=['0% 0%','20% 0%','40% 0%','60% 0%','80% 0%','100% 0%'];el.textContent='';el.style.setProperty('background-position',positions[i]||'0% 0%','important');el.style.setProperty('background-size','600% 300%','important');el.style.setProperty('background-repeat','no-repeat','important');});}navActive('home');try{history.replaceState({arenaHome:true},'',location.pathname+location.search);}catch(_){}return;}const c=e.target.closest('[data-category]');if(c){category(c.dataset.category,true);return;}const a=e.target.closest('[data-action]');if(a){const k=a.dataset.action;if(k==='update'){const a=document.createElement('a');a.href='https://github.com/FatihKoc81/Arena/releases/latest/download/Arena.apk';a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();return;}if(k==='allgames'){navActive('games');return;}if(k==='league')return league();if(k==='friends')return soon('Arkadaşlar');if(k==='settings'||k==='menu'||k==='profile'||k==='login')return account();const names={reward:'Günlük Ödül',tasks:'Günlük Görevler',achievements:'Başarılar',season:'Sezon'};return soon(names[k]||'ARENA');}const f=e.target.closest('[data-feature]');if(f){launchGame(f.dataset.feature);}});
 view.addEventListener('click',e=>{const b=e.target.closest('.ar-back');if(b){e.preventDefault();view.hidden=true;home.hidden=false;document.documentElement.classList.add('arena-home-fixed');navActive('home');ana.scrollTop=0;try{history.replaceState({arenaHome:true},'',location.pathname+location.search);}catch(_){}return;}const l=e.target.closest('[data-launch]');if(l)launchGame(l.dataset.launch);});
-if(!document.getElementById('arenaNeonNav')){const nav=document.createElement('nav');nav.id='arenaNeonNav';nav.innerHTML='<button class="active" data-nav="home"><i>⌂</i>Ana Sayfa</button><button data-nav="games"><i>🎮</i>Oyunlar</button><button data-nav="league"><i>🏆</i>Lig</button><button data-nav="challenge"><i>⚔️</i>Meydan Oku</button><button data-nav="friends"><i>👥</i>Arkadaşlar</button><button data-nav="profile"><i>♟</i>Profil</button>';document.body.appendChild(nav);nav.addEventListener('click',e=>{const b=e.target.closest('[data-nav]');if(!b)return;const k=b.dataset.nav;if(k==='home')return goHome();if(k==='games'){document.documentElement.classList.remove('arena-home-fixed');view.hidden=true;home.hidden=false;navActive('games');document.querySelector('#arenaHubHome .ar-categories').scrollIntoView({behavior:'smooth',block:'start'});return;}navActive(k);if(k==='league')league();else if(k==='challenge')challenge();else if(k==='friends')soon('Arkadaşlar');else account();});}
+if(!document.getElementById('arenaNeonNav')){const nav=document.createElement('nav');nav.id='arenaNeonNav';nav.innerHTML='<button class="active" data-nav="home"><i>⌂</i>Ana Sayfa</button><button data-nav="games"><i>🎮</i>Oyunlar</button><button data-nav="league"><i>🏆</i>Lig</button><button data-nav="challenge"><i>⚔️</i>Meydan Oku</button><button data-nav="friends"><i>👥</i>Arkadaşlar</button><button data-nav="profile"><i>♟</i>Profil</button>';document.body.appendChild(nav);nav.addEventListener('click',e=>{const b=e.target.closest('[data-nav]');if(!b)return;const k=b.dataset.nav;if(k==='home')return goHome();if(k==='games'){document.documentElement.classList.add('arena-home-fixed');view.hidden=true;home.hidden=false;navActive('games');return;}navActive(k);if(k==='league')league();else if(k==='challenge')challenge();else if(k==='friends')soon('Arkadaşlar');else account();});}
 if(title)title.addEventListener('click',e=>{const hs=e.target.closest('[data-header-hotspot]');if(hs){e.preventDefault();e.stopImmediatePropagation();const k=hs.dataset.headerHotspot;if(k==='settings')account();else if(k==='notifications')soon('Bildirimler');else if(k==='update'){const a=document.createElement('a');a.href='https://github.com/FatihKoc81/Arena/releases/latest/download/Arena.apk';a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();}else soon('Menü');return;}e.preventDefault();e.stopImmediatePropagation();goHome();},true);
 home.querySelector('.ar-brand').addEventListener('click',goHome);
 findGames();new MutationObserver(findGames).observe(ana,{childList:true,subtree:true});
 window.addEventListener('load',()=>{findGames();profile();dailyMission();});window.addEventListener('focus',profile);
-(function bindProfileAuth(){let tries=0;function bind(){if(!window.firebase||!firebase.apps||!firebase.apps.length||!firebase.auth){if(tries++<100)setTimeout(bind,200);return;}try{firebase.auth().onAuthStateChanged(u=>profile(u));}catch(e){console.warn('ARENA profil oturumu:',e);}}bind();})();window.addEventListener('arena:home',goHome);window.addEventListener('anasayfa',goHome);window.addEventListener('popstate',()=>{if(!view.hidden)goHome();});if(window.Puan&&Puan.degisti)Puan.degisti(profile);setTimeout(profile,300);setTimeout(profile,1200);
+(function bindProfileAuth(){let tries=0;function bind(){if(!window.firebase||!firebase.apps||!firebase.apps.length||!firebase.auth){if(tries++<100)setTimeout(bind,200);return;}try{firebase.auth().onAuthStateChanged(u=>profile(u));}catch(e){console.warn('ARENA profil oturumu:',e);}}bind();})();window.addEventListener('arena:home',goHome);window.addEventListener('anasayfa',goHome);window.addEventListener('popstate',e=>{const panel=home.querySelector('.ar-categories');if(panel&&panel.classList.contains('is-open')){const back=home.querySelector('[data-category-back]');if(back)back.click();}else if(!view.hidden)goHome();});if(window.Puan&&Puan.degisti)Puan.degisti(profile);setTimeout(profile,300);setTimeout(profile,1200);
 /* Unified responsive home layout: identical on web and APK. */
 const unifiedHome=document.createElement('style');
 unifiedHome.id='arenaUnifiedResponsiveHome';
@@ -1152,6 +1163,71 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
    html.arena-home-fixed #arenaHubHome>.ar-daily{height:62px!important;min-height:62px!important;max-height:62px!important}
    html.arena-home-fixed #arenaHubHome .ar-categories{gap:5px!important}
  }
+ `;
+ document.head.appendChild(s);
+})();
+
+
+/* Category detail stays inside the existing category slot; no page movement or button scaling */
+(function(){
+ const s=document.createElement('style');s.id='arenaInlineCategoryNoScroll';
+ s.textContent=`
+ html.arena-home-fixed,html.arena-home-fixed body{overflow:hidden!important;overscroll-behavior:none!important}
+ html.arena-home-fixed #ana{overflow:hidden!important;overscroll-behavior:none!important}
+ html.arena-home-fixed #arenaHubHome .ar-cat,
+ html.arena-home-fixed #arenaHubHome .ar-cat:active,
+ html.arena-home-fixed #arenaHubHome .ar-short,
+ html.arena-home-fixed #arenaHubHome .ar-short:active{
+   transform:none!important;scale:1!important;transition:none!important;
+ }
+ html.arena-home-fixed #arenaHubHome .ar-categories.is-open{
+   display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+   grid-template-rows:clamp(34px,5vh,42px) minmax(0,1fr)!important;
+   gap:5px!important;overflow:hidden!important;min-height:0!important;
+ }
+ html.arena-home-fixed #arenaHubHome .ar-inline-category-head{
+   display:flex!important;align-items:center!important;gap:9px!important;
+   min-width:0!important;height:100%!important;padding:2px 5px!important;
+   color:#fff!important;font-size:clamp(13px,3.7vw,17px)!important;font-weight:900!important;
+   border:1px solid #345b91!important;border-radius:11px!important;
+   background:linear-gradient(100deg,#172f5b,#101a3b)!important;
+ }
+ html.arena-home-fixed #arenaHubHome .ar-inline-back{
+   display:grid!important;place-items:center!important;flex:0 0 30px!important;
+   width:30px!important;height:28px!important;padding:0!important;
+   border:1px solid #527bb0!important;border-radius:8px!important;
+   color:#fff!important;background:#102b52!important;font-size:19px!important;
+ }
+ html.arena-home-fixed #arenaHubHome .ar-inline-game-list{
+   display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+   grid-auto-rows:minmax(0,1fr)!important;align-content:stretch!important;
+   gap:clamp(5px,.8vh,8px)!important;min-height:0!important;height:100%!important;
+   overflow:hidden!important;
+ }
+ html.arena-home-fixed #arenaHubHome .ar-inline-game-list .ar-game-card{
+   display:flex!important;flex-direction:row!important;align-items:center!important;
+   justify-content:flex-start!important;gap:8px!important;width:100%!important;
+   min-width:0!important;min-height:0!important;height:100%!important;
+   padding:6px 8px!important;overflow:hidden!important;
+   border:1px solid #3b6094!important;border-radius:12px!important;
+   background:linear-gradient(145deg,#18365f,#0a1731)!important;
+   color:#fff!important;text-align:left!important;transform:none!important;
+   box-sizing:border-box!important;
+ }
+ html.arena-home-fixed #arenaHubHome .ar-inline-game-list .ar-game-card i{
+   flex:0 0 32px!important;width:32px!important;font-size:26px!important;
+   font-style:normal!important;text-align:center!important;
+ }
+ html.arena-home-fixed #arenaHubHome .ar-inline-game-list .ar-game-card span{display:block!important;min-width:0!important}
+ html.arena-home-fixed #arenaHubHome .ar-inline-game-list .ar-game-card strong{
+   display:block!important;font-size:clamp(10px,3vw,14px)!important;line-height:1.1!important;
+   overflow-wrap:anywhere!important;
+ }
+ html.arena-home-fixed #arenaHubHome .ar-inline-game-list .ar-game-card small{
+   display:block!important;margin-top:3px!important;font-size:clamp(8px,2.2vw,10px)!important;
+   line-height:1.1!important;color:#b6c9e9!important;
+ }
+ html.arena-home-fixed #arenaHubHome .ar-inline-game-list .ar-game-card.soon{opacity:.7!important;border-style:dashed!important}
  `;
  document.head.appendChild(s);
 })();
