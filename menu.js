@@ -221,7 +221,7 @@ const arenaHomePolish=document.createElement('style');arenaHomePolish.id='arenaH
 
 
 
-if(title){title.innerHTML='<button class="ar-header-hotspot left" data-header-hotspot="menu" aria-label="Menü"></button><button class="ar-header-update" data-header-hotspot="update" aria-label="ARENA Güncelle">↓</button><button class="ar-header-hotspot bell" data-header-hotspot="notifications" aria-label="Bildirimler"></button><button class="ar-header-hotspot gear" data-header-hotspot="settings" aria-label="Ayarlar"></button>';title.setAttribute('role','group');title.setAttribute('aria-label','ARENA üst menü');}
+if(title){title.innerHTML='<button class="ar-header-hotspot left" data-header-hotspot="menu" aria-label="Menü"></button><button class="ar-header-hotspot bell" data-header-hotspot="notifications" aria-label="Bildirimler"></button><button class="ar-header-hotspot gear" data-header-hotspot="settings" aria-label="Ayarlar"></button>';title.setAttribute('role','group');title.setAttribute('aria-label','ARENA üst menü');}
 /* Web ve APK aynı ana sayfa bileşenlerini kullanır. */
 (function(){
   let nativeApp=false;
@@ -273,10 +273,10 @@ function league(){if(window.Arena&&Arena.ac)Arena.ac('siralama');else alert('Lig
 function challenge(){if(window.Arena&&Arena.meydanOku)Arena.meydanOku();else alert('Meydan Oku bölümü yüklenemedi.');}
 function account(){if(window.Hesap&&Hesap.ac)Hesap.ac();else if(window.ArenaAuth&&ArenaAuth.ac)ArenaAuth.ac();else alert('Profil bölümü yüklenemedi.');}
 function soon(n){if(window.Ekonomi&&Ekonomi.sor)Ekonomi.sor(n,'Bu bölüm sonraki geliştirme aşamasında açılacak.',[{t:'Tamam',c:'gri'}]);else alert(n+' bölümü yakında açılacak.');}
-home.addEventListener('click',e=>{const back=e.target.closest('[data-category-back]');if(back){const panel=home.querySelector('.ar-categories');if(panel){panel.classList.remove('is-open');delete panel.dataset.openCategory;panel.innerHTML=cats.map(c=>'<button class="ar-cat '+c.color+'" data-category="'+c.id+'"><span class="ar-cat-icon">'+c.icon+'</span><span class="ar-cat-copy"><strong>'+c.name+'</strong><small>'+categoryCount(c)+'</small></span><span class="ar-cat-arrow">›</span></button>').join('');panel.querySelectorAll('.ar-cat-icon').forEach((el,i)=>{if(i>=6){el.textContent=i===6?'👁️':'⚡';return;}const positions=['0% 0%','20% 0%','40% 0%','60% 0%','80% 0%','100% 0%'];el.textContent='';el.style.setProperty('background-position',positions[i]||'0% 0%','important');el.style.setProperty('background-size','600% 300%','important');el.style.setProperty('background-repeat','no-repeat','important');});}navActive('home');try{history.replaceState({arenaHome:true},'',location.pathname+location.search);}catch(_){}return;}const c=e.target.closest('[data-category]');if(c){category(c.dataset.category,true);return;}const a=e.target.closest('[data-action]');if(a){const k=a.dataset.action;if(k==='update'){const a=document.createElement('a');a.href='https://github.com/FatihKoc81/Arena/releases/latest/download/Arena.apk';a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();return;}if(k==='allgames'){navActive('games');return;}if(k==='league')return league();if(k==='friends')return soon('Arkadaşlar');if(k==='settings'||k==='menu'||k==='profile'||k==='login')return account();const names={reward:'Günlük Ödül',tasks:'Günlük Görevler',achievements:'Başarılar',season:'Sezon'};return soon(names[k]||'ARENA');}const f=e.target.closest('[data-feature]');if(f){launchGame(f.dataset.feature);}});
+home.addEventListener('click',e=>{const back=e.target.closest('[data-category-back]');if(back){const panel=home.querySelector('.ar-categories');if(panel){panel.classList.remove('is-open');delete panel.dataset.openCategory;panel.innerHTML=cats.map(c=>'<button class="ar-cat '+c.color+'" data-category="'+c.id+'"><span class="ar-cat-icon">'+c.icon+'</span><span class="ar-cat-copy"><strong>'+c.name+'</strong><small>'+categoryCount(c)+'</small></span><span class="ar-cat-arrow">›</span></button>').join('');panel.querySelectorAll('.ar-cat-icon').forEach((el,i)=>{if(i>=6){el.textContent=i===6?'👁️':'⚡';return;}const positions=['0% 0%','20% 0%','40% 0%','60% 0%','80% 0%','100% 0%'];el.textContent='';el.style.setProperty('background-position',positions[i]||'0% 0%','important');el.style.setProperty('background-size','600% 300%','important');el.style.setProperty('background-repeat','no-repeat','important');});}navActive('home');try{history.replaceState({arenaHome:true},'',location.pathname+location.search);}catch(_){}return;}const c=e.target.closest('[data-category]');if(c){category(c.dataset.category,true);return;}const a=e.target.closest('[data-action]');if(a){const k=a.dataset.action;if(k==='update'){const a=document.createElement('a');a.href='https://github.com/FatihKoc81/Arena/releases/latest/download/Arena.apk';a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();return;}if(k==='allgames'){navActive('games');return;}if(k==='league')return league();if(k==='friends')return soon('Arkadaşlar');if(k==='menu')return arenaOpenMenu();if(k==='settings'||k==='profile'||k==='login')return account();const names={reward:'Günlük Ödül',tasks:'Günlük Görevler',achievements:'Başarılar',season:'Sezon'};return soon(names[k]||'ARENA');}const f=e.target.closest('[data-feature]');if(f){launchGame(f.dataset.feature);}});
 view.addEventListener('click',e=>{const b=e.target.closest('.ar-back');if(b){e.preventDefault();view.hidden=true;home.hidden=false;document.documentElement.classList.add('arena-home-fixed');navActive('home');ana.scrollTop=0;try{history.replaceState({arenaHome:true},'',location.pathname+location.search);}catch(_){}return;}const l=e.target.closest('[data-launch]');if(l)launchGame(l.dataset.launch);});
 if(!document.getElementById('arenaNeonNav')){const nav=document.createElement('nav');nav.id='arenaNeonNav';nav.innerHTML='<button class="active" data-nav="home"><i>⌂</i>Ana Sayfa</button><button data-nav="games"><i>🎮</i>Oyunlar</button><button data-nav="league"><i>🏆</i>Lig</button><button data-nav="challenge"><i>⚔️</i>Meydan Oku</button><button data-nav="friends"><i>👥</i>Arkadaşlar</button><button data-nav="profile"><i>♟</i>Profil</button>';document.body.appendChild(nav);nav.addEventListener('click',e=>{const b=e.target.closest('[data-nav]');if(!b)return;const k=b.dataset.nav;if(k==='home')return goHome();if(k==='games'){document.documentElement.classList.add('arena-home-fixed');view.hidden=true;home.hidden=false;navActive('games');return;}navActive(k);if(k==='league')league();else if(k==='challenge')challenge();else if(k==='friends')soon('Arkadaşlar');else account();});}
-if(title)title.addEventListener('click',e=>{const hs=e.target.closest('[data-header-hotspot]');if(hs){e.preventDefault();e.stopImmediatePropagation();const k=hs.dataset.headerHotspot;if(k==='settings')account();else if(k==='notifications')soon('Bildirimler');else if(k==='update'){const a=document.createElement('a');a.href='https://github.com/FatihKoc81/Arena/releases/latest/download/Arena.apk';a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();}else soon('Menü');return;}e.preventDefault();e.stopImmediatePropagation();goHome();},true);
+if(title)title.addEventListener('click',e=>{const hs=e.target.closest('[data-header-hotspot]');if(hs){e.preventDefault();e.stopImmediatePropagation();const k=hs.dataset.headerHotspot;if(k==='settings')account();else if(k==='notifications')soon('Bildirimler');else if(k==='menu')arenaOpenMenu();return;}e.preventDefault();e.stopImmediatePropagation();goHome();},true);
 home.querySelector('.ar-brand').addEventListener('click',goHome);
 findGames();new MutationObserver(findGames).observe(ana,{childList:true,subtree:true});
 window.addEventListener('load',()=>{findGames();profile();dailyMission();});window.addEventListener('focus',profile);
@@ -1265,4 +1265,53 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
  body>h1 .ar-header-update:active{transform:translateY(-50%)!important}
  `;
  document.head.appendChild(s);
+})();
+
+
+/* Menü içinden güncelleme; ana ekranda bağımsız indirme düğmesi gösterilmez. */
+(function(){
+ const css=document.createElement('style');
+ css.id='arenaMenuUpdateAndOverflowFix';
+ css.textContent=`
+ body>h1 .ar-header-update{display:none!important}
+ #arenaHubHome .ar-profile::before,#arenaHubHome .ar-profile::after,
+ #arenaHubHome .ar-avatar::before,#arenaHubHome .ar-avatar::after{content:none!important;display:none!important}
+ #arenaHubHome .ar-avatar{overflow:hidden!important;outline:0!important;box-shadow:none!important}
+ #arenaHubHome .ar-feature,
+ #arenaHubHome .ar-feature:nth-child(1),#arenaHubHome .ar-feature:nth-child(2),
+ #arenaHubHome .ar-feature:nth-child(3),#arenaHubHome .ar-feature:nth-child(4),
+ #arenaHubHome .ar-feature:nth-child(5),#arenaHubHome .ar-feature:nth-child(6){
+   background:transparent!important;background-color:transparent!important;background-image:none!important;
+   box-shadow:none!important;border:0!important;
+ }
+ #arenaHubHome .ar-feature i,
+ #arenaHubHome .ar-feature:nth-child(1) i,#arenaHubHome .ar-feature:nth-child(2) i,
+ #arenaHubHome .ar-feature:nth-child(3) i,#arenaHubHome .ar-feature:nth-child(4) i,
+ #arenaHubHome .ar-feature:nth-child(5) i,#arenaHubHome .ar-feature:nth-child(6) i{
+   background:#07152d!important;
+   background-image:linear-gradient(155deg,#142b50 0%,#09172e 55%,#050d20 100%)!important;
+   background-color:#07152d!important;
+   border:1px solid #527db8!important;border-radius:14px!important;
+   box-shadow:inset 0 1px #ffffff20,0 4px 10px #0008!important;
+ }
+ #arenaMenuUpdateLayer{position:fixed;inset:0;z-index:200000;display:none;align-items:flex-start;justify-content:flex-start;padding:calc(env(safe-area-inset-top) + 68px) 14px 20px;background:#0009}
+ #arenaMenuUpdateLayer.open{display:flex}
+ #arenaMenuUpdatePanel{width:min(310px,86vw);padding:14px;border:1px solid #42669d;border-radius:18px;background:linear-gradient(155deg,#142b50,#050d20);box-shadow:0 14px 38px #000b}
+ #arenaMenuUpdatePanel strong{display:block;color:#fff;font-size:16px;margin:2px 4px 12px}
+ #arenaMenuUpdatePanel button{width:100%;min-height:48px;border:1px solid #e4b64b;border-radius:13px;background:linear-gradient(120deg,#573b0a,#241a0a);color:#ffe28a;font-size:15px;font-weight:900}
+ #arenaMenuUpdatePanel .arena-menu-close{margin-top:8px;border-color:#42618f;background:#0b1931;color:#dce8ff}
+ `;
+ document.head.appendChild(css);
+ const layer=document.createElement('div');layer.id='arenaMenuUpdateLayer';
+ layer.innerHTML='<div id="arenaMenuUpdatePanel" role="dialog" aria-label="Menü"><strong>ARENA MENÜ</strong><button type="button" data-ar-menu-update>↓ ARENA Güncelle</button><button type="button" class="arena-menu-close" data-ar-menu-close>Kapat</button></div>';
+ document.body.appendChild(layer);
+ window.arenaOpenMenu=function(){layer.classList.add('open');};
+ layer.addEventListener('click',function(e){
+   if(e.target===layer||e.target.closest('[data-ar-menu-close]')){layer.classList.remove('open');return;}
+   if(e.target.closest('[data-ar-menu-update]')){
+     layer.classList.remove('open');
+     const a=document.createElement('a');a.href='https://github.com/FatihKoc81/Arena/releases/latest/download/Arena.apk';a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();
+   }
+ });
+ document.addEventListener('keydown',function(e){if(e.key==='Escape')layer.classList.remove('open');});
 })();
