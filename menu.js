@@ -962,3 +962,41 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
  `;
  document.head.appendChild(s);
 })();
+
+
+/* Further vertical emphasis on category tiles; keep all other home sections visible */
+(function(){
+ const s=document.createElement('style');
+ s.id='arenaCategoryHeightNext';
+ s.textContent=`
+ html.arena-home-fixed #arenaHubHome{
+   grid-template-rows:
+     clamp(66px,7.8vh,80px)
+     clamp(50px,5.8vh,62px)
+     minmax(0,1fr)
+     clamp(48px,5.8vh,58px)
+     20px
+     clamp(68px,8.5vh,82px)!important;
+   gap:clamp(4px,.5vh,6px)!important;
+ }
+ html.arena-home-fixed #arenaHubHome .ar-categories{
+   grid-template-rows:repeat(4,minmax(0,1fr))!important;
+   gap:clamp(6px,.9vh,9px)!important;
+ }
+ html.arena-home-fixed #arenaHubHome .ar-cat{
+   min-height:0!important;height:100%!important;
+   padding:7px clamp(7px,1.7vw,13px)!important;
+ }
+ @media(max-height:760px){
+   html.arena-home-fixed #arenaHubHome{
+     grid-template-rows:58px 48px minmax(0,1fr) 44px 18px 64px!important;
+     gap:4px!important;
+   }
+   html.arena-home-fixed #arenaHubHome .ar-categories{
+     grid-template-rows:repeat(4,minmax(0,1fr))!important;
+     gap:5px!important;
+   }
+ }
+ `;
+ document.head.appendChild(s);
+})();
