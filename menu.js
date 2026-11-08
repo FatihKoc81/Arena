@@ -216,7 +216,7 @@ const arenaHomePolish=document.createElement('style');arenaHomePolish.id='arenaH
 
 
 if(title){title.innerHTML='<button class="ar-header-hotspot left" data-header-hotspot="menu" aria-label="Menü"></button><button class="ar-header-hotspot bell" data-header-hotspot="notifications" aria-label="Bildirimler"></button><button class="ar-header-hotspot gear" data-header-hotspot="settings" aria-label="Ayarlar"></button>';title.setAttribute('role','group');title.setAttribute('aria-label','ARENA üst menü');}
-/* Platform-specific home: featured mini-game strip is reserved for the native app. */
+/* Web ve APK aynı ana sayfa bileşenlerini kullanır. */
 (function(){
   let nativeApp=false;
   try{
@@ -226,15 +226,6 @@ if(title){title.innerHTML='<button class="ar-header-hotspot left" data-header-ho
   }catch(_){}
   document.documentElement.classList.toggle('arena-native-app',nativeApp);
   document.documentElement.classList.toggle('arena-web-app',!nativeApp);
-  const platformStyle=document.createElement('style');
-  platformStyle.textContent=`
-    html.arena-web-app #arenaHubHome .ar-section-title,
-    html.arena-web-app #arenaHubHome .ar-featured{display:none!important}
-    html.arena-web-app #arenaHubHome{padding-bottom:20px!important}
-    html.arena-native-app #arenaHubHome .ar-section-title,
-    html.arena-native-app #arenaHubHome .ar-featured{display:flex}
-  `;
-  document.head.appendChild(platformStyle);
 })();
 
 const home=document.createElement('div');home.id='arenaHubHome';
@@ -271,4 +262,77 @@ if(title)title.addEventListener('click',e=>{const hs=e.target.closest('[data-hea
 home.querySelector('.ar-brand').addEventListener('click',goHome);
 findGames();new MutationObserver(findGames).observe(ana,{childList:true,subtree:true});
 window.addEventListener('load',()=>{findGames();profile();dailyMission();});window.addEventListener('focus',profile);window.addEventListener('arena:home',goHome);window.addEventListener('anasayfa',goHome);window.addEventListener('popstate',()=>{if(!view.hidden)goHome();});if(window.Puan&&Puan.degisti)Puan.degisti(profile);setTimeout(profile,300);setTimeout(profile,1200);
+/* Unified responsive home layout: identical on web and APK. */
+const unifiedHome=document.createElement('style');
+unifiedHome.id='arenaUnifiedResponsiveHome';
+unifiedHome.textContent=`
+html.arena-web-app #arenaHubHome .ar-section-title,
+html.arena-native-app #arenaHubHome .ar-section-title{display:flex!important}
+html.arena-web-app #arenaHubHome .ar-featured,
+html.arena-native-app #arenaHubHome .ar-featured{display:grid!important}
+body{padding-bottom:calc(86px + env(safe-area-inset-bottom))!important}
+#ana{display:block!important;min-height:0!important;height:auto!important;padding:0 7px 16px!important;overflow:visible!important}
+#arenaHubHome{display:flex!important;flex:0 0 auto!important;flex-direction:column!important;justify-content:flex-start!important;align-items:stretch!important;gap:12px!important;min-height:0!important;height:auto!important;padding:4px 0 16px!important}
+#arenaHubHome .ar-profile{display:grid!important;grid-template-columns:clamp(54px,15vw,64px) minmax(0,1fr) clamp(48px,14vw,58px) clamp(88px,26vw,112px)!important;align-items:center!important;gap:6px!important;width:100%!important;height:auto!important;min-height:80px!important;margin:0!important;padding:6px 8px!important;box-sizing:border-box!important;overflow:visible!important}
+#arenaHubHome .ar-avatar{display:grid!important;place-items:center!important;width:clamp(52px,15vw,60px)!important;height:clamp(52px,15vw,60px)!important;min-width:0!important;min-height:0!important;align-self:center!important;justify-self:center!important;overflow:hidden!important;border:3px solid #ffd35a!important;border-radius:50%!important;background:linear-gradient(145deg,#f6d878,#9b5a16)!important;box-shadow:0 0 10px #ffcc4e88,inset 0 1px #fff8!important;box-sizing:border-box!important}
+#arenaHubHome .ar-avatar img{display:block!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:cover!important;object-position:center!important;border-radius:50%!important}
+#arenaHubHome .ar-player{min-width:0!important;align-self:center!important}
+#arenaHubHome .ar-player-name{font-size:clamp(12px,3.6vw,17px)!important;line-height:1.15!important}
+#arenaHubHome .ar-level-line{display:flex!important;flex-wrap:wrap!important;gap:5px!important;margin-top:5px!important}
+#arenaHubHome .ar-level-pill{font-size:11px!important;padding:4px 7px!important}
+#arenaHubHome .ar-xp{font-size:10px!important}
+#arenaHubHome .ar-xpbar{height:5px!important;margin-top:5px!important}
+#arenaHubHome .ar-league{display:grid!important;place-items:center!important;width:100%!important;height:58px!important;min-width:0!important}
+#arenaHubHome .ar-league img{display:block!important;width:100%!important;height:56px!important;object-fit:contain!important}
+#arenaHubHome .ar-wallet{display:grid!important;grid-template-columns:1fr!important;gap:5px!important;min-width:0!important}
+#arenaHubHome .ar-wallet-row{display:flex!important;align-items:center!important;justify-content:space-between!important;min-width:0!important;height:31px!important;min-height:31px!important;padding:3px 6px!important;font-size:11px!important;line-height:1!important;gap:3px!important;border-radius:10px!important}
+#arenaHubHome .ar-wallet-row b{font-size:15px!important;line-height:1!important}
+#arenaHubHome .ar-shortcuts{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:5px!important;margin:0!important}
+#arenaHubHome .ar-short{display:flex!important;align-items:center!important;justify-content:center!important;min-width:0!important;width:100%!important;height:68px!important;min-height:68px!important;padding:4px 1px!important;gap:4px!important;font-size:clamp(8px,2.5vw,10px)!important;line-height:1.08!important;white-space:normal!important}
+#arenaHubHome .ar-short i{font-size:clamp(19px,5.4vw,25px)!important;line-height:1!important}
+#arenaHubHome .ar-categories{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important;margin:0!important}
+#arenaHubHome .ar-cat{display:grid!important;grid-template-columns:clamp(54px,16vw,70px) minmax(0,1fr)!important;align-items:center!important;gap:6px!important;width:100%!important;height:clamp(72px,20vw,82px)!important;min-height:clamp(72px,20vw,82px)!important;padding:6px 8px!important;border-radius:16px!important;box-sizing:border-box!important}
+#arenaHubHome .ar-cat-icon{display:block!important;width:100%!important;height:clamp(52px,15vw,66px)!important;min-width:0!important;min-height:0!important;font-size:0!important;background-size:600% 300%!important;background-repeat:no-repeat!important}
+#arenaHubHome .ar-cat-copy{min-width:0!important}
+#arenaHubHome .ar-cat-copy strong{display:block!important;font-size:clamp(13px,3.7vw,17px)!important;line-height:1.12!important;overflow-wrap:anywhere!important}
+#arenaHubHome .ar-cat-copy small{display:block!important;font-size:clamp(10px,2.9vw,12px)!important;margin-top:4px!important}
+#arenaHubHome .ar-daily{display:grid!important;grid-template-columns:48px minmax(0,1fr) auto!important;align-items:center!important;gap:7px!important;width:100%!important;height:auto!important;min-height:66px!important;margin:0!important;padding:8px 9px!important;box-sizing:border-box!important}
+#arenaHubHome .ar-daily-target{font-size:36px!important}
+#arenaHubHome .ar-daily-copy{min-width:0!important}
+#arenaHubHome .ar-daily-copy strong{font-size:14px!important}
+#arenaHubHome .ar-daily-copy small{font-size:11px!important}
+#arenaHubHome .ar-daily-reward{padding:6px 8px!important;font-size:13px!important}
+#arenaHubHome .ar-section-title{display:flex!important;align-items:center!important;justify-content:space-between!important;margin:2px 2px 0!important;font-size:clamp(16px,4.5vw,20px)!important}
+#arenaHubHome .ar-section-title small{font-size:11px!important}
+#arenaHubHome .ar-featured{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:6px!important;width:100%!important;margin:0!important;padding:0 0 4px!important}
+#arenaHubHome .ar-feature{display:block!important;min-width:0!important;padding:0!important;font-size:clamp(8px,2.5vw,10px)!important;line-height:1.12!important}
+#arenaHubHome .ar-feature i{display:grid!important;place-items:center!important;width:100%!important;height:clamp(42px,13vw,54px)!important;margin:0 0 4px!important;border:1px solid #527db8!important;border-radius:12px!important;background:linear-gradient(145deg,#173d70,#211342)!important;background-image:none!important;box-shadow:inset 0 1px #ffffff24,0 4px 10px #0008!important;font-size:clamp(22px,6vw,27px)!important;font-style:normal!important}
+#arenaHubCategory{padding:2px 0 18px!important}
+#arenaNeonNav{left:7px!important;right:7px!important;bottom:calc(4px + env(safe-area-inset-bottom))!important;display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:2px!important;padding:4px 3px!important;border-radius:21px!important;box-sizing:border-box!important}
+#arenaNeonNav button{display:flex!important;align-items:center!important;justify-content:center!important;min-width:0!important;width:100%!important;height:62px!important;min-height:62px!important;padding:3px 1px!important;gap:3px!important;font-size:clamp(8px,2.5vw,10px)!important}
+#arenaNeonNav button i{font-size:clamp(19px,5.5vw,24px)!important;line-height:1!important}
+#arena-table-modal{box-sizing:border-box!important;gap:8px!important}
+#arena-table-modal .at-head{position:sticky!important;top:0!important;z-index:3!important;background:#07152df2!important;backdrop-filter:blur(10px)!important;border-radius:12px!important}
+#arena-table-modal .at-panel{box-shadow:inset 0 1px #ffffff12,0 7px 18px #0005!important}
+#arena-table-modal .at-hand{display:flex!important;flex-wrap:nowrap!important;justify-content:flex-start!important;overflow-x:auto!important;overflow-y:visible!important;padding:10px 4px 14px!important;scrollbar-width:thin!important;touch-action:pan-x!important}
+#arena-table-modal .at-tile,#arena-table-modal .at-card{flex:0 0 auto!important;touch-action:manipulation!important;user-select:none!important;-webkit-user-select:none!important}
+#arena-table-modal .at-game,#arena-table-modal .at-btn{transition:transform .14s ease,filter .14s ease!important}
+#arena-table-modal .at-game:active,#arena-table-modal .at-btn:active{transform:scale(.97)!important;filter:brightness(1.15)!important}
+@media(max-width:360px){
+ #arenaHubHome{gap:9px!important}
+ #arenaHubHome .ar-profile{grid-template-columns:52px minmax(0,1fr) 46px 84px!important;gap:4px!important;padding:5px 5px!important}
+ #arenaHubHome .ar-avatar{width:50px!important;height:50px!important}
+ #arenaHubHome .ar-player-name{font-size:12px!important}
+ #arenaHubHome .ar-wallet-row{height:29px!important;min-height:29px!important;font-size:10px!important}
+ #arenaHubHome .ar-wallet-row b{font-size:13px!important}
+ #arenaHubHome .ar-cat{grid-template-columns:52px minmax(0,1fr)!important;height:70px!important;min-height:70px!important;padding:5px!important}
+ #arenaHubHome .ar-cat-icon{height:52px!important}
+ #arenaHubHome .ar-daily{grid-template-columns:40px minmax(0,1fr) auto!important;gap:5px!important}
+ #arenaHubHome .ar-daily-target{font-size:30px!important}
+ #arenaHubHome .ar-daily-reward{font-size:11px!important;padding:5px!important}
+ #arenaNeonNav button{height:58px!important;min-height:58px!important}
+}
+`;
+document.head.appendChild(unifiedHome);
+
 })();
