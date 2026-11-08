@@ -1462,3 +1462,81 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
    card.style.setProperty('box-shadow','none','important');
  });
 })();
+
+
+/* FINAL FIX: featured game labels and card wrappers must not inherit category colors. */
+(function(){
+  const style = document.createElement('style');
+  style.id = 'arenaFeaturedNoColorBleedFinal';
+  style.textContent = `
+    #arenaHubHome .ar-feature,
+    #arenaHubHome .ar-feature[data-feature],
+    #arenaHubHome .ar-feature:nth-child(n) {
+      background: transparent !important;
+      background-color: transparent !important;
+      background-image: none !important;
+      border: 0 !important;
+      box-shadow: none !important;
+      outline: 0 !important;
+      filter: none !important;
+      overflow: hidden !important;
+    }
+    #arenaHubHome .ar-feature::before,
+    #arenaHubHome .ar-feature::after,
+    #arenaHubHome .ar-feature > *:not(i)::before,
+    #arenaHubHome .ar-feature > *:not(i)::after {
+      content: none !important;
+      display: none !important;
+    }
+    #arenaHubHome .ar-feature > *:not(i) {
+      background: transparent !important;
+      background-color: transparent !important;
+      background-image: none !important;
+      border: 0 !important;
+      box-shadow: none !important;
+    }
+    #arenaHubHome .ar-feature > i {
+      background: linear-gradient(155deg,#142b50 0%,#09172e 58%,#050d20 100%) !important;
+      background-color: #09172e !important;
+      background-image: linear-gradient(155deg,#142b50 0%,#09172e 58%,#050d20 100%) !important;
+      background-size: 100% 100% !important;
+      background-position: center !important;
+      background-repeat: no-repeat !important;
+      border: 1px solid #527db8 !important;
+      border-radius: 14px !important;
+      box-shadow: inset 0 1px #ffffff20, 0 4px 10px #0008 !important;
+      overflow: hidden !important;
+    }
+  `;
+  document.head.appendChild(style);
+
+  function clearFeatureColorBleed(){
+    document.querySelectorAll('#arenaHubHome .ar-feature').forEach(function(card){
+      ['background','background-color','background-image','border','box-shadow','outline','filter'].forEach(function(prop){
+        card.style.setProperty(prop, prop === 'background' ? 'transparent' : (prop === 'background-image' ? 'none' : (prop === 'background-color' ? 'transparent' : (prop === 'border' ? '0' : (prop === 'box-shadow' ? 'none' : (prop === 'outline' ? '0' : 'none'))))), 'important');
+      });
+      card.querySelectorAll(':scope > *:not(i)').forEach(function(label){
+        label.style.setProperty('background','transparent','important');
+        label.style.setProperty('background-image','none','important');
+        label.style.setProperty('background-color','transparent','important');
+        label.style.setProperty('box-shadow','none','important');
+        label.style.setProperty('border','0','important');
+      });
+      const tile = card.querySelector(':scope > i');
+      if(tile){
+        tile.style.setProperty('background','linear-gradient(155deg,#142b50 0%,#09172e 58%,#050d20 100%)','important');
+        tile.style.setProperty('background-image','linear-gradient(155deg,#142b50 0%,#09172e 58%,#050d20 100%)','important');
+        tile.style.setProperty('background-color','#09172e','important');
+        tile.style.setProperty('background-size','100% 100%','important');
+        tile.style.setProperty('background-position','center','important');
+        tile.style.setProperty('background-repeat','no-repeat','important');
+        tile.style.setProperty('border','1px solid #527db8','important');
+        tile.style.setProperty('box-shadow','inset 0 1px #ffffff20,0 4px 10px #0008','important');
+      }
+    });
+  }
+  clearFeatureColorBleed();
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded',clearFeatureColorBleed,{once:true});
+  }
+})();
