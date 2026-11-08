@@ -246,7 +246,7 @@ home.innerHTML='<div class="ar-top"><button class="ar-top-btn" data-action="menu
 '<div class="ar-section-title">🔥 Öne Çıkan Oyunlar</div><div class="ar-featured"><button class="ar-feature" data-feature="milyoner"><i>🏆</i><span class="ar-feature-label">Milyoner</span></button><button class="ar-feature" data-feature="passaparola"><i>🔤</i><span class="ar-feature-label">Passaparola</span></button><button class="ar-feature" data-feature="kelime"><i>🧩</i><span class="ar-feature-label">Harfler</span></button><button class="ar-feature" data-feature="rotasyon"><i>🔠</i><span class="ar-feature-label">Rotasyon</span></button><button class="ar-feature" data-feature="islem"><i>➗</i><span class="ar-feature-label">İşlem</span></button><button class="ar-feature" data-feature="okey"><i>🀄</i><span class="ar-feature-label">Okey</span></button></div>';
 ana.insertBefore(home,ana.firstChild);ana.appendChild(view);document.documentElement.classList.add('arena-home-fixed');
 
-home.querySelectorAll('.ar-cat-icon').forEach((el,i)=>{if(i>=6){el.textContent=i===6?'👁️':'⚡';el.style.setProperty('background-image','none','important');el.style.setProperty('background-position','center','important');el.style.setProperty('font-size','42px','important');el.style.setProperty('display','grid','important');el.style.setProperty('place-items','center','important');return;}const positions=['0% 0%','20% 0%','40% 0%','60% 0%','80% 0%','100% 0%'];el.textContent='';el.style.setProperty('background-position',positions[i]||'0% 0%','important');el.style.setProperty('background-size','600% 300%','important');el.style.setProperty('background-repeat','no-repeat','important');});
+home.querySelectorAll('.ar-cat-icon').forEach((el,i)=>{if(i>=6){el.textContent=i===6?'🧠':'⚡';el.style.setProperty('background-image','none','important');el.style.setProperty('background-position','center','important');el.style.setProperty('font-size','42px','important');el.style.setProperty('display','grid','important');el.style.setProperty('place-items','center','important');return;}const positions=['0% 0%','20% 0%','40% 0%','60% 0%','80% 0%','100% 0%'];el.textContent='';el.style.setProperty('background-position',positions[i]||'0% 0%','important');el.style.setProperty('background-size','600% 300%','important');el.style.setProperty('background-repeat','no-repeat','important');});
 home.querySelectorAll('.ar-feature i').forEach(el=>{el.style.setProperty('background-image','none','important');el.style.setProperty('background-position','center','important');});
 
 function findGames(){const candidates=Array.from(ana.querySelectorAll('button')).filter(b=>!home.contains(b)&&!view.contains(b));Object.keys(defs).forEach(id=>{if(found[id]&&document.contains(found[id]))return;const d=defs[id],b=candidates.find(x=>d.re.test((x.id==='basla'?'Milyoner ':'')+(x.textContent||'').replace(/\s+/g,' ')));if(b){found[id]=b;b.classList.add('arena-original-game');}});}
@@ -2150,4 +2150,74 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
  `;
  document.head.appendChild(css);
 })();
+})();
+
+
+/* HOTFIX 2026-11-08: category layout must never create a side rail. */
+(function(){
+ const fix=document.createElement('style');
+ fix.id='arenaCategoryNoSideRailHotfix';
+ fix.textContent=`
+  html.arena-home-fixed body #ana{
+    display:block!important;position:fixed!important;
+    top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top))!important;
+    bottom:calc(70px + env(safe-area-inset-bottom))!important;
+    left:0!important;right:0!important;width:100%!important;
+    max-width:none!important;height:auto!important;min-height:0!important;max-height:none!important;
+    margin:0!important;padding:4px 7px 5px!important;overflow:hidden!important;box-sizing:border-box!important;
+  }
+  html.arena-home-fixed body #arenaHubHome:has(.ar-categories.is-open){
+    display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+    grid-template-rows:auto auto minmax(0,1fr)!important;
+    grid-auto-columns:minmax(0,1fr)!important;grid-auto-flow:row!important;
+    align-items:stretch!important;align-content:stretch!important;justify-content:stretch!important;
+    width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;max-height:100%!important;
+    gap:8px!important;padding:2px 0 0!important;margin:0!important;overflow:hidden!important;box-sizing:border-box!important;
+  }
+  html.arena-home-fixed body #arenaHubHome:has(.ar-categories.is-open)>.ar-profile{
+    grid-column:1!important;grid-row:1!important;width:100%!important;min-width:0!important;
+  }
+  html.arena-home-fixed body #arenaHubHome:has(.ar-categories.is-open)>.ar-shortcuts{
+    grid-column:1!important;grid-row:2!important;display:grid!important;
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;width:100%!important;min-width:0!important;
+    height:clamp(76px,10vh,90px)!important;min-height:clamp(76px,10vh,90px)!important;max-height:clamp(76px,10vh,90px)!important;
+    margin:0!important;gap:5px!important;overflow:hidden!important;
+  }
+  html.arena-home-fixed body #arenaHubHome:has(.ar-categories.is-open)>.ar-shortcuts>.ar-short{
+    width:100%!important;min-width:0!important;height:100%!important;min-height:0!important;max-height:100%!important;
+    padding:5px 2px!important;font-size:clamp(9px,2.7vw,12px)!important;
+  }
+  html.arena-home-fixed body #arenaHubHome:has(.ar-categories.is-open)>.ar-categories.is-open{
+    grid-column:1!important;grid-row:3!important;display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;grid-template-rows:58px minmax(0,1fr)!important;
+    width:100%!important;min-width:0!important;height:100%!important;min-height:0!important;
+    margin:0!important;padding:0 0 2px!important;gap:9px!important;overflow:hidden!important;box-sizing:border-box!important;
+  }
+  html.arena-home-fixed body #arenaHubHome:has(.ar-categories.is-open)>.ar-daily,
+  html.arena-home-fixed body #arenaHubHome:has(.ar-categories.is-open)>.ar-section-title,
+  html.arena-home-fixed body #arenaHubHome:has(.ar-categories.is-open)>.ar-featured{display:none!important}
+  html.arena-home-fixed body #arenaHubHome .ar-inline-category-head{
+    width:100%!important;height:58px!important;min-height:58px!important;
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    text-align:center!important;font-size:clamp(18px,5vw,24px)!important;
+  }
+  html.arena-home-fixed body #arenaHubHome .ar-inline-game-list{
+    width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;
+    display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    grid-auto-rows:minmax(108px,1fr)!important;align-content:start!important;align-items:stretch!important;
+    gap:10px!important;overflow-y:auto!important;overflow-x:hidden!important;
+  }
+  html.arena-home-fixed body #arenaHubHome .ar-inline-game-list>.ar-game-card{
+    width:100%!important;min-width:0!important;min-height:108px!important;height:auto!important;
+  }
+  @media(max-width:390px){
+    html.arena-home-fixed body #arenaHubHome:has(.ar-categories.is-open)>.ar-shortcuts{
+      height:72px!important;min-height:72px!important;max-height:72px!important;
+    }
+    html.arena-home-fixed body #arenaHubHome:has(.ar-categories.is-open)>.ar-categories.is-open{
+      grid-template-rows:52px minmax(0,1fr)!important;
+    }
+  }
+ `;
+ document.head.appendChild(fix);
 })();
