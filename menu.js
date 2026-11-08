@@ -236,7 +236,7 @@ if(title){title.innerHTML='<button class="ar-header-hotspot left" data-header-ho
 
 const home=document.createElement('div');home.id='arenaHubHome';
 const view=document.createElement('div');view.id='arenaHubCategory';view.hidden=true;
-function categoryCount(c){const ready=c.games.length,coming=c.planned.length;return ready?ready+' hazır'+(coming?' · '+coming+' yakında':''):'Yakında · '+coming+' oyun';}
+function categoryCount(c){try{if(typeof findGames==='function')findGames();}catch(_){}const ready=c.games.filter(k=>!!found[k]||(['okey','yuzbir','batak','poker'].includes(k)&&!!(window.ArenaMasaOyunlari&&window.ArenaMasaOyunlari.ac))||!!(window.ArenaMiniOyunlar&&window.ArenaMiniOyunlar.varMi&&window.ArenaMiniOyunlar.varMi(k))).length,coming=c.planned.length;return ready?ready+' Oyun'+(coming?' · '+coming+' yakında':''):'Yakında · '+coming+' oyun';}
 home.innerHTML='<div class="ar-top"><button class="ar-top-btn" data-action="menu">☷</button><div class="ar-brand">ARENA<small>OYUN PLATFORMU</small></div><button class="ar-top-btn" data-action="settings">⚙</button></div>'+
 '<div class="ar-profile"><div class="ar-avatar" id="arAvatar" data-action="profile"><span class="ar-guest-avatar">👤</span></div><div class="ar-player" data-action="profile"><div class="ar-player-name" id="arPlayerName">Misafir</div><div class="ar-level-line"><span class="ar-level-pill" id="arLevel">Seviye 1</span><span class="ar-xp" id="arXp">0 XP</span></div><div class="ar-xpbar"><i id="arXpBar"></i></div><button class="ar-login-state" id="arLoginState" data-action="profile" type="button">Google ile giriş yap</button></div><div class="ar-league"><img src="arena-league.webp" alt="Altın Lig"></div><div class="ar-wallet"><div class="ar-wallet-row"><span>🪙</span><b id="arGold">100</b><span>＋</span></div><div class="ar-wallet-row"><span>❤️</span><b id="arLives">3 / 3</b><span>＋</span></div></div></div>'+
 '<div class="ar-shortcuts"><button class="ar-short" data-action="reward"><i>🎁</i>Günlük<br>Ödül</button><button class="ar-short" data-action="tasks"><i>📋</i>Günlük<br>Görevler</button><button class="ar-short" data-action="league"><i>🏆</i>Lig<br>Sıralaması</button><button class="ar-short" data-action="friends"><i>👥</i>Arkadaşlar</button><button class="ar-short" data-action="achievements"><i>🛡️</i>Başarılar</button><button class="ar-short" data-action="season"><i>🗓️</i>Sezon</button></div>'+
@@ -483,4 +483,25 @@ document.head.appendChild(arenaReferenceFinal);
     #arenaHubHome .ar-login-state{font-size:9px!important}
   }
   `;document.head.appendChild(s);
+
+/* Final account clarity and shared layout polish */
+const accountPolish=document.createElement('style');
+accountPolish.id='arenaAccountPolish';
+accountPolish.textContent=`
+#arenaHubHome .ar-profile{overflow:visible!important;align-items:center!important}
+#arenaHubHome .ar-avatar{position:relative!important;overflow:hidden!important;isolation:isolate!important;flex:none!important}
+#arenaHubHome .ar-avatar img{position:relative!important;z-index:1!important;width:100%!important;height:100%!important;object-fit:cover!important;border-radius:50%!important}
+#arenaHubHome .ar-guest-avatar{display:grid!important;place-items:center!important;width:100%!important;height:100%!important;border-radius:50%!important;background:linear-gradient(145deg,#244b7d,#0b1833)!important;color:#dbeafe!important;font-size:28px!important}
+#arenaHubHome .ar-login-state{display:inline-flex!important;align-items:center!important;justify-content:center!important;width:auto!important;min-height:20px!important;margin-top:5px!important;padding:3px 8px!important;border:1px solid #6daaff!important;border-radius:9px!important;background:linear-gradient(90deg,#087fe8,#354ac4)!important;color:#fff!important;font-size:10px!important;font-weight:850!important;line-height:1.1!important}
+#arenaHubHome .ar-login-state[style*="display: none"]{display:none!important}
+#arenaHubHome .ar-player{min-width:0!important}
+#arenaHubHome .ar-player-name{overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+#arenaHubHome .ar-featured{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important}
+#arenaHubHome .ar-feature{min-width:0!important;overflow:hidden!important}
+#arenaHubHome .ar-feature i{width:100%!important;box-sizing:border-box!important}
+#arenaNeonNav{padding-bottom:calc(5px + env(safe-area-inset-bottom))!important}
+body{padding-bottom:calc(88px + env(safe-area-inset-bottom))!important}
+`;
+document.head.appendChild(accountPolish);
+
 })();
