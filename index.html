@@ -556,7 +556,9 @@ document.addEventListener("anasayfa", gKapat);
     // Ana menüde alt bölüm artık belge akışındadır; ekranı kilitlemek kaydırmayı engeller.
     // İçerik sığmıyorsa doğal sayfa kaydırmasıyla tüm oyun kartları ve alt butonlar görünür.
     if (gor) {
-      document.documentElement.classList.add("menu-kilit");
+      // Menü tek ekrana sığıyorsa kaymayı kilitle; içerik uzunsa doğal kaydırmaya izin ver.
+      var tasiyor = document.documentElement.scrollHeight > window.innerHeight + 4;
+      document.documentElement.classList.toggle("menu-kilit", !tasiyor);
       sonAnahtar = "";
       return;
     }
@@ -586,7 +588,7 @@ document.addEventListener("anasayfa", gKapat);
   new MutationObserver(ppHizala).observe(document.body, { attributes: true, attributeFilter: ["class"] });
   window.addEventListener("resize", guncelle);
   window.addEventListener("scroll", function () {
-    if (document.documentElement.classList.contains("menu-kilit") && window.scrollY) window.scrollTo(0, 0);
+    if (document.documentElement.classList.contains("menu-kilit") && document.documentElement.scrollHeight <= window.innerHeight + 4 && window.scrollY) window.scrollTo(0, 0);
   });
   // Sayfa kilitliyken bile kaydırılabilir bir liste (Sıralama, pencereler) içindeki kaydırma engellenmez
   function kayanVar(el) {
@@ -597,7 +599,7 @@ document.addEventListener("anasayfa", gKapat);
     return false;
   }
   document.addEventListener("touchmove", function (e) {
-    if (document.documentElement.classList.contains("menu-kilit") && !(e.target.closest && e.target.closest("input,textarea")) && !kayanVar(e.target)) e.preventDefault();
+    if (document.documentElement.classList.contains("menu-kilit") && document.documentElement.scrollHeight <= window.innerHeight + 4 && !(e.target.closest && e.target.closest("input,textarea")) && !kayanVar(e.target)) e.preventDefault();
   }, { passive: false });
   guncelle();
   setInterval(guncelle, 500);
