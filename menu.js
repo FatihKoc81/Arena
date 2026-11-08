@@ -1847,5 +1847,5 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
   }
   clean();
   const root=document.getElementById('arenaHubHome');
-  if(root&&window.MutationObserver)new MutationObserver(clean).observe(root,{subtree:true,childList:true,attributes:true,attributeFilter:['style','class']});
+  if(root&&window.MutationObserver)new MutationObserver(clean).observe(root,{subtree:true,childList:true});
 })();
