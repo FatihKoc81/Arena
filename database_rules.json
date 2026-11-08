@@ -110,14 +110,45 @@
           ".read": "auth != null",
           "$hafta": {
             "$lig": {
-              ".indexOn": [
-                "p"
-              ],
-              "$uid": {
-                ".write": "auth != null && auth.uid === $uid",
-                ".validate": "newData.hasChildren(['ad','p']) && newData.child('p').isNumber() && newData.child('p').val() >= 0 && newData.child('p').val() < 1000000 && newData.child('ad').isString() && newData.child('ad').val().length <= 18"
+              "$grup": {
+                ".indexOn": [
+                  "p"
+                ],
+                "$uid": {
+                  ".write": "auth != null && auth.uid === $uid",
+                  ".validate": "newData.hasChildren(['ad','p']) && newData.child('p').isNumber() && newData.child('p').val() >= 0 && newData.child('p').val() < 1000000 && newData.child('ad').isString() && newData.child('ad').val().length <= 18"
+                }
               }
             }
+          }
+        },
+        "ligSayi": {
+          ".read": "auth != null",
+          "$hafta": {
+            "$lig": {
+              ".write": "auth != null",
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100000000"
+            }
+          }
+        },
+        "cevrimici": {
+          ".read": "auth != null",
+          ".write": "auth != null",
+          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 1000000"
+        },
+        "istekler": {
+          ".read": "auth != null && ((query.orderByChild == 'to' && query.equalTo == auth.uid) || (query.orderByChild == 'from' && query.equalTo == auth.uid))",
+          ".indexOn": [
+            "to",
+            "from"
+          ],
+          "$id": {
+            ".write": "auth != null && ((!data.exists() && newData.child('from').val() === auth.uid) || (data.exists() && (data.child('from').val() === auth.uid || data.child('to').val() === auth.uid)))"
+          }
+        },
+        "fcm": {
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid"
           }
         }
       }
