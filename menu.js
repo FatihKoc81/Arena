@@ -1415,3 +1415,47 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
  `;
  document.head.appendChild(css);
 })();
+
+/* Final visual cleanup: mask the baked-in yellow header crescent and clip featured tiles. */
+(function(){
+ const css=document.createElement('style');
+ css.id='arenaFinalBleedCleanup';
+ css.textContent=`
+ body>h1{position:relative!important;overflow:hidden!important}
+ body>h1::after{
+   content:''!important;display:block!important;position:absolute!important;
+   left:0!important;bottom:0!important;width:94px!important;height:17px!important;
+   background:#020b21!important;pointer-events:none!important;z-index:60!important;
+ }
+ #arenaHubHome .ar-featured{
+   display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;
+   grid-template-rows:auto!important;align-items:start!important;align-content:start!important;
+   height:auto!important;min-height:0!important;max-height:none!important;
+   overflow:hidden!important;padding:0 0 3px!important;margin:0!important;
+ }
+ #arenaHubHome .ar-feature{
+   display:grid!important;grid-template-rows:clamp(48px,14vw,58px) auto!important;
+   align-content:start!important;align-items:start!important;justify-items:stretch!important;
+   width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;
+   overflow:hidden!important;padding:0!important;margin:0!important;
+   background:transparent!important;background-image:none!important;background-color:transparent!important;
+   border:0!important;box-shadow:none!important;
+ }
+ #arenaHubHome .ar-feature i{
+   display:grid!important;place-items:center!important;flex:none!important;
+   width:100%!important;height:clamp(48px,14vw,58px)!important;
+   min-height:0!important;max-height:58px!important;margin:0 0 4px!important;
+   overflow:hidden!important;box-sizing:border-box!important;
+   background:linear-gradient(155deg,#142b50 0%,#09172e 58%,#050d20 100%)!important;
+   background-image:linear-gradient(155deg,#142b50 0%,#09172e 58%,#050d20 100%)!important;
+   border:1px solid #527db8!important;border-radius:12px!important;
+   box-shadow:inset 0 1px #ffffff20,0 3px 8px #0008!important;
+ }
+ #arenaHubHome .ar-feature, #arenaHubHome .ar-feature *{
+   background-color:transparent;
+ }
+ #arenaHubHome .ar-feature i{background-color:#09172e!important}
+ #arenaHubHome .ar-feature:not(:has(i)){background:none!important}
+ `;
+ document.head.appendChild(css);
+})();
