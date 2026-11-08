@@ -293,12 +293,13 @@
   function hesapHtml(u) { return ayar ? '<button class="hs-l" data-hs="profil">← Profile dön</button>' + ayarHtml(u) : profilHtml(u); }
   function profilHtml(u) {
     var ad = (u && u.displayName) || (kayit && kayit.ad) || "Oyuncu", P = window.Puan, satir = "";
+    var googleHesabi = !!(u && u.providerData && u.providerData.some(function (p) { return p.providerId === "google.com"; }));
     if (P) Object.keys(P.tablo).map(function (o) { return { ad: P.tablo[o].ad, p: P.oyunPuani(o) }; })
       .sort(function (a, b) { return b.p - a.p; })
       .forEach(function (x) { satir += '<div class="hs-r"><span>' + esc(x.ad) + "</span><b>" + x.p + "</b></div>"; });
     return '<div class="hs-pf"><div class="hs-av">' + esc(ad.charAt(0).toLocaleUpperCase("tr")) + '</div><div class="hs-pn">' + esc(ad) + "</div>" +
       '<div class="hs-k">' + (u.email ? '📧 ' + esc(u.email) + (u.emailVerified ? ' ✓ doğrulandı' : ' (doğrulanmadı)') : '📱 ' + esc(u.phoneNumber || '')) + "</div>" +
-      (kayit && kayit.ad ? '<div class="hs-k">ARENA kullanıcı adı: <b>' + esc(kayit.ad) + '</b></div>' : '<div class="hs-k">Google profilinle giriş yaptın.</div>') + "</div>" +
+      (kayit && kayit.ad ? '<div class="hs-k">ARENA kullanıcı adı: <b>' + esc(kayit.ad) + '</b></div>' : '<div class="hs-k">' + (googleHesabi ? 'Google hesabınla giriş yaptın.' : 'Hesabınla giriş yaptın.') + '</div>') + "</div>" +
       '<div class="hs-top">⭐ Toplam puan <b>' + (P ? P.toplam() : 0) + "</b></div>" + satir +
       '<button class="hs-bt gri" data-hs="ayar">⚙️ Hesap ayarları</button>' +
       '<button class="hs-bt gri" data-hs="guncelle">⬇ ARENA Güncelle</button>';
@@ -321,7 +322,7 @@
     var u = A.currentUser, b = el.querySelector(".hs-body");
     var eski = {}; ["hs-e", "hs-a", "hs-kod"].forEach(function (id) { var x = document.getElementById(id); if (x) eski[id] = x.value; });
     var h = msg ? '<div class="hs-msg' + (msgOk ? " ok" : "") + '">' + esc(msg) + "</div>" : "";
-    h += !u ? '<div class="hs-k">Bağlanıyor…</div>' : u.isAnonymous ? (telefonEkrani ? telefonHtml() : misafirHtml()) : (kayit && kayit.ad ? hesapHtml(u) : ilkKullaniciAdiHtml());
+    h += !u ? '<div class="hs-k">Bağlanıyor…</div>' : u.isAnonymous ? (telefonEkrani ? telefonHtml() : misafirHtml()) : hesapHtml(u);
     b.innerHTML = h;
     for (var id in eski) { var x = document.getElementById(id); if (x) x.value = eski[id]; }
   }
