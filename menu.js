@@ -240,7 +240,7 @@ const view=document.createElement('div');view.id='arenaHubCategory';view.hidden=
 function categoryCount(c){try{if(typeof findGames==='function')findGames();}catch(_){}const ready=c.games.filter(k=>!!found[k]||(['okey','yuzbir','batak','poker'].includes(k)&&!!(window.ArenaMasaOyunlari&&window.ArenaMasaOyunlari.ac))||!!(window.ArenaMiniOyunlar&&window.ArenaMiniOyunlar.varMi&&window.ArenaMiniOyunlar.varMi(k))).length,coming=c.planned.length;return ready?ready+' Oyun'+(coming?' · '+coming+' yakında':''):'Yakında · '+coming+' oyun';}
 home.innerHTML='<div class="ar-top"><button class="ar-top-btn" data-action="menu">☷</button><div class="ar-brand">ARENA<small>OYUN PLATFORMU</small></div><button class="ar-top-btn" data-action="settings">⚙</button></div>'+
 '<div class="ar-profile"><div class="ar-avatar" id="arAvatar" data-action="profile"><span class="ar-guest-avatar">👤</span></div><div class="ar-player" data-action="profile"><div class="ar-player-name" id="arPlayerName">Misafir</div><div class="ar-level-line"><span class="ar-level-pill" id="arLevel">Seviye 1</span><span class="ar-xp" id="arXp">0 XP</span></div><div class="ar-xpbar"><i id="arXpBar"></i></div><button class="ar-login-state" id="arLoginState" data-action="profile" type="button">Google ile giriş yap</button></div><div class="ar-league"><img src="arena-league.webp" alt="Altın Lig"></div><div class="ar-wallet"><div class="ar-wallet-row"><span>🪙</span><b id="arGold">100</b><span>＋</span></div><div class="ar-wallet-row"><span>❤️</span><b id="arLives">3 / 3</b><span>＋</span></div></div></div>'+
-'<div class="ar-shortcuts"><button class="ar-short" data-action="reward"><i>🎁</i>Günlük Ödül</button><button class="ar-short" data-action="tasks"><i>📋</i>Günlük Görev</button><button class="ar-short" data-action="achievements"><i>🏆</i>Başarılar</button><button class="ar-short" data-action="season"><i>🗓️</i>Sezon</button><button class="ar-short ar-short-market" data-action="market"><i>🏪</i>Market<br><small>Premium · Altın</small></button></div>'+
+'<div class="ar-shortcuts"><button class="ar-short" data-action="reward"><i>🎁</i>Günlük Ödül</button><button class="ar-short" data-action="tasks"><i>📋</i>Günlük Görev</button><button class="ar-short" data-action="achievements"><i>🏆</i>Başarılar</button><button class="ar-short" data-action="season"><i>🗓️</i>Sezon</button><button class="ar-short ar-short-market" data-action="market"><i>🏪</i>Market</button></div>'+
 '<div class="ar-categories">'+cats.map(c=>'<button class="ar-cat '+c.color+'" data-category="'+c.id+'"><span class="ar-cat-icon">'+c.icon+'</span><span class="ar-cat-copy"><strong>'+c.name+'</strong><small>'+categoryCount(c)+'</small></span><span class="ar-cat-arrow">›</span></button>').join('')+'</div>'+
 '<div class="ar-daily"><span class="ar-daily-target">🎯</span><span class="ar-daily-copy"><strong>Günün Görevi</strong><small>3 farklı oyun oyna.</small><span class="ar-progress"><i></i></span></span><span class="ar-daily-reward">🪙 +150</span></div>'+
 '<div class="ar-section-title">🔥 Öne Çıkan Oyunlar</div><div class="ar-featured"><button class="ar-feature" data-feature="milyoner"><i>🏆</i><span class="ar-feature-label">Milyoner</span></button><button class="ar-feature" data-feature="passaparola"><i>🔤</i><span class="ar-feature-label">Passaparola</span></button><button class="ar-feature" data-feature="kelime"><i>🧩</i><span class="ar-feature-label">Harfler</span></button><button class="ar-feature" data-feature="rotasyon"><i>🔠</i><span class="ar-feature-label">Rotasyon</span></button><button class="ar-feature" data-feature="islem"><i>➗</i><span class="ar-feature-label">İşlem</span></button><button class="ar-feature" data-feature="okey"><i>🀄</i><span class="ar-feature-label">Okey</span></button></div>';
@@ -2077,6 +2077,75 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
     html.arena-home-fixed body #arenaHubHome .ar-inline-game-list{gap:7px!important;grid-auto-rows:minmax(100px,1fr)!important}
     html.arena-home-fixed body #arenaHubHome .ar-inline-game-list .ar-game-card{min-height:100px!important;padding:7px!important;gap:6px!important}
     html.arena-home-fixed body #arenaHubHome .ar-inline-game-list .ar-game-card i{flex-basis:36px!important;width:36px!important;font-size:29px!important}
+  }
+ `;
+ document.head.appendChild(css);
+})();
+
+/* Keep the shortcut strip fixed while the selected category uses the remaining space. */
+(function(){
+ const css=document.createElement('style');
+ css.id='arenaFixedShortcutCategoryFill';
+ css.textContent=`
+  html body #arenaHubHome .ar-shortcuts{
+    height:clamp(86px,10vh,96px)!important;
+    min-height:clamp(86px,10vh,96px)!important;
+    max-height:clamp(86px,10vh,96px)!important;
+    align-self:start!important;box-sizing:border-box!important;
+    margin:0!important;overflow:hidden!important;
+  }
+  html body #arenaHubHome .ar-short{
+    height:100%!important;min-height:0!important;max-height:100%!important;
+    align-self:stretch!important;box-sizing:border-box!important;
+  }
+  html.arena-home-fixed body #arenaHubHome:has(.ar-categories.is-open){
+    display:grid!important;
+    grid-template-rows:auto clamp(86px,10vh,96px) minmax(0,1fr)!important;
+    grid-auto-rows:0!important;
+    gap:clamp(6px,.8vh,10px)!important;
+    align-content:stretch!important;
+  }
+  html.arena-home-fixed body #arenaHubHome:has(.ar-categories.is-open)>.ar-daily,
+  html.arena-home-fixed body #arenaHubHome:has(.ar-categories.is-open)>.ar-section-title,
+  html.arena-home-fixed body #arenaHubHome:has(.ar-categories.is-open)>.ar-featured{
+    display:none!important;
+  }
+  html.arena-home-fixed body #arenaHubHome .ar-categories.is-open{
+    grid-row:3!important;align-self:stretch!important;
+    display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+    grid-template-rows:58px minmax(0,1fr)!important;
+    gap:clamp(8px,1.2vh,12px)!important;
+    width:100%!important;height:100%!important;min-height:0!important;
+    margin:0!important;padding:0 2px 2px!important;
+    overflow:hidden!important;box-sizing:border-box!important;
+  }
+  html.arena-home-fixed body #arenaHubHome .ar-inline-game-list{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    grid-auto-rows:minmax(0,1fr)!important;
+    align-content:stretch!important;align-items:stretch!important;
+    justify-content:stretch!important;justify-items:stretch!important;
+    gap:clamp(10px,1.5vh,16px)!important;
+    width:100%!important;height:100%!important;min-height:0!important;
+    overflow-y:auto!important;overflow-x:hidden!important;
+    padding:0 0 3px!important;box-sizing:border-box!important;
+  }
+  html.arena-home-fixed body #arenaHubHome .ar-inline-game-list .ar-game-card{
+    width:100%!important;height:100%!important;min-height:0!important;
+    align-self:stretch!important;justify-self:stretch!important;
+    box-sizing:border-box!important;
+  }
+  @media(max-width:390px){
+    html body #arenaHubHome .ar-shortcuts,
+    html.arena-home-fixed body #arenaHubHome:has(.ar-categories.is-open){
+      --arena-short-height:82px;
+    }
+    html body #arenaHubHome .ar-shortcuts{
+      height:82px!important;min-height:82px!important;max-height:82px!important;
+    }
+    html.arena-home-fixed body #arenaHubHome:has(.ar-categories.is-open){
+      grid-template-rows:auto 82px minmax(0,1fr)!important;
+    }
   }
  `;
  document.head.appendChild(css);
