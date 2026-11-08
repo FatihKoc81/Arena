@@ -1315,3 +1315,68 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
  });
  document.addEventListener('keydown',function(e){if(e.key==='Escape')layer.classList.remove('open');});
 })();
+
+
+/* FINAL CLEANUP: clip header overflow and force uniform featured tiles */
+(function(){
+ const css=document.createElement('style');
+ css.id='arenaFinalHeaderAndFeaturedCleanup';
+ css.textContent=`
+ /* Header artwork/decorations must stay inside the header band. */
+ body>h1{
+   position:relative!important;
+   overflow:hidden!important;
+   clip-path:inset(0)!important;
+   isolation:isolate!important;
+ }
+ body>h1::before,body>h1::after{content:none!important;display:none!important}
+ /* Remove any leftover decorative arc bleeding from the old header/profile layer. */
+ #ana::before,#ana::after,
+ #arenaHubHome::before,#arenaHubHome::after,
+ #arenaHubHome>.ar-profile::before,#arenaHubHome>.ar-profile::after,
+ #arenaHubHome .ar-avatar::before,#arenaHubHome .ar-avatar::after{
+   content:none!important;display:none!important;background:none!important;box-shadow:none!important;
+ }
+ #arenaHubHome .ar-profile{position:relative!important;isolation:isolate!important}
+ #arenaHubHome .ar-avatar{overflow:hidden!important;outline:0!important;box-shadow:none!important}
+ /* All featured cards use the same navy tile; never inherit game-specific colors. */
+ #arenaHubHome .ar-feature,
+ #arenaHubHome .ar-feature:nth-child(n){
+   background:transparent!important;background-color:transparent!important;background-image:none!important;
+   border:0!important;box-shadow:none!important;
+ }
+ #arenaHubHome .ar-feature::before,#arenaHubHome .ar-feature::after,
+ #arenaHubHome .ar-feature i::before,#arenaHubHome .ar-feature i::after{
+   content:none!important;display:none!important;background:none!important;box-shadow:none!important;
+ }
+ #arenaHubHome .ar-feature i,
+ #arenaHubHome .ar-feature:nth-child(n) i{
+   background:#09172e!important;
+   background-image:linear-gradient(155deg,#142b50 0%,#09172e 58%,#050d20 100%)!important;
+   background-color:#09172e!important;
+   border:1px solid #527db8!important;
+   border-radius:14px!important;
+   box-shadow:inset 0 1px #ffffff20,0 4px 10px #0008!important;
+ }
+ `;
+ document.head.appendChild(css);
+ function normalizeFeatured(){
+   document.querySelectorAll('#arenaHubHome .ar-feature').forEach(function(card){
+     card.style.setProperty('background','transparent','important');
+     card.style.setProperty('background-image','none','important');
+     card.style.setProperty('background-color','transparent','important');
+     card.style.setProperty('border','0','important');
+     card.style.setProperty('box-shadow','none','important');
+     const tile=card.querySelector('i');
+     if(tile){
+       tile.style.setProperty('background','linear-gradient(155deg,#142b50 0%,#09172e 58%,#050d20 100%)','important');
+       tile.style.setProperty('background-image','linear-gradient(155deg,#142b50 0%,#09172e 58%,#050d20 100%)','important');
+       tile.style.setProperty('background-color','#09172e','important');
+       tile.style.setProperty('border','1px solid #527db8','important');
+       tile.style.setProperty('box-shadow','inset 0 1px #ffffff20,0 4px 10px #0008','important');
+     }
+   });
+ }
+ normalizeFeatured();
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',normalizeFeatured,{once:true});
+})();
