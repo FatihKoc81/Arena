@@ -243,7 +243,7 @@ home.innerHTML='<div class="ar-top"><button class="ar-top-btn" data-action="menu
 '<div class="ar-shortcuts"><button class="ar-short" data-action="reward"><i>🎁</i>Günlük<br>Ödül</button><button class="ar-short" data-action="tasks"><i>📋</i>Günlük<br>Görevler</button><button class="ar-short" data-action="achievements"><i>🛡️</i>Başarılar</button><button class="ar-short" data-action="season"><i>🗓️</i>Sezon</button></div>'+
 '<div class="ar-categories">'+cats.map(c=>'<button class="ar-cat '+c.color+'" data-category="'+c.id+'"><span class="ar-cat-icon">'+c.icon+'</span><span class="ar-cat-copy"><strong>'+c.name+'</strong><small>'+categoryCount(c)+'</small></span><span class="ar-cat-arrow">›</span></button>').join('')+'</div>'+
 '<div class="ar-daily"><span class="ar-daily-target">🎯</span><span class="ar-daily-copy"><strong>Günün Görevi</strong><small>3 farklı oyun oyna.</small><span class="ar-progress"><i></i></span></span><span class="ar-daily-reward">🪙 +150</span></div>'+
-'<div class="ar-section-title">🔥 Öne Çıkan Oyunlar <small data-action="allgames">Tümünü Gör ›</small></div><div class="ar-featured"><button class="ar-feature" data-feature="milyoner"><i>🏆</i>Milyoner</button><button class="ar-feature" data-feature="passaparola"><i>🔤</i>Passaparola</button><button class="ar-feature" data-feature="kelime"><i>🧩</i>Kelime<br>Oyunu</button><button class="ar-feature" data-feature="rotasyon"><i>🔠</i>Rotasyon</button><button class="ar-feature" data-feature="islem"><i>➗</i>İşlem</button><button class="ar-feature" data-feature="okey"><i>🀄</i>Okey</button></div>';
+'<div class="ar-section-title">🔥 Öne Çıkan Oyunlar <small data-action="allgames">Tümünü Gör ›</small></div><div class="ar-featured"><button class="ar-feature" data-feature="milyoner"><i>🏆</i><span class="ar-feature-label">Milyoner</span></button><button class="ar-feature" data-feature="passaparola"><i>🔤</i><span class="ar-feature-label">Passaparola</span></button><button class="ar-feature" data-feature="kelime"><i>🧩</i><span class="ar-feature-label">Kelime<br>Oyunu</span></button><button class="ar-feature" data-feature="rotasyon"><i>🔠</i><span class="ar-feature-label">Rotasyon</span></button><button class="ar-feature" data-feature="islem"><i>➗</i><span class="ar-feature-label">İşlem</span></button><button class="ar-feature" data-feature="okey"><i>🀄</i><span class="ar-feature-label">Okey</span></button></div>';
 ana.insertBefore(home,ana.firstChild);ana.appendChild(view);document.documentElement.classList.add('arena-home-fixed');
 
 home.querySelectorAll('.ar-cat-icon').forEach((el,i)=>{if(i>=6){el.textContent=i===6?'👁️':'⚡';el.style.setProperty('background-image','none','important');el.style.setProperty('background-position','center','important');el.style.setProperty('font-size','42px','important');el.style.setProperty('display','grid','important');el.style.setProperty('place-items','center','important');return;}const positions=['0% 0%','20% 0%','40% 0%','60% 0%','80% 0%','100% 0%'];el.textContent='';el.style.setProperty('background-position',positions[i]||'0% 0%','important');el.style.setProperty('background-size','600% 300%','important');el.style.setProperty('background-repeat','no-repeat','important');});
@@ -1539,4 +1539,53 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded',clearFeatureColorBleed,{once:true});
   }
+})();
+
+
+/* Final featured row cleanup: labels have their own transparent layer. */
+(function(){
+  const css=document.createElement('style');
+  css.id='arenaFeaturedLabelsTransparentFinal';
+  css.textContent=`
+    #arenaHubHome .ar-feature,
+    #arenaHubHome .ar-feature[data-feature],
+    #arenaHubHome .ar-feature:nth-child(n){
+      background:transparent!important;background-color:transparent!important;
+      background-image:none!important;border:0!important;box-shadow:none!important;
+      outline:0!important;filter:none!important;
+    }
+    #arenaHubHome .ar-feature::before,
+    #arenaHubHome .ar-feature::after,
+    #arenaHubHome .ar-feature-label::before,
+    #arenaHubHome .ar-feature-label::after{content:none!important;display:none!important}
+    #arenaHubHome .ar-feature > i{
+      background:linear-gradient(155deg,#142b50 0%,#09172e 58%,#050d20 100%)!important;
+      background-color:#09172e!important;background-image:linear-gradient(155deg,#142b50 0%,#09172e 58%,#050d20 100%)!important;
+      border:1px solid #527db8!important;border-radius:14px!important;
+      box-shadow:inset 0 1px #ffffff20,0 4px 10px #0008!important;
+    }
+    #arenaHubHome .ar-feature > .ar-feature-label{
+      display:block!important;width:100%!important;min-height:0!important;
+      padding:0!important;margin:0!important;
+      color:#fff!important;background:transparent!important;background-color:transparent!important;
+      background-image:none!important;border:0!important;box-shadow:none!important;
+      text-align:center!important;line-height:1.12!important;
+    }
+  `;
+  document.head.appendChild(css);
+  document.querySelectorAll('#arenaHubHome .ar-feature').forEach(function(card){
+    card.style.setProperty('background','transparent','important');
+    card.style.setProperty('background-color','transparent','important');
+    card.style.setProperty('background-image','none','important');
+    card.style.setProperty('border','0','important');
+    card.style.setProperty('box-shadow','none','important');
+    const label=card.querySelector('.ar-feature-label');
+    if(label){
+      label.style.setProperty('background','transparent','important');
+      label.style.setProperty('background-color','transparent','important');
+      label.style.setProperty('background-image','none','important');
+      label.style.setProperty('border','0','important');
+      label.style.setProperty('box-shadow','none','important');
+    }
+  });
 })();
