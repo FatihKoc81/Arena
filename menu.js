@@ -4,14 +4,14 @@
 const ana=document.getElementById('ana'),title=document.querySelector('body>h1');
 if(!ana||ana.dataset.arenaReference==='1')return;ana.dataset.arenaReference='1';
 const cats=[
-{id:'bilgi',name:'Bilgi Arenası',icon:'🧠',desc:'Bilgini sına, zirveye çık',count:'2 Hazır',color:'violet',games:['milyoner','passaparola'],planned:['Hızlı Karar','Bilgi Düellosu','Genel Kültür']},
-{id:'kelime',name:'Harf Dünyası',icon:'🔤',desc:'Harflerle kelimeler üret',count:'3 Hazır',color:'blue',games:['kelime','rotasyon','wordScramble'],planned:['Kelime Zinciri']},
-{id:'masa',name:'Masa Stratejileri',icon:'🎲',desc:'Sevilen masa oyunları bir arada',count:'4 Hazır',color:'green',games:['okey','yuzbir','batak','poker'],planned:['Tavla','Dama','Satranç']},
-{id:'sudoku',name:'Mantık Atölyesi',icon:'🧊',desc:'Akıl yürüt, desenleri çöz',count:'1 Hazır',color:'orange',games:['miniSudoku'],planned:['Kakuro','Nonogram','Mantık Izgarası','Şekil Dizileri']},
-{id:'sayi',name:'Bulmaca Evreni',icon:'🧩',desc:'Zekânı kullan, bulmacaları çöz',count:'2 Hazır',color:'pink',games:['islem','mathSprint'],planned:['Sayı Çaprazı','2048']},
-{id:'renk',name:'Renk Labirenti',icon:'⚗️',desc:'Renkleri ayır, doğru sıraya diz',count:'1 Hazır',color:'cyan',games:['colorSort'],planned:['Top Sıralama','Su Sıralama']},
-{id:'dikkat',name:'Hafıza Yolculuğu',icon:'👁️',desc:'Ayrıntıları fark et, hafızanı sına',count:'1 Hazır',color:'indigo',games:['memory'],planned:['Görsel Hafıza','Nesneyi Bul','7 Fark Bul']},
-{id:'refleks',name:'Refleks Arenası',icon:'⚡',desc:'Hızını ve tepkini test et',count:'1 Hazır',color:'red',games:['reflexTap'],planned:['Hızlı Dokun','Renk Tepkisi','Hızlı Eşleştirme']}
+{id:'bilgi',name:'Zihin Meydanı',icon:'🧠',desc:'Bilgini sına, zirveye çık',count:'2 Hazır',color:'violet',games:['milyoner','passaparola'],planned:['Hızlı Karar','Bilgi Düellosu','Genel Kültür']},
+{id:'kelime',name:'Kelime Üssü',icon:'🔤',desc:'Harflerle kelimeler üret',count:'3 Hazır',color:'blue',games:['kelime','rotasyon','wordScramble'],planned:['Kelime Zinciri']},
+{id:'masa',name:'Oyun Masası',icon:'🎲',desc:'Sevilen masa oyunları bir arada',count:'4 Hazır',color:'green',games:['okey','yuzbir','batak','poker'],planned:['Tavla','Dama','Satranç']},
+{id:'sudoku',name:'Akıl Labirenti',icon:'🧊',desc:'Akıl yürüt, desenleri çöz',count:'1 Hazır',color:'orange',games:['miniSudoku'],planned:['Kakuro','Nonogram','Mantık Izgarası','Şekil Dizileri']},
+{id:'sayi',name:'Şifre Avı',icon:'🧩',desc:'Zekânı kullan, bulmacaları çöz',count:'2 Hazır',color:'pink',games:['islem','mathSprint'],planned:['Sayı Çaprazı','2048']},
+{id:'renk',name:'Renk Ustası',icon:'⚗️',desc:'Renkleri ayır, doğru sıraya diz',count:'1 Hazır',color:'cyan',games:['colorSort'],planned:['Top Sıralama','Su Sıralama']},
+{id:'dikkat',name:'Hafıza Gücü',icon:'🧠',desc:'Ayrıntıları fark et, hafızanı sına',count:'1 Hazır',color:'indigo',games:['memory'],planned:['Görsel Hafıza','Nesneyi Bul','7 Fark Bul']},
+{id:'refleks',name:'Hız Parkuru',icon:'⚡',desc:'Hızını ve tepkini test et',count:'1 Hazır',color:'red',games:['reflexTap'],planned:['Hızlı Dokun','Renk Tepkisi','Hızlı Eşleştirme']}
 ];
 const defs={
 okey:{name:'Okey',icon:'🀄',desc:'Taşlarını diz, elini tamamla',re:/__arena_okey_never__/i},
