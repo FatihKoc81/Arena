@@ -2271,3 +2271,151 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
  `;
  document.head.appendChild(lock);
 })();
+
+
+/* HOTFIX 2026-11-09: restore normal home grid and preserve top rows in category view. */
+(function(){
+ const fix=document.createElement('style');
+ fix.id='arenaRestoreHomeGrid20261109';
+ fix.textContent=`
+  /* Keep the established page design, but undo the broken six/seven-row sizing. */
+  html.arena-home-fixed body #ana{
+    display:block!important;position:fixed!important;
+    top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top))!important;
+    bottom:calc(70px + env(safe-area-inset-bottom))!important;
+    left:0!important;right:0!important;width:100%!important;max-width:720px!important;
+    height:auto!important;min-height:0!important;max-height:none!important;
+    margin:0 auto!important;padding:5px 7px 5px!important;
+    overflow:hidden!important;box-sizing:border-box!important;
+  }
+  html.arena-home-fixed body #arenaHubHome{
+    display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+    grid-template-rows:80px 72px minmax(0,1fr) 72px 26px 88px!important;
+    grid-auto-rows:initial!important;grid-auto-flow:row!important;
+    align-content:stretch!important;align-items:stretch!important;justify-content:stretch!important;
+    width:100%!important;height:100%!important;min-height:0!important;max-height:100%!important;
+    gap:6px!important;margin:0!important;padding:0!important;overflow:hidden!important;box-sizing:border-box!important;
+  }
+  html.arena-home-fixed body #arenaHubHome>.ar-top{display:none!important}
+  html.arena-home-fixed body #arenaHubHome>.ar-profile{
+    grid-column:1!important;grid-row:1!important;display:grid!important;
+    width:100%!important;height:80px!important;min-height:80px!important;max-height:80px!important;
+    margin:0!important;align-self:stretch!important;overflow:hidden!important;
+    grid-template-columns:clamp(54px,15vw,64px) minmax(0,1fr) clamp(48px,14vw,58px) clamp(88px,26vw,112px)!important;
+    box-sizing:border-box!important;transform:none!important;animation:none!important;
+  }
+  html.arena-home-fixed body #arenaHubHome>.ar-shortcuts{
+    grid-column:1!important;grid-row:2!important;display:grid!important;
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    width:100%!important;height:72px!important;min-height:72px!important;max-height:72px!important;
+    margin:0!important;gap:5px!important;overflow:hidden!important;align-self:stretch!important;
+    transform:none!important;animation:none!important;
+  }
+  html.arena-home-fixed body #arenaHubHome>.ar-shortcuts>.ar-short{
+    width:100%!important;height:100%!important;min-height:0!important;max-height:100%!important;
+    padding:4px 1px!important;box-sizing:border-box!important;transform:none!important;animation:none!important;
+  }
+  html.arena-home-fixed body #arenaHubHome>.ar-categories{
+    grid-column:1!important;grid-row:3!important;display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    grid-template-rows:repeat(4,minmax(0,1fr))!important;
+    width:100%!important;height:100%!important;min-height:0!important;max-height:100%!important;
+    margin:0!important;padding:0!important;gap:7px!important;overflow:hidden!important;box-sizing:border-box!important;
+  }
+  html.arena-home-fixed body #arenaHubHome>.ar-categories:not(.is-open)>.ar-cat{
+    display:grid!important;grid-column:auto!important;grid-row:auto!important;
+    width:100%!important;height:100%!important;min-height:0!important;max-height:none!important;
+    grid-template-columns:clamp(48px,14vw,68px) minmax(0,1fr) 20px!important;
+    align-items:center!important;gap:5px!important;padding:5px 7px!important;box-sizing:border-box!important;
+  }
+  html.arena-home-fixed body #arenaHubHome>.ar-daily{
+    grid-column:1!important;grid-row:4!important;display:grid!important;
+    width:100%!important;height:72px!important;min-height:72px!important;max-height:72px!important;
+    margin:0!important;padding:6px 8px!important;box-sizing:border-box!important;overflow:hidden!important;
+  }
+  html.arena-home-fixed body #arenaHubHome>.ar-section-title{
+    grid-column:1!important;grid-row:5!important;display:flex!important;
+    width:100%!important;height:26px!important;min-height:26px!important;max-height:26px!important;
+    margin:0!important;align-items:center!important;justify-content:center!important;
+  }
+  html.arena-home-fixed body #arenaHubHome>.ar-featured{
+    grid-column:1!important;grid-row:6!important;display:grid!important;
+    grid-template-columns:repeat(6,minmax(0,1fr))!important;grid-template-rows:minmax(0,1fr)!important;
+    width:100%!important;height:88px!important;min-height:88px!important;max-height:88px!important;
+    margin:0!important;padding:0 0 2px!important;gap:5px!important;overflow:hidden!important;box-sizing:border-box!important;
+  }
+  html.arena-home-fixed body #arenaHubHome .ar-feature{height:100%!important;min-height:0!important;overflow:hidden!important}
+  html.arena-home-fixed body #arenaHubHome .ar-feature i{height:auto!important;min-height:0!important;flex:1 1 auto!important}
+  /* Category mode: profile and shortcut rows retain exactly the same positions and dimensions. */
+  html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open){
+    grid-template-rows:80px 72px minmax(0,1fr)!important;
+    gap:6px!important;
+  }
+  html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-profile{grid-row:1!important}
+  html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-shortcuts{grid-row:2!important}
+  html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-categories.is-open{
+    grid-column:1!important;grid-row:3!important;display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;grid-template-rows:54px minmax(0,1fr)!important;
+    width:100%!important;height:100%!important;min-height:0!important;max-height:100%!important;
+    margin:0!important;padding:0 0 2px!important;gap:8px!important;overflow:hidden!important;box-sizing:border-box!important;
+  }
+  html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-daily,
+  html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-section-title,
+  html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-featured{display:none!important}
+  html.arena-home-fixed body #arenaHubHome .ar-inline-category-head{
+    display:grid!important;grid-template-columns:54px minmax(0,1fr)!important;
+    align-items:center!important;justify-content:stretch!important;gap:8px!important;
+    width:100%!important;height:54px!important;min-height:54px!important;
+    padding:3px 8px!important;box-sizing:border-box!important;
+  }
+  html.arena-home-fixed body #arenaHubHome .ar-inline-category-head>span{
+    text-align:center!important;font-size:clamp(18px,5vw,23px)!important;font-weight:950!important;
+  }
+  html.arena-home-fixed body #arenaHubHome .ar-inline-back{
+    display:grid!important;place-items:center!important;width:48px!important;height:46px!important;
+    min-height:46px!important;margin:0!important;padding:0!important;z-index:100!important;
+    pointer-events:auto!important;touch-action:manipulation!important;cursor:pointer!important;
+  }
+  html.arena-home-fixed body #arenaHubHome .ar-inline-game-list{
+    display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    grid-auto-rows:minmax(108px,1fr)!important;align-content:start!important;align-items:stretch!important;
+    gap:10px!important;width:100%!important;height:100%!important;min-height:0!important;
+    overflow-y:auto!important;overflow-x:hidden!important;padding:0 0 3px!important;box-sizing:border-box!important;
+  }
+  html.arena-home-fixed body #arenaHubHome .ar-inline-game-list>.ar-game-card{
+    display:flex!important;width:100%!important;min-width:0!important;min-height:108px!important;height:auto!important;
+  }
+  @media(max-height:720px){
+    html.arena-home-fixed body #arenaHubHome{grid-template-rows:74px 64px minmax(0,1fr) 62px 22px 76px!important;gap:4px!important}
+    html.arena-home-fixed body #arenaHubHome>.ar-profile{height:74px!important;min-height:74px!important;max-height:74px!important}
+    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts{height:64px!important;min-height:64px!important;max-height:64px!important}
+    html.arena-home-fixed body #arenaHubHome>.ar-daily{height:62px!important;min-height:62px!important;max-height:62px!important}
+    html.arena-home-fixed body #arenaHubHome>.ar-section-title{height:22px!important;min-height:22px!important;max-height:22px!important}
+    html.arena-home-fixed body #arenaHubHome>.ar-featured{height:76px!important;min-height:76px!important;max-height:76px!important}
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open){grid-template-rows:74px 64px minmax(0,1fr)!important}
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-profile{height:74px!important;min-height:74px!important;max-height:74px!important}
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-shortcuts{height:64px!important;min-height:64px!important;max-height:64px!important}
+  }
+ `;
+ document.head.appendChild(fix);
+})();
+
+/* Reliable in-app and Android/browser back handling for an open category. */
+(function(){
+ function categoryIsOpen(){
+   const panel=document.querySelector('#arenaHubHome .ar-categories');
+   return !!(panel&&panel.classList.contains('is-open'));
+ }
+ function closeCategory(){
+   if(!categoryIsOpen())return false;
+   const back=document.querySelector('#arenaHubHome [data-category-back]');
+   if(back){back.click();return true;}
+   return false;
+ }
+ window.addEventListener('popstate',function(){if(categoryIsOpen())closeCategory();},true);
+ document.addEventListener('keydown',function(e){
+   if((e.key==='Escape'||e.key==='Backspace')&&categoryIsOpen()){
+     e.preventDefault();e.stopPropagation();closeCategory();
+   }
+ },true);
+})();
