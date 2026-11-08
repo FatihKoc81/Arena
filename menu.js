@@ -159,7 +159,7 @@ const artStyle=document.createElement('style');
 artStyle.id='arenaReferenceSprite';
 artStyle.textContent=`
 #arenaHubHome .ar-cat-icon{background-image:url("arena-reference.webp")!important;background-size:600% 300%!important;background-repeat:no-repeat!important}
-#arenaHubHome .ar-feature i{background-image:url("arena-reference.webp")!important;background-size:600% 300%!important;background-repeat:no-repeat!important}
+#arenaHubHome .ar-feature i{background-image:none!important;background-size:auto!important;background-repeat:no-repeat!important}
 `;
 document.head.appendChild(artStyle);
 
@@ -248,7 +248,7 @@ home.innerHTML='<div class="ar-top"><button class="ar-top-btn" data-action="menu
 ana.insertBefore(home,ana.firstChild);ana.appendChild(view);
 
 home.querySelectorAll('.ar-cat-icon').forEach((el,i)=>{if(i<5){el.textContent='';el.style.setProperty('background-position',(i*20)+'% 0%','important');}else{el.style.setProperty('background-image','none','important');el.style.setProperty('background-position','center','important');el.style.setProperty('font-size','clamp(36px,9vw,48px)','important');el.style.setProperty('display','grid','important');el.style.setProperty('place-items','center','important');}});
-home.querySelectorAll('.ar-feature i').forEach((el,i)=>{el.textContent='';el.style.setProperty('background-position',(i*20)+'% 50%','important');});
+home.querySelectorAll('.ar-feature i').forEach(el=>{el.style.setProperty('background-image','none','important');el.style.setProperty('background-position','center','important');});
 
 const found={};
 function findGames(){const candidates=Array.from(ana.querySelectorAll('button')).filter(b=>!home.contains(b)&&!view.contains(b));Object.keys(defs).forEach(id=>{if(found[id]&&document.contains(found[id]))return;const d=defs[id],b=candidates.find(x=>d.re.test((x.id==='basla'?'Milyoner ':'')+(x.textContent||'').replace(/\\s+/g,' ')));if(b){found[id]=b;b.classList.add('arena-original-game');}});}
