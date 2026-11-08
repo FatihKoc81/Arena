@@ -1792,3 +1792,60 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
   `;
   document.head.appendChild(s);
 })();
+
+
+/* FINAL OVERRIDE: strip game-tinted backgrounds from every featured caption node. */
+(function(){
+  const css=document.createElement('style');
+  css.id='arenaFeaturedCaptionNoTintUltimate';
+  css.textContent=`
+    html body #arenaHubHome .ar-featured > .ar-feature,
+    html body #arenaHubHome .ar-featured > .ar-feature[data-feature]{
+      background:#09172e!important;
+      background-color:#09172e!important;
+      background-image:linear-gradient(180deg,#142b50 0%,#09172e 100%)!important;
+      border:1px solid #527db8!important;
+      box-shadow:inset 0 1px #ffffff20,0 4px 10px #0008!important;
+      overflow:hidden!important;
+    }
+    html body #arenaHubHome .ar-featured > .ar-feature > .ar-feature-label,
+    html body #arenaHubHome .ar-featured > .ar-feature > .ar-feature-label *,
+    html body #arenaHubHome .ar-featured > .ar-feature > *:not(i){
+      display:block!important;
+      background:transparent!important;
+      background-color:transparent!important;
+      background-image:none!important;
+      border:0!important;
+      box-shadow:none!important;
+      outline:0!important;
+      filter:none!important;
+      color:#fff!important;
+      border-radius:0!important;
+      -webkit-text-fill-color:#fff!important;
+    }
+    html body #arenaHubHome .ar-featured > .ar-feature > i{
+      background:transparent!important;background-color:transparent!important;
+      background-image:none!important;border:0!important;box-shadow:none!important;
+    }
+    html body #arenaHubHome .ar-featured > .ar-feature::before,
+    html body #arenaHubHome .ar-featured > .ar-feature::after,
+    html body #arenaHubHome .ar-featured > .ar-feature *::before,
+    html body #arenaHubHome .ar-featured > .ar-feature *::after{
+      content:none!important;display:none!important;background:none!important;box-shadow:none!important;
+    }
+  `;
+  document.head.appendChild(css);
+  function clean(){
+    document.querySelectorAll('#arenaHubHome .ar-featured > .ar-feature').forEach(card=>{
+      card.style.setProperty('background','#09172e','important');
+      card.style.setProperty('background-image','linear-gradient(180deg,#142b50 0%,#09172e 100%)','important');
+      card.querySelectorAll('.ar-feature-label,.ar-feature-label *,span:not(.ar-feature-label),b,strong').forEach(el=>{
+        ['background','background-color','background-image','border','box-shadow','outline','filter'].forEach(p=>
+          el.style.setProperty(p,(p==='background'||p==='background-color')?'transparent':(p==='background-image'?'none':'0'),'important'));
+      });
+    });
+  }
+  clean();
+  const root=document.getElementById('arenaHubHome');
+  if(root&&window.MutationObserver)new MutationObserver(clean).observe(root,{subtree:true,childList:true,attributes:true,attributeFilter:['style','class']});
+})();
