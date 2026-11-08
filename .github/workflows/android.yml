@@ -25,7 +25,7 @@ jobs:
           java-version: 17
 
       - name: Bağımlılıkları yükle
-        run: npm install
+        run: npm install --no-audit --no-fund --retry=5 --fetch-timeout=120000
 
       - name: Web dosyalarını hazırla
         run: |
