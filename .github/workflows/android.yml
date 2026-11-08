@@ -47,12 +47,16 @@ jobs:
           const fs = require('fs');
           const f = 'android/variables.gradle';
           let s = fs.readFileSync(f, 'utf8');
-          const settings = {
-            rgcfaIncludeGoogle: 'true',
-            androidxCredentialsVersion: "'1.3.0'"
-          };
-          for (const [key, value] of Object.entries(settings)) {
-            const re = new RegExp('^\\s*' + key + '\\s*=.*
+          if (!s.includes('rgcfaIncludeGoogle =')) {
+            s = s.replace('ext {', "ext {\n    rgcfaIncludeGoogle = true\n");
+          } else {
+            s = s.replace(/rgcfaIncludeGoogle\s*=\s*.*$/, '    rgcfaIncludeGoogle = true');
+          }
+          if (!s.includes('androidxCredentialsVersion =')) {
+            s = s.replace('ext {', "ext {\n    androidxCredentialsVersion = '1.3.0'\n");
+          } else {
+            s = s.replace(/androidxCredentialsVersion\s*=\s*.*$/, "    androidxCredentialsVersion = '1.3.0'");
+          }
           fs.writeFileSync(f, s);
           console.log('Firebase Authentication Google provider dependency enabled');
           NODE
