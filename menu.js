@@ -2461,3 +2461,42 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
  `;
  document.head.appendChild(style);
 })();
+
+
+/* 2026-11-09: absolute title lane prevents category-name clipping. */
+(function(){
+ const style=document.createElement('style');
+ style.id='arenaCategoryTitleLaneFix20261109';
+ style.textContent=`
+  html.arena-home-fixed body #arenaHubHome .ar-inline-category-head{
+    position:relative!important;display:block!important;
+    width:100%!important;height:54px!important;min-height:54px!important;
+    padding:0!important;overflow:hidden!important;box-sizing:border-box!important;
+  }
+  html.arena-home-fixed body #arenaHubHome .ar-inline-category-head>.ar-inline-back{
+    position:absolute!important;left:8px!important;right:auto!important;
+    top:50%!important;bottom:auto!important;transform:translateY(-50%)!important;
+    display:grid!important;place-items:center!important;
+    width:42px!important;height:42px!important;min-height:42px!important;
+    max-height:42px!important;margin:0!important;padding:0!important;
+    z-index:4!important;pointer-events:auto!important;
+  }
+  html.arena-home-fixed body #arenaHubHome .ar-inline-category-head>span{
+    position:absolute!important;left:58px!important;right:8px!important;
+    top:0!important;bottom:0!important;transform:none!important;
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    width:auto!important;height:auto!important;min-width:0!important;
+    margin:0!important;padding:0 3px!important;box-sizing:border-box!important;
+    text-align:center!important;text-transform:uppercase!important;
+    white-space:normal!important;overflow-wrap:break-word!important;
+    word-break:normal!important;line-height:1.08!important;
+    font-size:clamp(15px,4.4vw,21px)!important;font-weight:950!important;
+  }
+  @media(max-width:390px){
+    html.arena-home-fixed body #arenaHubHome .ar-inline-category-head>span{
+      left:54px!important;right:5px!important;font-size:clamp(14px,4.1vw,18px)!important;
+    }
+  }
+ `;
+ document.head.appendChild(style);
+})();
