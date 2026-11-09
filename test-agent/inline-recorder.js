@@ -1,7 +1,7 @@
 /* ARENA inline test recorder */
 (function(){
 "use strict";
-if(!new URLSearchParams(location.search).has("testagent"))return;
+
 const endpoint=(localStorage.getItem("arenaTestEndpoint")||"").replace(/\/$/,""),key=localStorage.getItem("arenaTestKey")||"",device=localStorage.getItem("arenaTestDevice")||"Android telefon";
 const deviceId=localStorage.getItem("arenaTestDeviceId")||("android-"+(crypto.randomUUID?crypto.randomUUID():Date.now()));
 if(!endpoint||!key)return;localStorage.setItem("arenaTestDeviceId",deviceId);
