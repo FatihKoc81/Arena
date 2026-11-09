@@ -77,62 +77,43 @@ function prefetchLatestReport(){
 }
 prefetchLatestReport();
 
-$("air-share").onclick=async()=>{
+$("air-share").onclick=()=>{
  const btn=$("air-share");
- let token=adminToken();
- if(!token){
-  token=window.prompt("Test kayıtlarını okuyabilmek için yönetici okuma anahtarını girin:");
-  if(!token){status("Yönetici anahtarı girilmedi");return}
-  token=token.trim();
-  if(!token){status("Yönetici anahtarı boş");return}
-  try{localStorage.setItem("arenaTestAdminKey",token)}catch(e){}
- }
- if(!cachedLatestReport){
+ // The cached report is shared before any await, UI mutation, or other work.
+ // This keeps Android's transient user activation attached to navigator.share().
+ if(cachedLatestReport&&typeof navigator.share==="function"){
+  const report=cachedLatestReport;
+  let sharePromise;
+  try{sharePromise=navigator.share({title:"ARENA test kaydı",text:report})}
+  catch(e){status("Android paylaşım hatası: "+(e.name||"Error")+" · "+(e.message||String(e)));return}
   btn.disabled=true;
-  try{
-   status("Rapor hazırlanıyor. Hazır olunca aynı düğmeye tekrar basın…");
-   cachedLatestReport=await (reportLoadPromise||fetchLatestReport(token));
-   reportLoadPromise=null;
-   status("Rapor hazır. Şimdi Son kaydı ChatGPT’ye gönder düğmesine tekrar basın.");
-  }catch(e){status("Gönderilemedi: "+(e&&e.message||e))}
-  finally{btn.disabled=false}
-  return;
- }
- const report=cachedLatestReport;
- btn.disabled=true;
- let sharePromise=null;
- if(navigator.share){
-  try{
-   // Call Web Share synchronously in the user's click handler to preserve Android user activation.
-   sharePromise=navigator.share({title:"ARENA test kaydı",text:report});
-  }catch(e){sharePromise=Promise.reject(e)}
- }
- if(sharePromise){
-  try{
-   await sharePromise;
-   status("Paylaşım menüsü açıldı. Listeden ChatGPT’yi seçin.");
+  Promise.resolve(sharePromise).then(()=>{
+   status("Paylaşım menüsü açıldı. ChatGPT’yi seçin.");
    cachedLatestReport="";
    prefetchLatestReport();
-  }catch(e){
+  }).catch(e=>{
    if(e&&e.name==="AbortError"){status("Paylaşım iptal edildi; kayıt sunucuda duruyor.");return}
-   status("Android paylaşımı açılamadı. Rapor panoya kopyalanıyor…");
-   let copied=false;
-   try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(report);copied=true}}catch(_e){}
-   if(copied)status("Paylaşım açılamadı; kayıt kopyalandı. ChatGPT’ye yapıştırın.");
-   else status("Paylaşım açılamadı. Raporu yeniden yükleyip tekrar deneyin.");
-  }finally{btn.disabled=false}
+   const active=navigator.userActivation?String(navigator.userActivation.isActive):"bilinmiyor";
+   status("Paylaşım açılamadı: "+(e&&e.name||"Error")+" · "+(e&&e.message||String(e))+" · etkin dokunuş: "+active);
+  }).finally(()=>{btn.disabled=false});
   return;
  }
- let copied=false;
- try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(report);copied=true}}catch(e){}
- if(copied)status("Kayıt kopyalandı. ChatGPT sohbetine yapıştırın.");
- else{
-  const area=document.createElement("textarea");area.value=report;area.setAttribute("readonly","");
-  area.style.cssText="position:fixed;inset:12px;width:calc(100% - 24px);height:70vh;z-index:2147483647;background:#fff;color:#000;padding:12px;font:13px monospace";
-  document.body.append(area);area.focus();area.select();
-  status("Metin seçildi. Kopyala deyip ChatGPT sohbetine yapıştırın.");
+ const token=adminToken();
+ if(!token){
+  const entered=window.prompt("Test kayıtlarını okuyabilmek için yönetici okuma anahtarını girin:");
+  if(!entered){status("Yönetici anahtarı girilmedi");return}
+  try{localStorage.setItem("arenaTestAdminKey",entered.trim())}catch(e){}
  }
- btn.disabled=false;
+ if(typeof navigator.share!=="function"){
+  status("Bu tarayıcı doğrudan paylaşımı desteklemiyor. Rapor kopyalanabilir.");
+  return;
+ }
+ btn.disabled=true;
+ status("Rapor hazırlanıyor. Hazır olunca aynı düğmeye tekrar basın…");
+ fetchLatestReport(adminToken()).then(report=>{
+  cachedLatestReport=report;
+  status("Rapor hazır. Şimdi aynı düğmeye bir kez daha basın.");
+ }).catch(e=>status("Rapor alınamadı: "+(e&&e.message||e))).finally(()=>{btn.disabled=false});
 };
 
 $("air-start").onclick=async()=>{if(busy||sid)return;if(!loadConfig()){status("Önce Test Kayıt Merkezi’nde ayarları kaydedin");return}busy=true;try{const d=await api("/session",{deviceId,deviceName:device,startedAt:new Date().toISOString()});sid=d.sessionId;started=Date.now();count=0;localStorage.setItem("arenaTestActiveSession",sid);localStorage.setItem("arenaTestStarted",String(started));localStorage.setItem("arenaTestCount","0");$("air-start").disabled=true;$("air-stop").disabled=false;status("Kayıt başladı");await event("recording_started",{url:location.href,geometryEnabled:true,geometryIntervalMs:250,recorderVersion:"inline-geometry-20261110"});setCollapsed(false);attachRecorder();await startGeometryWatch();window.addEventListener("error",e=>event("app_error",{message:e.message,file:e.filename,line:e.lineno}));window.addEventListener("unhandledrejection",e=>event("promise_error",{message:String(e.reason&&e.reason.message||e.reason)}));}catch(e){status("Başlatılamadı: "+e.message);$("air-start").disabled=false}finally{busy=false}};
