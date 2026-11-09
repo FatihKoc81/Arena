@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS test_events (
 CREATE INDEX IF NOT EXISTS idx_test_events_session ON test_events(session_id,id);
 
 CREATE TABLE IF NOT EXISTS test_snapshots (
- id INTEGER PRIMARY KEY AUTOINCREMENT,session_id TEXT NOT NULL,object_key TEXT NOT NULL,reason TEXT,
+ id INTEGER PRIMARY KEY AUTOINCREMENT,session_id TEXT NOT NULL,image_data TEXT NOT NULL,reason TEXT,
  created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
 );
 CREATE INDEX IF NOT EXISTS idx_test_snapshots_session ON test_snapshots(session_id,id);
