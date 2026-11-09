@@ -17,23 +17,24 @@ export default {async fetch(request,env){
 
  if(request.method==="POST"&&p.startsWith("/snapshot/")){
   if(!auth(request,env,"DEVICE_INGEST_KEY"))return json({error:"Unauthorized"},401,origin);
-  if(!env.RECORDINGS)return json({error:"R2 binding RECORDINGS is missing"},503,origin);
   const sid=decodeURIComponent(p.slice("/snapshot/".length));if(!idOk(sid))return json({error:"Invalid session id"},400,origin);
   const type=request.headers.get("Content-Type")||"image/jpeg";if(!type.startsWith("image/"))return json({error:"Image required"},415,origin);
-  const bytes=await request.arrayBuffer();if(bytes.byteLength>8000000)return json({error:"Image too large"},413,origin);
-  const key="sessions/"+sid+"/shots/"+crypto.randomUUID()+".jpg";await env.RECORDINGS.put(key,bytes,{httpMetadata:{contentType:type}});
-  await env.DB.prepare("INSERT INTO test_snapshots(session_id,object_key,reason) VALUES(?,?,?)").bind(sid,key,"tap-or-state").run();return json({ok:true,key},201,origin)
+  const bytes=new Uint8Array(await request.arrayBuffer());if(bytes.byteLength>700000)return json({error:"Image too large for D1 (limit 700 KB). Reduce screenshot quality/size."},413,origin);
+  let binary="";for(let i=0;i<bytes.length;i+=0x8000)binary+=String.fromCharCode(...bytes.subarray(i,i+0x8000));
+  const data=btoa(binary);
+  await env.DB.prepare("INSERT INTO test_snapshots(session_id,image_data,reason) VALUES(?,?,?)").bind(sid,data,"tap-or-state").run();
+  return json({ok:true,bytes:bytes.byteLength},201,origin)
  }
  if(request.method==="GET"&&p.startsWith("/snapshots/")){
   if(!auth(request,env,"ADMIN_READ_KEY"))return json({error:"Unauthorized"},401,origin);
-  const sid=decodeURIComponent(p.slice("/snapshots/".length));const r=await env.DB.prepare("SELECT object_key,reason,created_at FROM test_snapshots WHERE session_id=? ORDER BY id ASC").bind(sid).all();return json({ok:true,snapshots:r.results||[]},200,origin)
+  const sid=decodeURIComponent(p.slice("/snapshots/".length));const r=await env.DB.prepare("SELECT id,reason,created_at FROM test_snapshots WHERE session_id=? ORDER BY id ASC").bind(sid).all();return json({ok:true,snapshots:r.results||[]},200,origin)
  }
  if(request.method==="GET"&&p.startsWith("/snapshot-file/")){
   if(!auth(request,env,"ADMIN_READ_KEY"))return json({error:"Unauthorized"},401,origin);
-  if(!env.RECORDINGS)return json({error:"R2 binding RECORDINGS is missing"},503,origin);
-  const key=decodeURIComponent(p.slice("/snapshot-file/".length));if(!key.startsWith("sessions/"))return json({error:"Invalid key"},400,origin);
-  const obj=await env.RECORDINGS.get(key);if(!obj)return json({error:"Image not found"},404,origin);
-  return new Response(obj.body,{headers:{"Content-Type":"image/jpeg","Cache-Control":"no-store",...cors(origin)}})
+  const id=Number(decodeURIComponent(p.slice("/snapshot-file/".length)));if(!Number.isSafeInteger(id)||id<1)return json({error:"Invalid snapshot id"},400,origin);
+  const row=await env.DB.prepare("SELECT image_data FROM test_snapshots WHERE id=?").bind(id).first();if(!row)return json({error:"Image not found"},404,origin);
+  const binary=atob(row.image_data);const bytes=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+  return new Response(bytes,{headers:{"Content-Type":"image/jpeg","Cache-Control":"no-store",...cors(origin)}})
  }
 
  if(request.method==="POST"&&p==="/session"){
