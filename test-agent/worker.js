@@ -38,7 +38,7 @@ export default {async fetch(request,env){
  }
 
  if(request.method==="POST"&&p==="/session"){
-  if(!auth(request,env,"DEVICE_INGEST_KEY"))return json({error:"Unauthorized"},401,origin);
+  if(!auth(request,env,"DEVICE_INGEST_KEY"))return json({error:env.DEVICE_INGEST_KEY?"Cihaz anahtarı eşleşmiyor":"DEVICE_INGEST_KEY secret tanımlı değil"},401,origin);
   let d;try{d=await request.json()}catch{return json({error:"Invalid JSON"},400,origin)}
   const sid=crypto.randomUUID();try{await env.DB.prepare("INSERT INTO test_sessions(session_id,device_id,device_name,started_at,event_count) VALUES(?,?,?,?,0)").bind(sid,String(d.deviceId||"").slice(0,100),String(d.deviceName||"Android").slice(0,80),String(d.startedAt||new Date().toISOString())).run();return json({ok:true,sessionId:sid},201,origin)}catch(e){return json({error:"Session create failed",detail:String(e.message||e)},500,origin)}
  }
