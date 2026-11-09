@@ -2983,3 +2983,46 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
   `;
   document.head.appendChild(style);
 })();
+
+
+/* 2026-11-09: hard stop all visual transitions inside the home surface.
+   Video review shows a transient double-render while category content swaps. */
+(function(){
+  if(document.getElementById('arenaHardStopHomeMotion20261109')) return;
+  const style=document.createElement('style');
+  style.id='arenaHardStopHomeMotion20261109';
+  style.textContent=`
+    #arenaHubHome,
+    #arenaHubHome *,
+    #arenaHubHome *::before,
+    #arenaHubHome *::after{
+      animation:none!important;
+      transition-property:none!important;
+      transition-duration:0s!important;
+      transition-delay:0s!important;
+      scroll-behavior:auto!important;
+      -webkit-tap-highlight-color:transparent!important;
+    }
+    #arenaHubHome .ar-cat:active,
+    #arenaHubHome .ar-feature:active,
+    #arenaHubHome .ar-short:active,
+    #arenaHubHome .ar-game-card:active{
+      transform:none!important;
+      -webkit-transform:none!important;
+      filter:none!important;
+      opacity:1!important;
+    }
+    #arenaHubHome .ar-categories,
+    #arenaHubHome .ar-categories.is-open,
+    #arenaHubHome .ar-inline-game-list{
+      animation:none!important;
+      transition:none!important;
+    }
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*){
+      animation:none!important;
+    }
+  `;
+  document.head.appendChild(style);
+})();
