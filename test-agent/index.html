@@ -18,12 +18,12 @@ video{width:100%;max-height:65vh;background:#000;border-radius:10px;margin-top:1
 <label for="endpoint">Test Worker adresi</label><input id="endpoint" placeholder="https://arena-test-agent....workers.dev">
 <label for="key">Cihaz erişim anahtarı</label><input id="key" type="password" placeholder="DEVICE_INGEST_KEY">
 <label for="device">Cihaz adı</label><input id="device" value="Android telefon">
-<button id="save">Ayarları kaydet ve ARENA'yı aç</button><button class="secondary" id="ping">Sunucuyu dene</button>
+<button id="save">Ayarları kaydet ve ARENA'yı aç</button><button class="secondary" id="ping">Sunucuyu dene</button><button id="openArena" class="secondary">ARENA'yı ayrı sekmede aç</button><p class="muted" id="appState">ARENA henüz açılmadı.</p>
 <p id="status">Durum: Kurulum bekleniyor</p><p id="recordStatus" class="muted">Henüz kayıt başlamadı.</p>
 <button id="start">● Kaydı başlat</button><button id="stop" class="danger" disabled>■ Kaydı bitir ve gönder</button>
 <p class="muted">Ekran videosu için Android/tarayıcı ekran paylaşımı izni isteyebilir. İzin penceresi çıkarsa tüm ekranı paylaşmayı seçin. Desteklenmiyorsa dokunuş ve sayfa olayları yine kaydedilir.</p>
 </section>
-<section class="card"><b>ARENA test ekranı</b><p>ARENA bu sayfanın içine gömülmek yerine ayrı sekmede açılır. Böylece mobil ekranda sıkışmaz.</p><button id="openArena">ARENA'yı ayrı sekmede aç</button><p class="muted" id="appState">ARENA henüz açılmadı.</p></section>
+
 <section class="card"><b>Kayıtları görüntüle</b>
 <label for="admin">Yönetici okuma anahtarı</label><input id="admin" type="password" placeholder="ADMIN_READ_KEY">
 <button id="loadSessions">Kayıtları getir</button><div id="sessions" class="muted">Henüz liste yüklenmedi.</div>
