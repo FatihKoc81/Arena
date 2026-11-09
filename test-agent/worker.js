@@ -6,8 +6,9 @@ function cors(origin) {
 function json(data,status,origin) {
   return new Response(JSON.stringify(data),{status:status||200,headers:{"Content-Type":"application/json; charset=utf-8","Cache-Control":"no-store",...cors(origin)}});
 }
-function authorized(request,env) {
-  return !!env.DEVICE_INGEST_KEY && request.headers.get("Authorization")==="Bearer "+env.DEVICE_INGEST_KEY;
+function authorized(request,env,secretName) {
+  const secret=env[secretName];
+  return !!secret && request.headers.get("Authorization")==="Bearer "+secret;
 }
 export default {
   async fetch(request,env) {
@@ -21,7 +22,7 @@ export default {
     if(request.method==="GET"&&url.pathname==="/health")
       return json({ok:true,service:"ARENA Test Agent",time:new Date().toISOString()},200,origin);
     if(request.method==="POST"&&url.pathname==="/report") {
-      if(!authorized(request,env)) return json({error:"Unauthorized"},401,origin);
+      if(!authorized(request,env,"DEVICE_INGEST_KEY")) return json({error:"Unauthorized"},401,origin);
       const length=Number(request.headers.get("Content-Length")||0);
       if(length>20000) return json({error:"Payload too large"},413,origin);
       let data;
@@ -41,7 +42,7 @@ export default {
       }
     }
     if(request.method==="GET"&&url.pathname==="/latest") {
-      if(!authorized(request,env)) return json({error:"Unauthorized"},401,origin);
+      if(!authorized(request,env,"ADMIN_READ_KEY")) return json({error:"Unauthorized"},401,origin);
       const limit=Math.max(1,Math.min(100,Number(url.searchParams.get("limit")||30)));
       try {
         const result=await env.DB.prepare("SELECT id, created_at, device_id, device_name, app_version, event_type, payload_json FROM test_reports ORDER BY id DESC LIMIT ?").bind(limit).all();
