@@ -80,23 +80,28 @@ $("air-share").onclick=async()=>{
    return (i+1)+". "+x.event_type+" · "+new Date(x.created_at).toLocaleTimeString("tr-TR")+"\\n"+p
   });
   const report=["ARENA TEST KAYDI","Tarih: "+new Date(s.started_at).toLocaleString("tr-TR"),"Cihaz: "+s.device_name,"Olay sayısı: "+s.event_count,"Oturum: "+s.session_id,"","OLAYLAR",...lines].join("\\n");
+  let shared=false;
   if(navigator.share){
    try{
     await navigator.share({title:"ARENA test kaydı",text:report});
+    shared=true;
     status("Paylaşım menüsü açıldı. Listeden ChatGPT’yi seçin.");
    }catch(shareError){
     if(shareError&&shareError.name==="AbortError"){status("Paylaşım iptal edildi; kayıt sunucuda duruyor.");return}
-    throw shareError;
+    status("Paylaşım izni verilmedi; kopyalama yöntemine geçiliyor…");
    }
-  }else{
+  }
+  if(!shared){
    let copied=false;
    try{if(navigator.clipboard&&navigator.clipboard.writeText){await navigator.clipboard.writeText(report);copied=true}}catch(e){}
    if(!copied){
-    const area=document.createElement("textarea");area.value=report;area.style.cssText="position:fixed;left:-9999px;top:0;opacity:0";document.body.append(area);area.focus();area.select();
-    try{copied=!!document.execCommand("copy")}catch(e){}area.remove();
-   }
-   if(copied)status("Kayıt kopyalandı. ChatGPT sohbetine yapıştırın.");
-   else{const area=document.createElement("textarea");area.value=report;area.style.cssText="position:fixed;inset:12px;width:calc(100% - 24px);height:70vh;z-index:2147483647;background:#fff;color:#000;padding:12px";document.body.append(area);area.focus();area.select();status("Otomatik kopyalama engellendi. Açılan metni seçip kopyalayın.")}
+    const area=document.createElement("textarea");area.value=report;area.setAttribute("readonly","");
+    area.style.cssText="position:fixed;inset:12px;width:calc(100% - 24px);height:70vh;z-index:2147483647;background:#fff;color:#000;padding:12px;font:13px monospace";
+    document.body.append(area);area.focus();area.select();
+    try{copied=!!document.execCommand("copy")}catch(e){}
+    if(copied){area.remove();status("Kayıt kopyalandı. ChatGPT sohbetine yapıştırın.")}
+    else{status("Metin seçildi. Kopyala deyip ChatGPT sohbetine yapıştırın.")}
+   }else status("Kayıt kopyalandı. ChatGPT sohbetine yapıştırın.");
   }
  }catch(e){
   status("Gönderilemedi: "+(e&&e.message||e));
