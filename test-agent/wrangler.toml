@@ -5,4 +5,4 @@ compatibility_date = "2026-11-09"
 [[d1_databases]]
 binding = "DB"
 database_name = "arena-test-logs"
-database_id = "CLOUDFLARE_D1_DATABASE_ID"
+database_id = "5b9e7e8f-df87-49dc-bf07-de27a47e8ee5"
