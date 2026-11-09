@@ -2653,7 +2653,7 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
       display:grid!important;width:calc(100% - 12px)!important;
       max-width:calc(100% - 12px)!important;min-width:0!important;justify-self:center!important;
       height:80px!important;min-height:80px!important;max-height:80px!important;
-      margin:0!important;align-self:stretch!important;justify-self:stretch!important;
+      margin:0!important;align-self:stretch!important;justify-self:center!important;
       box-sizing:border-box!important;transform:none!important;translate:none!important;
       rotate:none!important;scale:none!important;animation:none!important;transition:none!important;
     }
