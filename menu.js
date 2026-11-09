@@ -2832,3 +2832,115 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
   `;
   document.head.appendChild(style);
 })();
+
+
+/* 2026-11-09: SCREENSHOT FIX — keep the top rows IN GRID FLOW.
+   The previous absolute-position override removed them from the grid and
+   caused the shortcut strip to drift/overlap the category cards. */
+(function(){
+  if(document.getElementById('arenaScreenshotGridFlowFix20261109')) return;
+  const style=document.createElement('style');
+  style.id='arenaScreenshotGridFlowFix20261109';
+  style.textContent=`
+    html.arena-home-fixed body #ana{
+      display:block!important;
+      position:fixed!important;
+      top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top))!important;
+      right:0!important;bottom:calc(70px + env(safe-area-inset-bottom))!important;left:0!important;
+      width:100%!important;max-width:720px!important;height:auto!important;
+      min-height:0!important;max-height:none!important;
+      margin:0 auto!important;padding:5px 7px!important;
+      overflow:hidden!important;box-sizing:border-box!important;
+    }
+    html.arena-home-fixed body #arenaHubHome{
+      position:relative!important;
+      display:grid!important;
+      grid-template-columns:minmax(0,1fr)!important;
+      grid-template-rows:80px 72px minmax(0,1fr) 72px 26px 88px!important;
+      grid-auto-rows:initial!important;grid-auto-flow:row!important;
+      align-content:stretch!important;align-items:stretch!important;
+      justify-content:stretch!important;
+      width:100%!important;height:100%!important;
+      min-width:0!important;min-height:0!important;max-height:100%!important;
+      margin:0!important;padding:0!important;gap:6px!important;
+      overflow:hidden!important;box-sizing:border-box!important;
+      transform:none!important;translate:none!important;scale:none!important;
+      animation:none!important;transition:none!important;
+    }
+    /* Cancel every prior fixed/absolute positioning rule: both rows now
+       occupy permanent grid tracks and cannot overlap or drift. */
+    html.arena-home-fixed body #arenaHubHome>.ar-profile{
+      position:relative!important;inset:auto!important;
+      grid-column:1!important;grid-row:1!important;
+      display:grid!important;width:100%!important;max-width:100%!important;min-width:0!important;
+      height:80px!important;min-height:80px!important;max-height:80px!important;
+      margin:0!important;align-self:stretch!important;justify-self:stretch!important;
+      box-sizing:border-box!important;transform:none!important;translate:none!important;
+      rotate:none!important;scale:none!important;animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts{
+      position:relative!important;inset:auto!important;
+      grid-column:1!important;grid-row:2!important;
+      display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
+      width:100%!important;max-width:100%!important;min-width:0!important;
+      height:72px!important;min-height:72px!important;max-height:72px!important;
+      margin:0!important;padding:0!important;gap:5px!important;
+      align-self:stretch!important;justify-self:stretch!important;
+      box-sizing:border-box!important;overflow:hidden!important;
+      transform:none!important;translate:none!important;rotate:none!important;scale:none!important;
+      animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts>.ar-short{
+      position:relative!important;display:flex!important;
+      width:100%!important;min-width:0!important;max-width:100%!important;
+      height:72px!important;min-height:72px!important;max-height:72px!important;
+      margin:0!important;padding:4px 1px!important;box-sizing:border-box!important;
+      transform:none!important;translate:none!important;rotate:none!important;scale:none!important;
+      animation:none!important;transition:none!important;flex:none!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts>.ar-short>i{
+      display:grid!important;place-items:center!important;position:static!important;
+      width:30px!important;min-width:30px!important;max-width:30px!important;
+      height:30px!important;min-height:30px!important;max-height:30px!important;
+      margin:0!important;padding:0!important;flex:none!important;
+      font-size:27px!important;line-height:30px!important;
+      transform:none!important;translate:none!important;rotate:none!important;scale:none!important;
+      animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-categories{
+      grid-column:1!important;grid-row:3!important;
+      width:100%!important;height:100%!important;min-height:0!important;max-height:100%!important;
+      margin:0!important;padding:0!important;box-sizing:border-box!important;
+    }
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open){
+      grid-template-rows:80px 72px minmax(0,1fr)!important;
+      gap:6px!important;
+    }
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-profile{grid-row:1!important}
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-shortcuts{grid-row:2!important}
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-categories.is-open{
+      grid-column:1!important;grid-row:3!important;
+      width:100%!important;height:100%!important;min-height:0!important;max-height:100%!important;
+    }
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-daily,
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-section-title,
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-featured{display:none!important}
+    html.arena-home-fixed body #arenaHubHome .ar-profile,
+    html.arena-home-fixed body #arenaHubHome .ar-profile *,
+    html.arena-home-fixed body #arenaHubHome .ar-shortcuts,
+    html.arena-home-fixed body #arenaHubHome .ar-shortcuts *,
+    html.arena-home-fixed body #arenaHubHome .ar-cat,
+    html.arena-home-fixed body #arenaHubHome .ar-daily,
+    html.arena-home-fixed body #arenaHubHome .ar-feature{
+      animation:none!important;transition:none!important;will-change:auto!important;
+    }
+    html.arena-home-fixed body #arenaHubHome .ar-short:active,
+    html.arena-home-fixed body #arenaHubHome .ar-short:focus,
+    html.arena-home-fixed body #arenaHubHome .ar-cat:active,
+    html.arena-home-fixed body #arenaHubHome .ar-cat:focus{
+      transform:none!important;translate:none!important;scale:none!important;
+      filter:none!important;animation:none!important;transition:none!important;
+    }
+  `;
+  document.head.appendChild(style);
+})();
