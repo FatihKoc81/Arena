@@ -3079,8 +3079,14 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
       transform:none!important;translate:none!important;animation:none!important;transition:none!important;
     }
     html.arena-home-fixed body #arenaHubHome>.ar-profile{
-      position:relative!important;top:auto!important;inset:auto!important;
-      grid-row:1!important;margin:0!important;
+      position:fixed!important;
+      top:calc(var(--arena-header-fixed-height,58px) + 8px + env(safe-area-inset-top))!important;
+      left:50%!important;right:auto!important;bottom:auto!important;
+      width:calc(100% - 28px)!important;max-width:692px!important;min-width:0!important;
+      height:80px!important;min-height:80px!important;max-height:80px!important;
+      margin:0!important;padding:0!important;box-sizing:border-box!important;
+      transform:translateX(-50%)!important;translate:none!important;
+      z-index:10020!important;animation:none!important;transition:none!important;
     }
   `;
   document.head.appendChild(style);
