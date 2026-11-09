@@ -36,7 +36,7 @@ video{width:100%;max-height:65vh;background:#000;border-radius:10px;margin-top:1
 (function(){
 "use strict";
 const $=id=>document.getElementById(id),APP_URL="https://fatihkoc81.github.io/Arena/";
-let endpoint="",key="",admin="",deviceId="",sessionId="",events=0,recordStarted=0;
+let endpoint="",key="",admin="",deviceId="",sessionId="",events=0,recordStarted=0,recorder=null,stream=null,chunks=[];
 const say=s=>{$("status").textContent="Durum: "+s};
 const log=s=>{$("log").textContent=new Date().toLocaleTimeString("tr-TR")+" — "+s};
 function cfg(){endpoint=$("endpoint").value.trim().replace(/\/$/,"");key=$("key").value.trim();admin=$("admin").value.trim();if(!/^https:\/\//.test(endpoint)||!key){say("Worker adresi veya cihaz anahtarı eksik");return false}localStorage.setItem("arenaTestEndpoint",endpoint);localStorage.setItem("arenaTestKey",key);localStorage.setItem("arenaTestDevice",$("device").value.trim());return true}
