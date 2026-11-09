@@ -1,0 +1,8 @@
+name = "arena-test-agent"
+main = "worker.js"
+compatibility_date = "2026-11-09"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "arena-test-logs"
+database_id = "CLOUDFLARE_D1_DATABASE_ID"
