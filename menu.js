@@ -3026,3 +3026,57 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
   `;
   document.head.appendChild(style);
 })();
+
+
+/* 2026-11-09: LOCK HEADER-TO-PROFILE GAP.
+   Measure the rendered ARENA header once, then use that exact pixel height
+   for both the fixed header and the fixed #ana viewport origin. */
+(function(){
+  if(document.getElementById('arenaHeaderProfileGapLock20261109')) return;
+  const root=document.documentElement;
+  const header=document.querySelector('body>h1');
+  if(!header) return;
+  let headerHeight=Math.round(header.getBoundingClientRect().height);
+  if(!Number.isFinite(headerHeight)||headerHeight<1){
+    const base=parseFloat(getComputedStyle(root).getPropertyValue('--bas-yuk'))||58;
+    headerHeight=Math.round(base);
+  }
+  root.style.setProperty('--arena-header-fixed-height',headerHeight+'px');
+  const style=document.createElement('style');
+  style.id='arenaHeaderProfileGapLock20261109';
+  style.textContent=`
+    html.arena-home-fixed body>h1{
+      position:fixed!important;
+      top:0!important;left:0!important;right:0!important;
+      height:var(--arena-header-fixed-height,58px)!important;
+      min-height:var(--arena-header-fixed-height,58px)!important;
+      max-height:var(--arena-header-fixed-height,58px)!important;
+      margin:0!important;padding:0!important;
+      box-sizing:border-box!important;flex:none!important;
+      z-index:10030!important;
+      transform:none!important;translate:none!important;animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #ana{
+      position:fixed!important;
+      top:var(--arena-header-fixed-height,58px)!important;
+      bottom:calc(70px + env(safe-area-inset-bottom))!important;
+      left:0!important;right:0!important;
+      width:100%!important;max-width:720px!important;
+      height:auto!important;min-height:0!important;max-height:none!important;
+      margin:0 auto!important;
+      padding:5px 7px 5px!important;
+      box-sizing:border-box!important;
+      overflow:hidden!important;
+      transform:none!important;translate:none!important;animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #arenaHubHome{
+      margin:0!important;padding:0!important;
+      transform:none!important;translate:none!important;animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-profile{
+      position:relative!important;top:auto!important;inset:auto!important;
+      grid-row:1!important;margin:0!important;
+    }
+  `;
+  document.head.appendChild(style);
+})();
