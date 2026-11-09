@@ -87,7 +87,7 @@ function startGeometryWatch(w){
   previous=current;
  }catch(e){sendEvent("recorder_error",{stage:"geometry_watch",message:e.message})}},250)
 }
-function attachClicks(){const w=appWindow();if(!w)return false;try{if(w.__arenaRecorderDoc===w.document)return true;w.__arenaRecorderDoc=w.document;
+function attachClicks(){const w=appWindow();if(!w)return false;try{if(w.__arenaRecorderDoc===w.document){if(sessionId&&!geometryTimer)startGeometryWatch(w);return true;}w.__arenaRecorderDoc=w.document;
 w.document.addEventListener("click",e=>{const el=e.target&&e.target.closest?e.target.closest("button,a,[role=button],.ar-category,.ar-card,[onclick]"):e.target;const detail={x:Math.round(e.clientX),y:Math.round(e.clientY),tag:el&&el.tagName||"",id:el&&el.id||"",className:el&&String(el.className||"").slice(0,180)||"",text:el&&String(el.innerText||el.textContent||"").trim().slice(0,160)||"",url:w.location.href,layoutBefore:layoutMetrics()};sendEvent("tap",detail);if(el&&el.closest&&el.closest("#oyun,#arenaGame,.ar-game,.ar-game-screen,#secenekler,.jokerler"))sendEvent("game_action",{action:"control_tap",id:detail.id,className:detail.className,text:detail.text,url:w.location.href});setTimeout(()=>captureSnapshot("dokunma-sonrasi"),350)},true);
 w.addEventListener("hashchange",()=>queueScreenCheck(w,"hashchange"));w.addEventListener("popstate",()=>queueScreenCheck(w,"popstate"));w.addEventListener("pageshow",()=>queueScreenCheck(w,"pageshow"));
 w.addEventListener("error",e=>sendEvent(e.target&&e.target!==w?"resource_error":"app_error",{message:String(e.message||"JavaScript/resource error"),file:e.filename||e.target&&e.target.src||"",line:e.lineno||0,column:e.colno||0,tag:e.target&&e.target.tagName||""}),true);
@@ -108,11 +108,11 @@ $("start").onclick=async()=>{
    catch(e){$("recordStatus").textContent="Ekran videosu izni alınamadı; dokunuş olayları kaydediliyor. "+e.message}
   }else{$("recordStatus").textContent="Bu tarayıcı ekran videosunu desteklemiyor; dokunuş olayları kaydediliyor."}
   $("start").disabled=true;$("stop").disabled=false;
-  await sendEvent("recording_started",{mode:"tap_screenshots+geometry",geometryIntervalMs:250});
+  await sendEvent("recording_started",{mode:"tap_screenshots+geometry",geometryIntervalMs:250,geometryEnabled:true,recorderVersion:"geometry-fix-20261110"});
   say("Kayıt başladı");log("Kayıt oturumu "+sessionId+" başladı");
   watchArena();
   const activeWindow=appWindow();
-  if(activeWindow){startGeometryWatch(activeWindow);captureSnapshot("kayit-baslangici")}
+  if(activeWindow){startGeometryWatch(activeWindow);captureSnapshot("kayit-baslangici")}else{sendEvent("recorder_warning",{stage:"geometry_start",message:"ARENA sekmesine erişilemedi; ARENA’yı test aracındaki bağlantıyla açıp yeniden deneyin."})}
 
  }catch(e){say("Kayıt başlatılamadı: "+e.message);log(e.message)}
 };
