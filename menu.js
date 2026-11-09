@@ -2944,3 +2944,42 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
   `;
   document.head.appendChild(style);
 })();
+
+
+/* 2026-11-09: remove press-scale/transition motion from every home tile. */
+(function(){
+  if(document.getElementById('arenaZeroPressMotion20261109')) return;
+  const style=document.createElement('style');
+  style.id='arenaZeroPressMotion20261109';
+  style.textContent=`
+    #arenaHubHome,
+    #arenaHubHome .ar-profile,
+    #arenaHubHome .ar-shortcuts,
+    #arenaHubHome .ar-short,
+    #arenaHubHome .ar-short i,
+    #arenaHubHome .ar-cat,
+    #arenaHubHome .ar-cat *,
+    #arenaHubHome .ar-daily,
+    #arenaHubHome .ar-featured,
+    #arenaHubHome .ar-feature,
+    #arenaHubHome .ar-feature *,
+    #arenaHubHome .ar-categories,
+    #arenaHubHome .ar-inline-category-head,
+    #arenaHubHome .ar-inline-game-list,
+    #arenaHubHome .ar-game-card{
+      animation:none!important;transition:none!important;will-change:auto!important;
+    }
+    #arenaHubHome .ar-cat:active,
+    #arenaHubHome .ar-feature:active,
+    #arenaHubHome .ar-short:active,
+    #arenaHubHome .ar-game-card:active,
+    #arenaHubHome .ar-cat:focus,
+    #arenaHubHome .ar-feature:focus,
+    #arenaHubHome .ar-short:focus,
+    #arenaHubHome .ar-game-card:focus{
+      transform:none!important;translate:none!important;rotate:none!important;
+      scale:none!important;filter:none!important;animation:none!important;transition:none!important;
+    }
+  `;
+  document.head.appendChild(style);
+})();
