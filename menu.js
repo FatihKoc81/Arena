@@ -3036,12 +3036,17 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
   const root=document.documentElement;
   const header=document.querySelector('body>h1');
   if(!header) return;
-  let headerHeight=Math.round(header.getBoundingClientRect().height);
-  if(!Number.isFinite(headerHeight)||headerHeight<1){
-    const base=parseFloat(getComputedStyle(root).getPropertyValue('--bas-yuk'))||58;
-    headerHeight=Math.round(base);
+  function syncArenaHeaderHeight(){
+    let headerHeight=Math.round(header.getBoundingClientRect().height);
+    if(!Number.isFinite(headerHeight)||headerHeight<1){
+      const base=parseFloat(getComputedStyle(root).getPropertyValue('--bas-yuk'))||58;
+      headerHeight=Math.round(base);
+    }
+    root.style.setProperty('--arena-header-fixed-height',headerHeight+'px');
   }
-  root.style.setProperty('--arena-header-fixed-height',headerHeight+'px');
+  syncArenaHeaderHeight();
+  if(typeof ResizeObserver==='function') new ResizeObserver(syncArenaHeaderHeight).observe(header);
+  window.addEventListener('resize',syncArenaHeaderHeight,{passive:true});
   const style=document.createElement('style');
   style.id='arenaHeaderProfileGapLock20261109';
   style.textContent=`
@@ -3064,7 +3069,7 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
       width:100%!important;max-width:720px!important;
       height:auto!important;min-height:0!important;max-height:none!important;
       margin:0 auto!important;
-      padding:5px 7px 5px!important;
+      padding:8px 7px 5px!important;
       box-sizing:border-box!important;
       overflow:hidden!important;
       transform:none!important;translate:none!important;animation:none!important;transition:none!important;
