@@ -10,7 +10,7 @@ Toplanan veriler: tarayıcı/Android user-agent, dil, ekran ve viewport ölçül
 3. D1 > Create database: arena-test-logs.
 4. D1 Console'da schema.sql içeriğini çalıştırın.
 5. Worker Settings > Bindings > D1 Database: Variable name DB, oluşturduğunuz veritabanını bağlayın.
-6. Worker Settings > Variables and Secrets bölümünde DEVICE_INGEST_KEY adında güçlü, rastgele bir Secret oluşturun. Anahtarı kimseyle paylaşmayın.
+6. Worker Settings > Variables and Secrets bölümünde DEVICE_INGEST_KEY adında güçlü, rastgele bir Secret oluşturun. Ayrıca raporları okumak için ayrı bir ADMIN_READ_KEY Secret oluşturun. Telefon paneline yalnızca DEVICE_INGEST_KEY girilir; ADMIN_READ_KEY telefona girilmez.
 7. Worker adresini not edin. Örnek: https://arena-test-agent.hesap.workers.dev.
 
 ## GitHub Pages
@@ -18,7 +18,7 @@ Panel adresi: https://fatihkoc81.github.io/Arena/test-agent/
 
 ## Telefonda eşleştirme
 1. Paneli Xiaomi Mi 8 Lite üzerinde açın.
-2. Worker adresini ve DEVICE_INGEST_KEY değerini girin.
+2. Worker adresini ve DEVICE_INGEST_KEY değerini girin. ADMIN_READ_KEY yalnızca yönetici rapor sorguları içindir.
 3. Ayarları kaydet ve bağlan düğmesine dokunun.
 
 ## Sınırlar
