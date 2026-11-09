@@ -18,7 +18,7 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;color:#b9d3ff;font-size:12px}
 <label for="key">Cihaz erişim anahtarı</label><input id="key" type="password" placeholder="Cloudflare DEVICE_INGEST_KEY">
 <label for="device">Cihaz adı</label><input id="device" value="Xiaomi Mi 8 Lite">
 <button id="save">Ayarları kaydet ve bağlan</button><button class="secondary" id="ping">Bağlantıyı dene</button>
-<p id="status">Durum: Kurulum bekleniyor</p><div class="muted">Anahtar yalnızca bu telefonun tarayıcısında saklanır. Bu sayfayı herkese açık paylaşmayın.</div>
+<p id="status">Durum: Kurulum bekleniyor</p><p id="wakeStatus" class="muted">Ekran açık tutma: kontrol ediliyor…</p><div class="muted">Anahtar yalnızca bu telefonun tarayıcısında saklanır. Bu sayfayı herkese açık paylaşmayın.</div>
 </section>
 <section class="card"><b>Canlı test</b><p class="muted">Raporlama, bu sayfa açık ve ön plandayken yaklaşık dakikada bir yapılır. Telefon veya tarayıcı kapalıyken kesintisiz test garantisi yoktur.</p>
 <iframe id="frame" title="ARENA canlı uygulama" src="about:blank"></iframe></section>
@@ -28,8 +28,14 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;color:#b9d3ff;font-size:12px}
 (function(){
 "use strict";
 const $=id=>document.getElementById(id), APP_URL="https://fatihkoc81.github.io/Arena/";
-let endpoint="",key="",deviceId="",errors=[],attached=false;
+let endpoint="",key="",deviceId="",errors=[],attached=false,wakeLock=null;
 function say(s){$("status").textContent="Durum: "+s;}
+async function keepScreenAwake(){
+ if(!("wakeLock" in navigator)){$("wakeStatus").textContent="Ekran açık tutma: tarayıcı desteklemiyor; telefon ayarından ekran zaman aşımını uzatın.";return;}
+ if(document.visibilityState!=="visible")return;
+ try{if(wakeLock&&!wakeLock.released)return;wakeLock=await navigator.wakeLock.request("screen");$("wakeStatus").textContent="Ekran açık tutma: etkin ✓";wakeLock.addEventListener("release",()=>{$("wakeStatus").textContent="Ekran açık tutma: serbest bırakıldı";});}
+ catch(e){$("wakeStatus").textContent="Ekran açık tutma izni alınamadı: "+e.message;}
+}
 function log(s){$("log").textContent=new Date().toLocaleTimeString("tr-TR")+" — "+s;}
 function configLoad(){
  $("endpoint").value=localStorage.getItem("arenaTestEndpoint")||"";
@@ -86,12 +92,13 @@ function attachFrame(){
 $("frame").addEventListener("load",()=>setTimeout(attachFrame,700));
 $("save").addEventListener("click",()=>{if(!cfgSave())return;$("frame").src=APP_URL+"?testagent="+Date.now();say("ARENA açılıyor…");});
 $("ping").addEventListener("click",ping);
-document.addEventListener("visibilitychange",()=>{if(!document.hidden)send("resume",snapshot());});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden){keepScreenAwake();send("resume",snapshot());}});
 window.addEventListener("online",()=>send("online",snapshot()));
 window.addEventListener("offline",()=>send("offline",snapshot()));
 window.addEventListener("error",e=>send("agent_error",{message:String(e.message||"Agent error")}));
 setInterval(()=>{if(document.hidden||$("frame").src==="about:blank")return;attachFrame();const s=snapshot();s.recentErrors=errors.slice(-10);send("heartbeat",s);},60000);
 configLoad();
+keepScreenAwake();
 if(localStorage.getItem("arenaTestEndpoint")&&localStorage.getItem("arenaTestKey")){$("save").click();}
 })();
 </script></body></html>
