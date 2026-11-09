@@ -2936,3 +2936,39 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
   `;
   document.head.appendChild(style);
 })();
+
+
+/* 2026-11-09: HARD PIN PROFILE ROW TO THE ARENA HEADER GRID.
+   The profile is anchored to the stable home origin; category rendering can
+   only replace the content row below the shortcut strip. */
+(function(){
+  if(document.getElementById('arenaProfileAbsoluteAnchor20261109')) return;
+  const style=document.createElement('style');
+  style.id='arenaProfileAbsoluteAnchor20261109';
+  style.textContent=`
+    html.arena-home-fixed body #ana{
+      top:var(--arena-header-fixed-height,58px)!important;
+      padding:8px 7px 5px!important;box-sizing:border-box!important;
+    }
+    html.arena-home-fixed body #arenaHubHome{
+      position:relative!important;top:0!important;left:0!important;margin:0!important;
+      transform:none!important;translate:none!important;scale:none!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-profile,
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-profile{
+      position:absolute!important;top:0!important;left:6px!important;right:6px!important;
+      inset-block-start:0!important;inset-inline:6px!important;
+      grid-column:1!important;grid-row:1!important;
+      width:auto!important;max-width:none!important;
+      height:80px!important;min-height:80px!important;max-height:80px!important;
+      margin:0!important;transform:none!important;translate:none!important;scale:none!important;
+      animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts,
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-shortcuts{
+      grid-column:1!important;grid-row:2!important;
+      transform:none!important;translate:none!important;scale:none!important;
+    }
+  `;
+  document.head.appendChild(style);
+})();
