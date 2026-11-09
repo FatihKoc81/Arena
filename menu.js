@@ -2861,3 +2861,78 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
   `;
   document.head.appendChild(style);
 })();
+
+
+/* 2026-11-09: KEEP PROFILE + SHORTCUT ROWS IDENTICAL WHEN A CATEGORY OPENS.
+   Category selection may only replace the category area; it must not resize,
+   reposition, or animate either of the two rows above it. */
+(function(){
+  if(document.getElementById('arenaTopRowsStayFixed20261109')) return;
+  const style=document.createElement('style');
+  style.id='arenaTopRowsStayFixed20261109';
+  style.textContent=`
+    html.arena-home-fixed body #arenaHubHome{
+      display:grid!important;
+      grid-template-columns:minmax(0,1fr)!important;
+      grid-template-rows:80px 68px minmax(0,1fr) 72px 26px 88px!important;
+      grid-auto-rows:initial!important;
+      align-content:stretch!important;
+      align-items:stretch!important;
+      gap:6px!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-profile,
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-profile{
+      position:relative!important;inset:auto!important;
+      grid-column:1!important;grid-row:1!important;
+      width:calc(100% - 12px)!important;max-width:calc(100% - 12px)!important;
+      height:80px!important;min-height:80px!important;max-height:80px!important;
+      margin:0 auto!important;align-self:stretch!important;
+      transform:none!important;translate:none!important;scale:none!important;
+      animation:none!important;transition:none!important;
+      box-sizing:border-box!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts,
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-shortcuts{
+      position:relative!important;inset:auto!important;
+      grid-column:1!important;grid-row:2!important;
+      display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
+      width:100%!important;max-width:100%!important;min-width:0!important;
+      height:68px!important;min-height:68px!important;max-height:68px!important;
+      margin:0!important;padding:0!important;gap:5px!important;
+      align-self:stretch!important;justify-self:stretch!important;
+      transform:none!important;translate:none!important;scale:none!important;
+      animation:none!important;transition:none!important;
+      box-sizing:border-box!important;overflow:hidden!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts>.ar-short{
+      display:flex!important;width:100%!important;min-width:0!important;max-width:100%!important;
+      height:68px!important;min-height:68px!important;max-height:68px!important;
+      margin:0!important;padding:4px 1px!important;box-sizing:border-box!important;
+      transform:none!important;translate:none!important;scale:none!important;
+      animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open){
+      grid-template-rows:80px 68px minmax(0,1fr)!important;
+      gap:6px!important;
+    }
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-categories.is-open{
+      grid-column:1!important;grid-row:3!important;
+      width:100%!important;height:100%!important;min-height:0!important;max-height:100%!important;
+      margin:0!important;padding:0!important;align-self:stretch!important;
+    }
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-daily,
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-section-title,
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-featured{
+      display:none!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-profile,
+    html.arena-home-fixed body #arenaHubHome>.ar-profile *,
+    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts,
+    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts *,
+    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts>.ar-short:active,
+    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts>.ar-short:focus{
+      animation:none!important;transition:none!important;will-change:auto!important;
+    }
+  `;
+  document.head.appendChild(style);
+})();
