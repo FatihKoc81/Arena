@@ -14,6 +14,28 @@ export default {async fetch(request,env){
   const payload=JSON.stringify(d.payload||{});if(payload.length>16000)return json({error:"Payload too large"},413,origin);
   try{await env.DB.prepare("INSERT INTO test_reports (device_id,device_name,app_version,event_type,payload_json) VALUES (?,?,?,?,?)").bind(String(d.deviceId||"").slice(0,80),String(d.deviceName||"Android").slice(0,80),String(d.appVersion||"web").slice(0,40),String(d.eventType||"heartbeat").slice(0,40),payload).run();return json({ok:true,received:true},201,origin)}catch(e){return json({error:"Database write failed",detail:String(e.message||e)},500,origin)}
  }
+
+ if(request.method==="POST"&&p.startsWith("/snapshot/")){
+  if(!auth(request,env,"DEVICE_INGEST_KEY"))return json({error:"Unauthorized"},401,origin);
+  if(!env.RECORDINGS)return json({error:"R2 binding RECORDINGS is missing"},503,origin);
+  const sid=decodeURIComponent(p.slice("/snapshot/".length));if(!idOk(sid))return json({error:"Invalid session id"},400,origin);
+  const type=request.headers.get("Content-Type")||"image/jpeg";if(!type.startsWith("image/"))return json({error:"Image required"},415,origin);
+  const bytes=await request.arrayBuffer();if(bytes.byteLength>8000000)return json({error:"Image too large"},413,origin);
+  const key="sessions/"+sid+"/shots/"+crypto.randomUUID()+".jpg";await env.RECORDINGS.put(key,bytes,{httpMetadata:{contentType:type}});
+  await env.DB.prepare("INSERT INTO test_snapshots(session_id,object_key,reason) VALUES(?,?,?)").bind(sid,key,"tap-or-state").run();return json({ok:true,key},201,origin)
+ }
+ if(request.method==="GET"&&p.startsWith("/snapshots/")){
+  if(!auth(request,env,"ADMIN_READ_KEY"))return json({error:"Unauthorized"},401,origin);
+  const sid=decodeURIComponent(p.slice("/snapshots/".length));const r=await env.DB.prepare("SELECT object_key,reason,created_at FROM test_snapshots WHERE session_id=? ORDER BY id ASC").bind(sid).all();return json({ok:true,snapshots:r.results||[]},200,origin)
+ }
+ if(request.method==="GET"&&p.startsWith("/snapshot-file/")){
+  if(!auth(request,env,"ADMIN_READ_KEY"))return json({error:"Unauthorized"},401,origin);
+  if(!env.RECORDINGS)return json({error:"R2 binding RECORDINGS is missing"},503,origin);
+  const key=decodeURIComponent(p.slice("/snapshot-file/".length));if(!key.startsWith("sessions/"))return json({error:"Invalid key"},400,origin);
+  const obj=await env.RECORDINGS.get(key);if(!obj)return json({error:"Image not found"},404,origin);
+  return new Response(obj.body,{headers:{"Content-Type":"image/jpeg","Cache-Control":"no-store",...cors(origin)}})
+ }
+
  if(request.method==="POST"&&p==="/session"){
   if(!auth(request,env,"DEVICE_INGEST_KEY"))return json({error:"Unauthorized"},401,origin);
   let d;try{d=await request.json()}catch{return json({error:"Invalid JSON"},400,origin)}
@@ -42,7 +64,7 @@ export default {async fetch(request,env){
  }
  if(request.method==="GET"&&p==="/sessions"){
   if(!auth(request,env,"ADMIN_READ_KEY"))return json({error:"Unauthorized"},401,origin);
-  const limit=Math.max(1,Math.min(100,Number(url.searchParams.get("limit")||30)));const r=await env.DB.prepare("SELECT session_id,device_name,started_at,ended_at,event_count,video_key FROM test_sessions ORDER BY started_at DESC LIMIT ?").bind(limit).all();return json({ok:true,sessions:r.results||[]},200,origin)
+  const limit=Math.max(1,Math.min(100,Number(url.searchParams.get("limit")||30)));const r=await env.DB.prepare("SELECT s.session_id,s.device_name,s.started_at,s.ended_at,s.event_count,(SELECT COUNT(*) FROM test_snapshots t WHERE t.session_id=s.session_id) AS snapshot_count FROM test_sessions s ORDER BY s.started_at DESC LIMIT ?").bind(limit).all();return json({ok:true,sessions:r.results||[]},200,origin)
  }
  if(request.method==="GET"&&p.startsWith("/events/")){
   if(!auth(request,env,"ADMIN_READ_KEY"))return json({error:"Unauthorized"},401,origin);
