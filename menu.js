@@ -2972,3 +2972,41 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
   `;
   document.head.appendChild(style);
 })();
+
+
+/* 2026-11-10: FINAL PROFILE Y-ANCHOR FIX.
+   The test recorder showed the profile alternating between y=66 and y=68
+   while the header stayed at 58px. Keep the home viewport origin and its
+   top inset invariant in both category and home states. */
+(function(){
+  if(document.getElementById('arenaProfileYAnchor20261110')) return;
+  const style=document.createElement('style');
+  style.id='arenaProfileYAnchor20261110';
+  style.textContent=`
+    html.arena-home-fixed body #ana{
+      top:var(--arena-header-fixed-height,58px)!important;
+      padding-top:8px!important;
+      box-sizing:border-box!important;
+    }
+    html.arena-home-fixed body #arenaHubHome{
+      position:relative!important;
+      top:0!important;
+      margin-top:0!important;
+      padding-top:0!important;
+      transform:none!important;
+      translate:none!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-profile,
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-profile{
+      position:absolute!important;
+      top:0!important;
+      inset-block-start:0!important;
+      margin-top:0!important;
+      transform:none!important;
+      translate:none!important;
+      animation:none!important;
+      transition:none!important;
+    }
+  `;
+  document.head.appendChild(style);
+})();
