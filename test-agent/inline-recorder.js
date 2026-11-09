@@ -77,45 +77,45 @@ function prefetchLatestReport(){
 }
 prefetchLatestReport();
 
-$("air-share").onclick=()=>{
+$("air-share").onclick=async()=>{
  const btn=$("air-share");
- // The cached report is shared before any await, UI mutation, or other work.
- // This keeps Android's transient user activation attached to navigator.share().
- if(cachedLatestReport&&typeof navigator.share==="function"){
-  const report=cachedLatestReport;
-  let sharePromise;
-  try{sharePromise=navigator.share({title:"ARENA test kaydı",text:report})}
-  catch(e){status("Android paylaşım hatası: "+(e.name||"Error")+" · "+(e.message||String(e)));return}
-  btn.disabled=true;
-  Promise.resolve(sharePromise).then(()=>{
-   status("Paylaşım menüsü açıldı. ChatGPT’yi seçin.");
-   cachedLatestReport="";
-   prefetchLatestReport();
-  }).catch(e=>{
-   if(e&&e.name==="AbortError"){status("Paylaşım iptal edildi; kayıt sunucuda duruyor.");return}
-   const active=navigator.userActivation?String(navigator.userActivation.isActive):"bilinmiyor";
-   status("Paylaşım açılamadı: "+(e&&e.name||"Error")+" · "+(e&&e.message||String(e))+" · etkin dokunuş: "+active);
-  }).finally(()=>{btn.disabled=false});
-  return;
- }
- const token=adminToken();
- if(!token){
+ if(!adminToken()){
   const entered=window.prompt("Test kayıtlarını okuyabilmek için yönetici okuma anahtarını girin:");
   if(!entered){status("Yönetici anahtarı girilmedi");return}
   try{localStorage.setItem("arenaTestAdminKey",entered.trim())}catch(e){}
  }
- if(typeof navigator.share!=="function"){
-  status("Bu tarayıcı doğrudan paylaşımı desteklemiyor. Rapor kopyalanabilir.");
-  return;
+ let report=cachedLatestReport;
+ if(!report){
+  try{status("Son kayıt hazırlanıyor…");report=await (reportLoadPromise||fetchLatestReport(adminToken()));if(!report)throw Error("Rapor alınamadı");cachedLatestReport=report}
+  catch(e){status("Rapor alınamadı: "+(e&&e.message||e));return}
  }
- btn.disabled=true;
- status("Rapor hazırlanıyor. Hazır olunca aynı düğmeye tekrar basın…");
- fetchLatestReport(adminToken()).then(report=>{
-  cachedLatestReport=report;
-  status("Rapor hazır. Şimdi aynı düğmeye bir kez daha basın.");
- }).catch(e=>status("Rapor alınamadı: "+(e&&e.message||e))).finally(()=>{btn.disabled=false});
+ if(typeof navigator.share==="function"){
+  try{
+   await navigator.share({title:"ARENA test kaydı",text:report});
+   status("Paylaşım menüsü açıldı. ChatGPT’yi seçin.");
+   cachedLatestReport="";prefetchLatestReport();return;
+  }catch(e){
+   if(e&&e.name==="AbortError"){status("Paylaşım iptal edildi. Tekrar deneyebilirsiniz.");return}
+   // Android WebView/browser permission failure: fall through to clipboard.
+  }
+ }
+ try{
+  if(navigator.clipboard&&typeof navigator.clipboard.writeText==="function"){
+   await navigator.clipboard.writeText(report);
+   status("Kayıt panoya kopyalandı. ChatGPT’ye dönüp yapıştırın.");return;
+  }
+ }catch(e){}
+ let area=document.getElementById("air-copy-fallback");
+ if(!area){
+  area=document.createElement("textarea");area.id="air-copy-fallback";area.setAttribute("readonly","");
+  area.style.cssText="position:fixed;left:12px;right:12px;bottom:12px;width:calc(100% - 24px);height:42vh;z-index:2147483647;background:#fff;color:#111;padding:10px;border:2px solid #247cf0;border-radius:10px;font:12px monospace";
+  panel.appendChild(area);
+ }
+ area.value=report;area.style.display="block";area.focus();area.select();
+ let copied=false;try{copied=document.execCommand("copy")}catch(e){}
+ if(copied){status("Kayıt panoya kopyalandı. ChatGPT’ye dönüp yapıştırın.");area.style.display="none"}
+ else status("Otomatik kopyalama engellendi. Açılan metne basılı tutup Tümünü seç > Kopyala yapın.");
 };
-
 $("air-start").onclick=async()=>{if(busy||sid)return;if(!loadConfig()){status("Önce Test Kayıt Merkezi’nde ayarları kaydedin");return}busy=true;try{const d=await api("/session",{deviceId,deviceName:device,startedAt:new Date().toISOString()});sid=d.sessionId;started=Date.now();count=0;localStorage.setItem("arenaTestActiveSession",sid);localStorage.setItem("arenaTestStarted",String(started));localStorage.setItem("arenaTestCount","0");$("air-start").disabled=true;$("air-stop").disabled=false;status("Kayıt başladı");await event("recording_started",{url:location.href,geometryEnabled:true,geometryIntervalMs:250,recorderVersion:"inline-geometry-20261110"});setCollapsed(false);attachRecorder();await startGeometryWatch();window.addEventListener("error",e=>event("app_error",{message:e.message,file:e.filename,line:e.lineno}));window.addEventListener("unhandledrejection",e=>event("promise_error",{message:String(e.reason&&e.reason.message||e.reason)}));}catch(e){status("Başlatılamadı: "+e.message);$("air-start").disabled=false}finally{busy=false}};
 $("air-stop").onclick=async()=>{if(!sid||busy)return;loadConfig();if(!endpoint||!key){status("Kayıt ayarları bulunamadı");return}busy=true;$("air-stop").disabled=true;if(geometryTimer){clearInterval(geometryTimer);geometryTimer=null}try{await event("recording_finished",{eventCount:count,geometryEnabled:true});const id=sid;await api("/session/"+encodeURIComponent(id)+"/finish",{endedAt:new Date().toISOString(),eventCount:count});sid="";localStorage.removeItem("arenaTestActiveSession");localStorage.removeItem("arenaTestStarted");localStorage.removeItem("arenaTestCount");if(listener)document.removeEventListener("click",listener,true);listener=null;$("air-start").disabled=false;status("Gönderildi ✓ · "+count+" olay");cachedLatestReport="";prefetchLatestReport()}catch(e){status("Gönderilemedi: "+e.message);$("air-stop").disabled=false}finally{busy=false}};
 if(sid){$("air-start").disabled=true;$("air-stop").disabled=false;status("Önceki kayıt devam ediyor · "+count+" olay");attachRecorder();setCollapsed(true)}
