@@ -13,3 +13,9 @@ CREATE TABLE IF NOT EXISTS test_events (
  id INTEGER PRIMARY KEY AUTOINCREMENT,session_id TEXT NOT NULL,event_type TEXT NOT NULL,payload_json TEXT NOT NULL,created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
 );
 CREATE INDEX IF NOT EXISTS idx_test_events_session ON test_events(session_id,id);
+
+CREATE TABLE IF NOT EXISTS test_snapshots (
+ id INTEGER PRIMARY KEY AUTOINCREMENT,session_id TEXT NOT NULL,object_key TEXT NOT NULL,reason TEXT,
+ created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+);
+CREATE INDEX IF NOT EXISTS idx_test_snapshots_session ON test_snapshots(session_id,id);
