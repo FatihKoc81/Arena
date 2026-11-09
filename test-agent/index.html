@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="tr"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080c20"><title>ARENA Test Agent</title>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#080c20;color:#f4f7ff;font:15px system-ui,sans-serif;padding:16px}
+main{max-width:760px;margin:auto}.card{background:#111b38;border:1px solid #294477;border-radius:16px;padding:15px;margin:12px 0}
+h1{font-size:23px;margin:4px 0}p{color:#b9c8e8;line-height:1.5}.muted{font-size:12px;color:#91a5ce}
+label{display:block;margin:12px 0 5px;color:#cbd8f4}input{width:100%;padding:13px;border-radius:10px;border:1px solid #48649b;background:#08132c;color:white;font-size:15px}
+button{border:0;border-radius:10px;padding:13px 16px;background:#247cf0;color:white;font-weight:800;font-size:15px;margin:8px 6px 0 0}
+button.secondary{background:#263858}#status{font-weight:800}#frame{width:100%;height:72vh;min-height:480px;border:1px solid #38558c;border-radius:12px;background:#050914}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;color:#b9d3ff;font-size:12px}
+</style></head><body><main>
+<h1>🧪 ARENA Test Agent</h1>
+<p>Bu sayfa ARENA'yı aynı pencerede açar; tarayıcı hatalarını, yükleme sürelerini ve cihaz bilgilerini test sunucusuna raporlar.</p>
+<section class="card">
+<label for="endpoint">Test Worker adresi</label><input id="endpoint" placeholder="https://arena-test-agent.hesap.workers.dev">
+<label for="key">Cihaz erişim anahtarı</label><input id="key" type="password" placeholder="Cloudflare DEVICE_INGEST_KEY">
+<label for="device">Cihaz adı</label><input id="device" value="Xiaomi Mi 8 Lite">
+<button id="save">Ayarları kaydet ve bağlan</button><button class="secondary" id="ping">Bağlantıyı dene</button>
+<p id="status">Durum: Kurulum bekleniyor</p><div class="muted">Anahtar yalnızca bu telefonun tarayıcısında saklanır. Bu sayfayı herkese açık paylaşmayın.</div>
+</section>
+<section class="card"><b>Canlı test</b><p class="muted">Raporlama, bu sayfa açık ve ön plandayken yaklaşık dakikada bir yapılır. Telefon veya tarayıcı kapalıyken kesintisiz test garantisi yoktur.</p>
+<iframe id="frame" title="ARENA canlı uygulama" src="about:blank"></iframe></section>
+<section class="card"><b>Son yerel durum</b><pre id="log">Henüz rapor yok.</pre></section>
+</main>
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id), APP_URL="https://fatihkoc81.github.io/Arena/";
+let endpoint="",key="",deviceId="",errors=[],attached=false;
+function say(s){$("status").textContent="Durum: "+s;}
+function log(s){$("log").textContent=new Date().toLocaleTimeString("tr-TR")+" — "+s;}
+function configLoad(){
+ $("endpoint").value=localStorage.getItem("arenaTestEndpoint")||"";
+ $("key").value=localStorage.getItem("arenaTestKey")||"";
+ $("device").value=localStorage.getItem("arenaTestDevice")||"Xiaomi Mi 8 Lite";
+ deviceId=localStorage.getItem("arenaTestDeviceId")||("mi8lite-"+crypto.randomUUID());
+ localStorage.setItem("arenaTestDeviceId",deviceId);
+}
+function cfgSave(){
+ endpoint=$("endpoint").value.trim().replace(/\/$/,"");key=$("key").value.trim();
+ if(!/^https:\/\//.test(endpoint)||!key){say("Worker adresi veya erişim anahtarı eksik");return false;}
+ localStorage.setItem("arenaTestEndpoint",endpoint);localStorage.setItem("arenaTestKey",key);localStorage.setItem("arenaTestDevice",$("device").value.trim());
+ say("Ayarlar kaydedildi");return true;
+}
+async function request(path,opts){
+ const r=await fetch(endpoint+path,{...opts,headers:{Authorization:"Bearer "+key,"Content-Type":"application/json",...(opts&&opts.headers||{})}});
+ const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||("HTTP "+r.status));return d;
+}
+async function ping(){
+ if(!cfgSave())return;
+ try{const r=await fetch(endpoint+"/health",{cache:"no-store"});const d=await r.json();if(!r.ok||!d.ok)throw new Error("Health kontrolü başarısız");say("Sunucu erişilebilir ✓");log("Worker bağlantısı başarılı");}
+ catch(e){say("Bağlantı hatası: "+e.message);log(e.message);}
+}
+function snapshot(){
+ const n=navigator,p=performance&&performance.getEntriesByType?performance.getEntriesByType("navigation")[0]:null;
+ return {url:location.href,userAgent:n.userAgent,platform:n.platform,language:n.language,
+ screen:{width:screen.width,height:screen.height,pixelRatio:devicePixelRatio},
+ viewport:{width:innerWidth,height:innerHeight},online:n.onLine,
+ connection:n.connection?{effectiveType:n.connection.effectiveType,downlink:n.connection.downlink,rtt:n.connection.rtt}:null,
+ memory:performance&&performance.memory?{usedJSHeapSize:performance.memory.usedJSHeapSize,totalJSHeapSize:performance.memory.totalJSHeapSize}:null,
+ navigation:p?{loadEventEnd:p.loadEventEnd,domContentLoaded:p.domContentLoadedEventEnd,domInteractive:p.domInteractive,transferSize:p.transferSize}:null,
+ visibility:document.visibilityState,timestamp:new Date().toISOString()};
+}
+async function send(type,payload){
+ if(!endpoint||!key)return;
+ try{
+  await request("/report",{method:"POST",body:JSON.stringify({deviceId,deviceName:$("device").value.trim()||"Android cihaz",appVersion:"arena-web-test-1",eventType:type,payload})});
+  say("Bağlı · son rapor "+new Date().toLocaleTimeString("tr-TR"));log(type+" raporu gönderildi");
+ }catch(e){say("Rapor gönderilemedi: "+e.message);log(e.message);}
+}
+function attachFrame(){
+ try{
+  const w=$("frame").contentWindow,d=$("frame").contentDocument;
+  if(!w||!d||!d.documentElement||w.__arenaTestAttached)return;
+  w.__arenaTestAttached=true;
+  w.addEventListener("error",e=>{errors.push({type:"js_error",message:String(e.message||"Script error"),file:String(e.filename||"").slice(0,250),line:e.lineno||0});send("js_error",errors.slice(-10));});
+  w.addEventListener("unhandledrejection",e=>{errors.push({type:"promise_rejection",message:String(e.reason&&e.reason.message||e.reason||"Unhandled rejection").slice(0,500)});send("promise_error",errors.slice(-10));});
+  const original=w.console.error.bind(w.console);
+  w.console.error=function(){const msg=Array.from(arguments).map(x=>String(x&&x.message||x)).join(" ").slice(0,700);errors.push({type:"console_error",message:msg});send("console_error",errors.slice(-10));original(...arguments);};
+  d.addEventListener("error",e=>{if(e.target&&e.target!==w){errors.push({type:"resource_error",tag:e.target.tagName||"",src:e.target.src||e.target.href||""});send("resource_error",errors.slice(-10));}},true);
+  attached=true;send("page_attached",{title:d.title,href:w.location.href});
+ }catch(e){say("ARENA sayfasına erişilemedi: "+e.message);}
+}
+$("frame").addEventListener("load",()=>setTimeout(attachFrame,700));
+$("save").addEventListener("click",()=>{if(!cfgSave())return;$("frame").src=APP_URL+"?testagent="+Date.now();say("ARENA açılıyor…");});
+$("ping").addEventListener("click",ping);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)send("resume",snapshot());});
+window.addEventListener("online",()=>send("online",snapshot()));
+window.addEventListener("offline",()=>send("offline",snapshot()));
+window.addEventListener("error",e=>send("agent_error",{message:String(e.message||"Agent error")}));
+setInterval(()=>{if(document.hidden||$("frame").src==="about:blank")return;attachFrame();const s=snapshot();s.recentErrors=errors.slice(-10);send("heartbeat",s);},60000);
+configLoad();
+if(localStorage.getItem("arenaTestEndpoint")&&localStorage.getItem("arenaTestKey")){$("save").click();}
+})();
+</script></body></html>
