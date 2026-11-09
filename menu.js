@@ -2606,232 +2606,10 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
 })();
 
 
-/* 2026-11-09: FINAL GRID LOCK — profile and shortcuts stay in fixed grid rows.
-   Undo the previous position:fixed/translateX pin, which caused visible widening. */
-(function(){
-  if(document.getElementById('arenaFinalGridLock20261109')) return;
-  const style=document.createElement('style');
-  style.id='arenaFinalGridLock20261109';
-  style.textContent=`
-    html.arena-home-fixed body #arenaHubHome{
-      display:grid!important;
-      grid-template-columns:minmax(0,1fr)!important;
-      grid-template-rows:80px 72px minmax(0,1fr)!important;
-      grid-auto-flow:row!important;
-      align-content:stretch!important;
-      align-items:stretch!important;
-      gap:6px!important;
-      width:100%!important;
-      height:100%!important;
-      min-width:0!important;
-      min-height:0!important;
-      box-sizing:border-box!important;
-    }
-    html.arena-home-fixed body #arenaHubHome>.ar-profile{
-      position:relative!important;
-      inset:auto!important;
-      grid-column:1!important;
-      grid-row:1!important;
-      display:grid!important;
-      width:100%!important;
-      min-width:0!important;
-      max-width:100%!important;
-      height:80px!important;
-      min-height:80px!important;
-      max-height:80px!important;
-      margin:0!important;
-      transform:none!important;
-      translate:none!important;
-      scale:none!important;
-      animation:none!important;
-      transition:none!important;
-      box-sizing:border-box!important;
-    }
-    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts{
-      position:relative!important;
-      inset:auto!important;
-      grid-column:1!important;
-      grid-row:2!important;
-      display:grid!important;
-      grid-template-columns:repeat(5,minmax(0,1fr))!important;
-      grid-template-rows:minmax(0,1fr)!important;
-      width:100%!important;
-      min-width:0!important;
-      max-width:100%!important;
-      height:72px!important;
-      min-height:72px!important;
-      max-height:72px!important;
-      margin:0!important;
-      padding:0!important;
-      gap:5px!important;
-      transform:none!important;
-      translate:none!important;
-      scale:none!important;
-      animation:none!important;
-      transition:none!important;
-      box-sizing:border-box!important;
-    }
-    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts>.ar-short{
-      display:flex!important;
-      position:relative!important;
-      width:100%!important;
-      min-width:0!important;
-      max-width:100%!important;
-      height:72px!important;
-      min-height:72px!important;
-      max-height:72px!important;
-      margin:0!important;
-      padding:4px 1px!important;
-      box-sizing:border-box!important;
-      transform:none!important;
-      translate:none!important;
-      rotate:none!important;
-      scale:none!important;
-      animation:none!important;
-      transition:none!important;
-      flex:none!important;
-      overflow:hidden!important;
-    }
-    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts>.ar-short>i{
-      display:grid!important;
-      place-items:center!important;
-      position:static!important;
-      width:30px!important;
-      min-width:30px!important;
-      max-width:30px!important;
-      height:30px!important;
-      min-height:30px!important;
-      max-height:30px!important;
-      margin:0!important;
-      padding:0!important;
-      font-size:27px!important;
-      line-height:30px!important;
-      transform:none!important;
-      translate:none!important;
-      rotate:none!important;
-      scale:none!important;
-      animation:none!important;
-      transition:none!important;
-      flex:none!important;
-    }
-    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts>.ar-short:active,
-    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts>.ar-short:focus,
-    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts>.ar-short:focus-visible{
-      width:100%!important;
-      max-width:100%!important;
-      transform:none!important;
-      translate:none!important;
-      scale:none!important;
-      filter:none!important;
-      animation:none!important;
-      transition:none!important;
-    }
-    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open){
-      grid-template-rows:80px 72px minmax(0,1fr)!important;
-    }
-    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-profile{grid-row:1!important}
-    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-shortcuts{grid-row:2!important}
-    @media(max-height:720px){
-      html.arena-home-fixed body #arenaHubHome{grid-template-rows:80px 72px minmax(0,1fr)!important}
-      html.arena-home-fixed body #arenaHubHome>.ar-profile{height:80px!important;min-height:80px!important;max-height:80px!important}
-      html.arena-home-fixed body #arenaHubHome>.ar-shortcuts,
-      html.arena-home-fixed body #arenaHubHome>.ar-shortcuts>.ar-short{height:72px!important;min-height:72px!important;max-height:72px!important}
-    }
-  `;
-  document.head.appendChild(style);
-})();
 
 
-/* 2026-11-09: NO-MOTION TOP PLANE — anchor profile and shortcut strip
-   to the same home viewport origin, not to changing grid flow. */
-(function(){
-  if(document.getElementById('arenaNoMotionTopPlane20261109')) return;
-  const style=document.createElement('style');
-  style.id='arenaNoMotionTopPlane20261109';
-  style.textContent=`
-    html,body,#ana,#arenaHubHome{
-      zoom:1!important;
-    }
-    html.arena-home-fixed body #arenaHubHome{
-      position:relative!important;
-      transform:none!important;
-      translate:none!important;
-      scale:none!important;
-      animation:none!important;
-      transition:none!important;
-    }
-    /* These two elements are removed from grid flow and pinned to the
-       same parent coordinates in both home and category states. */
-    html.arena-home-fixed body #arenaHubHome>.ar-profile{
-      position:absolute!important;
-      top:0!important;right:0!important;bottom:auto!important;left:0!important;
-      width:100%!important;max-width:none!important;min-width:0!important;
-      height:80px!important;min-height:80px!important;max-height:80px!important;
-      margin:0!important;transform:none!important;translate:none!important;
-      rotate:none!important;scale:none!important;
-      animation:none!important;transition:none!important;
-      z-index:30!important;box-sizing:border-box!important;
-    }
-    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts{
-      position:absolute!important;
-      top:86px!important;right:0!important;bottom:auto!important;left:0!important;
-      width:100%!important;max-width:none!important;min-width:0!important;
-      height:68px!important;min-height:68px!important;max-height:68px!important;
-      margin:0!important;padding:0!important;gap:5px!important;
-      transform:none!important;translate:none!important;rotate:none!important;scale:none!important;
-      animation:none!important;transition:none!important;
-      z-index:30!important;box-sizing:border-box!important;
-    }
-    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts>.ar-short{
-      position:relative!important;display:flex!important;
-      width:100%!important;min-width:0!important;max-width:100%!important;
-      height:68px!important;min-height:68px!important;max-height:68px!important;
-      margin:0!important;padding:4px 1px!important;box-sizing:border-box!important;
-      transform:none!important;translate:none!important;rotate:none!important;scale:none!important;
-      animation:none!important;transition:none!important;will-change:auto!important;
-    }
-    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts>.ar-short>i{
-      position:static!important;display:grid!important;place-items:center!important;
-      width:auto!important;min-width:0!important;max-width:100%!important;
-      height:auto!important;min-height:0!important;max-height:none!important;
-      margin:0!important;padding:0!important;flex:none!important;
-      font-size:clamp(19px,5.4vw,25px)!important;line-height:1!important;
-      transform:none!important;translate:none!important;rotate:none!important;scale:none!important;
-      animation:none!important;transition:none!important;will-change:auto!important;
-    }
-    /* No scale/expand feedback on any home/category tile. */
-    html.arena-home-fixed body #arenaHubHome .ar-profile,
-    html.arena-home-fixed body #arenaHubHome .ar-profile *,
-    html.arena-home-fixed body #arenaHubHome .ar-shortcuts,
-    html.arena-home-fixed body #arenaHubHome .ar-shortcuts *,
-    html.arena-home-fixed body #arenaHubHome .ar-cat,
-    html.arena-home-fixed body #arenaHubHome .ar-daily,
-    html.arena-home-fixed body #arenaHubHome .ar-feature,
-    html.arena-home-fixed body #arenaHubHome .ar-game-card{
-      animation:none!important;transition:none!important;
-      will-change:auto!important;
-    }
-    html.arena-home-fixed body #arenaHubHome .ar-short:active,
-    html.arena-home-fixed body #arenaHubHome .ar-short:focus,
-    html.arena-home-fixed body #arenaHubHome .ar-cat:active,
-    html.arena-home-fixed body #arenaHubHome .ar-cat:focus,
-    html.arena-home-fixed body #arenaHubHome .ar-game-card:active,
-    html.arena-home-fixed body #arenaHubHome .ar-game-card:focus{
-      transform:none!important;translate:none!important;rotate:none!important;scale:none!important;
-      filter:none!important;animation:none!important;transition:none!important;
-    }
-    @media(max-height:720px){
-      html.arena-home-fixed body #arenaHubHome>.ar-profile{
-        height:80px!important;min-height:80px!important;max-height:80px!important;
-      }
-      html.arena-home-fixed body #arenaHubHome>.ar-shortcuts,
-      html.arena-home-fixed body #arenaHubHome>.ar-shortcuts>.ar-short{
-        height:68px!important;min-height:68px!important;max-height:68px!important;
-      }
-    }
-  `;
-  document.head.appendChild(style);
-})();
+
+
 
 
 /* 2026-11-09: SCREENSHOT FIX — keep the top rows IN GRID FLOW.
@@ -2872,7 +2650,8 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
     html.arena-home-fixed body #arenaHubHome>.ar-profile{
       position:relative!important;inset:auto!important;
       grid-column:1!important;grid-row:1!important;
-      display:grid!important;width:100%!important;max-width:100%!important;min-width:0!important;
+      display:grid!important;width:calc(100% - 12px)!important;
+      max-width:calc(100% - 12px)!important;min-width:0!important;justify-self:center!important;
       height:80px!important;min-height:80px!important;max-height:80px!important;
       margin:0!important;align-self:stretch!important;justify-self:stretch!important;
       box-sizing:border-box!important;transform:none!important;translate:none!important;
@@ -2895,6 +2674,7 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
       width:100%!important;min-width:0!important;max-width:100%!important;
       height:68px!important;min-height:68px!important;max-height:68px!important;
       margin:0!important;padding:4px 1px!important;box-sizing:border-box!important;
+      font-size:10px!important;line-height:1.1!important;gap:3px!important;
       transform:none!important;translate:none!important;rotate:none!important;scale:none!important;
       animation:none!important;transition:none!important;flex:none!important;
     }
@@ -2903,7 +2683,7 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
       width:auto!important;min-width:0!important;max-width:100%!important;
       height:auto!important;min-height:0!important;max-height:none!important;
       margin:0!important;padding:0!important;flex:none!important;
-      font-size:clamp(19px,5.4vw,25px)!important;line-height:1!important;
+      font-size:22px!important;line-height:28px!important;
       transform:none!important;translate:none!important;rotate:none!important;scale:none!important;
       animation:none!important;transition:none!important;
     }
