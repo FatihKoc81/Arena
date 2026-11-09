@@ -15,7 +15,7 @@ video{width:100%;max-height:65vh;background:#000;border-radius:10px;margin-top:1
 <h1>🧪 ARENA Test Kayıt Merkezi</h1>
 <p>Kaydı başlatın, ARENA içinde sorun yaşadığınız yere dokunun ve kaydı bitirin. Dokunuşlar zaman damgasıyla kaydedilir. Tarayıcı ekran kaydını destekliyorsa ekran videosu da eklenir.</p>
 <section class="card">
-<label for="endpoint">Test Worker adresi</label><input id="endpoint" placeholder="https://arena-test-agent....workers.dev">
+<label for="endpoint">Test Worker adresi</label><input id="endpoint" placeholder="https://arena-test-agent.fatihkoc7.workers.dev">
 <label for="key">Cihaz erişim anahtarı</label><input id="key" type="password" placeholder="DEVICE_INGEST_KEY">
 <label for="device">Cihaz adı</label><input id="device" value="Android telefon">
 <button id="save" class="secondary">Ayarları kaydet</button><button class="secondary" id="ping">Sunucuyu dene</button><a id="openArena" href="https://fatihkoc81.github.io/Arena/?testagent=1" target="arenaTestApp">ARENA'yı ayrı sekmede aç</a><p class="muted" id="appState">ARENA henüz açılmadı.</p>
@@ -42,7 +42,7 @@ const log=s=>{$("log").textContent=new Date().toLocaleTimeString("tr-TR")+" — 
 function cfg(){endpoint=$("endpoint").value.trim().replace(/\/$/,"");key=$("key").value.trim();admin=$("admin").value.trim();if(!/^https:\/\//.test(endpoint)||!key){say("Worker adresi veya cihaz anahtarı eksik");return false}localStorage.setItem("arenaTestEndpoint",endpoint);localStorage.setItem("arenaTestKey",key);localStorage.setItem("arenaTestDevice",$("device").value.trim());return true}
 function headers(){return {"Authorization":"Bearer "+key}}
 async function api(path,options={}){const r=await fetch(endpoint+path,{...options,headers:{...headers(),...(options.headers||{})}});const d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||"HTTP "+r.status);return d}
-function loadCfg(){$("endpoint").value=localStorage.getItem("arenaTestEndpoint")||"";$("key").value=localStorage.getItem("arenaTestKey")||"";$("device").value=localStorage.getItem("arenaTestDevice")||"Android telefon";deviceId=localStorage.getItem("arenaTestDeviceId")||("android-"+crypto.randomUUID());localStorage.setItem("arenaTestDeviceId",deviceId)}
+function loadCfg(){$("endpoint").value=localStorage.getItem("arenaTestEndpoint")||"https://arena-test-agent.fatihkoc7.workers.dev";$("key").value=localStorage.getItem("arenaTestKey")||"";$("device").value=localStorage.getItem("arenaTestDevice")||"Android telefon";deviceId=localStorage.getItem("arenaTestDeviceId")||("android-"+crypto.randomUUID());localStorage.setItem("arenaTestDeviceId",deviceId)}
 async function ping(){if(!cfg())return;try{const r=await fetch(endpoint+"/health");if(!r.ok)throw Error("HTTP "+r.status);say("Sunucu erişilebilir ✓");log("Worker bağlantısı başarılı")}catch(e){say("Bağlantı hatası: "+e.message)}}
 function appWindow(){try{if(arenaWin&&!arenaWin.closed&&arenaWin.document)return arenaWin}catch(e){}return null}
 async function sendEvent(type,detail={}){if(!sessionId)return;const payload={at:new Date().toISOString(),elapsedMs:Date.now()-recordStarted,type,detail};try{await api("/event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sessionId,deviceId,eventType:type,payload})});events++;$("recordStatus").textContent="Kayıt sürüyor · "+events+" olay"}catch(e){log("Olay gönderilemedi: "+e.message)}}
