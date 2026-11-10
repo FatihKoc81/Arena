@@ -119,19 +119,20 @@ jobs:
           grep -i 'push-notifications' android/capacitor.settings.gradle || { echo 'HATA: Push Notifications eklentisi Android projesine eklenmedi'; exit 1; }
           test -f android/app/google-services.json
 
-      - name: Ekranı dikeyde sabitle
+      - name: Oyunlara göre ekran yönünü serbest bırak
         run: |
-          node -e "
-          const fs=require('fs');
-          const f='android/app/src/main/AndroidManifest.xml';
-          let x=fs.readFileSync(f,'utf8');
-          if(/android:screenOrientation="[^"]*"/.test(x)){
-            x=x.replace(/android:screenOrientation="[^"]*"/,'android:screenOrientation="unspecified"');
+          node <<'NODE'
+          const fs = require('fs');
+          const file = 'android/app/src/main/AndroidManifest.xml';
+          let xml = fs.readFileSync(file, 'utf8');
+          if (/android:screenOrientation="[^"]*"/.test(xml)) {
+            xml = xml.replace(/android:screenOrientation="[^"]*"/, 'android:screenOrientation="unspecified"');
           } else {
-            x=x.replace(/<activity\b/,'<activity android:screenOrientation="unspecified"');
+            xml = xml.replace(/<activity\\b/, '<activity android:screenOrientation="unspecified"');
           }
-          fs.writeFileSync(f,x);
-          console.log('Yön kilidi: dynamic (controlled by ScreenOrientation plugin)');"
+          fs.writeFileSync(file, xml);
+          console.log('Android orientation set to unspecified; game screens can request landscape.');
+          NODE
           grep -n screenOrientation android/app/src/main/AndroidManifest.xml
 
       - name: AdMob eklentisi Android projesinde mi kontrol et
