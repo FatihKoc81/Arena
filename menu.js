@@ -6,7 +6,7 @@ if(!ana||ana.dataset.arenaReference==='1')return;ana.dataset.arenaReference='1';
 const cats=[
 {id:'bilgi',name:'Zihin Meydanı',icon:'🧠',desc:'Bilgini sına, zirveye çık',count:'2 Hazır',color:'violet',games:['milyoner','passaparola'],planned:['Hızlı Karar','Bilgi Düellosu','Genel Kültür']},
 {id:'kelime',name:'Kelime Üssü',icon:'🔤',desc:'Harflerle kelimeler üret',count:'3 Hazır',color:'blue',games:['kelime','rotasyon','wordScramble','wordle'],planned:['Kelime Zinciri']},
-{id:'masa',name:'Oyun Masası',icon:'🎲',desc:'Sevilen masa oyunları bir arada',count:'4 Hazır',color:'green',games:['okey','yuzbir','batak','poker','checkers'],planned:['Tavla','Satranç']},
+{id:'masa',name:'Oyun Masası',icon:'🎲',desc:'Sevilen masa oyunları bir arada',count:'4 Hazır',color:'green',games:['okey','yuzbir','batak','poker','checkers','backgammon'],planned:['Satranç']},
 {id:'sudoku',name:'Akıl Labirenti',icon:'🧊',desc:'Akıl yürüt, desenleri çöz',count:'1 Hazır',color:'orange',games:['miniSudoku','nonogram'],planned:['Kakuro','Mantık Izgarası','Şekil Dizileri']},
 {id:'sayi',name:'Şifre Avı',icon:'🧩',desc:'Zekânı kullan, bulmacaları çöz',count:'2 Hazır',color:'pink',games:['islem','mathSprint','game2048','ticTacToe','connectFour','minesweeper'],planned:['Sayı Çaprazı']},
 {id:'renk',name:'Renk Ustası',icon:'⚗️',desc:'Renkleri ayır, doğru sıraya diz',count:'1 Hazır',color:'cyan',games:['colorSort'],planned:['Top Sıralama','Su Sıralama']},
@@ -26,6 +26,7 @@ islem:{name:'İşlem Oyunu',icon:'➗',desc:'Sayılarla hedefe ulaş',re:/işlem
 wordScramble:{name:'Kelime Karıştırma',icon:'🔤',desc:'Karışık harflerden kelimeyi bul',re:/__arena_extra_word__/i},
 wordle:{name:'Kelime Tahmin',icon:'🟩',desc:'Altı denemede beş harfli kelimeyi bul',re:/__arena_wordle__/i},
 checkers:{name:'Dama',icon:'⚫',desc:'Zorunlu alma ve taş yükseltmeyle rakibi yen',re:/__arena_checkers__/i},
+backgammon:{name:'Tavla',icon:'🎲',desc:'Zarlarını kullan, taşlarını topla',re:/__arena_backgammon__/i},
 miniSudoku:{name:'Klasik Sudoku 9×9',icon:'🔢',desc:'1–9 rakamlarıyla klasik Sudoku çöz',re:/__arena_extra_sudoku__/i},
 nonogram:{name:'Nonogram 7×7',icon:'🧩',desc:'Satır ve sütun ipuçlarıyla resmi çöz',re:/__arena_nonogram__/i},
 mathSprint:{name:'Matematik Sprinti',icon:'➗',desc:'30 saniyede işlemleri çöz',re:/__arena_extra_math__/i},
