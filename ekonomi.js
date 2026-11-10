@@ -1,7 +1,7 @@
 // ekonomi.js: altın, premium, kullanıcı adı, reklam, mağaza ve diyalog penceresi. Tüm oyunlar bunu ortak kullanır.
 // index.html'de oyun script'lerinden ÖNCE yüklenmelidir: <script src="ekonomi.js"></script>
 (function () {
-  var TEST = true;          // true: gerçek reklam/ödeme bağlı değilse TEST reklamı çıkar, satın almalar ücretsiz simüle edilir. YAYINDA false YAP!
+  var TEST = false;         // ÜRETİM GÜVENLİĞİ: test reklamı ve ücretsiz sahte satın alma kapalı.
   var ODUL_ALTIN = 30;      // mağazada reklam izleyince kazanılan altın
   var URUNLER = [           // fiyatlar örnektir
     { id: "altin100", t: "🪙 100 Altın", f: "₺29,99", n: 100 },
@@ -116,8 +116,7 @@
   function satinAl(urun, ok) {
     var bitir = function (b) { if (b) ok(); else dukkan(null, "Satın alma tamamlanmadı"); };
     if (typeof window.cemberSatinAl === "function") window.cemberSatinAl(urun.id, bitir); // gerçek ödeme: bunu bağla
-    else if (TEST) bitir(true);
-    else dukkan(null, "Satın alma henüz bağlı değil");
+    else dukkan(null, "Güvenli mağaza ödemesi henüz bağlanmadı. Ödeme alınmadı ve altın eklenmedi.");
   }
   function dukkan(geri, not) {
     var ops = [{ t: "📺 Reklam izle  +" + ODUL_ALTIN + " 🪙", f: function () {
