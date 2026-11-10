@@ -3010,3 +3010,124 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
   `;
   document.head.appendChild(style);
 })();
+
+
+/* 2026-11-10: STABLE HEADER/PROFILE ANCHOR + IMMUTABLE TOP ROWS. */
+(function(){
+  if(document.getElementById('arenaStableTopGeometry20261110')) return;
+  const style=document.createElement('style');
+  style.id='arenaStableTopGeometry20261110';
+  style.textContent=`
+    /* The header uses one deterministic height; never follow transient RO measurements. */
+    html.arena-home-fixed{
+      --arena-header-fixed-height:calc(var(--bas-yuk,58px) + env(safe-area-inset-top))!important;
+    }
+    html.arena-home-fixed body>h1{
+      position:fixed!important;top:0!important;left:0!important;right:0!important;
+      width:100%!important;
+      height:var(--arena-header-fixed-height)!important;
+      min-height:var(--arena-header-fixed-height)!important;
+      max-height:var(--arena-header-fixed-height)!important;
+      margin:0!important;padding:0!important;box-sizing:border-box!important;
+      transform:none!important;translate:none!important;scale:none!important;
+      animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #ana{
+      position:fixed!important;
+      top:var(--arena-header-fixed-height)!important;
+      bottom:calc(70px + env(safe-area-inset-bottom))!important;
+      left:0!important;right:0!important;width:100%!important;max-width:720px!important;
+      height:auto!important;min-height:0!important;max-height:none!important;
+      margin:0 auto!important;padding:8px 7px 5px!important;
+      box-sizing:border-box!important;overflow:hidden!important;
+      transform:none!important;translate:none!important;scale:none!important;
+      animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #arenaHubHome{
+      position:relative!important;top:0!important;left:0!important;
+      display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+      grid-template-rows:80px 68px minmax(0,1fr) 72px 26px 88px!important;
+      grid-auto-rows:initial!important;grid-auto-flow:row!important;
+      align-content:stretch!important;align-items:stretch!important;
+      width:100%!important;height:100%!important;min-height:0!important;max-height:100%!important;
+      margin:0!important;padding:0!important;gap:6px!important;overflow:hidden!important;
+      transform:none!important;translate:none!important;scale:none!important;
+      animation:none!important;transition:none!important;
+    }
+    /* Profile is anchored to header-bottom + exactly 8px. */
+    html.arena-home-fixed body #arenaHubHome>.ar-profile{
+      position:absolute!important;top:0!important;left:6px!important;right:6px!important;
+      inset:0 6px auto!important;grid-column:1!important;grid-row:1!important;
+      width:auto!important;height:80px!important;min-height:80px!important;max-height:80px!important;
+      margin:0!important;padding:5px 8px!important;box-sizing:border-box!important;
+      transform:none!important;translate:none!important;rotate:none!important;scale:none!important;
+      animation:none!important;transition:none!important;will-change:auto!important;
+    }
+    /* Shortcut strip always occupies the same second track in both views. */
+    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts{
+      position:relative!important;inset:auto!important;grid-column:1!important;grid-row:2!important;
+      display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
+      width:100%!important;height:68px!important;min-height:68px!important;max-height:68px!important;
+      margin:0!important;padding:0!important;gap:5px!important;box-sizing:border-box!important;
+      transform:none!important;translate:none!important;rotate:none!important;scale:none!important;
+      animation:none!important;transition:none!important;will-change:auto!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts>.ar-short{
+      display:flex!important;align-items:center!important;justify-content:center!important;
+      width:100%!important;height:68px!important;min-height:68px!important;max-height:68px!important;
+      margin:0!important;padding:4px 1px!important;box-sizing:border-box!important;
+      transform:none!important;translate:none!important;rotate:none!important;scale:none!important;
+      animation:none!important;transition:none!important;will-change:auto!important;
+      touch-action:manipulation!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts>.ar-short *,
+    html.arena-home-fixed body #arenaHubHome>.ar-profile *{
+      transform:none!important;translate:none!important;rotate:none!important;scale:none!important;
+      animation:none!important;transition:none!important;will-change:auto!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-categories{
+      grid-column:1!important;grid-row:3!important;display:grid!important;
+      grid-template-columns:repeat(2,minmax(0,1fr))!important;
+      grid-template-rows:repeat(4,minmax(0,1fr))!important;
+      width:100%!important;height:100%!important;min-height:0!important;max-height:100%!important;
+      margin:0!important;padding:0!important;gap:7px!important;overflow:hidden!important;
+      transform:none!important;translate:none!important;scale:none!important;
+      animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open){
+      grid-template-rows:80px 68px minmax(0,1fr)!important;
+      gap:6px!important;
+    }
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-profile{
+      position:absolute!important;top:0!important;left:6px!important;right:6px!important;
+      grid-column:1!important;grid-row:1!important;
+    }
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-shortcuts{
+      grid-column:1!important;grid-row:2!important;
+    }
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-categories.is-open{
+      grid-column:1!important;grid-row:3!important;width:100%!important;height:100%!important;
+      min-height:0!important;max-height:100%!important;margin:0!important;padding:0!important;
+    }
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-daily,
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-section-title,
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-featured{display:none!important}
+    html.arena-home-fixed body #arenaHubHome .ar-cat,
+    html.arena-home-fixed body #arenaHubHome .ar-cat:active,
+    html.arena-home-fixed body #arenaHubHome .ar-short:active,
+    html.arena-home-fixed body #arenaHubHome .ar-short:focus,
+    html.arena-home-fixed body #arenaHubHome .ar-short:focus-visible{
+      transform:none!important;translate:none!important;rotate:none!important;scale:none!important;
+      filter:none!important;animation:none!important;transition:none!important;outline:none!important;
+    }
+    html.arena-home-fixed body #arenaHubHome,
+    html.arena-home-fixed body #arenaHubHome *,
+    html.arena-home-fixed body #arenaHubHome *::before,
+    html.arena-home-fixed body #arenaHubHome *::after{
+      animation:none!important;transition-property:none!important;
+      transition-duration:0s!important;transition-delay:0s!important;
+      scroll-behavior:auto!important;will-change:auto!important;
+    }
+  `;
+  document.head.appendChild(style);
+})();
