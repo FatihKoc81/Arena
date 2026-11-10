@@ -3796,3 +3796,104 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
   `;
   document.head.appendChild(css);
 })();
+
+
+/* 2026-11-10: CATEGORY DETAIL FULL-WIDTH PATCH.
+   Prevent the category header and game cards from being laid out as sibling
+   columns by older fixed-home grid rules. Keep the detail view in one column
+   and let the game cards use the available viewport width. */
+(function(){
+  if(document.getElementById('arenaCategoryDetailViewportPatch20261110'))return;
+  const style=document.createElement('style');
+  style.id='arenaCategoryDetailViewportPatch20261110';
+  style.textContent=`
+    html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open{
+      display:flex!important;
+      flex:0 0 auto!important;
+      flex-direction:column!important;
+      align-items:stretch!important;
+      justify-content:flex-start!important;
+      grid-column:1 / -1!important;
+      grid-row:3!important;
+      position:relative!important;
+      inset:auto!important;
+      width:100%!important;
+      min-width:0!important;
+      max-width:100%!important;
+      height:auto!important;
+      min-height:0!important;
+      max-height:none!important;
+      margin:0!important;
+      padding:0!important;
+      overflow:visible!important;
+      box-sizing:border-box!important;
+      transform:none!important;
+      translate:none!important;
+    }
+    html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-category-head{
+      display:flex!important;
+      position:relative!important;
+      inset:auto!important;
+      flex:0 0 auto!important;
+      align-self:stretch!important;
+      width:100%!important;
+      min-width:0!important;
+      max-width:100%!important;
+      min-height:56px!important;
+      height:auto!important;
+      margin:0 0 10px!important;
+      padding:8px 12px!important;
+      box-sizing:border-box!important;
+    }
+    html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list{
+      display:grid!important;
+      position:relative!important;
+      inset:auto!important;
+      flex:0 0 auto!important;
+      align-self:stretch!important;
+      grid-template-columns:repeat(2,minmax(0,1fr))!important;
+      grid-auto-rows:minmax(112px,auto)!important;
+      align-content:start!important;
+      align-items:stretch!important;
+      justify-content:stretch!important;
+      width:100%!important;
+      min-width:0!important;
+      max-width:100%!important;
+      height:auto!important;
+      min-height:0!important;
+      max-height:none!important;
+      margin:0!important;
+      padding:0 0 16px!important;
+      gap:10px!important;
+      overflow-x:hidden!important;
+      overflow-y:visible!important;
+      box-sizing:border-box!important;
+      transform:none!important;
+      translate:none!important;
+    }
+    html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card{
+      display:flex!important;
+      position:relative!important;
+      inset:auto!important;
+      flex-direction:row!important;
+      align-items:center!important;
+      justify-content:flex-start!important;
+      width:100%!important;
+      min-width:0!important;
+      max-width:100%!important;
+      min-height:112px!important;
+      height:auto!important;
+      margin:0!important;
+      padding:10px!important;
+      grid-column:auto!important;
+      box-sizing:border-box!important;
+      overflow:hidden!important;
+    }
+    @media(max-width:420px){
+      html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list{
+        grid-template-columns:minmax(0,1fr)!important;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+})();
