@@ -556,7 +556,7 @@ window.altSatir = function () {
 (function () {
   const ana = document.getElementById("ana"), h1 = document.querySelector("h1");
   if (!ana || !h1) return;
-  let son = 0, hazir = false, cik = false;
+  let son = 0, anaGeriSayisi = 0, hazir = false, cik = false;
   let aktif = false; // son eklenen kayıt gerçek bir dokunuşla mı eklendi? (dokunuşsuz kayıtlar geri tuşunda atlanıp uygulamadan çıkarır)
   const durum = (dokunus) => { aktif = !!dokunus; try { history.pushState({ arena: 1 }, ""); } catch (e) {} };
 
@@ -625,14 +625,21 @@ window.altSatir = function () {
     const kapandi = katmanKapat();
     const yeniden = () => { if (!tus) durum(); };
     if (anaMi()) {
-      // Ana sayfa. Tarayıcıda hiç çıkma. APK'da ARKA ARKAYA İKİ basış uygulamadan çıkar, tek basış sadece uyarı verir.
-      if (kapandi) { yeniden(); return; }
-      if (!window.Capacitor) { yeniden(); return; }
-      if (Date.now() - son < 2000) {
+      // Ana sayfada yanlışlıkla çıkışı önle: APK'da üç ardışık geri basış gerekir.
+      if (kapandi) { anaGeriSayisi = 0; son = 0; yeniden(); return; }
+      if (!window.Capacitor) { anaGeriSayisi = 0; son = 0; yeniden(); return; }
+      const simdi = Date.now();
+      if (simdi - son > 2500) anaGeriSayisi = 0;
+      anaGeriSayisi++;
+      son = simdi;
+      if (anaGeriSayisi >= 3) {
+        anaGeriSayisi = 0;
+        son = 0;
         cikis();
         return;
       }
-      son = Date.now(); toast("Çıkmak için tekrar geri bas"); yeniden();
+      toast("Çıkmak için geri tuşuna " + (3 - anaGeriSayisi) + " kez daha bas");
+      yeniden();
       return;
     }
     if (!kapandi) { h1.click(); zorlaAna(); try { window.Ekonomi.kapat(); } catch (e) {} }           // oyundaysa ana sayfaya dön (açık pencere kalmasın)
