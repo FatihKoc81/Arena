@@ -8,7 +8,7 @@ const cats=[
 {id:'kelime',name:'Kelime Üssü',icon:'🔤',desc:'Harflerle kelimeler üret',count:'3 Hazır',color:'blue',games:['kelime','rotasyon','wordScramble'],planned:['Kelime Zinciri']},
 {id:'masa',name:'Oyun Masası',icon:'🎲',desc:'Sevilen masa oyunları bir arada',count:'4 Hazır',color:'green',games:['okey','yuzbir','batak','poker'],planned:['Tavla','Dama','Satranç']},
 {id:'sudoku',name:'Akıl Labirenti',icon:'🧊',desc:'Akıl yürüt, desenleri çöz',count:'1 Hazır',color:'orange',games:['miniSudoku'],planned:['Kakuro','Nonogram','Mantık Izgarası','Şekil Dizileri']},
-{id:'sayi',name:'Şifre Avı',icon:'🧩',desc:'Zekânı kullan, bulmacaları çöz',count:'2 Hazır',color:'pink',games:['islem','mathSprint','game2048'],planned:['Sayı Çaprazı']},
+{id:'sayi',name:'Şifre Avı',icon:'🧩',desc:'Zekânı kullan, bulmacaları çöz',count:'2 Hazır',color:'pink',games:['islem','mathSprint','game2048','ticTacToe','connectFour','minesweeper'],planned:['Sayı Çaprazı']},
 {id:'renk',name:'Renk Ustası',icon:'⚗️',desc:'Renkleri ayır, doğru sıraya diz',count:'1 Hazır',color:'cyan',games:['colorSort'],planned:['Top Sıralama','Su Sıralama']},
 {id:'dikkat',name:'Hafıza Gücü',icon:'🧠',desc:'Ayrıntıları fark et, hafızanı sına',count:'1 Hazır',color:'indigo',games:['memory'],planned:['Görsel Hafıza','Nesneyi Bul','7 Fark Bul']},
 {id:'refleks',name:'Hız Parkuru',icon:'⚡',desc:'Hızını ve tepkini test et',count:'1 Hazır',color:'red',games:['reflexTap'],planned:['Hızlı Dokun','Renk Tepkisi','Hızlı Eşleştirme']}
@@ -26,6 +26,9 @@ islem:{name:'İşlem Oyunu',icon:'➗',desc:'Sayılarla hedefe ulaş',re:/işlem
 wordScramble:{name:'Kelime Karıştırma',icon:'🔤',desc:'Karışık harflerden kelimeyi bul',re:/__arena_extra_word__/i},
 miniSudoku:{name:'Mini Sudoku 4×4',icon:'🔢',desc:'4×4 sayı bulmacasını çöz',re:/__arena_extra_sudoku__/i},
 mathSprint:{name:'Matematik Sprinti',icon:'➗',desc:'30 saniyede işlemleri çöz',re:/__arena_extra_math__/i},\ngame2048:{name:'2048',icon:'🔢',desc:'Aynı sayıları birleştirerek 2048’e ulaş',re:/__arena_extra_2048__/i},
+ticTacToe:{name:'XOX Ustası',icon:'❎',desc:'Botuna karşı üç taşı sırala',re:/__arena_extra_xo__/i},
+connectFour:{name:'Dört Taş',icon:'🔴',desc:'Dört taşı yan yana getir',re:/__arena_extra_c4__/i},
+minesweeper:{name:'Mayın Tarlası',icon:'💣',desc:'Sayı ipuçlarıyla mayınları bul',re:/__arena_extra_mines__/i},
 colorSort:{name:'Renk Sıralama',icon:'🧪',desc:'Topları aynı tüplerde topla',re:/__arena_extra_color__/i},
 memory:{name:'Hafıza Kartları',icon:'🧠',desc:'Aynı sembolleri eşleştir',re:/__arena_extra_memory__/i},
 reflexTap:{name:'Refleks Testi',icon:'⚡',desc:'Yeşil ekrana zamanında dokun',re:/__arena_extra_reflex__/i}
