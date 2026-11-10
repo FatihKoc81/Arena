@@ -63,12 +63,64 @@ async function fetchLatestReport(token){
  if(!list.sessions||!list.sessions.length)throw Error("Sunucuda kayıt bulunamadı");
  const s=list.sessions[0];
  const data=await readApi("/events/"+encodeURIComponent(s.session_id),token);
- const lines=(data.events||[]).map((x,i)=>{
-  let p=x.payload_json;
-  try{p=JSON.stringify(JSON.parse(p),null,2)}catch(e){}
-  return (i+1)+". "+x.event_type+" · "+new Date(x.created_at).toLocaleTimeString("tr-TR")+"\\n"+p
+ const events=data.events||[];
+ const parsed=events.map(x=>{
+  let p=x.payload_json||{};
+  try{if(typeof p==="string")p=JSON.parse(p)}catch(e){p={}}
+  return {type:x.event_type||p.type||"event",detail:p.detail||{},at:x.created_at||p.at||""};
  });
- return ["ARENA TEST KAYDI","Tarih: "+new Date(s.started_at).toLocaleString("tr-TR"),"Cihaz: "+s.device_name,"Olay sayısı: "+s.event_count,"Oturum: "+s.session_id,"","OLAYLAR",...lines].join("\\n");
+ const countBy=types=>parsed.filter(x=>types.includes(x.type));
+ const errors=countBy(["app_error","promise_error","recorder_error"]);
+ const taps=countBy(["tap"]);
+ const layouts=countBy(["layout_change"]);
+ const snapshots=countBy(["layout_snapshot"]);
+ const fmt=v=>Number.isFinite(Number(v))?Number(v).toFixed(1):String(v??"?");
+ const lines=[
+  "ARENA KISA TEST RAPORU",
+  "Tarih: "+new Date(s.started_at).toLocaleString("tr-TR"),
+  "Cihaz: "+(s.device_name||"Android"),
+  "Oturum: "+s.session_id,
+  "Olay: "+events.length+" | Tıklama: "+taps.length+" | Yerleşim değişimi: "+layouts.length+" | Hata: "+errors.length
+ ];
+ if(errors.length){
+  lines.push("HATALAR:");
+  errors.slice(0,5).forEach(x=>{
+   const d=x.detail||{};
+   lines.push("• "+x.type+": "+String(d.message||d.stage||"Ayrıntı yok").slice(0,140));
+  });
+ }
+ if(layouts.length){
+  let moved=0,profile=[],controls=[];
+  layouts.forEach(x=>{
+   const d=x.detail||{};
+   moved+=Number(d.changedCount)||0;
+   const a=d.anchors||{};
+   if(a.profileHeaderGap){
+    const b=a.profileHeaderGap.before, n=a.profileHeaderGap.after;
+    profile.push(fmt(b)+"px → "+fmt(n)+"px");
+   }
+   (d.changes||[]).forEach(c=>{
+    if(c.kind!=="changed")return;
+    const delta=c.delta||{};
+    const keys=Object.keys(delta);
+    if(keys.length)controls.push(String(c.key||"Kontrol").slice(0,55)+" ("+keys.slice(0,3).join(", ")+")");
+   });
+  });
+  lines.push("EKRAN: "+moved+" ölçüm değişikliği yakalandı.");
+  if(profile.length)lines.push("Profil–başlık aralığı: "+profile.slice(0,3).join("; "));
+  if(controls.length)lines.push("Değişen öğeler: "+[...new Set(controls)].slice(0,6).join("; "));
+ }else{
+  lines.push("EKRAN: Belirgin yerleşim değişimi kaydedilmedi.");
+ }
+ if(taps.length){
+  const names=taps.slice(-8).map(x=>{
+   const d=x.detail||{};
+   return String(d.text||d.id||d.tag||"öğe").replace(/\s+/g," ").slice(0,35);
+  });
+  lines.push("SON TIKLAMALAR: "+names.join(" → "));
+ }
+ lines.push("Not: Ham JSON ve uzun olay dökümü çıkarıldı; yalnızca önemli özet gönderildi.");
+ return lines.join("\n");
 }
 function prefetchLatestReport(){
  const token=adminToken();
