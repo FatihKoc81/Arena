@@ -3311,3 +3311,104 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
   `;
   document.head.appendChild(style);
 })();
+
+
+
+/* 2026-11-10: FINAL FLOW LAYOUT FIX — no absolute overlap between profile, shortcuts and categories. */
+(function(){
+  if(document.getElementById('arenaFinalFlowLayout20261110'))return;
+  const style=document.createElement('style');
+  style.id='arenaFinalFlowLayout20261110';
+  style.textContent=`
+    /* Keep the header fixed, but put every home section back into real layout flow. */
+    html.arena-home-fixed body #ana{
+      top:var(--arena-header-fixed-height,calc(58px + env(safe-area-inset-top)))!important;
+      padding:8px 7px 5px!important;
+      box-sizing:border-box!important;
+      overflow:hidden!important;
+    }
+    html.arena-home-fixed body #ana #arenaHubHome{
+      display:grid!important;
+      grid-template-columns:minmax(0,1fr)!important;
+      grid-template-rows:auto auto minmax(0,1fr) auto auto auto!important;
+      grid-auto-flow:row!important;
+      align-content:stretch!important;
+      align-items:stretch!important;
+      gap:8px!important;
+      position:relative!important;
+      inset:auto!important;
+      width:100%!important;height:100%!important;
+      min-height:0!important;max-height:100%!important;
+      margin:0!important;padding:0!important;
+      overflow:hidden!important;
+      transform:none!important;translate:none!important;
+    }
+    html.arena-home-fixed body #ana #arenaHubHome > .ar-profile{
+      position:relative!important;inset:auto!important;
+      grid-column:1!important;grid-row:1!important;
+      display:grid!important;
+      width:100%!important;height:100px!important;
+      min-height:100px!important;max-height:100px!important;
+      margin:0!important;
+      box-sizing:border-box!important;
+      transform:none!important;translate:none!important;scale:none!important;
+      animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #ana #arenaHubHome > .ar-shortcuts{
+      position:relative!important;inset:auto!important;
+      grid-column:1!important;grid-row:2!important;
+      display:grid!important;
+      grid-template-columns:repeat(5,minmax(0,1fr))!important;
+      width:100%!important;height:100px!important;
+      min-height:100px!important;max-height:100px!important;
+      margin:0!important;padding:0!important;gap:7px!important;
+      box-sizing:border-box!important;
+      transform:none!important;translate:none!important;scale:none!important;
+      animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #ana #arenaHubHome > .ar-shortcuts > .ar-short{
+      position:relative!important;inset:auto!important;
+      display:flex!important;align-items:center!important;justify-content:center!important;
+      width:100%!important;height:100px!important;
+      min-width:0!important;min-height:100px!important;max-height:100px!important;
+      margin:0!important;padding:8px 2px!important;
+      box-sizing:border-box!important;
+      transform:none!important;translate:none!important;scale:none!important;
+      animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #ana #arenaHubHome > .ar-categories{
+      position:relative!important;inset:auto!important;
+      grid-column:1!important;grid-row:3!important;
+      display:grid!important;
+      width:100%!important;height:100%!important;
+      min-height:0!important;max-height:100%!important;
+      margin:0!important;padding:0!important;
+      overflow:hidden!important;
+      transform:none!important;translate:none!important;
+    }
+    html.arena-home-fixed body #ana #arenaHubHome:has(> .ar-categories.is-open){
+      grid-template-rows:auto auto minmax(0,1fr)!important;
+      gap:8px!important;
+    }
+    html.arena-home-fixed body #ana #arenaHubHome:has(> .ar-categories.is-open) > .ar-categories.is-open{
+      position:relative!important;inset:auto!important;
+      grid-column:1!important;grid-row:3!important;
+      width:100%!important;height:100%!important;
+      min-height:0!important;max-height:100%!important;
+      margin:0!important;padding:0!important;
+    }
+    html.arena-home-fixed body #ana #arenaHubHome:has(> .ar-categories.is-open) > .ar-daily,
+    html.arena-home-fixed body #ana #arenaHubHome:has(> .ar-categories.is-open) > .ar-section-title,
+    html.arena-home-fixed body #ana #arenaHubHome:has(> .ar-categories.is-open) > .ar-featured{
+      display:none!important;
+    }
+    html.arena-home-fixed body #ana #arenaHubHome > .ar-profile,
+    html.arena-home-fixed body #ana #arenaHubHome > .ar-shortcuts,
+    html.arena-home-fixed body #ana #arenaHubHome > .ar-shortcuts > .ar-short,
+    html.arena-home-fixed body #ana #arenaHubHome > .ar-profile *,
+    html.arena-home-fixed body #ana #arenaHubHome > .ar-shortcuts *{
+      animation:none!important;transition:none!important;will-change:auto!important;
+    }
+  `;
+  document.head.appendChild(style);
+})();
