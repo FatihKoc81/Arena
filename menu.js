@@ -3492,3 +3492,41 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
   `;
   document.head.appendChild(style);
 })();
+
+
+/* 2026-11-10: MATCH SHORTCUTS TO DAILY TASK HEIGHT. */
+(function(){
+  if(document.getElementById('arenaShortcutDailyEqualHeight20261110'))return;
+  const style=document.createElement('style');
+  style.id='arenaShortcutDailyEqualHeight20261110';
+  style.textContent=`
+    html.arena-home-fixed body #ana #arenaHubHome>.ar-shortcuts,
+    html.arena-home-fixed body #ana #arenaHubHome>.ar-daily{
+      height:62px!important;
+      min-height:62px!important;
+      max-height:62px!important;
+      margin-top:0!important;
+      margin-bottom:0!important;
+      box-sizing:border-box!important;
+    }
+    html.arena-home-fixed body #ana #arenaHubHome>.ar-shortcuts>.ar-short{
+      height:100%!important;
+      min-height:0!important;
+      max-height:100%!important;
+      box-sizing:border-box!important;
+    }
+    @media(max-height:720px){
+      html.arena-home-fixed body #ana #arenaHubHome>.ar-shortcuts,
+      html.arena-home-fixed body #ana #arenaHubHome>.ar-daily{
+        height:62px!important;min-height:62px!important;max-height:62px!important;
+      }
+    }
+    @media(max-width:390px){
+      html.arena-home-fixed body #ana #arenaHubHome>.ar-shortcuts,
+      html.arena-home-fixed body #ana #arenaHubHome>.ar-daily{
+        height:48px!important;min-height:48px!important;max-height:48px!important;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+})();
