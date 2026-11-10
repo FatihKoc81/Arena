@@ -22,13 +22,22 @@
   }
   window.__adHata = AdMob ? "" : ("AdMob eklentisi yok " + hata);
 
+  var sonHataBildirimi = 0;
   function bildir(m) {
+    // Ad network 403/no-fill is not a gameplay error. Show one quiet, short notice
+    // at most once per 30 seconds instead of stacking blocking-looking messages.
+    var now = Date.now();
+    if (now - sonHataBildirimi < 30000) return;
+    sonHataBildirimi = now;
     try {
+      var old = document.getElementById("arenaAdUnavailableNotice");
+      if (old) old.remove();
       var t = document.createElement("div");
-      t.textContent = m;
-      t.style.cssText = "position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:2147483000;max-width:88vw;background:rgba(120,20,20,.96);color:#fff;border-radius:14px;padding:10px 16px;font:600 13px system-ui,sans-serif;text-align:center";
+      t.id = "arenaAdUnavailableNotice";
+      t.textContent = "Reklam şu anda kullanılamıyor. Oyuna devam edebilirsiniz.";
+      t.style.cssText = "position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:2147483000;max-width:88vw;background:rgba(25,38,65,.96);border:1px solid #527bb0;color:#fff;border-radius:12px;padding:9px 13px;font:600 12px system-ui,sans-serif;text-align:center;pointer-events:none";
       document.body.appendChild(t);
-      setTimeout(function () { t.remove(); }, 6000);
+      setTimeout(function () { t.remove(); }, 2200);
     } catch (e) {}
   }
 

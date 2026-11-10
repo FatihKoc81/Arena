@@ -3737,3 +3737,53 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
     }
   },true);
 })();
+
+
+/* 2026-11-10: CATEGORY DETAIL LAYOUT FIX.
+   The open category panel was still a two-column home grid, placing the heading
+   in column one and the games list in column two. Make the detail view a full-width
+   vertical flow while preserving the fixed profile/shortcut rows. */
+(function(){
+  if(document.getElementById('arenaCategoryDetailFullWidthFix20261110'))return;
+  var css=document.createElement('style');
+  css.id='arenaCategoryDetailFullWidthFix20261110';
+  css.textContent=`
+    html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open{
+      display:flex!important;flex-direction:column!important;align-items:stretch!important;
+      justify-content:flex-start!important;gap:10px!important;
+      grid-template-columns:minmax(0,1fr)!important;
+      grid-template-rows:auto minmax(0,1fr)!important;
+      width:100%!important;min-width:0!important;height:auto!important;min-height:0!important;
+      max-height:none!important;overflow:visible!important;
+      margin:0!important;padding:0!important;box-sizing:border-box!important;
+    }
+    html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-category-head{
+      display:flex!important;flex:0 0 auto!important;align-self:stretch!important;
+      position:relative!important;inset:auto!important;
+      width:100%!important;min-width:0!important;min-height:48px!important;
+      margin:0!important;padding:0 8px!important;box-sizing:border-box!important;
+    }
+    html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list{
+      display:grid!important;position:relative!important;inset:auto!important;
+      flex:1 1 auto!important;align-self:stretch!important;
+      grid-template-columns:repeat(2,minmax(0,1fr))!important;
+      grid-auto-rows:minmax(112px,auto)!important;align-content:start!important;align-items:stretch!important;
+      width:100%!important;min-width:0!important;height:auto!important;min-height:0!important;
+      max-height:none!important;overflow-x:hidden!important;overflow-y:auto!important;
+      gap:10px!important;margin:0!important;padding:0 0 12px!important;box-sizing:border-box!important;
+    }
+    html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card{
+      display:flex!important;position:relative!important;inset:auto!important;
+      width:100%!important;min-width:0!important;min-height:112px!important;height:auto!important;
+      grid-column:auto!important;grid-row:auto!important;align-self:stretch!important;
+      box-sizing:border-box!important;
+    }
+    @media(max-width:390px){
+      html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list{
+        grid-template-columns:minmax(0,1fr)!important;
+        grid-auto-rows:minmax(112px,auto)!important;
+      }
+    }
+  `;
+  document.head.appendChild(css);
+})();
