@@ -3412,3 +3412,39 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
   `;
   document.head.appendChild(style);
 })();
+
+
+
+/* 2026-11-10: HEADER-TO-PROFILE GAP LOCK — exactly 8px. */
+(function(){
+  if(document.getElementById('arenaHeaderProfileGapLock20261110'))return;
+  const style=document.createElement('style');
+  style.id='arenaHeaderProfileGapLock20261110';
+  style.textContent=`
+    html.arena-home-fixed{
+      --arena-header-fixed-height:calc(58px + env(safe-area-inset-top))!important;
+      --arena-header-profile-gap:8px!important;
+    }
+    html.arena-home-fixed body>h1{
+      position:fixed!important;top:0!important;left:0!important;right:0!important;
+      height:var(--arena-header-fixed-height)!important;
+      min-height:var(--arena-header-fixed-height)!important;
+      max-height:var(--arena-header-fixed-height)!important;
+      margin:0!important;padding:0!important;box-sizing:border-box!important;
+      transform:none!important;translate:none!important;animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #ana{
+      position:fixed!important;
+      top:var(--arena-header-fixed-height)!important;
+      padding-top:var(--arena-header-profile-gap)!important;
+      box-sizing:border-box!important;
+    }
+    html.arena-home-fixed body #ana #arenaHubHome > .ar-profile{
+      position:relative!important;inset:auto!important;
+      grid-column:1!important;grid-row:1!important;
+      margin-top:0!important;margin-bottom:0!important;
+      transform:none!important;translate:none!important;
+    }
+  `;
+  document.head.appendChild(style);
+})();
