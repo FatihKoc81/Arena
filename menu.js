@@ -3254,3 +3254,60 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
   `;
   document.head.appendChild(style);
 })();
+
+
+/* 2026-11-10: FINAL PIXEL-LOCK — fixed header baseline and shortcut geometry. */
+(function(){
+  if(document.getElementById('arenaFinalPixelLock20261110'))return;
+  const style=document.createElement('style');
+  style.id='arenaFinalPixelLock20261110';
+  style.textContent=`
+    html.arena-home-fixed{--arena-header-fixed-height:calc(58px + env(safe-area-inset-top))!important}
+    html.arena-home-fixed body>h1{
+      position:fixed!important;top:0!important;left:0!important;right:0!important;
+      height:var(--arena-header-fixed-height)!important;
+      min-height:var(--arena-header-fixed-height)!important;max-height:var(--arena-header-fixed-height)!important;
+      margin:0!important;padding:0!important;box-sizing:border-box!important;
+      transform:none!important;translate:none!important;scale:none!important;
+      animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #ana{
+      position:fixed!important;top:var(--arena-header-fixed-height)!important;
+      bottom:calc(70px + env(safe-area-inset-bottom))!important;
+      left:0!important;right:0!important;width:100%!important;max-width:720px!important;
+      margin:0 auto!important;padding:8px 7px 5px!important;box-sizing:border-box!important;
+      transform:none!important;translate:none!important;animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #arenaHubHome{
+      position:relative!important;top:0!important;margin:0!important;padding:0!important;
+      width:100%!important;height:100%!important;min-height:0!important;max-height:100%!important;
+      transform:none!important;translate:none!important;animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-profile{
+      position:absolute!important;top:0!important;left:6px!important;right:6px!important;
+      height:80px!important;min-height:80px!important;max-height:80px!important;
+      margin:0!important;box-sizing:border-box!important;
+      transform:none!important;translate:none!important;animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts{
+      position:absolute!important;top:86px!important;left:7px!important;right:7px!important;
+      display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
+      width:auto!important;height:68px!important;min-height:68px!important;max-height:68px!important;
+      margin:0!important;padding:0!important;gap:5px!important;box-sizing:border-box!important;
+      transform:none!important;translate:none!important;animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts>.ar-short{
+      position:relative!important;top:0!important;left:auto!important;right:auto!important;
+      width:100%!important;height:68px!important;min-height:68px!important;max-height:68px!important;
+      min-width:0!important;margin:0!important;padding:4px 1px!important;box-sizing:border-box!important;
+      transform:none!important;translate:none!important;scale:none!important;
+      animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-profile *,
+    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts *{
+      animation:none!important;transition:none!important;transform:none!important;
+      translate:none!important;scale:none!important;will-change:auto!important;
+    }
+  `;
+  document.head.appendChild(style);
+})();
