@@ -304,7 +304,17 @@ if(title)title.addEventListener('click',e=>{const hs=e.target.closest('[data-hea
 home.querySelector('.ar-brand').addEventListener('click',goHome);
 findGames();new MutationObserver(findGames).observe(ana,{childList:true,subtree:true});
 window.addEventListener('load',()=>{findGames();profile();dailyMission();});window.addEventListener('focus',profile);
-(function bindProfileAuth(){let tries=0;function bind(){if(!window.firebase||!firebase.apps||!firebase.apps.length||!firebase.auth){if(tries++<100)setTimeout(bind,200);return;}try{firebase.auth().onAuthStateChanged(u=>profile(u));}catch(e){console.warn('ARENA profil oturumu:',e);}}bind();})();window.addEventListener('arena:home',goHome);window.addEventListener('anasayfa',goHome);window.addEventListener('popstate',e=>{const panel=home.querySelector('.ar-categories');if(panel&&panel.classList.contains('is-open')){restoreCategories();}else if(!view.hidden)goHome();});if(window.Puan&&Puan.degisti)Puan.degisti(profile);setTimeout(profile,300);setTimeout(profile,1200);
+(function bindProfileAuth(){let tries=0;function bind(){if(!window.firebase||!firebase.apps||!firebase.apps.length||!firebase.auth){if(tries++<100)setTimeout(bind,200);return;}try{firebase.auth().onAuthStateChanged(u=>profile(u));}catch(e){console.warn('ARENA profil oturumu:',e);}}bind();})();window.addEventListener('arena:game-close',function(){
+  /* The table game owns a full-screen fixed layer. When it closes, restore
+     ARENA's fixed home geometry without destroying the category the player came from. */
+  document.documentElement.classList.add('arena-home-fixed');
+  const panel=home.querySelector('.ar-categories');
+  navActive(panel&&panel.classList.contains('is-open')?'games':'home');
+  profile();
+  ana.scrollTop=0;
+  window.scrollTo(0,0);
+});
+window.addEventListener('arena:home',goHome);window.addEventListener('anasayfa',goHome);window.addEventListener('popstate',e=>{const panel=home.querySelector('.ar-categories');if(panel&&panel.classList.contains('is-open')){restoreCategories();}else if(!view.hidden)goHome();});if(window.Puan&&Puan.degisti)Puan.degisti(profile);setTimeout(profile,300);setTimeout(profile,1200);
 /* Unified responsive home layout: identical on web and APK. */
 const unifiedHome=document.createElement('style');
 unifiedHome.id='arenaUnifiedResponsiveHome';
