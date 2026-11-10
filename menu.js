@@ -5,7 +5,7 @@ const ana=document.getElementById('ana'),title=document.querySelector('body>h1')
 if(!ana||ana.dataset.arenaReference==='1')return;ana.dataset.arenaReference='1';
 const cats=[
 {id:'bilgi',name:'Zihin Meydanı',icon:'🧠',desc:'Bilgini sına, zirveye çık',count:'2 Hazır',color:'violet',games:['milyoner','passaparola'],planned:['Hızlı Karar','Bilgi Düellosu','Genel Kültür']},
-{id:'kelime',name:'Kelime Üssü',icon:'🔤',desc:'Harflerle kelimeler üret',count:'3 Hazır',color:'blue',games:['kelime','rotasyon','wordScramble'],planned:['Kelime Zinciri']},
+{id:'kelime',name:'Kelime Üssü',icon:'🔤',desc:'Harflerle kelimeler üret',count:'3 Hazır',color:'blue',games:['kelime','rotasyon','wordScramble','wordle'],planned:['Kelime Zinciri']},
 {id:'masa',name:'Oyun Masası',icon:'🎲',desc:'Sevilen masa oyunları bir arada',count:'4 Hazır',color:'green',games:['okey','yuzbir','batak','poker'],planned:['Tavla','Dama','Satranç']},
 {id:'sudoku',name:'Akıl Labirenti',icon:'🧊',desc:'Akıl yürüt, desenleri çöz',count:'1 Hazır',color:'orange',games:['miniSudoku'],planned:['Kakuro','Nonogram','Mantık Izgarası','Şekil Dizileri']},
 {id:'sayi',name:'Şifre Avı',icon:'🧩',desc:'Zekânı kullan, bulmacaları çöz',count:'2 Hazır',color:'pink',games:['islem','mathSprint','game2048','ticTacToe','connectFour','minesweeper'],planned:['Sayı Çaprazı']},
@@ -24,6 +24,7 @@ kelime:{name:'Kelime Oyunu',icon:'🔤',desc:'İpuçlarından kelimeleri bul',re
 rotasyon:{name:'Rotasyon',icon:'🧩',desc:'Harfleri birleştir, kelimeleri keşfet',re:/rotasyon/i},
 islem:{name:'İşlem Oyunu',icon:'➗',desc:'Sayılarla hedefe ulaş',re:/işlem oyunu|🔢 işlem/i},
 wordScramble:{name:'Kelime Karıştırma',icon:'🔤',desc:'Karışık harflerden kelimeyi bul',re:/__arena_extra_word__/i},
+wordle:{name:'Kelime Tahmin',icon:'🟩',desc:'Altı denemede beş harfli kelimeyi bul',re:/__arena_wordle__/i},
 miniSudoku:{name:'Klasik Sudoku 9×9',icon:'🔢',desc:'1–9 rakamlarıyla klasik Sudoku çöz',re:/__arena_extra_sudoku__/i},
 mathSprint:{name:'Matematik Sprinti',icon:'➗',desc:'30 saniyede işlemleri çöz',re:/__arena_extra_math__/i},
 game2048:{name:'2048',icon:'🔢',desc:'Aynı sayıları birleştirerek 2048’e ulaş',re:/__arena_extra_2048__/i},
