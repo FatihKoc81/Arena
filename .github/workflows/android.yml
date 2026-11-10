@@ -128,7 +128,7 @@ jobs:
           if (/android:screenOrientation="[^"]*"/.test(xml)) {
             xml = xml.replace(/android:screenOrientation="[^"]*"/, 'android:screenOrientation="unspecified"');
           } else {
-            xml = xml.replace(/<activity\\b/, '<activity android:screenOrientation="unspecified"');
+            xml = xml.replace('<activity', '<activity android:screenOrientation="unspecified"');
           }
           fs.writeFileSync(file, xml);
           console.log('Android orientation set to unspecified; game screens can request landscape.');
