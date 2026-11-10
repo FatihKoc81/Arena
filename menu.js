@@ -221,7 +221,7 @@ const arenaHomePolish=document.createElement('style');arenaHomePolish.id='arenaH
 
 
 
-if(title){title.innerHTML='<button class="ar-header-hotspot left" data-header-hotspot="menu" aria-label="Menü"></button><button class="ar-header-hotspot bell" data-header-hotspot="notifications" aria-label="Bildirimler"></button><button class="ar-header-hotspot gear" data-header-hotspot="settings" aria-label="Ayarlar"></button>';title.setAttribute('role','group');title.setAttribute('aria-label','ARENA üst menü');}
+if(title){title.innerHTML='<button class="ar-header-hotspot left" data-header-hotspot="menu" aria-label="Menü"></button><button class="ar-header-hotspot home" data-header-hotspot="home" aria-label="Ana sayfaya dön"></button><button class="ar-header-hotspot bell" data-header-hotspot="notifications" aria-label="Bildirimler"></button><button class="ar-header-hotspot gear" data-header-hotspot="settings" aria-label="Ayarlar"></button>';title.setAttribute('role','group');title.setAttribute('aria-label','ARENA üst menü');}
 /* Web ve APK aynı ana sayfa bileşenlerini kullanır. */
 (function(){
   let nativeApp=false;
@@ -300,7 +300,7 @@ function soon(n){if(window.Ekonomi&&Ekonomi.sor)Ekonomi.sor(n,'Bu bölüm sonrak
 home.addEventListener('click',e=>{const back=e.target.closest('[data-category-back]');if(back){e.preventDefault();restoreCategories();return;}const launch=e.target.closest('[data-launch]');if(launch){e.preventDefault();launchGame(launch.dataset.launch);return;}const c=e.target.closest('[data-category]');if(c){category(c.dataset.category,true);return;}const a=e.target.closest('[data-action]');if(a){const k=a.dataset.action;if(k==='update'){const a=document.createElement('a');a.href='https://github.com/FatihKoc81/Arena/releases/latest/download/Arena.apk';a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();return;}if(k==='allgames'){navActive('games');return;}if(k==='league')return league();if(k==='friends')return soon('Arkadaşlar');if(k==='menu')return arenaOpenMenu();if(k==='settings'||k==='profile'||k==='login')return account();const names={reward:'Günlük Ödül',tasks:'Günlük Görevler',achievements:'Başarılar',season:'Sezon',market:'Market / Altın Satın Al'};return soon(names[k]||'ARENA');}const f=e.target.closest('[data-feature]');if(f){launchGame(f.dataset.feature);}});
 view.addEventListener('click',e=>{const b=e.target.closest('.ar-back');if(b){e.preventDefault();view.hidden=true;home.hidden=false;document.documentElement.classList.add('arena-home-fixed');navActive('home');ana.scrollTop=0;try{history.replaceState({arenaHome:true},'',location.pathname+location.search);}catch(_){}return;}const l=e.target.closest('[data-launch]');if(l)launchGame(l.dataset.launch);});
 if(!document.getElementById('arenaNeonNav')){const nav=document.createElement('nav');nav.id='arenaNeonNav';nav.innerHTML='<button class="active" data-nav="home"><i>⌂</i>Ana Sayfa</button><button data-nav="games"><i>🎮</i>Oyunlar</button><button data-nav="league"><i>🏆</i>Lig</button><button data-nav="challenge"><i>⚔️</i>Meydan Oku</button><button data-nav="friends"><i>👥</i>Arkadaşlar</button><button data-nav="profile"><i>♟</i>Profil</button>';document.body.appendChild(nav);nav.addEventListener('click',e=>{const b=e.target.closest('[data-nav]');if(!b)return;const k=b.dataset.nav;if(k==='home')return goHome();if(k==='games'){document.documentElement.classList.add('arena-home-fixed');view.hidden=true;home.hidden=false;navActive('games');return;}navActive(k);if(k==='league')league();else if(k==='challenge')challenge();else if(k==='friends')soon('Arkadaşlar');else account();});}
-if(title)title.addEventListener('click',e=>{const hs=e.target.closest('[data-header-hotspot]');if(hs){e.preventDefault();e.stopImmediatePropagation();const k=hs.dataset.headerHotspot;if(k==='settings')account();else if(k==='notifications')soon('Bildirimler');else if(k==='menu')arenaOpenMenu();return;}e.preventDefault();e.stopImmediatePropagation();goHome();},true);
+if(title)title.addEventListener('click',e=>{const hs=e.target.closest('[data-header-hotspot]');if(hs){e.preventDefault();e.stopImmediatePropagation();const k=hs.dataset.headerHotspot;if(k==='home')goHome();else if(k==='settings')account();else if(k==='notifications')soon('Bildirimler');else if(k==='menu')arenaOpenMenu();return;}e.preventDefault();e.stopImmediatePropagation();goHome();},true);
 home.querySelector('.ar-brand').addEventListener('click',goHome);
 findGames();new MutationObserver(findGames).observe(ana,{childList:true,subtree:true});
 window.addEventListener('load',()=>{findGames();profile();dailyMission();});window.addEventListener('focus',profile);
@@ -3526,6 +3526,49 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
       html.arena-home-fixed body #ana #arenaHubHome>.ar-daily{
         height:48px!important;min-height:48px!important;max-height:48px!important;
       }
+    }
+  `;
+  document.head.appendChild(style);
+})();
+
+
+/* 2026-11-10: HEADER HOME HIT AREA + SHORTCUT TYPOGRAPHY LOCK */
+(function(){
+  if(document.getElementById('arenaHeaderHomeAndShortcutTextLock20261110'))return;
+  var style=document.createElement('style');
+  style.id='arenaHeaderHomeAndShortcutTextLock20261110';
+  style.textContent=`
+    body>h1 .ar-header-hotspot.home{
+      left:24%!important;right:24%!important;width:52%!important;
+      top:8%!important;height:84%!important;z-index:53!important;
+      display:block!important;cursor:pointer!important;
+      -webkit-tap-highlight-color:transparent!important;
+    }
+    #arenaHubHome .ar-shortcuts>.ar-short{
+      box-sizing:border-box!important;
+      font-family:system-ui,-apple-system,"Segoe UI",sans-serif!important;
+      font-size:9px!important;font-weight:850!important;
+      line-height:1.05!important;letter-spacing:0!important;
+      font-kerning:none!important;font-synthesis:none!important;
+      font-variant-ligatures:none!important;
+      -webkit-text-size-adjust:100%!important;text-size-adjust:100%!important;
+      white-space:normal!important;overflow-wrap:normal!important;
+      word-break:normal!important;
+      transform:none!important;scale:none!important;
+      transition:none!important;animation:none!important;
+      will-change:auto!important;
+    }
+    #arenaHubHome .ar-shortcuts>.ar-short>i{
+      flex:0 0 auto!important;
+      font-size:22px!important;line-height:1!important;
+      font-weight:400!important;transform:none!important;
+      transition:none!important;animation:none!important;
+    }
+    #arenaHubHome .ar-shortcuts>.ar-short:active,
+    #arenaHubHome .ar-shortcuts>.ar-short:focus,
+    #arenaHubHome .ar-shortcuts>.ar-short:focus-visible{
+      transform:none!important;scale:none!important;
+      filter:none!important;outline-offset:2px!important;
     }
   `;
   document.head.appendChild(style);
