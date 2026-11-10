@@ -2816,17 +2816,18 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
   const root=document.documentElement;
   const header=document.querySelector('body>h1');
   if(!header) return;
-  function syncArenaHeaderHeight(){
+  function lockArenaHeaderHeight(){
     let headerHeight=Math.round(header.getBoundingClientRect().height);
     if(!Number.isFinite(headerHeight)||headerHeight<1){
       const base=parseFloat(getComputedStyle(root).getPropertyValue('--bas-yuk'))||58;
       headerHeight=Math.round(base);
     }
-    root.style.setProperty('--arena-header-fixed-height',headerHeight+'px');
+    /* Freeze the first real header measurement. Never let ResizeObserver,
+       category rendering, or viewport micro-resizes move the home origin. */
+    root.style.setProperty('--arena-header-fixed-height',headerHeight+'px','important');
   }
-  syncArenaHeaderHeight();
-  if(typeof ResizeObserver==='function') new ResizeObserver(syncArenaHeaderHeight).observe(header);
-  window.addEventListener('resize',syncArenaHeaderHeight,{passive:true});
+  lockArenaHeaderHeight();
+  /* Intentionally no ResizeObserver/window-resize remeasurement here. */
   const style=document.createElement('style');
   style.id='arenaHeaderProfileGapLock20261109';
   style.textContent=`
@@ -3127,6 +3128,85 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
       animation:none!important;transition-property:none!important;
       transition-duration:0s!important;transition-delay:0s!important;
       scroll-behavior:auto!important;will-change:auto!important;
+    }
+  `;
+  document.head.appendChild(style);
+})();
+
+
+/* 2026-11-10: HARD HOME GEOMETRY LOCK.
+   Header height is measured once above; all home rows stay in fixed tracks.
+   Category changes replace only the category track, never the profile/header. */
+(function(){
+  if(document.getElementById('arenaHardLayoutLock20261110')) return;
+  const style=document.createElement('style');
+  style.id='arenaHardLayoutLock20261110';
+  style.textContent=`
+    html.arena-home-fixed body>h1{
+      position:fixed!important;inset:0 0 auto 0!important;
+      height:var(--arena-header-fixed-height,58px)!important;
+      min-height:var(--arena-header-fixed-height,58px)!important;
+      max-height:var(--arena-header-fixed-height,58px)!important;
+      margin:0!important;padding:0!important;box-sizing:border-box!important;
+      transform:none!important;translate:none!important;animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #ana{
+      position:fixed!important;
+      top:var(--arena-header-fixed-height,58px)!important;
+      bottom:calc(70px + env(safe-area-inset-bottom))!important;
+      left:0!important;right:0!important;width:100%!important;max-width:720px!important;
+      height:auto!important;min-height:0!important;max-height:none!important;
+      margin:0 auto!important;padding:8px 7px 5px!important;box-sizing:border-box!important;
+      overflow:hidden!important;transform:none!important;translate:none!important;animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #arenaHubHome{
+      position:relative!important;inset:auto!important;
+      display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+      grid-template-rows:80px 68px minmax(0,1fr) 72px 26px 88px!important;
+      grid-auto-flow:row!important;grid-auto-rows:initial!important;
+      width:100%!important;height:100%!important;min-height:0!important;max-height:100%!important;
+      margin:0!important;padding:0!important;gap:6px!important;overflow:hidden!important;
+      transform:none!important;translate:none!important;animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-profile{
+      position:absolute!important;top:0!important;left:6px!important;right:6px!important;
+      width:auto!important;height:80px!important;min-height:80px!important;max-height:80px!important;
+      margin:0!important;box-sizing:border-box!important;
+      transform:none!important;translate:none!important;animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts{
+      position:relative!important;grid-column:1!important;grid-row:2!important;
+      display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
+      width:100%!important;height:68px!important;min-height:68px!important;max-height:68px!important;
+      margin:0!important;padding:0!important;gap:5px!important;box-sizing:border-box!important;
+      transform:none!important;translate:none!important;animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts>.ar-short{
+      width:100%!important;height:68px!important;min-height:68px!important;max-height:68px!important;
+      margin:0!important;padding:4px 1px!important;box-sizing:border-box!important;
+      transform:none!important;translate:none!important;animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-categories{
+      grid-column:1!important;grid-row:3!important;min-height:0!important;height:100%!important;
+      margin:0!important;overflow:hidden!important;
+    }
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open){
+      grid-template-rows:80px 68px minmax(0,1fr)!important;
+    }
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-categories.is-open{
+      grid-column:1!important;grid-row:3!important;width:100%!important;height:100%!important;
+      min-height:0!important;max-height:100%!important;margin:0!important;padding:0!important;
+    }
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-daily,
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-section-title,
+    html.arena-home-fixed body #arenaHubHome:has(>.ar-categories.is-open)>.ar-featured{display:none!important}
+    html.arena-home-fixed body #arenaHubHome>.ar-profile,
+    html.arena-home-fixed body #arenaHubHome>.ar-profile *,
+    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts,
+    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts *,
+    html.arena-home-fixed body #arenaHubHome>.ar-categories,
+    html.arena-home-fixed body #arenaHubHome>.ar-categories *{
+      animation:none!important;transition:none!important;will-change:auto!important;
     }
   `;
   document.head.appendChild(style);
