@@ -3573,3 +3573,74 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
   `;
   document.head.appendChild(style);
 })();
+
+
+/* 2026-11-10: CATEGORY READABILITY + VERTICAL SPACE REBALANCE */
+(function(){
+  if(document.getElementById('arenaCategoryReadabilityBalance20261110'))return;
+  var style=document.createElement('style');
+  style.id='arenaCategoryReadabilityBalance20261110';
+  style.textContent=`
+    /* Remove excess separation below the daily mission and before featured games. */
+    #arenaHubHome .ar-daily{
+      margin-bottom:0!important;
+    }
+    #arenaHubHome .ar-section-title:has(+.ar-featured){
+      margin-top:3px!important;
+      margin-bottom:4px!important;
+    }
+    #arenaHubHome{
+      row-gap:7px!important;
+    }
+    /* Give category cards more room so every line stays inside its frame. */
+    #arenaHubHome .ar-categories{
+      row-gap:10px!important;
+      column-gap:9px!important;
+    }
+    #arenaHubHome .ar-categories:not(.is-open)>.ar-cat{
+      height:clamp(92px,14.5vw,116px)!important;
+      min-height:clamp(92px,14.5vw,116px)!important;
+      padding:8px 10px!important;
+      box-sizing:border-box!important;
+      align-items:center!important;
+    }
+    #arenaHubHome .ar-cat-copy{
+      min-width:0!important;
+      overflow:visible!important;
+    }
+    #arenaHubHome .ar-cat-copy strong{
+      color:#fff!important;
+      font-size:clamp(14px,3.9vw,19px)!important;
+      font-weight:950!important;
+      line-height:1.16!important;
+      letter-spacing:.1px!important;
+      text-shadow:0 1px 2px #000b,0 0 5px #0005!important;
+      overflow-wrap:normal!important;
+      word-break:normal!important;
+    }
+    #arenaHubHome .ar-cat-copy small{
+      color:#fff!important;
+      font-size:clamp(11px,3vw,14px)!important;
+      font-weight:800!important;
+      line-height:1.2!important;
+      margin-top:5px!important;
+      text-shadow:0 1px 2px #000c!important;
+      overflow-wrap:anywhere!important;
+    }
+    #arenaHubHome .ar-cat-arrow{
+      color:#fff!important;
+      border-color:#ffffffb5!important;
+      text-shadow:0 1px 2px #000!important;
+    }
+    @media(max-width:390px){
+      #arenaHubHome .ar-categories:not(.is-open)>.ar-cat{
+        height:clamp(90px,24vw,108px)!important;
+        min-height:clamp(90px,24vw,108px)!important;
+        padding:7px 7px!important;
+      }
+      #arenaHubHome .ar-cat-copy strong{font-size:clamp(13px,3.8vw,16px)!important}
+      #arenaHubHome .ar-cat-copy small{font-size:clamp(10px,2.9vw,12px)!important}
+    }
+  `;
+  document.head.appendChild(style);
+})();
