@@ -3211,3 +3211,36 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
   `;
   document.head.appendChild(style);
 })();
+
+
+/* 2026-11-10: ABSOLUTE SHORTCUT ROW ANCHOR. */
+(function(){
+  if(document.getElementById('arenaShortcutAbsoluteAnchor20261110')) return;
+  const style=document.createElement('style');
+  style.id='arenaShortcutAbsoluteAnchor20261110';
+  style.textContent=`
+    html.arena-home-fixed body #arenaHubHome{
+      position:relative!important;
+    }
+    /* Profile stays at the fixed home origin; shortcuts sit 6px below its 80px track. */
+    html.arena-home-fixed body #arenaHubHome>.ar-profile{
+      position:absolute!important;top:0!important;left:6px!important;right:6px!important;
+      height:80px!important;min-height:80px!important;max-height:80px!important;
+      margin:0!important;transform:none!important;translate:none!important;scale:none!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts{
+      position:absolute!important;top:86px!important;left:7px!important;right:7px!important;
+      width:auto!important;height:68px!important;min-height:68px!important;max-height:68px!important;
+      margin:0!important;padding:0!important;box-sizing:border-box!important;
+      transform:none!important;translate:none!important;scale:none!important;
+      animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #arenaHubHome>.ar-shortcuts>.ar-short{
+      position:relative!important;top:0!important;align-self:stretch!important;
+      width:100%!important;height:68px!important;min-height:68px!important;max-height:68px!important;
+      margin:0!important;transform:none!important;translate:none!important;scale:none!important;
+      animation:none!important;transition:none!important;
+    }
+  `;
+  document.head.appendChild(style);
+})();
