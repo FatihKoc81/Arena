@@ -2824,7 +2824,7 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
     }
     /* Freeze the first real header measurement. Never let ResizeObserver,
        category rendering, or viewport micro-resizes move the home origin. */
-    root.style.setProperty('--arena-header-fixed-height',headerHeight+'px','important');
+    /* Do not freeze this early measurement inline: the shared CSS variable below includes safe-area inset and is used by both header and content. */
   }
   lockArenaHeaderHeight();
   /* Intentionally no ResizeObserver/window-resize remeasurement here. */
