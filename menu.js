@@ -3644,3 +3644,96 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
   `;
   document.head.appendChild(style);
 })();
+
+
+/* 2026-11-10: FINAL STABLE HOME ANCHORS + THREE-PRESS EXIT GUARD */
+(function(){
+  if(document.getElementById('arenaFinalStableAnchors20261110'))return;
+  const style=document.createElement('style');
+  style.id='arenaFinalStableAnchors20261110';
+  style.textContent=`
+    html.arena-home-fixed body>h1{
+      height:calc(58px + env(safe-area-inset-top))!important;
+      min-height:calc(58px + env(safe-area-inset-top))!important;
+      max-height:calc(58px + env(safe-area-inset-top))!important;
+      transform:none!important;translate:none!important;animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #ana{
+      top:calc(58px + env(safe-area-inset-top))!important;
+      padding-top:10px!important;
+      overflow-x:hidden!important;overflow-y:auto!important;
+    }
+    html.arena-home-fixed body #ana #arenaHubHome{
+      display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+      grid-template-rows:100px 62px auto!important;
+      align-content:start!important;align-items:stretch!important;
+      gap:8px!important;height:auto!important;min-height:0!important;
+      overflow:visible!important;
+    }
+    html.arena-home-fixed body #ana #arenaHubHome>.ar-profile{
+      grid-row:1!important;position:relative!important;inset:auto!important;
+      width:100%!important;height:100px!important;min-height:100px!important;max-height:100px!important;
+      margin:0!important;transform:none!important;translate:none!important;scale:none!important;
+      animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #ana #arenaHubHome>.ar-shortcuts{
+      grid-row:2!important;position:relative!important;inset:auto!important;
+      display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;
+      width:100%!important;height:62px!important;min-height:62px!important;max-height:62px!important;
+      margin:0!important;padding:0!important;gap:7px!important;
+      transform:none!important;translate:none!important;animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #ana #arenaHubHome>.ar-shortcuts>.ar-short{
+      width:100%!important;height:62px!important;min-height:62px!important;max-height:62px!important;
+      margin:0!important;transform:none!important;translate:none!important;scale:none!important;
+      animation:none!important;transition:none!important;
+    }
+    html.arena-home-fixed body #ana #arenaHubHome>.ar-profile *,
+    html.arena-home-fixed body #ana #arenaHubHome>.ar-shortcuts *{
+      animation:none!important;transition:none!important;transform:none!important;translate:none!important;scale:none!important;
+    }
+    @media(max-width:390px){
+      html.arena-home-fixed body #ana #arenaHubHome>.ar-shortcuts,
+      html.arena-home-fixed body #ana #arenaHubHome>.ar-shortcuts>.ar-short{
+        height:54px!important;min-height:54px!important;max-height:54px!important;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+})();
+
+(function(){
+  if(window.__arenaThreeBackExit20261110)return;
+  window.__arenaThreeBackExit20261110=true;
+  let presses=0,timer=0,guard=false;
+  function message(text){
+    let n=document.getElementById('arena-back-exit-note');
+    if(!n){n=document.createElement('div');n.id='arena-back-exit-note';n.style.cssText='position:fixed;z-index:2147483646;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%);padding:12px 18px;border:1px solid #4c83c8;border-radius:14px;background:#071832;color:#fff;font:700 14px system-ui;box-shadow:0 5px 20px #0009;text-align:center;pointer-events:none';document.body.appendChild(n)}
+    n.textContent=text;n.style.display='block';
+    clearTimeout(n._hide);n._hide=setTimeout(()=>n.style.display='none',1700);
+  }
+  function reset(){presses=0;clearTimeout(timer)}
+  function back(){
+    if(guard)return;
+    guard=true;
+    presses++;
+    if(presses===1){message('Çıkmak için geri tuşuna 2 kez daha basın.');}
+    else if(presses===2){message('Çıkmak için 1 kez daha basın.');}
+    else {reset();message('ARENA’dan çıkılıyor…');setTimeout(()=>{try{window.close()}catch(e){};if(history.length>1)history.go(-1)},180);}
+    clearTimeout(timer);timer=setTimeout(reset,2200);
+    history.pushState({arenaBackGuard:true,presses},'',location.href);
+    setTimeout(()=>guard=false,80);
+  }
+  history.pushState({arenaBackGuard:true},'',location.href);
+  window.addEventListener('popstate',function(){
+    if(guard)return;
+    back();
+  });
+  window.addEventListener('keydown',function(e){
+    if(e.key==='Escape'||e.key==='Backspace'){
+      const t=e.target;
+      if(t&&(/INPUT|TEXTAREA|SELECT/.test(t.tagName)||t.isContentEditable))return;
+      e.preventDefault();back();
+    }
+  },true);
+})();
