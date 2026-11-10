@@ -125,11 +125,13 @@ jobs:
           const fs=require('fs');
           const f='android/app/src/main/AndroidManifest.xml';
           let x=fs.readFileSync(f,'utf8');
-          if(!x.includes('android:screenOrientation')){
-            x=x.replace(/<activity\b/,'<activity android:screenOrientation=\"portrait\"');
-            fs.writeFileSync(f,x);
+          if(/android:screenOrientation="[^"]*"/.test(x)){
+            x=x.replace(/android:screenOrientation="[^"]*"/,'android:screenOrientation="unspecified"');
+          } else {
+            x=x.replace(/<activity\b/,'<activity android:screenOrientation="unspecified"');
           }
-          console.log('Yön kilidi: portrait');"
+          fs.writeFileSync(f,x);
+          console.log('Yön kilidi: dynamic (controlled by ScreenOrientation plugin)');"
           grep -n screenOrientation android/app/src/main/AndroidManifest.xml
 
       - name: AdMob eklentisi Android projesinde mi kontrol et
