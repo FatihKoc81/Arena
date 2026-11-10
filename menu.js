@@ -5,13 +5,13 @@ const ana=document.getElementById('ana'),title=document.querySelector('body>h1')
 if(!ana||ana.dataset.arenaReference==='1')return;ana.dataset.arenaReference='1';
 const cats=[
 {id:'bilgi',name:'Zihin Meydanı',icon:'🧠',desc:'Bilgini sına, zirveye çık',count:'2 Hazır',color:'violet',games:['milyoner','passaparola'],planned:['Hızlı Karar','Bilgi Düellosu','Genel Kültür']},
-{id:'kelime',name:'Kelime Üssü',icon:'🔤',desc:'Harflerle kelimeler üret',count:'3 Hazır',color:'blue',games:['kelime','rotasyon','wordScramble','wordle'],planned:['Kelime Zinciri']},
-{id:'masa',name:'Oyun Masası',icon:'🎲',desc:'Sevilen masa oyunları bir arada',count:'4 Hazır',color:'green',games:['okey','yuzbir','batak','poker','checkers','backgammon'],planned:['Satranç']},
-{id:'sudoku',name:'Akıl Labirenti',icon:'🧊',desc:'Akıl yürüt, desenleri çöz',count:'1 Hazır',color:'orange',games:['miniSudoku','nonogram'],planned:['Kakuro','Mantık Izgarası','Şekil Dizileri']},
-{id:'sayi',name:'Şifre Avı',icon:'🧩',desc:'Zekânı kullan, bulmacaları çöz',count:'2 Hazır',color:'pink',games:['islem','mathSprint','game2048','ticTacToe','connectFour','minesweeper'],planned:['Sayı Çaprazı']},
+{id:'kelime',name:'Kelime Üssü',icon:'🔤',desc:'Harflerle kelimeler üret',count:'4 Hazır',color:'blue',games:['kelime','rotasyon','wordScramble','wordle'],planned:['Kelime Zinciri']},
+{id:'masa',name:'Oyun Masası',icon:'🎲',desc:'Sevilen masa oyunları bir arada',count:'6 Hazır',color:'green',games:['okey','yuzbir','batak','poker','checkers','backgammon'],planned:['Satranç']},
+{id:'sudoku',name:'Akıl Labirenti',icon:'🧊',desc:'Akıl yürüt, desenleri çöz',count:'2 Hazır',color:'orange',games:['miniSudoku','nonogram'],planned:['Kakuro','Mantık Izgarası','Şekil Dizileri']},
+{id:'sayi',name:'Şifre Avı',icon:'🧩',desc:'Zekânı kullan, bulmacaları çöz',count:'6 Hazır',color:'pink',games:['islem','mathSprint','game2048','ticTacToe','connectFour','minesweeper'],planned:['Sayı Çaprazı']},
 {id:'renk',name:'Renk Ustası',icon:'⚗️',desc:'Renkleri ayır, doğru sıraya diz',count:'1 Hazır',color:'cyan',games:['colorSort'],planned:['Top Sıralama','Su Sıralama']},
 {id:'dikkat',name:'Hafıza Gücü',icon:'🧠',desc:'Ayrıntıları fark et, hafızanı sına',count:'1 Hazır',color:'indigo',games:['memory'],planned:['Görsel Hafıza','Nesneyi Bul','7 Fark Bul']},
-{id:'refleks',name:'Hız Parkuru',icon:'⚡',desc:'Hızını ve tepkini test et',count:'1 Hazır',color:'red',games:['reflexTap','snake'],planned:['Hızlı Dokun','Renk Tepkisi','Hızlı Eşleştirme']}
+{id:'refleks',name:'Hız Parkuru',icon:'⚡',desc:'Hızını ve tepkini test et',count:'2 Hazır',color:'red',games:['reflexTap','snake'],planned:['Hızlı Dokun','Renk Tepkisi','Hızlı Eşleştirme']}
 ];
 const defs={
 okey:{name:'Okey',icon:'🀄',desc:'Taşlarını diz, elini tamamla',re:/__arena_okey_never__/i},
