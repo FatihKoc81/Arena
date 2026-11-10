@@ -59,6 +59,7 @@ h1{display:grid!important;grid-template-columns:1fr auto 1fr;justify-content:nor
 <div class="ust"><b id="oSeviye"></b><span id="oCan"></span><span id="sayac"></span></div>
 <div class="cubuk"><div id="bar"></div></div>
 <p id="soruMetni"></p>
+<button type="button" id="soruSesBtn" class="jok" style="width:100%;margin:0 0 10px">🔊 Soruyu sesli oku</button>
 <div id="secenekler"></div>
 <div class="jokerler">
 <button class="jok" id="jYarim">✂️ 50:50</button>
@@ -115,6 +116,18 @@ if (typeof st.bonus !== "number") st.bonus = 0; // her 3 bölümde kazanılan, s
 const kaydet = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} };
 
 let lv, soru, kilit, jok, butonlar, ciftAktif;
+let soruSesAcik = true;
+function soruSesDurdur(){try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}}
+function soruSesOku(){
+  if(!soruSesAcik||!lv||!lv[soru])return;
+  if(!("speechSynthesis" in window))return;
+  soruSesDurdur();
+  const q=lv[soru],metin="Soru. "+q[0]+". Seçenekler. "+q[1].map((x,i)=>"Şık "+("A B C D".split(" ")[i])+". "+x).join(". ");
+  const u=new SpeechSynthesisUtterance(metin);u.lang="tr-TR";u.rate=0.92;u.pitch=1;u.volume=1;
+  const voices=window.speechSynthesis.getVoices();const tr=voices.find(v=>/^tr([-_]|$)/i.test(v.lang));if(tr)u.voice=tr;
+  window.speechSynthesis.speak(u);
+}
+
 
 // CAN: her bölüm CAN_MAX canla başlar. Yanlış cevap 1 can götürür ve aynı sıraya sonraki seriden yeni soru gelir.
 // Can bitince: KAYIP_BEDEL altınla devam / reklamla +1 can / bir alt bölümün 1. sorusundan başla.
@@ -145,6 +158,7 @@ function sureBaslat() {
 function sureBitti() {
   if (kilit) return;
   kilit = true;
+  soruSesDurdur();
   butonlar[lv[soru][2]].classList.add("dogru");
   $("sayac").textContent = "⏰ Süre doldu";
   setTimeout(yanlisCan, 1300);
@@ -169,7 +183,7 @@ let duel = null;
   },
   dur: function () { duel = null; sureDurdur(); }
 };
-document.addEventListener("anasayfa", () => { sureDurdur(); duel = null; });
+document.addEventListener("anasayfa", () => { sureDurdur(); soruSesDurdur(); duel = null; });
 
 function ekran(id) {
   ["ana", "oyun", "son"].forEach(e => $(e).classList.toggle("hidden", e !== id));
@@ -223,7 +237,9 @@ function goster() {
     kutu.append(b);
     return b;
   });
+  const sesBtn=$("soruSesBtn"); if(sesBtn){sesBtn.textContent=soruSesAcik?"🔊 Soruyu tekrar dinle":"🔇 Sesli okuma kapalı";sesBtn.onclick=()=>{soruSesAcik=!soruSesAcik;if(soruSesAcik)soruSesOku();else soruSesDurdur();sesBtn.textContent=soruSesAcik?"🔊 Soruyu tekrar dinle":"🔇 Sesli okuma kapalı";};}
   sureBaslat();
+  if(soruSesAcik){if(window.speechSynthesis&&window.speechSynthesis.getVoices)window.speechSynthesis.getVoices();setTimeout(soruSesOku,250);}
 }
 
 function sonraki() {
@@ -250,6 +266,7 @@ function cevapla(i) {
   }
 
   kilit = true;
+  soruSesDurdur();
   sureDurdur();
   butonlar[dogru].classList.add("dogru");
   if (i === dogru) { Puan.ekle("milyoner"); return void setTimeout(sonraki, 900); }
@@ -483,7 +500,8 @@ document.addEventListener("anasayfa", gKapat);
 <script src="islem.js?v=20261104a"></script>
 <script src="ads.js?v=20261104a"></script>
 <script src="rotasyon.js?v=20261104a"></script>
-<script src="menu.js?v=20261110-games-pack11"></script>
+<script src="dini-milyoner.js?v=20261110-voice1"></script>
+<script src="menu.js?v=20261110-dini1"></script>
 <script src="masa.js?v=20261110-batak-table-ui1"></script>
 <script src="mini-oyunlar.js?v=20261110-games-pack13"></script>
 <script>window.ARENA_APP="arena";</script><!-- sıralama/düello verileri bu adla ayrı tutulur -->

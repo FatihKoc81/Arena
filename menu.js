@@ -4,7 +4,7 @@
 const ana=document.getElementById('ana'),title=document.querySelector('body>h1');
 if(!ana||ana.dataset.arenaReference==='1')return;ana.dataset.arenaReference='1';
 const cats=[
-{id:'bilgi',name:'Zihin Meydanı',icon:'🧠',desc:'Bilgini sına, zirveye çık',count:'2 Hazır',color:'violet',games:['milyoner','passaparola'],planned:['Hızlı Karar','Bilgi Düellosu','Genel Kültür']},
+{id:'bilgi',name:'Zihin Meydanı',icon:'🧠',desc:'Bilgini sına, zirveye çık',count:'3 Hazır',color:'violet',games:['milyoner','diniMilyoner','passaparola'],planned:['Hızlı Karar','Bilgi Düellosu','Genel Kültür']},
 {id:'kelime',name:'Kelime Üssü',icon:'🔤',desc:'Harflerle kelimeler üret',count:'4 Hazır',color:'blue',games:['kelime','rotasyon','wordScramble','wordle'],planned:['Kelime Zinciri']},
 {id:'masa',name:'Oyun Masası',icon:'🎲',desc:'Sevilen masa oyunları bir arada',count:'6 Hazır',color:'green',games:['okey','yuzbir','batak','poker','checkers','backgammon'],planned:['Satranç']},
 {id:'sudoku',name:'Akıl Labirenti',icon:'🧊',desc:'Akıl yürüt, desenleri çöz',count:'2 Hazır',color:'orange',games:['miniSudoku','nonogram'],planned:['Kakuro','Mantık Izgarası','Şekil Dizileri']},
@@ -19,6 +19,7 @@ yuzbir:{name:'101',icon:'🎴',desc:'Perlerini aç, 101 puanı geç',re:/__arena
 batak:{name:'Batak',icon:'♠️',desc:'İhaleni al, elleri topla',re:/__arena_batak_never__/i},
 poker:{name:'Poker',icon:'🃏',desc:'Texas Hold’em masasına otur',re:/__arena_poker_never__/i},
 milyoner:{name:'Milyoner',icon:'🏆',desc:'Genel kültür ve bilgi yarışması',re:/milyoner|oyuna başla/i},
+diniMilyoner:{name:'Dini Milyoner',icon:'🕌',desc:'Sadece İslam dini üzerine 15 soruluk büyük ödül yarışı',re:/__arena_dini_milyoner__/i},
 passaparola:{name:'Passaparola',icon:'🔤',desc:'Harf harf cevapla, süreye karşı yarış',re:/pass.?aparola/i},
 kelime:{name:'Kelime Oyunu',icon:'🔤',desc:'İpuçlarından kelimeleri bul',re:/kelime oyunu/i},
 rotasyon:{name:'Rotasyon',icon:'🧩',desc:'Harfleri birleştir, kelimeleri keşfet',re:/rotasyon/i},
