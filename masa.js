@@ -39,7 +39,7 @@ const css=`#arena-table-modal{position:fixed;inset:0;z-index:30000;background:ra
 .at-batak .at-actions{justify-content:center;flex-shrink:0;margin-top:4px}
 @media(max-height:480px){.at-batak .at-batak-table{margin-top:42px;max-height:calc(100dvh - 130px)}.at-batak .at-batak-hand{padding:3px}.at-batak .at-batak-seat.top{top:-5%}.at-batak .at-batak-seat.bottom{bottom:-8%}}
 .at-board{background:radial-gradient(ellipse,#176344,#0b382e 65%,#08241f);border:5px solid #78532d;border-radius:25px;padding:14px 8px;min-height:150px}.at-seats{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;text-align:center;font-size:11px;color:#d9f6e7;margin-bottom:12px}.at-seat{padding:7px 2px;border:1px solid #ffffff25;border-radius:10px;background:#001b1b66}.at-seat b{display:block;color:#fff;font-size:12px}.at-hand,.at-tablecards{display:flex;flex-wrap:nowrap;gap:5px;justify-content:flex-start;margin:12px 0;max-width:100%;overflow-x:auto;overflow-y:hidden;padding:7px 3px 12px;box-sizing:border-box;scrollbar-width:thin;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}.at-hand>.at-card,.at-hand>.at-tile,.at-tablecards>.at-card,.at-tablecards>.at-tile{flex:0 0 auto}.at-hand .at-card{width:clamp(34px,10vw,48px);height:clamp(52px,15vw,68px);font-size:clamp(15px,4.5vw,19px)}.at-hand .at-tile{width:clamp(32px,9vw,40px);height:clamp(46px,13vw,54px)}.at-tile{width:35px;height:49px;border-radius:7px;background:linear-gradient(160deg,#fffef2,#e6e0c8);border:1px solid #c6bda2;color:#142033;font-weight:900;font-size:19px;display:grid;place-items:center}.at-tile.red,.at-card.red{color:#d21d2b}.at-tile.blue{color:#1766c2}.at-tile.yellow{color:#bd8b00}.at-tile.selected{transform:translateY(-7px);outline:3px solid #ffe27a}.at-card{width:39px;height:56px;background:#fff;border-radius:7px;color:#172033;border:1px solid #b8c3d4;display:grid;place-items:center;font-weight:900;font-size:17px}.at-card.back{background:repeating-linear-gradient(45deg,#173f78,#173f78 5px,#e0eaff 6px,#173f78 8px);color:transparent}.at-status{text-align:center;color:#fff;font-weight:750;padding:8px;min-height:38px}.at-big{font-size:25px;font-weight:950;text-align:center}.at-bid{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}.at-btn:disabled{opacity:.35}`;
-function mount(){if(root)return;let st=document.createElement('style');st.textContent=css;document.head.appendChild(st);root=document.createElement('section');root.id='arena-table-modal';root.hidden=true;document.body.appendChild(root);root.addEventListener('click',e=>{let b=e.target.closest('[data-at]');if(!b)return;let a=b.dataset.at;if(a==='close'){const closedGame=g&&g.kind?g.kind:null;root.hidden=true;g=null;unlockOrientation();const restore=()=>{try{window.dispatchEvent(new CustomEvent('arena:game-close',{detail:{id:closedGame}}));}catch(_){window.dispatchEvent(new Event('arena:game-close'));}};if(typeof requestAnimationFrame==='function')requestAnimationFrame(restore);else setTimeout(restore,0);}else if(a==='lobby')lobby();else if(a==='start')start(b.dataset.game);else if(a==='sort')sortHand();else if(a==='draw')draw(b.dataset.src);else if(a==='tile')sel(+b.dataset.i);else if(a==='discard')discard();else if(a==='bid')bid(+b.dataset.n);else if(a==='passbid')passBid();else if(a==='trump')chooseTrump(b.dataset.suit);else if(a==='card')card(+b.dataset.i);else if(a==='poker-call')pokerAct('call');else if(a==='poker-raise')pokerAct('raise');else if(a==='fold')pokerAct('fold');else if(a==='next')next();else if(a==='meld')meld();else if(a==='okeywin')okeyWin();});bindRackDrag();}
+function mount(){if(root)return;let st=document.createElement('style');st.textContent=css;document.head.appendChild(st);root=document.createElement('section');root.id='arena-table-modal';root.hidden=true;document.body.appendChild(root);root.addEventListener('click',e=>{let b=e.target.closest('[data-at]');if(!b)return;if(b.matches('.at-rack .at-tile')&&root.dataset.rackDraggedAt&&Date.now()-Number(root.dataset.rackDraggedAt)<700){e.preventDefault();e.stopImmediatePropagation();return;}let a=b.dataset.at;if(a==='close'){const closedGame=g&&g.kind?g.kind:null;root.hidden=true;g=null;unlockOrientation();const restore=()=>{try{window.dispatchEvent(new CustomEvent('arena:game-close',{detail:{id:closedGame}}));}catch(_){window.dispatchEvent(new Event('arena:game-close'));}};if(typeof requestAnimationFrame==='function')requestAnimationFrame(restore);else setTimeout(restore,0);}else if(a==='lobby')lobby();else if(a==='start')start(b.dataset.game);else if(a==='sort')sortHand();else if(a==='draw')draw(b.dataset.src);else if(a==='tile')sel(+b.dataset.i);else if(a==='discard')discard();else if(a==='bid')bid(+b.dataset.n);else if(a==='passbid')passBid();else if(a==='trump')chooseTrump(b.dataset.suit);else if(a==='card')card(+b.dataset.i);else if(a==='poker-call')pokerAct('call');else if(a==='poker-raise')pokerAct('raise');else if(a==='fold')pokerAct('fold');else if(a==='next')next();else if(a==='meld')meld();else if(a==='okeywin')okeyWin();});bindRackDrag();}
 function bindRackDrag(){
 if(root.dataset.rackDragBound==="1")return;
 root.dataset.rackDragBound="1";
@@ -53,10 +53,16 @@ root.addEventListener("pointermove",e=>{
  const d=g&&g._rackDrag;if(!d||d.pointerId!==e.pointerId)return;
  if(Math.hypot(e.clientX-d.x,e.clientY-d.y)>7){d.moved=true;root.classList.add("at-rack-dragging");}
 });
+const cancelDrag=e=>{
+ const d=g&&g._rackDrag;if(!d||d.pointerId!==e.pointerId)return;
+ g._rackDrag=null;root.classList.remove("at-rack-dragging");
+ try{if(root.hasPointerCapture(e.pointerId))root.releasePointerCapture(e.pointerId);}catch(_){}
+};
 root.addEventListener("pointerup",e=>{
  const d=g&&g._rackDrag;if(!d||d.pointerId!==e.pointerId)return;
  g._rackDrag=null;root.classList.remove("at-rack-dragging");
- if(!d.moved){sel(d.id);return;}
+ if(!d.moved)return; // Dokunma seçimini tek seferlik click handler yapar.
+ root.dataset.rackDraggedAt=String(Date.now()); // Sürükleme sonrası sentetik click seçimi değiştirmesin.
  const under=document.elementFromPoint(e.clientX,e.clientY);
  const target=under&&under.closest?under.closest(".at-rack .at-tile"):null;
  const from=d.id,to=target?Number(target.dataset.i):from;
@@ -67,10 +73,8 @@ root.addEventListener("pointerup",e=>{
  g.sel=selectedIds.map(id=>hand.findIndex(t=>t.id===id)).filter(i=>i>=0);
  tileView("Taşın ıstakadaki yeri değiştirildi.");
 });
-root.addEventListener("pointercancel",e=>{
- const d=g&&g._rackDrag;if(!d||d.pointerId!==e.pointerId)return;
- g._rackDrag=null;root.classList.remove("at-rack-dragging");
-});
+root.addEventListener("pointercancel",cancelDrag);
+root.addEventListener("lostpointercapture",cancelDrag);
 }
 function show(title,body,actions){mount();root.hidden=false;root.innerHTML='<div class="at-head"><button data-at="lobby">←</button><div><strong>ARENA · '+title+'</strong><div class="at-sub">Botlara karşı · Çevrimdışı</div></div><button data-at="close">✕</button></div>'+body+'<div class="at-actions">'+(actions||'')+'</div>';}
 function lobby(){unlockOrientation();g=null;show('KLASİK MASA','<div class="at-panel"><div class="at-big">🎲 Klasik Oyunlar</div><p class="at-sub" style="text-align:center">Masana otur ve oyunu seç.</p></div><div class="at-lobby">'+[['okey','🀄','Okey','Taşlarını diz'],['yuzbir','🎴','101','Perlerini aç'],['batak','♠️','Batak','İhaleni al'],['poker','🃏','Poker','Texas Hold’em']].map(x=>'<button class="at-game" data-at="start" data-game="'+x[0]+'"><i>'+x[1]+'</i><b>'+x[2]+'</b><small>'+x[3]+'</small></button>').join('')+'</div><div class="at-panel at-muted">Sanal oyun puanları kullanılır. Gerçek para veya bahis yoktur.</div>');}
