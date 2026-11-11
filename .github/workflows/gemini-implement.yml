@@ -64,12 +64,22 @@ jobs:
             ].join('\n\n');
             const url='https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key='+encodeURIComponent(process.env.GEMINI_API_KEY);
             let data;
-            for(let attempt=0;attempt<4;attempt++){
-              const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:0.15,maxOutputTokens:7000}})});
-              data=await res.json();
-              if(res.ok) break;
-              if(![429,500,503].includes(res.status)||attempt===3) throw new Error('Gemini API '+res.status+': '+JSON.stringify(data).slice(0,1200));
-              await new Promise(r=>setTimeout(r,2000*(attempt+1)));
+            const requestBody=JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:0.15,maxOutputTokens:7000}});
+            for(let attempt=0;attempt<5;attempt++){
+              try {
+                const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:requestBody,signal:AbortSignal.timeout(90000)});
+                const raw=await res.text();
+                try { data=JSON.parse(raw); } catch { throw new Error('Gemini yanıtı JSON değil: '+raw.slice(0,500)); }
+                if(res.ok) break;
+                const err=new Error('Gemini API '+res.status+': '+JSON.stringify(data).slice(0,1200));
+                if(![429,500,502,503,504].includes(res.status)) throw Object.assign(err,{permanent:true});
+                throw err;
+              } catch(e) {
+                if(e.permanent || attempt===4) throw e;
+                const delay=5000*(attempt+1);
+                console.warn('Gemini geçici hata, yeniden denenecek ('+(attempt+1)+'/5): '+e.message+'; '+delay+' ms');
+                await new Promise(r=>setTimeout(r,delay));
+              }
             }
             const patch=(data.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('\n').replace(/^\s*```(?:diff)?\s*/,'').replace(/\s*```\s*$/,'').trim();
             if(!patch.startsWith('diff --git ')) throw new Error('Gemini geçerli unified diff üretmedi; otomatik uygulama yapılmadı.');
