@@ -1,0 +1,93 @@
+name: Gemini implementation branch
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  gemini-implementation:
+    if: github.event.issue.pull_request && github.event.comment.user.login == 'FatihKoc81' && startsWith(github.event.comment.body, '/gemini ')
+    runs-on: ubuntu-latest
+    steps:
+      - name: PR dalını ve hedefini bul
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const {owner,repo}=context.repo;
+            const pr=await github.rest.pulls.get({owner,repo,pull_number:context.issue.number});
+            core.setOutput('head_ref',pr.data.head.ref);
+            core.setOutput('head_sha',pr.data.head.sha);
+            core.setOutput('base_ref',pr.data.base.ref);
+            core.setOutput('instruction',context.payload.comment.body.replace(/^\/gemini\s+/,'').trim());
+      - name: PR dalını al
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.pr.outputs.head_sha }}
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Gemini ayrı geliştirme dalında değişiklik önersin
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+          SOURCE_BRANCH: ${{ steps.pr.outputs.head_ref }}
+          BASE_BRANCH: ${{ steps.pr.outputs.base_ref }}
+          INSTRUCTION: ${{ steps.pr.outputs.instruction }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const fs=require('fs');
+          const {execFileSync}=require('child_process');
+          async function main(){
+            const diff=execFileSync('git',['diff','HEAD^','HEAD','--','*.js','*.css','*.html','*.json','*.md'],{encoding:'utf8',maxBuffer:8*1024*1024});
+            const files=execFileSync('git',['ls-files'],{encoding:'utf8'}).split('\n').filter(Boolean);
+            const context=files.map(f=>{
+              if(!/\.(js|css|html|json|md)$/.test(f)) return '';
+              try { const s=fs.readFileSync(f,'utf8'); return '\n--- '+f+' ---\n'+s.slice(0,18000); } catch{return '';}
+            }).filter(Boolean).join('\n').slice(0,90000);
+            const prompt=[
+              'ARENA projesinde deneyimli oyun geliştiricisisin. İstenen işi uygula: '+process.env.INSTRUCTION,
+              'Yalnızca gerekli dosyalarda minimal, güvenli değişiklik yap. Mevcut oyun kurallarını, Türkçe metinleri, mobil dokunmatik kullanımını ve Android WebView uyumunu koru.',
+              'Çıktı olarak yalnızca standart unified diff üret. Diff mutlaka a/ ve b/ dosya yolları içersin. Açıklama, markdown çiti veya diff dışı metin yazma. İş yapılamıyorsa boş yanıt ver.',
+              'Mevcut PR farkı:\n'+diff,
+              'İlgili depo kaynakları:\n'+context
+            ].join('\n\n');
+            const url='https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key='+encodeURIComponent(process.env.GEMINI_API_KEY);
+            let data;
+            for(let attempt=0;attempt<4;attempt++){
+              const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:0.15,maxOutputTokens:7000}})});
+              data=await res.json();
+              if(res.ok) break;
+              if(![429,500,503].includes(res.status)||attempt===3) throw new Error('Gemini API '+res.status+': '+JSON.stringify(data).slice(0,1200));
+              await new Promise(r=>setTimeout(r,2000*(attempt+1)));
+            }
+            const patch=(data.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('\n').replace(/^\s*```(?:diff)?\s*/,'').replace(/\s*```\s*$/,'').trim();
+            if(!patch.startsWith('diff --git ')) throw new Error('Gemini geçerli unified diff üretmedi; otomatik uygulama yapılmadı.');
+            fs.writeFileSync('/tmp/gemini.patch',patch+'\n');
+            execFileSync('git',['apply','--check','/tmp/gemini.patch'],{stdio:'inherit'});
+            execFileSync('git',['apply','/tmp/gemini.patch'],{stdio:'inherit'});
+            execFileSync('git',['config','user.name','github-actions[bot]']);
+            execFileSync('git',['config','user.email','41898282+github-actions[bot]@users.noreply.github.com']);
+            execFileSync('git',['checkout','-b','ai/gemini-pr-'+process.env.PR_NUMBER+'-'+process.env.RUN_ID]);
+            execFileSync('git',['add','-A']);
+            if(!execFileSync('git',['diff','--cached','--name-only'],{encoding:'utf8'}).trim()) throw new Error('Uygulanacak değişiklik yok.');
+            execFileSync('git',['commit','-m','Gemini implementation for PR #'+process.env.PR_NUMBER]);
+            const branch='ai/gemini-pr-'+process.env.PR_NUMBER+'-'+process.env.RUN_ID;
+            execFileSync('git',['push','origin','HEAD:refs/heads/'+branch],{stdio:'inherit'});
+            const [owner,repo]=process.env.REPOSITORY.split('/');
+            const api='https://api.github.com/repos/'+owner+'/'+repo+'/pulls';
+            const res=await fetch(api,{method:'POST',headers:{'Authorization':'Bearer '+process.env.GH_TOKEN,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json'},body:JSON.stringify({title:'[Gemini] '+process.env.INSTRUCTION.slice(0,70),head:branch,base:process.env.SOURCE_BRANCH,body:'Gemini tarafından ayrı geliştirme dalında hazırlanmış değişiklik önerisi.\n\nİlgili ana PR: #'+process.env.PR_NUMBER+'\n\nBu PR otomatik olarak birleştirilmez. İnceleme ve test gerektirir.'})});
+            const result=await res.json();
+            if(!res.ok) throw new Error('Değişiklik PR\'ı açılamadı: '+JSON.stringify(result).slice(0,1200));
+            console.log('Gemini değişiklik PR\'ı: '+result.html_url);
+          }
+          main().catch(e=>{console.error(e);process.exit(1)});
+          NODE
