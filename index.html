@@ -50,7 +50,7 @@ h1{display:grid!important;grid-template-columns:1fr auto 1fr;justify-content:nor
 #oyun .jokerler #jYarim{grid-column:1;grid-row:1}#oyun .jokerler #jSeyirci{grid-column:2;grid-row:1}#oyun .jokerler #jCift{grid-column:3;grid-row:1}
 #oyun .oyun-footer{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr) minmax(0,1fr);align-items:center;gap:8px;margin-top:12px}
 #oyun .oyun-pill{box-sizing:border-box;min-width:0;min-height:42px;border:2px solid #4a5a9a;border-radius:24px;background:#101a38;color:#fff;padding:7px 5px;font:800 13px/1.15 system-ui,sans-serif;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#oyun button.oyun-pill{cursor:pointer}
+#oyun button.oyun-pill{cursor:pointer;outline:none;box-shadow:none;-webkit-tap-highlight-color:transparent}#oyun button.oyun-pill:focus,#oyun button.oyun-pill:focus-visible{outline:none;box-shadow:none}
 #oyun .oyun-pill.gold{border-color:#ffb300;color:#ffe27a;background:#171b2c}
 #oyun .oyun-pill.voice{border-color:#4a78ba;color:#bfe7ff;background:#102443}
 #oyun .oyun-pill.player{display:flex;align-items:center;justify-content:center}
@@ -78,8 +78,8 @@ h1{display:grid!important;grid-template-columns:1fr auto 1fr;justify-content:nor
 <button class="jok" id="jCift">🛡️ Çift Cevap</button>
 </div>
 <div class="oyun-footer">
-<button type="button" id="oyunAltinBtn" class="oyun-pill gold" aria-label="Altın satın al"></button>
 <div class="oyun-pill player" id="oyunOyuncu"></div>
+<button type="button" id="oyunAltinBtn" class="oyun-pill gold" aria-label="Altın satın al"></button>
 <button type="button" id="oyunSesToggle" class="oyun-pill voice" aria-label="Sesi aç veya kapat"></button>
 </div>
 </section>
