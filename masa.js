@@ -43,11 +43,35 @@ function mount(){if(root)return;let st=document.createElement('style');st.textCo
 function bindRackDrag(){
 if(root.dataset.rackDragBound==="1")return;
 root.dataset.rackDragBound="1";
-root.addEventListener("pointerdown",e=>{const tile=e.target.closest(".at-rack .at-tile");if(!tile||!g||!g.h||!g.h[0])return;g._rackDrag={id:Number(tile.dataset.i),pointerId:e.pointerId,x:e.clientX,y:e.clientY,moved:false};});
-root.addEventListener("pointermove",e=>{const d=g&&g._rackDrag;if(!d||d.pointerId!==e.pointerId)return;if(Math.hypot(e.clientX-d.x,e.clientY-d.y)>7){d.moved=true;root.classList.add("at-rack-dragging");}});
-root.addEventListener("pointerup",e=>{const d=g&&g._rackDrag;if(!d||d.pointerId!==e.pointerId)return;g._rackDrag=null;root.classList.remove("at-rack-dragging");if(!d.moved)return;const target=e.target.closest(".at-rack .at-tile"),from=d.id,to=target?Number(target.dataset.i):from;if(!Number.isInteger(from)||!Number.isInteger(to)||from===to)return;const hand=g.h[0],selectedIds=g.sel.map(i=>hand[i]&&hand[i].id).filter(Boolean),tile=hand.splice(from,1)[0];if(!tile)return;hand.splice(to,0,tile);g.sel=selectedIds.map(id=>hand.findIndex(t=>t.id===id)).filter(i=>i>=0);tileView("Taşın ıstakadaki yeri değiştirildi.");});
+root.addEventListener("pointerdown",e=>{
+ const tile=e.target.closest(".at-rack .at-tile");
+ if(!tile||!g||!g.h||!g.h[0])return;
+ g._rackDrag={id:Number(tile.dataset.i),pointerId:e.pointerId,x:e.clientX,y:e.clientY,moved:false};
+ try{root.setPointerCapture(e.pointerId);}catch(_){}
+});
+root.addEventListener("pointermove",e=>{
+ const d=g&&g._rackDrag;if(!d||d.pointerId!==e.pointerId)return;
+ if(Math.hypot(e.clientX-d.x,e.clientY-d.y)>7){d.moved=true;root.classList.add("at-rack-dragging");}
+});
+root.addEventListener("pointerup",e=>{
+ const d=g&&g._rackDrag;if(!d||d.pointerId!==e.pointerId)return;
+ g._rackDrag=null;root.classList.remove("at-rack-dragging");
+ if(!d.moved){sel(d.id);return;}
+ const under=document.elementFromPoint(e.clientX,e.clientY);
+ const target=under&&under.closest?under.closest(".at-rack .at-tile"):null;
+ const from=d.id,to=target?Number(target.dataset.i):from;
+ if(!Number.isInteger(from)||!Number.isInteger(to)||from===to)return;
+ const hand=g.h[0],selectedIds=g.sel.map(i=>hand[i]&&hand[i].id).filter(Boolean),tile=hand.splice(from,1)[0];
+ if(!tile)return;
+ hand.splice(to,0,tile);
+ g.sel=selectedIds.map(id=>hand.findIndex(t=>t.id===id)).filter(i=>i>=0);
+ tileView("Taşın ıstakadaki yeri değiştirildi.");
+});
+root.addEventListener("pointercancel",e=>{
+ const d=g&&g._rackDrag;if(!d||d.pointerId!==e.pointerId)return;
+ g._rackDrag=null;root.classList.remove("at-rack-dragging");
+});
 }
-
 function show(title,body,actions){mount();root.hidden=false;root.innerHTML='<div class="at-head"><button data-at="lobby">←</button><div><strong>ARENA · '+title+'</strong><div class="at-sub">Botlara karşı · Çevrimdışı</div></div><button data-at="close">✕</button></div>'+body+'<div class="at-actions">'+(actions||'')+'</div>';}
 function lobby(){unlockOrientation();g=null;show('KLASİK MASA','<div class="at-panel"><div class="at-big">🎲 Klasik Oyunlar</div><p class="at-sub" style="text-align:center">Masana otur ve oyunu seç.</p></div><div class="at-lobby">'+[['okey','🀄','Okey','Taşlarını diz'],['yuzbir','🎴','101','Perlerini aç'],['batak','♠️','Batak','İhaleni al'],['poker','🃏','Poker','Texas Hold’em']].map(x=>'<button class="at-game" data-at="start" data-game="'+x[0]+'"><i>'+x[1]+'</i><b>'+x[2]+'</b><small>'+x[3]+'</small></button>').join('')+'</div><div class="at-panel at-muted">Sanal oyun puanları kullanılır. Gerçek para veya bahis yoktur.</div>');}
 function start(id){if(id==='okey'||id==='yuzbir'||id==='batak'||id==='poker')lockLandscape();if(id==='okey'||id==='yuzbir')tiles(id);if(id==='batak')batak();if(id==='poker')poker();}
