@@ -80,7 +80,7 @@ h1{display:grid!important;grid-template-columns:1fr auto 1fr;justify-content:nor
 <div class="oyun-footer">
 <div class="oyun-pill player" id="oyunOyuncu"></div>
 <button type="button" id="oyunAltinBtn" class="oyun-pill gold" aria-label="Altın satın al"></button>
-<button type="button" id="oyunSesToggle" class="oyun-pill voice" aria-label="Sesi aç veya kapat"></button>
+<button type="button" id="oyunSesToggle" class="oyun-pill voice" aria-label="Soruyu dinle">🔊 Soruyu dinle</button>
 </div>
 </section>
 
@@ -266,7 +266,7 @@ function goster() {
   const altinBtn=$("oyunAltinBtn"),oyuncuEl=$("oyunOyuncu"),sesToggle=$("oyunSesToggle");
   if(altinBtn){altinBtn.textContent="🪙 "+(window.Ekonomi&&Ekonomi.altin?Number(Ekonomi.altin()).toLocaleString("tr-TR"):"0")+" +";altinBtn.onclick=()=>{if(window.Ekonomi&&Ekonomi.dukkan)Ekonomi.dukkan();};}
   if(oyuncuEl)oyuncuEl.textContent="👤 "+((window.Ekonomi&&Ekonomi.ad)?Ekonomi.ad():"Oyuncu");
-  if(sesToggle){sesToggle.textContent=soruSesAcik?"🔊 Ses":"🔇 Ses";sesToggle.onclick=()=>{soruSesAcik=!soruSesAcik;try{localStorage.setItem("arena_question_voice",soruSesAcik?"1":"0");}catch(e){}if(!soruSesAcik)soruSesDurdur();else soruSesOku();sesToggle.textContent=soruSesAcik?"🔊 Ses":"🔇 Ses";};}
+  if(sesToggle){sesToggle.textContent="🔊 Soruyu dinle";sesToggle.onclick=()=>{soruSesAcik=true;try{localStorage.setItem("arena_question_voice","1");}catch(e){}soruSesOku();};}
   sureBaslat();
   if(soruSesAcik)setTimeout(soruSesOku,350);
 }
