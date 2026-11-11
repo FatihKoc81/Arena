@@ -1,5 +1,5 @@
 /* Arena servis çalışanı: her zaman önce ağdan/dosyadan taze içerik alır, eski önbellekleri siler (güncellemeler takılı kalmasın). */
-const SURUM = "arena-20261110-category-fullwidth-fix2";
+const SURUM = "arena-20261111-tts-readaloud1";
 self.addEventListener("install", () => { self.skipWaiting(); });
 self.addEventListener("activate", (e) => {
   e.waitUntil(
