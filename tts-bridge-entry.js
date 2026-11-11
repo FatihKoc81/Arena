@@ -32,12 +32,11 @@ window.ArenaTTS={
   if(id!==sequence)return;
   await say("Soru. "+question,voice);
   if(id!==sequence)return;
-  await pause(1100);
-  await say("Seçenekler.",voice);
+  await pause(1000);
   for(let i=0;i<answers.length;i++){
    if(id!==sequence)return;
-   await pause(420);
-   await say(["A","B","C","D"][i]+" seçeneği. "+answers[i]+".",voice);
+   if(i>0)await pause(1000);
+   await say(answers[i]+".",voice);
   }
  },
  speak:async(text)=>{const voice=await getTurkishVoice();await say(text,voice);},
