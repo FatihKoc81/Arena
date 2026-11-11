@@ -87,12 +87,12 @@ function answer(i){
   if(state.i===14){setTimeout(()=>renderEnd("TEBRİKLER! DİNİ MİLYONERİ TAMAMLADIN! 10.000.000 puanlık büyük ödül."),750);return;}
   setTimeout(()=>{state.i++;state.lock=false;state.eliminated=[];state.feedback="";render();},850);return;
  }
- bs[i].classList.add("wrong");state.eliminated.push(i);
+ bs[i].classList.add("wrong");state.eliminated.push(i);stopVoice();
  if(state.double){state.double=false;state.feedback="İlk cevap yanlış. İkinci hakkını kullanabilirsin.";renderFeedback();return;}
  state.lock=true;stopVoice();state.lives--;state.feedback="Yanlış cevap. Doğru cevap: "+q[1][q[2]]+".";
  if(state.lives<=0){setTimeout(()=>renderEnd("Canların bitti. Güvenli ödülün: "+(state.i>=10?"250.000":state.i>=5?"7.500":"0")+" puan."),1000);return;}
  renderFeedback();
- setTimeout(()=>{state.i++;state.lock=false;state.eliminated=[];state.feedback="";if(state.i>=15){renderEnd("Oyun tamamlandı. Tebrikler!");return;}render();},1200);
+ setTimeout(()=>{if(state.i>=14){renderEnd("Son soruda yanlış cevap. Güvenli ödülün: "+(state.i>=10?"250.000":state.i>=5?"7.500":"0")+" puan.");return;}state.i++;state.lock=false;state.eliminated=[];state.feedback="";render();},1200);
 }
 function renderFeedback(){const el=root.querySelector(".dm-feedback");if(el)el.textContent=state.feedback;else{const d=document.createElement("div");d.className="dm-feedback";d.textContent=state.feedback;root.appendChild(d);}}
 function renderEnd(msg){clearInterval(timer);stopVoice();root.innerHTML='<div class="dm-brand" style="font-size:26px;margin:15vh 0 20px">🕌 DİNİ MİLYONER</div><div class="dm-result">'+msg+'</div><div class="dm-tools"><button class="dm-btn" data-dm="new">Yeniden oyna</button><button class="dm-btn" data-dm="home">Ana sayfa</button></div>';root.classList.add("open");}
