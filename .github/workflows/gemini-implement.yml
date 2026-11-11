@@ -23,7 +23,7 @@ jobs:
             const pr=await github.rest.pulls.get({owner,repo,pull_number:context.issue.number});
             core.setOutput('head_ref',pr.data.head.ref);
             core.setOutput('head_sha',pr.data.head.sha);
-            core.setOutput('base_ref',pr.data.base.ref);
+            core.setOutput('base_ref',pr.data.base.ref);\n            core.setOutput('base_sha',pr.data.base.sha);
             core.setOutput('instruction',context.payload.comment.body.replace(/^\/gemini\s+/,'').trim());
       - name: PR dalını al
         uses: actions/checkout@v4
@@ -38,7 +38,7 @@ jobs:
           REPOSITORY: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.issue.number }}
           SOURCE_BRANCH: ${{ steps.pr.outputs.head_ref }}
-          BASE_BRANCH: ${{ steps.pr.outputs.base_ref }}
+          BASE_BRANCH: ${{ steps.pr.outputs.base_ref }}\n          BASE_SHA: ${{ steps.pr.outputs.base_sha }}
           INSTRUCTION: ${{ steps.pr.outputs.instruction }}
           RUN_ID: ${{ github.run_id }}
         run: |
@@ -47,7 +47,7 @@ jobs:
           const fs=require('fs');
           const {execFileSync}=require('child_process');
           async function main(){
-            const diff=execFileSync('git',['diff','HEAD^','HEAD','--','*.js','*.css','*.html','*.json','*.md'],{encoding:'utf8',maxBuffer:8*1024*1024});
+            const diff=execFileSync('git',['diff',process.env.BASE_SHA,'HEAD','--','*.js','*.css','*.html','*.json','*.md'],{encoding:'utf8',maxBuffer:8*1024*1024});
             const files=execFileSync('git',['ls-files'],{encoding:'utf8'}).split('\n').filter(Boolean);
             const context=files.map(f=>{
               if(!/\.(js|css|html|json|md)$/.test(f)) return '';
