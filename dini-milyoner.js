@@ -52,9 +52,18 @@ const questions=[
 const prizes=["1.000","2.000","3.000","5.000","7.500","15.000","30.000","60.000","125.000","250.000","500.000","1.000.000","2.000.000","5.000.000","10.000.000"];
 let root=null,state=null,timer=null,tts=true;
 function stopVoice(){try{if(window.ArenaTTS)window.ArenaTTS.stop()}catch(e){}try{if(window.speechSynthesis)window.speechSynthesis.cancel()}catch(e){}}
-async function speak(){if(!tts||!state)return;const q=state.deck[state.i],text="Soru "+(state.i+1)+". "+q[0]+". Seçenekler. "+q[1].map((x,i)=>"Şık "+("ABCD"[i])+". "+x).join(". ")+".";
-if(window.ArenaTTS){try{await window.ArenaTTS.speak(text);return}catch(e){}}
-if(!("speechSynthesis"in window)||!("SpeechSynthesisUtterance"in window))return;try{stopVoice();const u=new SpeechSynthesisUtterance(text);u.lang="tr-TR";u.rate=.88;u.pitch=1;u.volume=1;const v=window.speechSynthesis.getVoices()||[],tr=v.find(x=>/^tr([-_]|$)/i.test(x.lang));if(tr)u.voice=tr;window.speechSynthesis.speak(u)}catch(e){}
+let voiceToken=0;
+function stopVoice(){voiceToken++;try{if(window.ArenaTTS)window.ArenaTTS.stop()}catch(e){}try{if(window.speechSynthesis)window.speechSynthesis.cancel()}catch(e){}}
+async function speak(){if(!tts||!state||!state.deck[state.i])return;const token=++voiceToken,q=state.deck[state.i],text="Soru "+(state.i+1)+". "+q[0]+". Seçenekler. "+q[1].map((x,i)=>"Şık "+("ABCD"[i])+". "+x).join(". ")+".";
+ try{
+  if(window.ArenaTTS&&typeof window.ArenaTTS.speak==="function"){
+   await window.ArenaTTS.speak(text);
+   if(token!==voiceToken)stopVoice();
+   return;
+  }
+ }catch(nativeError){console.warn("ARENA yerel seslendirme kullanılamadı:",nativeError);}
+ if(!("speechSynthesis" in window)||!("SpeechSynthesisUtterance" in window)){const f=root&&root.querySelector(".dm-feedback");if(f)f.textContent="Bu cihazda seslendirme motoru bulunamadı.";return;}
+ try{window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="tr-TR";u.rate=.88;u.pitch=1;u.volume=1;const voices=window.speechSynthesis.getVoices()||[];const tr=voices.find(v=>/^tr([-_]|$)/i.test(v.lang));if(tr)u.voice=tr;u.onerror=function(ev){console.warn("ARENA seslendirme hatası:",ev.error);};window.speechSynthesis.speak(u);}catch(e){console.warn("ARENA seslendirme hatası:",e);}
 }
 function shuffle(a){return a.map(x=>[Math.random(),x]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);}
 function mount(){if(root)return;let st=document.createElement("style");st.textContent=`
