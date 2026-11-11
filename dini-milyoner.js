@@ -54,6 +54,8 @@ let root=null,state=null,timer=null,tts=true;
 function stopVoice(){try{if(window.ArenaTTS)window.ArenaTTS.stop()}catch(e){}try{if(window.speechSynthesis)window.speechSynthesis.cancel()}catch(e){}}
 let voiceToken=0;
 function stopVoice(){voiceToken++;try{if(window.ArenaTTS)window.ArenaTTS.stop()}catch(e){}try{if(window.speechSynthesis)window.speechSynthesis.cancel()}catch(e){}}
+let voiceToken=0;
+function stopVoice(){voiceToken++;try{if(window.ArenaTTS)window.ArenaTTS.stop()}catch(e){}try{if(window.speechSynthesis)window.speechSynthesis.cancel()}catch(e){}}
 async function speak(){if(!tts||!state||!state.deck[state.i])return;const token=++voiceToken,q=state.deck[state.i],text="Soru "+(state.i+1)+". "+q[0]+". Seçenekler. "+q[1].map((x,i)=>"Şık "+("ABCD"[i])+". "+x).join(". ")+".";
  try{
   if(window.ArenaTTS&&typeof window.ArenaTTS.speak==="function"){
