@@ -98,7 +98,7 @@ function answer(i){
  if(i===q[2]){
   state.lock=true;stopVoice();bs[q[2]].classList.add("correct");state.double=false;state.feedback="Doğru cevap!";
   renderFeedback();
-  if(state.i===14){setTimeout(()=>renderEnd("TEBRİKLER! İLİM MİLYONERİİ TAMAMLADIN! 10.000.000 puanlık büyük ödül."),750);return;}
+  if(state.i===14){setTimeout(()=>renderEnd("TEBRİKLER! İLİM YARIŞMASIİ TAMAMLADIN! 10.000.000 puanlık büyük ödül."),750);return;}
   setTimeout(()=>{state.i++;state.lock=false;state.eliminated=[];state.feedback="";render();},850);return;
  }
  bs[i].classList.add("wrong");state.eliminated.push(i);stopVoice();
@@ -109,7 +109,7 @@ function answer(i){
  setTimeout(()=>{if(state.i>=14){renderEnd("Son soruda yanlış cevap. Güvenli ödülün: "+(state.i>=10?"250.000":state.i>=5?"7.500":"0")+" puan.");return;}state.i++;state.lock=false;state.eliminated=[];state.feedback="";render();},1200);
 }
 function renderFeedback(){const el=root.querySelector(".dm-feedback");if(el)el.textContent=state.feedback;else{const d=document.createElement("div");d.className="dm-feedback";d.textContent=state.feedback;root.appendChild(d);}}
-function renderEnd(msg){clearInterval(timer);stopVoice();root.innerHTML='<div class="dm-brand" style="font-size:26px;margin:15vh 0 20px">🕌 İLİM MİLYONERİ</div><div class="dm-result">'+msg+'</div><div class="dm-tools"><button class="dm-btn" data-dm="new">Yeniden oyna</button><button class="dm-btn" data-dm="home">Ana sayfa</button></div>';root.classList.add("open");}
+function renderEnd(msg){clearInterval(timer);stopVoice();root.innerHTML='<div class="dm-brand" style="font-size:26px;margin:15vh 0 20px">🕌 İLİM YARIŞMASI</div><div class="dm-result">'+msg+'</div><div class="dm-tools"><button class="dm-btn" data-dm="new">Yeniden oyna</button><button class="dm-btn" data-dm="home">Ana sayfa</button></div>';root.classList.add("open");}
 function half(){if(state.used.half||state.lock)return;state.used.half=true;let q=state.deck[state.i],wrong=shuffle([0,1,2,3].filter(i=>i!==q[2]));state.eliminated.push(...wrong.slice(0,2));render();}
 function audience(){if(state.used.audience||state.lock)return;state.used.audience=true;const q=state.deck[state.i],correct=55+Math.floor(Math.random()*31),others=shuffle([0,1,2,3].filter(i=>i!==q[2])),left=100-correct,p=[0,0,0,0];p[q[2]]=correct;let rest=left;others.forEach((ix,n)=>{const v=n===2?rest:Math.floor(Math.random()*(rest+1));p[ix]=v;rest-=v;});state.feedback="Seyirci oylaması: "+p.map((v,i)=>"ABCD"[i]+" %"+v).join(" · ");render();}
 function start(){state={deck:shuffle(questions).slice(0,15),i:0,lives:3,used:{half:false,audience:false,double:false},double:false,eliminated:[],feedback:"",lock:false};state.deck=state.deck.map(q=>{let opts=q[1].map((x,i)=>({x,ok:i===q[2]}));opts=shuffle(opts);return [q[0],opts.map(o=>o.x),opts.findIndex(o=>o.ok)];});render();}
