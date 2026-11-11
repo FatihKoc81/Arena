@@ -59,7 +59,7 @@ h1{display:grid!important;grid-template-columns:1fr auto 1fr;justify-content:nor
 <div class="ust"><b id="oSeviye"></b><span id="oCan"></span><span id="sayac"></span></div>
 <div class="cubuk"><div id="bar"></div></div>
 <p id="soruMetni"></p>
-<button type="button" id="soruSesBtn" class="jok" style="width:100%;margin:0 0 10px">🔊 Soruyu sesli oku</button>
+<button type="button" id="soruSesBtn" class="jok" style="display:block!important;width:100%;margin:0 0 12px;padding:10px 8px;font-size:15px">🔊 Soruyu ve şıkları tekrar dinle</button>
 <div id="secenekler"></div>
 <div class="jokerler">
 <button class="jok" id="jYarim">✂️ 50:50</button>
@@ -117,15 +117,36 @@ const kaydet = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } ca
 
 let lv, soru, kilit, jok, butonlar, ciftAktif;
 let soruSesAcik = true;
-function soruSesDurdur(){try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}}
+let soruSesToken = 0;
+function soruSesDurdur(){
+  soruSesToken++;
+  try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}
+}
 function soruSesOku(){
-  if(!soruSesAcik||!lv||!lv[soru])return;
-  if(!("speechSynthesis" in window))return;
-  soruSesDurdur();
-  const q=lv[soru],metin="Soru. "+q[0]+". Seçenekler. "+q[1].map((x,i)=>"Şık "+("A B C D".split(" ")[i])+". "+x).join(". ");
-  const u=new SpeechSynthesisUtterance(metin);u.lang="tr-TR";u.rate=0.92;u.pitch=1;u.volume=1;
-  const voices=window.speechSynthesis.getVoices();const tr=voices.find(v=>/^tr([-_]|$)/i.test(v.lang));if(tr)u.voice=tr;
-  window.speechSynthesis.speak(u);
+  if(!soruSesAcik||!lv||!lv[soru]||!$("oyun")||$("oyun").classList.contains("hidden"))return;
+  if(!("speechSynthesis" in window)||!("SpeechSynthesisUtterance" in window))return;
+  const token=++soruSesToken;
+  try{window.speechSynthesis.cancel();}catch(e){}
+  const q=lv[soru],le=["A","B","C","D"];
+  const metin="Soru. "+q[0]+". Seçenekler. "+q[1].map((x,i)=>"Şık "+(le[i]||"")+". "+x).join(". ") + ".";
+  const u=new SpeechSynthesisUtterance(metin);
+  u.lang="tr-TR";u.rate=0.88;u.pitch=1;u.volume=1;
+  const sesSec=()=>{
+    if(token!==soruSesToken||!soruSesAcik)return;
+    const voices=window.speechSynthesis.getVoices()||[];
+    const tr=voices.find(v=>/^tr([-_]|$)/i.test(v.lang));
+    if(tr)u.voice=tr;
+    try{window.speechSynthesis.speak(u);}catch(e){}
+  };
+  const voices=window.speechSynthesis.getVoices()||[];
+  if(voices.length)sesSec();
+  else {
+    let tamam=false;
+    const yedek=setTimeout(()=>{if(!tamam){tamam=true;sesSec();}},700);
+    window.speechSynthesis.onvoiceschanged=()=>{
+      if(tamam)return;tamam=true;clearTimeout(yedek);sesSec();
+    };
+  }
 }
 
 
@@ -239,7 +260,7 @@ function goster() {
   });
   const sesBtn=$("soruSesBtn"); if(sesBtn){sesBtn.textContent=soruSesAcik?"🔊 Soruyu tekrar dinle":"🔇 Sesli okuma kapalı";sesBtn.onclick=()=>{soruSesAcik=!soruSesAcik;if(soruSesAcik)soruSesOku();else soruSesDurdur();sesBtn.textContent=soruSesAcik?"🔊 Soruyu tekrar dinle":"🔇 Sesli okuma kapalı";};}
   sureBaslat();
-  if(soruSesAcik){if(window.speechSynthesis&&window.speechSynthesis.getVoices)window.speechSynthesis.getVoices();setTimeout(soruSesOku,250);}
+  if(soruSesAcik)setTimeout(soruSesOku,350);
 }
 
 function sonraki() {
