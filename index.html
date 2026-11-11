@@ -44,7 +44,17 @@ h1{display:grid!important;grid-template-columns:1fr auto 1fr;justify-content:nor
 .g-ev{width:68px;height:68px;flex:none;border-radius:50%;border:3px solid #44627f;background:rgba(0,0,0,.35);font-size:32px}
 </style>
 
-<style id="arenaMiniTTSLayout">#oyun .jokerler{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px!important}#oyun .soru-ses-mini{grid-column:3;grid-row:2;width:100%!important;min-width:0!important;margin:0!important;padding:7px 3px!important;font-size:11px!important;line-height:1.15!important;white-space:normal!important;min-height:36px!important}#oyun .jokerler #jYarim{grid-column:1;grid-row:1}#oyun .jokerler #jSeyirci{grid-column:2;grid-row:1}#oyun .jokerler #jCift{grid-column:3;grid-row:1}</style>
+<style id="arenaMiniTTSLayout">
+#oyun .jokerler{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px!important}
+#oyun .soru-ses-mini{grid-column:3;grid-row:2;width:100%!important;min-width:0!important;margin:0!important;padding:7px 3px!important;font-size:11px!important;line-height:1.15!important;white-space:normal!important;min-height:36px!important}
+#oyun .jokerler #jYarim{grid-column:1;grid-row:1}#oyun .jokerler #jSeyirci{grid-column:2;grid-row:1}#oyun .jokerler #jCift{grid-column:3;grid-row:1}
+#oyun .oyun-footer{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr) minmax(0,1fr);align-items:center;gap:8px;margin-top:12px}
+#oyun .oyun-pill{box-sizing:border-box;min-width:0;min-height:42px;border:2px solid #4a5a9a;border-radius:24px;background:#101a38;color:#fff;padding:7px 5px;font:800 13px/1.15 system-ui,sans-serif;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#oyun button.oyun-pill{cursor:pointer}
+#oyun .oyun-pill.gold{border-color:#ffb300;color:#ffe27a;background:#171b2c}
+#oyun .oyun-pill.voice{border-color:#4a78ba;color:#bfe7ff;background:#102443}
+#oyun .oyun-pill.player{display:flex;align-items:center;justify-content:center}
+</style>
 </head>
 <body>
 <h1><i class="hl">⚡</i><span>ARENA</span><i class="hl hs">⚡</i></h1>
@@ -66,6 +76,11 @@ h1{display:grid!important;grid-template-columns:1fr auto 1fr;justify-content:nor
 <button class="jok" id="jYarim">✂️ 50:50</button>
 <button class="jok" id="jSeyirci">👥 Seyirci</button>
 <button class="jok" id="jCift">🛡️ Çift Cevap</button><button type="button" id="soruSesBtn" class="jok soru-ses-mini">🔊 Soruyu dinle</button>
+</div>
+<div class="oyun-footer">
+<button type="button" id="oyunAltinBtn" class="oyun-pill gold" aria-label="Altın satın al"></button>
+<div class="oyun-pill player" id="oyunOyuncu"></div>
+<button type="button" id="oyunSesToggle" class="oyun-pill voice" aria-label="Sesi aç veya kapat"></button>
 </div>
 </section>
 
@@ -118,7 +133,7 @@ if (typeof st.bonus !== "number") st.bonus = 0; // her 3 bölümde kazanılan, s
 const kaydet = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} };
 
 let lv, soru, kilit, jok, butonlar, ciftAktif;
-let soruSesAcik = true;
+let soruSesAcik = (()=>{try{return localStorage.getItem('arena_question_voice')!=='0';}catch(e){return true;}})();
 let soruSesToken = 0;
 function soruSesDurdur(){soruSesToken++;try{if(window.ArenaTTS)window.ArenaTTS.stop();}catch(e){}try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}}
 async function soruSesOku(){if(!soruSesAcik||!lv||!lv[soru]||$("oyun").classList.contains("hidden"))return;const token=++soruSesToken,q=lv[soru],le=["A","B","C","D"];const metin="Soru. "+q[0]+". Seçenekler. "+q[1].map((x,i)=>"Şık "+le[i]+". "+x).join(". ")+".";
@@ -235,7 +250,11 @@ function goster() {
     kutu.append(b);
     return b;
   });
-  const sesBtn=$("soruSesBtn"); if(sesBtn){sesBtn.textContent="🔊 Soruyu dinle";sesBtn.onclick=()=>{soruSesAcik=true;soruSesOku();};}
+  const sesBtn=$("soruSesBtn"); if(sesBtn){sesBtn.textContent="🔊 Soruyu dinle";sesBtn.onclick=()=>{if(soruSesAcik)soruSesOku();};}
+  const altinBtn=$("oyunAltinBtn"),oyuncuEl=$("oyunOyuncu"),sesToggle=$("oyunSesToggle");
+  if(altinBtn){altinBtn.textContent="🪙 "+(window.Ekonomi&&Ekonomi.altin?Number(Ekonomi.altin()).toLocaleString("tr-TR"):"0")+" +";altinBtn.onclick=()=>{if(window.Ekonomi&&Ekonomi.dukkan)Ekonomi.dukkan();};}
+  if(oyuncuEl)oyuncuEl.textContent="👤 "+((window.Ekonomi&&Ekonomi.ad)?Ekonomi.ad():"Oyuncu");
+  if(sesToggle){sesToggle.textContent=soruSesAcik?"🔊 Ses Açık":"🔇 Ses Kapalı";sesToggle.onclick=()=>{soruSesAcik=!soruSesAcik;try{localStorage.setItem("arena_question_voice",soruSesAcik?"1":"0");}catch(e){}if(!soruSesAcik)soruSesDurdur();else soruSesOku();sesToggle.textContent=soruSesAcik?"🔊 Ses Açık":"🔇 Ses Kapalı";};}
   sureBaslat();
   if(soruSesAcik)setTimeout(soruSesOku,350);
 }
