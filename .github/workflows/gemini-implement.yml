@@ -98,8 +98,15 @@ jobs:
               if(completed) break;
             }
             if(!completed) throw new Error('Tüm Gemini modelleri/denemeleri başarısız oldu. Son hata: '+(lastError?.message||'bilinmiyor'));
-            const patch=(data.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('\n').replace(/^\s*```(?:diff)?\s*/,'').replace(/\s*```\s*$/,'').trim();
-            if(!patch.startsWith('diff --git ')) throw new Error('Gemini geçerli unified diff üretmedi; otomatik uygulama yapılmadı.');
+            const rawText=(data.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('\n').trim();
+            const fenced=rawText.match(/```(?:diff|patch)?\s*([\s\S]*?)```/i);
+            const candidate=fenced?fenced[1].trim():rawText;
+            const diffStart=candidate.indexOf('diff --git ');
+            const patch=diffStart>=0?candidate.slice(diffStart).trim():candidate;
+            if(!patch.startsWith('diff --git ') || !patch.includes('\n+++ b/')) {
+              console.error('Gemini yanıtı patch değil. Yanıtın ilk 1800 karakteri: '+rawText.slice(0,1800));
+              throw new Error('Gemini geçerli unified diff üretmedi; otomatik uygulama yapılmadı.');
+            }
             fs.writeFileSync('/tmp/gemini.patch',patch+'\n');
             execFileSync('git',['apply','--check','/tmp/gemini.patch'],{stdio:'inherit'});
             execFileSync('git',['apply','/tmp/gemini.patch'],{stdio:'inherit'});
