@@ -152,8 +152,9 @@ jobs:
           sed -i -E 's|<string name="app_name">[^<]*</string>|<string name="app_name">ARENA</string>|; s|<string name="title_activity_main">[^<]*</string>|<string name="title_activity_main">ARENA</string>|' android/app/src/main/res/values/strings.xml
           grep -n app_name android/app/src/main/res/values/strings.xml
 
-      - name: Uygulama ikonunu ayarla (yuvarlatılmış kare logo, uyarlanabilir ikon)
+      - name: ARENA uygulama logosunu tüm Android simge türlerine uygula
         run: |
+          set -e
           RES=android/app/src/main/res
           BG="#04102c"
           if ! command -v magick >/dev/null && ! command -v convert >/dev/null; then
@@ -161,8 +162,10 @@ jobs:
             sudo apt-get install -y -qq imagemagick
           fi
           IM=$(command -v magick || command -v convert)
-          $IM icon-512.png -alpha set \
-            \( -size 512x512 xc:none -fill white -draw "circle 256,256 256,10" \) \
+          test -s icon-512.png
+          test -s icon-foreground.png
+          $IM icon-512.png -resize 512x512^ -gravity center -extent 512x512 \
+            -alpha set \( -size 512x512 xc:none -fill white -draw "circle 256,256 256,8" \) \
             -compose DstIn -composite logo-round.png
           rm -f $RES/mipmap-*/ic_launcher*
           rm -rf $RES/mipmap-anydpi-v26
@@ -170,7 +173,7 @@ jobs:
           for d in "mdpi 108 48" "hdpi 162 72" "xhdpi 216 96" "xxhdpi 324 144" "xxxhdpi 432 192"; do
             set -- $d
             mkdir -p $RES/mipmap-$1
-            $IM icon-foreground.png -resize $2x$2 $RES/mipmap-$1/ic_launcher_foreground.png
+            $IM -size ${2}x${2} xc:none \( icon-foreground.png -resize $(( $2 * 72 / 100 ))x$(( $2 * 72 / 100 )) \) -gravity center -composite $RES/mipmap-$1/ic_launcher_foreground.png
             $IM icon-512.png -resize $3x$3 $RES/mipmap-$1/ic_launcher.png
             $IM logo-round.png -resize $3x$3 $RES/mipmap-$1/ic_launcher_round.png
           done
@@ -178,7 +181,9 @@ jobs:
           for n in ic_launcher ic_launcher_round; do
             echo '<?xml version="1.0" encoding="utf-8"?><adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android"><background android:drawable="@color/ic_launcher_background"/><foreground android:drawable="@mipmap/ic_launcher_foreground"/></adaptive-icon>' > $RES/mipmap-anydpi-v26/$n.xml
           done
-          ls $RES/mipmap-xxxhdpi
+          test -s $RES/mipmap-xxxhdpi/ic_launcher.png
+          test -s $RES/mipmap-xxxhdpi/ic_launcher_foreground.png
+          ls -l $RES/mipmap-xxxhdpi
 
       - name: Sürüm kodunu artır
         run: sed -i -E "s/versionCode [0-9]+/versionCode ${{ github.run_number }}/" android/app/build.gradle
