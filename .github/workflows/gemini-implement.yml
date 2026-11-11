@@ -100,6 +100,15 @@ jobs:
             }
             if(!completed) throw new Error('Tüm Gemini modelleri/denemeleri başarısız oldu. Son hata: '+(lastError?.message||'bilinmiyor'));
             const rawText=(data.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('\n').trim();
+            // Boş yanıtı sahte diff'e çevirmeden güvenli no-op olarak raporla.
+            if(!rawText){
+              console.log('Gemini boş yanıt verdi; hiçbir dosya değiştirilmedi.');
+              const [owner,repo]=process.env.REPOSITORY.split('/');
+              const commentUrl='https://api.github.com/repos/'+owner+'/'+repo+'/issues/'+process.env.PR_NUMBER+'/comments';
+              const note=await fetch(commentUrl,{method:'POST',headers:{'Authorization':'Bearer '+process.env.GH_TOKEN,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json'},body:JSON.stringify({body:'Gemini bu görev için boş yanıt verdi. Güvenlik gereği hiçbir dosya değiştirilmedi ve PR oluşturulmadı. Görev ayrıca kod incelemesiyle doğrulanmalıdır.'})});
+              if(!note.ok) throw new Error('Boş yanıt raporu PR\'a yazılamadı: '+(await note.text()).slice(0,800));
+              return;
+            }
             const fenced=rawText.match(/```(?:diff|patch)?\s*([\s\S]*?)```/i);
             const candidate=fenced?fenced[1].trim():rawText;
             const diffStart=candidate.indexOf('diff --git ');
