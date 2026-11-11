@@ -19,7 +19,7 @@ yuzbir:{name:'101',icon:'🎴',desc:'Gerçek 101 masasında per aç, rakiplerle 
 batak:{name:'Batak',icon:'♠️',desc:'İhaleni al, elleri topla',re:/__arena_batak_never__/i},
 poker:{name:'Poker',icon:'🃏',desc:'Texas Hold’em masasına otur',re:/__arena_poker_never__/i},
 milyoner:{name:'Milyoner',icon:'🏆',desc:'Genel kültür ve bilgi yarışması',re:/milyoner|oyuna başla/i},
-diniMilyoner:{name:'İlim Yarışması',icon:'🕌',desc:'İslam dini üzerine 15 soruluk bilgi yarışması',re:/__arena_dini_milyoner__/i},
+diniMilyoner:{name:'Dini İmtihan',icon:'🕌',desc:'İslam dini üzerine 15 soruluk bilgi yarışması',re:/__arena_dini_milyoner__/i},
 passaparola:{name:'Passaparola',icon:'🔤',desc:'Harf harf cevapla, süreye karşı yarış',re:/pass.?aparola/i},
 kelime:{name:'Kelime Oyunu',icon:'🔤',desc:'İpuçlarından kelimeleri bul',re:/kelime oyunu/i},
 rotasyon:{name:'Rotasyon',icon:'🧩',desc:'Harfleri birleştir, kelimeleri keşfet',re:/rotasyon/i},
