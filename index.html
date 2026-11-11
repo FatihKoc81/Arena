@@ -46,7 +46,7 @@ h1{display:grid!important;grid-template-columns:1fr auto 1fr;justify-content:nor
 
 <style id="arenaMiniTTSLayout">
 #oyun .jokerler{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px!important}
-#oyun .soru-ses-mini{grid-column:3;grid-row:2;width:100%!important;min-width:0!important;margin:0!important;padding:7px 3px!important;font-size:11px!important;line-height:1.15!important;white-space:normal!important;min-height:36px!important}
+
 #oyun .jokerler #jYarim{grid-column:1;grid-row:1}#oyun .jokerler #jSeyirci{grid-column:2;grid-row:1}#oyun .jokerler #jCift{grid-column:3;grid-row:1}
 #oyun .oyun-footer{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr) minmax(0,1fr);align-items:center;gap:8px;margin-top:12px}
 #oyun .oyun-pill{box-sizing:border-box;min-width:0;min-height:42px;border:2px solid #4a5a9a;border-radius:24px;background:#101a38;color:#fff;padding:7px 5px;font:800 13px/1.15 system-ui,sans-serif;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -75,7 +75,7 @@ h1{display:grid!important;grid-template-columns:1fr auto 1fr;justify-content:nor
 <div class="jokerler">
 <button class="jok" id="jYarim">✂️ 50:50</button>
 <button class="jok" id="jSeyirci">👥 Seyirci</button>
-<button class="jok" id="jCift">🛡️ Çift Cevap</button><button type="button" id="soruSesBtn" class="jok soru-ses-mini">🔊 Soruyu dinle</button>
+<button class="jok" id="jCift">🛡️ Çift Cevap</button>
 </div>
 <div class="oyun-footer">
 <button type="button" id="oyunAltinBtn" class="oyun-pill gold" aria-label="Altın satın al"></button>
@@ -250,11 +250,11 @@ function goster() {
     kutu.append(b);
     return b;
   });
-  const sesBtn=$("soruSesBtn"); if(sesBtn){sesBtn.textContent="🔊 Soruyu dinle";sesBtn.onclick=()=>{if(soruSesAcik)soruSesOku();};}
+  
   const altinBtn=$("oyunAltinBtn"),oyuncuEl=$("oyunOyuncu"),sesToggle=$("oyunSesToggle");
   if(altinBtn){altinBtn.textContent="🪙 "+(window.Ekonomi&&Ekonomi.altin?Number(Ekonomi.altin()).toLocaleString("tr-TR"):"0")+" +";altinBtn.onclick=()=>{if(window.Ekonomi&&Ekonomi.dukkan)Ekonomi.dukkan();};}
   if(oyuncuEl)oyuncuEl.textContent="👤 "+((window.Ekonomi&&Ekonomi.ad)?Ekonomi.ad():"Oyuncu");
-  if(sesToggle){sesToggle.textContent=soruSesAcik?"🔊 Ses Açık":"🔇 Ses Kapalı";sesToggle.onclick=()=>{soruSesAcik=!soruSesAcik;try{localStorage.setItem("arena_question_voice",soruSesAcik?"1":"0");}catch(e){}if(!soruSesAcik)soruSesDurdur();else soruSesOku();sesToggle.textContent=soruSesAcik?"🔊 Ses Açık":"🔇 Ses Kapalı";};}
+  if(sesToggle){sesToggle.textContent=soruSesAcik?"🔊 Ses":"🔇 Ses";sesToggle.onclick=()=>{soruSesAcik=!soruSesAcik;try{localStorage.setItem("arena_question_voice",soruSesAcik?"1":"0");}catch(e){}if(!soruSesAcik)soruSesDurdur();else soruSesOku();sesToggle.textContent=soruSesAcik?"🔊 Ses":"🔇 Ses";};}
   sureBaslat();
   if(soruSesAcik)setTimeout(soruSesOku,350);
 }
