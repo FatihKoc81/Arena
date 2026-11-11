@@ -44,6 +44,7 @@ h1{display:grid!important;grid-template-columns:1fr auto 1fr;justify-content:nor
 .g-ev{width:68px;height:68px;flex:none;border-radius:50%;border:3px solid #44627f;background:rgba(0,0,0,.35);font-size:32px}
 </style>
 
+<style id="arenaMiniTTSLayout">#oyun .jokerler{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px!important}#oyun .soru-ses-mini{grid-column:3;grid-row:2;width:100%!important;min-width:0!important;margin:0!important;padding:7px 3px!important;font-size:11px!important;line-height:1.15!important;white-space:normal!important;min-height:36px!important}#oyun .jokerler #jYarim{grid-column:1;grid-row:1}#oyun .jokerler #jSeyirci{grid-column:2;grid-row:1}#oyun .jokerler #jCift{grid-column:3;grid-row:1}</style>
 </head>
 <body>
 <h1><i class="hl">⚡</i><span>ARENA</span><i class="hl hs">⚡</i></h1>
@@ -59,12 +60,12 @@ h1{display:grid!important;grid-template-columns:1fr auto 1fr;justify-content:nor
 <div class="ust"><b id="oSeviye"></b><span id="oCan"></span><span id="sayac"></span></div>
 <div class="cubuk"><div id="bar"></div></div>
 <p id="soruMetni"></p>
-<button type="button" id="soruSesBtn" class="jok" style="display:block!important;width:100%;margin:0 0 12px;padding:10px 8px;font-size:15px">🔊 Soruyu ve şıkları tekrar dinle</button>
+
 <div id="secenekler"></div>
 <div class="jokerler">
 <button class="jok" id="jYarim">✂️ 50:50</button>
 <button class="jok" id="jSeyirci">👥 Seyirci</button>
-<button class="jok" id="jCift">🛡️ Çift Cevap</button>
+<button class="jok" id="jCift">🛡️ Çift Cevap</button><button type="button" id="soruSesBtn" class="jok soru-ses-mini">🔊 Soruyu dinle</button>
 </div>
 </section>
 
@@ -118,35 +119,10 @@ const kaydet = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } ca
 let lv, soru, kilit, jok, butonlar, ciftAktif;
 let soruSesAcik = true;
 let soruSesToken = 0;
-function soruSesDurdur(){
-  soruSesToken++;
-  try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}
-}
-function soruSesOku(){
-  if(!soruSesAcik||!lv||!lv[soru]||!$("oyun")||$("oyun").classList.contains("hidden"))return;
-  if(!("speechSynthesis" in window)||!("SpeechSynthesisUtterance" in window))return;
-  const token=++soruSesToken;
-  try{window.speechSynthesis.cancel();}catch(e){}
-  const q=lv[soru],le=["A","B","C","D"];
-  const metin="Soru. "+q[0]+". Seçenekler. "+q[1].map((x,i)=>"Şık "+(le[i]||"")+". "+x).join(". ") + ".";
-  const u=new SpeechSynthesisUtterance(metin);
-  u.lang="tr-TR";u.rate=0.88;u.pitch=1;u.volume=1;
-  const sesSec=()=>{
-    if(token!==soruSesToken||!soruSesAcik)return;
-    const voices=window.speechSynthesis.getVoices()||[];
-    const tr=voices.find(v=>/^tr([-_]|$)/i.test(v.lang));
-    if(tr)u.voice=tr;
-    try{window.speechSynthesis.speak(u);}catch(e){}
-  };
-  const voices=window.speechSynthesis.getVoices()||[];
-  if(voices.length)sesSec();
-  else {
-    let tamam=false;
-    const yedek=setTimeout(()=>{if(!tamam){tamam=true;sesSec();}},700);
-    window.speechSynthesis.onvoiceschanged=()=>{
-      if(tamam)return;tamam=true;clearTimeout(yedek);sesSec();
-    };
-  }
+function soruSesDurdur(){soruSesToken++;try{if(window.ArenaTTS)window.ArenaTTS.stop();}catch(e){}try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}}
+async function soruSesOku(){if(!soruSesAcik||!lv||!lv[soru]||$("oyun").classList.contains("hidden"))return;const token=++soruSesToken,q=lv[soru],le=["A","B","C","D"];const metin="Soru. "+q[0]+". Seçenekler. "+q[1].map((x,i)=>"Şık "+le[i]+". "+x).join(". ")+".";
+if(window.ArenaTTS){try{await window.ArenaTTS.speak(metin);if(token!==soruSesToken)window.ArenaTTS.stop();return;}catch(e){}}
+if(!("speechSynthesis"in window)||!("SpeechSynthesisUtterance"in window))return;try{window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(metin);u.lang="tr-TR";u.rate=.88;u.pitch=1;u.volume=1;const v=window.speechSynthesis.getVoices()||[],tr=v.find(x=>/^tr([-_]|$)/i.test(x.lang));if(tr)u.voice=tr;window.speechSynthesis.speak(u);}catch(e){}
 }
 
 
@@ -258,7 +234,7 @@ function goster() {
     kutu.append(b);
     return b;
   });
-  const sesBtn=$("soruSesBtn"); if(sesBtn){sesBtn.textContent=soruSesAcik?"🔊 Soruyu tekrar dinle":"🔇 Sesli okuma kapalı";sesBtn.onclick=()=>{soruSesAcik=!soruSesAcik;if(soruSesAcik)soruSesOku();else soruSesDurdur();sesBtn.textContent=soruSesAcik?"🔊 Soruyu tekrar dinle":"🔇 Sesli okuma kapalı";};}
+  const sesBtn=$("soruSesBtn"); if(sesBtn){sesBtn.textContent=soruSesAcik?"🔊 Soruyu dinle":"🔇 Ses kapalı";sesBtn.onclick=()=>{soruSesAcik=!soruSesAcik;if(soruSesAcik)soruSesOku();else soruSesDurdur();sesBtn.textContent=soruSesAcik?"🔊 Soruyu dinle":"🔇 Ses kapalı";};}
   sureBaslat();
   if(soruSesAcik)setTimeout(soruSesOku,350);
 }
