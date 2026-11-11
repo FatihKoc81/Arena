@@ -63,8 +63,8 @@ async function speak(){
   const voices=window.speechSynthesis.getVoices()||[],tr=voices.find(v=>/^tr([-_]|$)/i.test(v.lang));
   const say=text=>new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang="tr-TR";u.rate=.80;u.pitch=1;u.volume=1;if(tr)u.voice=tr;u.onend=resolve;u.onerror=resolve;window.speechSynthesis.speak(u);});
   await say("Soru. "+q[0]);if(token!==voiceToken)return;
-  await new Promise(r=>setTimeout(r,1100));await say("Seçenekler.");
-  for(let i=0;i<q[1].length;i++){if(token!==voiceToken)return;await new Promise(r=>setTimeout(r,420));await say(letters[i]+" seçeneği. "+q[1][i]+".");}
+  await new Promise(r=>setTimeout(r,1000));
+  for(let i=0;i<q[1].length;i++){if(token!==voiceToken)return;if(i>0)await new Promise(r=>setTimeout(r,1000));await say(q[1][i]+".");}
  }catch(e){console.warn("ARENA TTS:",e);}
 }
  try{if(window.ArenaTTS&&typeof window.ArenaTTS.speak==="function"){await window.ArenaTTS.speak(text);if(token!==voiceToken)stopVoice();return;}}
