@@ -42,4 +42,42 @@ Son değişikliklerde Okey ve 101 için ahşap görünümlü ıstaka, taş seçi
 5. **Önerilen düzeltme:** kısa ve uygulanabilir.
 6. **Sonuç:** Onay / Düzeltme gerekli.
 
-**Önemli:** Bu inceleme için `main` dalına doğrudan commit atma. Önce yalnızca rapor üret. Kod değişikliği gerekiyorsa ayrı dal ve Pull Request öner; ChatGPT ile çakışan değişiklik yapma.
+## Gemini görevi — Görsel tasarım ve kullanıcı deneyimi
+
+Gemini yalnızca kod hatası aramayacak; ARENA'nın masa oyunları için görsel tasarım ortağı olarak da bağımsız fikir üretecek. Özellikle Okey ve 101 ekranlarını gerçek bir masa oyunu hissi verecek şekilde değerlendirecek.
+
+### Görsel olarak incelenecek alanlar
+- **Taşlar:** renk ve sayı kontrastı, yazı tipi, taş oranları, kenar yuvarlaklığı, gölge, parlaklık ve gerçek taş hissi.
+- **Istaka:** ahşap dokusu, derinlik, ön dudak, taşların oturuşu, seçili taşın belirginliği ve sürükleme sırasında görsel geri bildirim.
+- **Masa:** arka plan/keçe dokusu, renk uyumu, ışık-gölge dengesi ve oyun alanının görsel hiyerarşisi.
+- **Oyuncu alanları:** rakiplerin konumu, isim ve profil alanları, sıra göstergesi, taş sayısı ve okunabilirlik.
+- **Kontroller:** taş çekme/atma, sıralama, per açma ve diğer butonların kolay bulunması; yanlışlıkla dokunmayı azaltan boyut ve aralıklar.
+- **Animasyonlar:** taş dağıtma, çekme, atma, seçme ve sürükleme hareketlerinin doğal, kısa ve akıcı olması.
+- **Ekran uyumu:** dar ve geniş telefonlar, portre/yatay yön, Android WebView, Chrome ve Safari. İçerik kesilmemeli, taşlar okunamayacak kadar küçülmemeli, gereksiz kaydırma oluşmamalı.
+
+### Tasarım değerlendirme kuralları
+1. Önce mevcut ekranı ve mevcut CSS/HTML yapısını incele; yalnızca varsayıma dayalı eleştiri yapma.
+2. Her önemli görsel sorun için mümkünse ekran görüntüsü üzerinde işaretli açıklama veya basit bir taslak öner.
+3. Tek bir tasarımı dayatma. Gerektiğinde en fazla 2–3 farklı tasarım alternatifi sun; her birinin artılarını ve eksilerini yaz.
+4. Alternatifleri gerçekçilik, okunabilirlik, telefon ekranına uyum, erişilebilirlik ve performans açısından karşılaştır.
+5. ARENA'nın mevcut görsel kimliğiyle uyumu koru; sırf gösterişli olsun diye gereksiz efekt, parlama veya animasyon ekleme.
+6. Görsel öneriler mevcut oyun kurallarını, taş sayısını veya dokunmatik etkileşimleri bozmamalı.
+7. Önerdiğin değişikliklerin hangi dosya ve CSS seçicilerini/HTML parçalarını etkileyeceğini belirt.
+8. Tasarım kararı verilmeden büyük çaplı görsel değişikliği uygulama. Önce önerileri ChatGPT ile karşılaştırılmak üzere raporla.
+
+### Görsel rapor formatı
+1. **Mevcut durum:** Güçlü ve zayıf yönler.
+2. **Sorun:** Ekran bölgesi ve kullanıcıya etkisi.
+3. **Alternatifler:** En fazla 2–3 tasarım fikri; mümkünse taslak/görsel referans.
+4. **Karşılaştırma:** Gerçekçilik, okunabilirlik, mobil uyum ve performans.
+5. **Önerilen seçenek:** Gerekçesi ve etkilenecek dosyalar.
+6. **Sonuç:** Tasarım onayı / kullanıcı kararı gerekli.
+
+### Ortak karar ve uygulama
+- ChatGPT ve Gemini önce teknik ve görsel önerileri ayrı ayrı değerlendirir.
+- Fikir ayrılığı varsa iki yaklaşımın artı/eksileri açıkça karşılaştırılır; gerekirse kullanıcıya kısa ve anlaşılır seçenekler sunulur.
+- Uygulanacak tasarım, teknik olarak güvenli ve oyun kullanımını kolaylaştıran seçenek olmalıdır.
+- ChatGPT onaylanan değişikliği GitHub'a uygular; Gemini'nin raporu tek başına kod değişikliği yetkisi vermez.
+- Son karar gerçek cihaz ekran görüntüsü/video testiyle doğrulanır.
+
+**Önemli:** Gemini bu inceleme için `main` dalına doğrudan commit atma. Önce yalnızca rapor üret. Kod değişikliği gerekiyorsa ayrı dal ve Pull Request öner; ChatGPT ile çakışan değişiklik yapma.
