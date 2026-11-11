@@ -235,7 +235,7 @@ function goster() {
     kutu.append(b);
     return b;
   });
-  const sesBtn=$("soruSesBtn"); if(sesBtn){sesBtn.textContent=soruSesAcik?"🔊 Soruyu dinle":"🔇 Ses kapalı";sesBtn.onclick=()=>{soruSesAcik=!soruSesAcik;if(soruSesAcik)soruSesOku();else soruSesDurdur();sesBtn.textContent=soruSesAcik?"🔊 Soruyu dinle":"🔇 Ses kapalı";};}
+  const sesBtn=$("soruSesBtn"); if(sesBtn){sesBtn.textContent="🔊 Soruyu dinle";sesBtn.onclick=()=>{soruSesAcik=true;soruSesOku();};}
   sureBaslat();
   if(soruSesAcik)setTimeout(soruSesOku,350);
 }
