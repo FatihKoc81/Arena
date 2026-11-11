@@ -27,6 +27,9 @@ jobs:
       - name: Bağımlılıkları yükle
         run: npm install --no-audit --no-fund --retry=5 --fetch-timeout=120000
 
+      - name: TTS köprüsünü derle
+        run: npx esbuild tts-bridge-entry.js --bundle --format=iife --platform=browser --outfile=tts-bridge.js
+
       - name: Web dosyalarını hazırla
         run: |
           WEB=$(node -p "require('./capacitor.config.json').webDir || 'www'")
