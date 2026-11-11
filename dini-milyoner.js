@@ -88,7 +88,7 @@ function render(msg){
  '<div class="dm-progressbar"><i style="width:'+((state.i)/15*100)+'%"></i></div>'+
  '<div class="dm-question">'+(msg||q[0])+'</div><div class="dm-answers">'+q[1].map((x,i)=>'<button class="dm-answer" data-dm="answer" data-i="'+i+'" '+(state.lock||state.eliminated.includes(i)?"disabled":"")+'>'+"ABCD"[i]+") "+x+'</button>').join("")+'</div>'+
  '<div class="dm-tools"><button class="dm-btn" data-dm="half" '+(state.used.half?"disabled":"")+'>✂️ 50:50</button><button class="dm-btn" data-dm="audience" '+(state.used.audience?"disabled":"")+'>👥 Seyirci</button><button class="dm-btn" data-dm="double" '+(state.used.double?"disabled":"")+'>🛡️ Çift Cevap</button></div>'+
-  '<div class="dm-footer"><div class="dm-pill">👤 '+ad+'</div><button type="button" class="dm-pill gold" data-dm="gold">🪙 '+(altin==null?"Altın":Number(altin).toLocaleString("tr-TR"))+' +</button><button type="button" class="dm-pill dm-voice" data-dm="voice">🔊 Soruyu dinle</button></div></div>'+
+  '<div class="dm-footer"><button type="button" class="dm-pill gold" data-dm="gold">🪙 '+(altin==null?"Altın":Number(altin).toLocaleString("tr-TR"))+' +</button><div class="dm-pill">👤 '+ad+'</div><button type="button" class="dm-pill dm-voice" data-dm="voice">🔊 Soruyu dinle</button></div></div>'+
  (state.feedback?'<div class="dm-feedback">'+state.feedback+'</div>':"");
  root.classList.add("open");if(!state.lock)speak();
 }
