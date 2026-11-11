@@ -112,8 +112,11 @@ jobs:
             const fenced=rawText.match(/```(?:diff|patch)?\s*([\s\S]*?)```/i);
             const candidate=fenced?fenced[1].trim():rawText;
             const diffStart=candidate.indexOf('diff --git ');
-            const patch=diffStart>=0?candidate.slice(diffStart).trim():candidate;
-            if(!patch.startsWith('diff --git ') || !patch.includes('\n+++ b/')) {
+            const fileStart=candidate.indexOf('--- a/');
+            const start=diffStart>=0?diffStart:fileStart;
+            const patch=start>=0?candidate.slice(start).trim():candidate;
+            // git apply hem git diff başlığını hem standart --- a/ +++ b/ unified patch'i kabul eder.
+            if(!(patch.startsWith('diff --git ')||patch.startsWith('--- a/')) || !patch.includes('\n+++ b/')) {
               console.error('Gemini yanıtı patch değil. Yanıtın ilk 1800 karakteri: '+rawText.slice(0,1800));
               throw new Error('Gemini geçerli unified diff üretmedi; otomatik uygulama yapılmadı.');
             }
