@@ -391,7 +391,7 @@ $("jCift").onclick = () => {
 $("sMenu").onclick = menu;
 const seviyeYazi = () => "🏁 Seviye " + Math.min(st.seviye, SEVIYE_SAYISI);
 Ekonomi.bar($("ana"), seviyeYazi, "in");
-Ekonomi.bar($("oyun"), seviyeYazi, "in");
+Ekonomi.bar($("oyun"), null, "in");
 Ekonomi.dock($("ana"), () => Puan.toplam(), seviyeYazi, () => (window.Arena ? Arena.siraYazi() : "Puan")); // ana sayfanın altı: ad+seviye, altın, premium, toplam puan + sıra
 menu();
 </script>
