@@ -3934,3 +3934,75 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
  `;
  document.head.appendChild(st);
 })();
+
+
+/* Fix category view: it lives inside #arenaHubHome .ar-categories, so it must leave the category grid. */
+(function(){
+ if(document.getElementById('arenaCategoryFullWidthFix'))return;
+ const st=document.createElement('style');st.id='arenaCategoryFullWidthFix';
+ st.textContent=`
+ html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open{
+   display:block!important;position:relative!important;
+   width:100%!important;min-width:0!important;max-width:100%!important;
+   height:auto!important;min-height:0!important;max-height:none!important;
+   grid-template-columns:minmax(0,1fr)!important;grid-template-rows:none!important;
+   grid-auto-flow:row!important;align-content:start!important;align-items:stretch!important;
+   gap:0!important;overflow:visible!important;padding:0!important;margin:0!important;
+ }
+ html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-category-head{
+   display:grid!important;grid-template-columns:56px minmax(0,1fr)!important;
+   align-items:center!important;gap:10px!important;width:100%!important;min-width:0!important;
+   min-height:76px!important;margin:0 0 14px!important;padding:10px 14px!important;
+   box-sizing:border-box!important;border:2px solid #c99a43!important;border-radius:20px!important;
+   background:linear-gradient(110deg,#102f5c,#101a3b 58%,#281747)!important;
+   box-shadow:0 0 18px #168bff30,inset 0 1px #fff6c744!important;
+   color:#fff!important;font-size:clamp(18px,5vw,24px)!important;font-weight:950!important;
+ }
+ html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-category-head>.ar-inline-back{
+   display:grid!important;place-items:center!important;width:48px!important;height:48px!important;
+   min-height:48px!important;margin:0!important;border:1px solid #648dc0!important;
+   border-radius:14px!important;background:linear-gradient(145deg,#173d70,#0b1d3b)!important;
+   color:#fff!important;font-size:26px!important;
+ }
+ html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list{
+   display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+   grid-auto-rows:minmax(138px,auto)!important;gap:12px!important;
+   width:100%!important;min-width:0!important;max-width:100%!important;
+   align-content:start!important;align-items:stretch!important;justify-items:stretch!important;
+   margin:0!important;padding:0 0 18px!important;overflow:visible!important;
+ }
+ html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card{
+   display:flex!important;flex-direction:column!important;align-items:flex-start!important;
+   justify-content:space-between!important;gap:8px!important;
+   width:100%!important;min-width:0!important;max-width:100%!important;
+   height:auto!important;min-height:138px!important;box-sizing:border-box!important;
+   padding:13px 12px!important;overflow:hidden!important;
+   border:2px solid #bd8e43!important;border-radius:21px!important;
+   background:linear-gradient(145deg,#173d69,#0a1832 70%,#241447)!important;
+   box-shadow:0 7px 18px #0009,inset 0 1px #fff8d566,0 0 12px #168bff22!important;
+   color:#fff!important;text-align:left!important;
+ }
+ html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card i{
+   display:block!important;flex:none!important;width:auto!important;height:auto!important;
+   font-size:clamp(36px,10vw,52px)!important;line-height:1!important;
+   filter:drop-shadow(0 5px 5px #000c)!important;
+ }
+ html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card span{
+   display:block!important;width:100%!important;min-width:0!important;
+ }
+ html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card strong{
+   display:block!important;font-size:clamp(14px,4vw,18px)!important;font-weight:950!important;line-height:1.12!important;
+ }
+ html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card small{
+   display:block!important;margin-top:4px!important;color:#d6e5ff!important;
+   font-size:clamp(10px,2.9vw,13px)!important;line-height:1.22!important;white-space:normal!important;
+ }
+ html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card[data-launch="milyoner"]{background:linear-gradient(145deg,#55320c,#151c3b 62%,#2a1553)!important;border-color:#f3c45d!important}
+ html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card[data-launch="diniMilyoner"]{background:linear-gradient(145deg,#07553e,#062b2d 62%,#101d35)!important;border-color:#58d6a1!important}
+ @media(max-width:360px){
+  html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list{gap:8px!important;grid-auto-rows:minmax(124px,auto)!important}
+  html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card{min-height:124px!important;padding:10px!important}
+ }
+ `;
+ document.head.appendChild(st);
+})();
