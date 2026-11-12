@@ -137,20 +137,32 @@ for(let c of ["red","blue","black","yellow"])for(let st=1;st<=13;st++)for(let le
 return all.sort((a,b)=>b.score-a.score||b.ids.length-a.ids.length);
 }
 function bot101Open(p,hand){
-if(g.playerOpened[p])return false;
-let candidates=bot101Candidates(hand),used={},score=0,laidSets=[];
-for(let set of candidates){
- if(set.ids.some(i=>used[i]))continue;
- let added=set.ids.filter(i=>!used[i]);
- if(Object.keys(used).length+added.length>=hand.length)continue;
- added.forEach(i=>used[i]=true);
- laidSets.push(set.ids.map(i=>hand[i]));
- score+=set.score;
- if(score>=101)break;
+if(g.playerOpened[p]||hand.length<4)return false;
+let candidates=bot101Candidates(hand),chosen=null,nodes=0,bestTiles=Infinity,bestScore=Infinity,limit=50000;
+function search(start,used,score,picked,tileCount){
+ if(++nodes>limit)return;
+ if(score>=101){
+  if(tileCount<bestTiles||(tileCount===bestTiles&&score<bestScore)){
+   bestTiles=tileCount;bestScore=score;chosen=picked.slice();
+  }
+  return;
+ }
+ if(tileCount>=hand.length-1||tileCount>=bestTiles)return;
+ for(let i=start;i<candidates.length&&nodes<=limit;i++){
+  let set=candidates[i],mask=0,overlap=false;
+  for(let index of set.ids){let bit=1<<index;if((used&bit)!==0){overlap=true;break;}mask|=bit;}
+  if(overlap)continue;
+  let nextCount=tileCount+set.ids.length;
+  if(nextCount>=hand.length||nextCount>bestTiles)continue;
+  picked.push(set);
+  search(i+1,used|mask,score+set.score,picked,nextCount);
+  picked.pop();
+ }
 }
-if(score<101)return false;
-let indices=Object.keys(used).map(Number).sort((a,b)=>b-a);
-indices.forEach(i=>hand.splice(i,1));
+search(0,0,0,[],0);
+if(!chosen)return false;
+let used=new Set(chosen.flatMap(set=>set.ids)),laidSets=chosen.map(set=>set.ids.map(i=>hand[i]));
+[...used].sort((a,b)=>b-a).forEach(i=>hand.splice(i,1));
 g.playerOpened[p]=true;
 g.laid[p].push(...laidSets);
 return true;
