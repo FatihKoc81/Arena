@@ -89,11 +89,51 @@ let rackTiles=g.h[0].map((t,i)=>'<button type="button" class="at-tile '+t.c+(g.s
 show(n,'<div class="at-panel"><div class="at-status" id="at-status">'+(msg||"Taş çek, sonra bir taş seçip at.")+'</div><div class="at-seats">'+seats+'<div class="at-seat">Deste<b>'+g.d.length+' taş</b></div></div><div class="at-board"><div class="at-muted" style="text-align:center">GÖSTERGE · '+tileHtml(g.indicator)+' &nbsp; OKEY · '+g.okey.c+' '+g.okey.n+'</div><div class="at-muted" style="text-align:center;margin-top:10px">SON ATILAN</div><div class="at-tablecards">'+(g.drop.length?tileHtml(g.drop[g.drop.length-1]):"—")+'</div></div>'+laid+'<div class="at-status">SENİN TAŞLARIN · '+g.h[0].length+'</div><div class="at-rack" data-rack="'+g.kind+'"><div class="at-rack-lip"></div><div class="at-hand" aria-label="Taş ıstakası">'+rackTiles+'</div><div class="at-rack-front"></div></div><div class="at-rack-help">Taşı basılı tutup sağa veya sola sürükleyerek yerini değiştir.</div></div>','<button class="at-btn primary" data-at="draw" data-src="deck" '+(g.drawn||g.won?"disabled":"")+'>Ortadan Çek</button><button class="at-btn" data-at="draw" data-src="drop" '+(g.drawn||!g.drop.length||g.won?"disabled":"")+'>Atılanı Al</button><button class="at-btn good" data-at="discard" '+(!g.drawn||!g.sel.length||g.won?"disabled":"")+'>Seçili Taşı At</button>'+(g.kind==="yuzbir"?'<button class="at-btn" data-at="meld" '+(g.won?"disabled":"")+'>'+(g.opened?"Per Aç / Ekle":"Per Aç (101+)")+'</button>':'<button class="at-btn" data-at="okeywin" '+(g.won?"disabled":"")+'>Elimi Kontrol Et</button>')+'<button class="at-btn" data-at="sort">Taşları Sırala</button><button class="at-btn" data-at="next">Yeni El</button>');
 }
 function tileUtility(t,hand){if(!t)return -99;if(t.c==="joker")return 80;let score=0;hand.forEach(x=>{if(!x||x.id===t.id||x.c==="joker")return;if(x.c===t.c&&Math.abs(x.n-t.n)===1)score+=12;if(x.n===t.n&&x.c!==t.c)score+=10;if(x.n===t.n&&x.c===t.c)score+=18;});if(g&&g.okey&&t.c===g.okey.c&&t.n===g.okey.n)score+=55;return score;}
+function tileSetScore(a){
+if(!validTileSet(a))return -Infinity;
+let normal=a.filter(t=>t.c!=="joker"),jokers=a.length-normal.length;
+if(!normal.length)return -Infinity;
+let total=normal.reduce((sum,t)=>sum+t.n,0);
+if(normal.every(t=>t.n===normal[0].n)&&new Set(normal.map(t=>t.c)).size===normal.length)return total+jokers*normal[0].n;
+let nums=normal.map(t=>t.n).sort((x,y)=>x-y);
+for(let start=Math.max(1,nums[nums.length-1]-a.length+1);start<=Math.min(nums[0],14-a.length+1);start++){
+ let end=start+a.length-1;
+ if(!nums.every(n=>n>=start&&n<=end))continue;
+ let missing=[];for(let n=start;n<=end;n++)if(!nums.includes(n))missing.push(n);
+ if(missing.length===jokers)return total+missing.reduce((sum,n)=>sum+n,0);
+}
+return -Infinity;
+}
 function bot101Candidates(hand){
 let all=[],seen={};
-function add(ids){if(ids.length<3)return;let key=ids.slice().sort((a,b)=>a-b).join(",");if(seen[key])return;let group=ids.map(i=>hand[i]);if(validTileSet(group)){seen[key]=true;all.push({ids:ids.slice(),score:group.reduce((v,t)=>v+(t.c==="joker"?0:t.n),0)});}}
-for(let n=1;n<=13;n++){let ids=[];["red","blue","black","yellow"].forEach(c=>{let ix=hand.findIndex(t=>t.c===c&&t.n===n);if(ix>=0)ids.push(ix);});if(ids.length>=3)add(ids);}
-for(let c of ["red","blue","black","yellow"])for(let st=1;st<=13;st++)for(let len=3;len<=13&&st+len-1<=13;len++){let ids=[],ok=true;for(let v=st;v<st+len;v++){let ix=hand.findIndex(t=>t.c===c&&t.n===v);if(ix<0){ok=false;break;}ids.push(ix);}if(ok)add(ids);}
+function add(ids){
+ if(ids.length<3)return;
+ let key=ids.slice().sort((a,b)=>a-b).join(",");
+ if(seen[key])return;
+ let group=ids.map(i=>hand[i]),score=tileSetScore(group);
+ if(Number.isFinite(score)){seen[key]=true;all.push({ids:ids.slice(),score});}
+}
+let jokerIds=hand.map((t,i)=>t.c==="joker"?i:-1).filter(i=>i>=0);
+for(let n=1;n<=13;n++){
+ let colors=["red","blue","black","yellow"],available=colors.map(c=>hand.findIndex(t=>t.c===c&&t.n===n)).filter(i=>i>=0);
+ for(let mask=1;mask<16;mask++){
+  let ids=available.filter(i=>(mask&(1<<colors.indexOf(hand[i].c)))!==0);
+  if(ids.length>4)continue;
+  for(let size=3;size<=4;size++){
+   let need=size-ids.length;
+   if(need>=0&&need<=jokerIds.length)add(ids.concat(jokerIds.slice(0,need)));
+  }
+ }
+}
+for(let c of ["red","blue","black","yellow"])for(let st=1;st<=13;st++)for(let len=3;len<=13&&st+len-1<=13;len++){
+ let ids=[],missing=[],ok=true;
+ for(let v=st;v<st+len;v++){
+  let ix=hand.findIndex(t=>t.c===c&&t.n===v);
+  if(ix<0)missing.push(v);else ids.push(ix);
+ }
+ if(missing.length<=jokerIds.length&&missing.length>0)add(ids.concat(jokerIds.slice(0,missing.length)));
+ else if(missing.length===0)add(ids);
+}
 return all.sort((a,b)=>b.score-a.score||b.ids.length-a.ids.length);
 }
 function bot101Open(p,hand){if(g.playerOpened[p])return false;let candidates=bot101Candidates(hand),used={},score=0;for(let set of candidates){if(set.ids.some(i=>used[i]))continue;set.ids.forEach(i=>used[i]=true);score+=set.score;if(score>=101)break;}if(score<101)return false;let indices=Object.keys(used).map(Number).sort((a,b)=>b-a),laid=[];indices.forEach(i=>laid.unshift(hand[i]));indices.forEach(i=>hand.splice(i,1));g.playerOpened[p]=true;g.laid[p]=g.laid[p].concat(laid);return true;}
@@ -103,7 +143,7 @@ function sortHand(){if(!g||!g.h||!g.h[0])return;const hand=g.h[0],chosen=g.sel.m
 function sel(i){if(!g||!g.h)return;g.sel=g.sel.includes(i)?g.sel.filter(x=>x!==i):g.sel.concat(i);tileView();}
 function draw(src){if(!g||g.drawn)return;let t=src==='drop'&&g.drop.length?g.drop.pop():g.d.pop();if(!t){tileView('Deste bitti. Yeni el başlat.');return}g.h[0].push(t);g.drawn=true;g.sel=[];tileView('Taş çektin. Şimdi bir taş seçip at.');}
 function discard(){if(!g||!g.drawn||!g.sel.length)return;let t=g.h[0].splice(g.sel[0],1)[0];g.drop.push(t);g.drawn=false;g.sel=[];for(let p=1;p<4;p++){if(g.d.length&&!g.won)botTileTurn(p);if(!g.won&&g.kind==="okey"&&g.h[p].length===14&&(canMakePairs(g.h[p])||meldPartition(g.h[p]))){g.won=true;g.winner=p;}if(g.won)break;}if(g.won){if(window.Puan&&g.winner===0)Puan.ekle(g.kind);tileView(g.winner===0?"Harika! Elini tamamladın.":(g.kind==="okey"?"Bot "+g.winner+" Okey elini bitirdi.":"Bot "+g.winner+" 101 elini bitirdi."));return;}if(g.kind==="okey"&&g.h[0].length===14&&(canMakePairs(g.h[0])||meldPartition(g.h[0]))){g.won=true;if(window.Puan)Puan.ekle("okey");tileView("Botlardan önce elini tamamladın! Okey kazandın.");return;}if(g.kind==="yuzbir"&&g.h[0].length===0&&!g.won){g.won=true;if(window.Puan)Puan.ekle("yuzbir");tileView("Harika! 101 elini bitirdin. Kazandın.");return;}tileView("Botlar taş ilişkilerine göre oynadı. Sıra yeniden sende.");}
-function meld(){if(!g||g.kind!=='yuzbir')return;let chosen=g.sel.map(i=>g.h[0][i]).filter(Boolean),score=chosen.reduce((sum,t)=>sum+(t.c==='joker'?Math.max(1,Math.round(chosen.filter(x=>x.c!=='joker').reduce((v,x)=>v+x.n,0)/Math.max(1,chosen.filter(x=>x.c!=='joker').length))):t.n),0);if(chosen.length<3||(!g.opened&&score<101)||!meldPartition(chosen)){tileView('101 açmak için seçtiğin taşlar geçerli seri/gruplara ayrılmalı ve toplamları en az 101 olmalı.');return}g.opened=true;g.playerOpened[0]=true;g.laid[0]=g.laid[0].concat(chosen);g.h[0]=g.h[0].filter((t,i)=>!g.sel.includes(i));g.sel=[];tileView('Tebrikler! '+chosen.length+' taşla '+score+' puanlık per açtın.');}
+function meld(){if(!g||g.kind!=='yuzbir')return;let chosen=g.sel.map(i=>g.h[0][i]).filter(Boolean),score=tileSetScore(chosen);if(chosen.length<3||(!g.opened&&score<101)||!meldPartition(chosen)){tileView('101 açmak için seçtiğin taşlar geçerli seri/gruplara ayrılmalı ve toplamları en az 101 olmalı.');return}g.opened=true;g.playerOpened[0]=true;g.laid[0]=g.laid[0].concat(chosen);g.h[0]=g.h[0].filter((t,i)=>!g.sel.includes(i));g.sel=[];tileView('Tebrikler! '+chosen.length+' taşla '+score+' puanlık per açtın.');}
 function okeyWin(){if(!g||g.kind!=='okey'||g.won)return;let a=g.h[0];if(a.length!==14){tileView('Bitirmek için elinde 14 taş olmalı.');return}let pairs=canMakePairs(a);if(pairs){g.won=true;if(window.Puan)Puan.ekle('okey');tileView('7 çift tamamlandı! Okey elini bitirdin.');return}if(meldPartition(a)){g.won=true;if(window.Puan)Puan.ekle('okey');tileView('Taşların geçerli seri ve gruplara ayrılıyor. Okey elini bitirdin!');return}tileView('Henüz bitmedi. Seri, grup veya 7 çift düzenini tamamla.');}
 function canMakePairs(a){if(a.length!==14)return false;let used=new Array(a.length).fill(false);function go(){let i=used.findIndex(v=>!v);if(i<0)return true;used[i]=true;for(let j=i+1;j<a.length;j++){if(used[j])continue;let x=a[i],y=a[j],match=x.c==='joker'||y.c==='joker'||(x.n===y.n&&x.c===y.c);if(match){used[j]=true;if(go())return true;used[j]=false}}used[i]=false;return false}return go()}
 function meldPartition(a){if(!a.length)return true;if(a.length<3)return false;let first=a[0];for(let size=3;size<=Math.min(13,a.length);size++){for(let ids of combinationsIndices(a.length-1,size-1)){let group=[first,...ids.map(i=>a[i+1])];if(validTileSet(group)){let used=new Set([0,...ids.map(i=>i+1)]),rest=a.filter((t,i)=>!used.has(i));if(meldPartition(rest))return true}}}return false}
