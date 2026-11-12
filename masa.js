@@ -95,14 +95,14 @@ let normal=a.filter(t=>t.c!=="joker"),jokers=a.length-normal.length;
 if(!normal.length)return -Infinity;
 let total=normal.reduce((sum,t)=>sum+t.n,0);
 if(normal.every(t=>t.n===normal[0].n)&&new Set(normal.map(t=>t.c)).size===normal.length)return total+jokers*normal[0].n;
-let nums=normal.map(t=>t.n).sort((x,y)=>x-y);
+let nums=normal.map(t=>t.n).sort((x,y)=>x-y),best=-Infinity;
 for(let start=Math.max(1,nums[nums.length-1]-a.length+1);start<=Math.min(nums[0],14-a.length+1);start++){
  let end=start+a.length-1;
  if(!nums.every(n=>n>=start&&n<=end))continue;
  let missing=[];for(let n=start;n<=end;n++)if(!nums.includes(n))missing.push(n);
- if(missing.length===jokers)return total+missing.reduce((sum,n)=>sum+n,0);
+ if(missing.length===jokers)best=Math.max(best,total+missing.reduce((sum,n)=>sum+n,0));
 }
-return -Infinity;
+return best;
 }
 function bot101Candidates(hand){
 let all=[],seen={};
