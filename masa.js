@@ -136,7 +136,25 @@ for(let c of ["red","blue","black","yellow"])for(let st=1;st<=13;st++)for(let le
 }
 return all.sort((a,b)=>b.score-a.score||b.ids.length-a.ids.length);
 }
-function bot101Open(p,hand){if(g.playerOpened[p])return false;let candidates=bot101Candidates(hand),used={},score=0;for(let set of candidates){if(set.ids.some(i=>used[i]))continue;let added=set.ids.filter(i=>!used[i]);if(Object.keys(used).length+added.length>=hand.length)continue;added.forEach(i=>used[i]=true);score+=set.score;if(score>=101)break;}if(score<101)return false;let indices=Object.keys(used).map(Number).sort((a,b)=>b-a),laid=[];indices.forEach(i=>laid.unshift(hand[i]));indices.forEach(i=>hand.splice(i,1));g.playerOpened[p]=true;g.laid[p].push(laid);return true;}
+function bot101Open(p,hand){
+if(g.playerOpened[p])return false;
+let candidates=bot101Candidates(hand),used={},score=0,laidSets=[];
+for(let set of candidates){
+ if(set.ids.some(i=>used[i]))continue;
+ let added=set.ids.filter(i=>!used[i]);
+ if(Object.keys(used).length+added.length>=hand.length)continue;
+ added.forEach(i=>used[i]=true);
+ laidSets.push(set.ids.map(i=>hand[i]));
+ score+=set.score;
+ if(score>=101)break;
+}
+if(score<101)return false;
+let indices=Object.keys(used).map(Number).sort((a,b)=>b-a);
+indices.forEach(i=>hand.splice(i,1));
+g.playerOpened[p]=true;
+g.laid[p].push(...laidSets);
+return true;
+}
 function botTileTurn(p){let hand=g.h[p],top=g.drop[g.drop.length-1],deckTile=g.d[g.d.length-1],useDrop=!!top&&tileUtility(top,hand)>tileUtility(deckTile,hand)+4;let drawn=useDrop?g.drop.pop():g.d.pop();if(!drawn)return;hand.push(drawn);if(g.kind==="yuzbir"&&!g.playerOpened[p])bot101Open(p,hand);let outIndex=0,best=Infinity;for(let i=0;i<hand.length;i++){let rest=hand.filter((_,k)=>k!==i),v=tileUtility(hand[i],rest);if(v<best){best=v;outIndex=i;}}g.drop.push(hand.splice(outIndex,1)[0]);if(g.kind==="yuzbir"&&g.playerOpened[p]&&hand.length===0){g.won=true;g.winner=p;}}
 function sortHand(){if(!g||!g.h||!g.h[0])return;const hand=g.h[0],chosen=g.sel.map(i=>hand[i]&&hand[i].id).filter(Boolean);const order={red:0,blue:1,black:2,yellow:3,joker:4};hand.sort((a,b)=>(order[a.c]??9)-(order[b.c]??9)||a.n-b.n||String(a.id).localeCompare(String(b.id)));g.sel=chosen.map(id=>hand.findIndex(t=>t.id===id)).filter(i=>i>=0);tileView('Taşların renge ve sayıya göre sıralandı.');}
 function sel(i){if(!g||!g.h)return;g.sel=g.sel.includes(i)?g.sel.filter(x=>x!==i):g.sel.concat(i);tileView();}
