@@ -159,19 +159,34 @@ function botTileTurn(p){let hand=g.h[p],top=g.drop[g.drop.length-1],deckTile=g.d
 function sortHand(){if(!g||!g.h||!g.h[0])return;const hand=g.h[0],chosen=g.sel.map(i=>hand[i]&&hand[i].id).filter(Boolean);const order={red:0,blue:1,black:2,yellow:3,joker:4};hand.sort((a,b)=>(order[a.c]??9)-(order[b.c]??9)||a.n-b.n||String(a.id).localeCompare(String(b.id)));g.sel=chosen.map(id=>hand.findIndex(t=>t.id===id)).filter(i=>i>=0);tileView('Taşların renge ve sayıya göre sıralandı.');}
 function sel(i){if(!g||!g.h)return;g.sel=g.sel.includes(i)?g.sel.filter(x=>x!==i):g.sel.concat(i);tileView();}
 function draw(src){if(!g||g.drawn)return;let t=src==='drop'&&g.drop.length?g.drop.pop():g.d.pop();if(!t){tileView('Deste bitti. Yeni el başlat.');return}g.h[0].push(t);g.drawn=true;g.sel=[];tileView('Taş çektin. Şimdi bir taş seçip at.');}
-function discard(){if(!g||!g.drawn||!g.sel.length)return;let t=g.h[0].splice(g.sel[0],1)[0];g.drop.push(t);g.drawn=false;g.sel=[];for(let p=1;p<4;p++){if(g.d.length&&!g.won)botTileTurn(p);if(!g.won&&g.kind==="okey"&&g.h[p].length===14&&(canMakePairs(g.h[p])||meldPartition(g.h[p]))){g.won=true;g.winner=p;}if(g.won)break;}if(g.won){if(window.Puan&&g.winner===0)Puan.ekle(g.kind);tileView(g.winner===0?"Harika! Elini tamamladın.":(g.kind==="okey"?"Bot "+g.winner+" Okey elini bitirdi.":"Bot "+g.winner+" 101 elini bitirdi."));return;}if(g.kind==="okey"&&g.h[0].length===14&&(canMakePairs(g.h[0])||meldPartition(g.h[0]))){g.won=true;if(window.Puan)Puan.ekle("okey");tileView("Botlardan önce elini tamamladın! Okey kazandın.");return;}if(g.kind==="yuzbir"&&g.h[0].length===0&&!g.won){g.won=true;if(window.Puan)Puan.ekle("yuzbir");tileView("Harika! 101 elini bitirdin. Kazandın.");return;}tileView("Botlar taş ilişkilerine göre oynadı. Sıra yeniden sende.");}
+function discard(){
+if(!g||!g.drawn||!g.sel.length)return;
+let t=g.h[0].splice(g.sel[0],1)[0];g.drop.push(t);g.drawn=false;g.sel=[];
+if(g.kind==="yuzbir"&&g.playerOpened[0]&&g.h[0].length===0){
+ g.won=true;g.winner=0;if(window.Puan)Puan.ekle("yuzbir");tileView("Son taşını attın! 101 elini bitirdin. Kazandın.");return;
+}
+for(let p=1;p<4;p++){
+ if(g.d.length&&!g.won)botTileTurn(p);
+ if(!g.won&&g.kind==="okey"&&g.h[p].length===14&&(canMakePairs(g.h[p])||meldPartition(g.h[p]))){g.won=true;g.winner=p;}
+ if(g.won)break;
+}
+if(g.won){if(window.Puan&&g.winner===0)Puan.ekle(g.kind);tileView(g.winner===0?"Harika! Elini tamamladın.":(g.kind==="okey"?"Bot "+g.winner+" Okey elini bitirdi.":"Bot "+g.winner+" 101 elini bitirdi."));return;}
+if(g.kind==="okey"&&g.h[0].length===14&&(canMakePairs(g.h[0])||meldPartition(g.h[0]))){g.won=true;if(window.Puan)Puan.ekle("okey");tileView("Botlardan önce elini tamamladın! Okey kazandın.");return;}
+tileView("Botlar taş ilişkilerine göre oynadı. Sıra yeniden sende.");
+}
 function meld(){
 if(!g||g.kind!=="yuzbir"||!g.sel.length)return;
 let chosen=g.sel.map(i=>g.h[0][i]).filter(Boolean);if(!chosen.length)return;
-let score=meldPartitionScore(chosen),sets=meldPartitionSets(chosen),added=false;
-if(!g.opened&&(!Number.isFinite(score)||score<101)){tileView("101 açmak için seçtiğin taşlar geçerli seri/gruplara ayrılmalı ve toplamları en az 101 olmalı.");return;}
-if(g.opened&&!Number.isFinite(score)){
+if(chosen.length>=g.h[0].length){tileView("Per açarken veya taş eklerken elinde atabileceğin en az bir taş kalmalı.");return;}
+let alreadyOpened=!!g.playerOpened[0],score=meldPartitionScore(chosen),sets=meldPartitionSets(chosen),added=false;
+if(!alreadyOpened&&(!Number.isFinite(score)||score<101)){tileView("101 açmak için seçtiğin taşlar geçerli seri/gruplara ayrılmalı ve toplamları en az 101 olmalı.");return;}
+if(alreadyOpened&&!Number.isFinite(score)){
  let updated=g.laid[0].map(set=>set.slice()),ok=true;
  for(let tile of chosen){let target=updated.findIndex(set=>validTileSet(set.concat(tile)));if(target<0){ok=false;break;}updated[target].push(tile);}
  if(!ok){tileView("Seçtiğin taş mevcut perlerden hiçbirine eklenemiyor.");return;}
  g.laid[0]=updated;added=true;
 }else{if(!sets||!sets.length){tileView("Seçtiğin taşlar geçerli per oluşturmuyor.");return;}g.laid[0].push(...sets);}
-g.opened=true;g.playerOpened[0]=true;g.h[0]=g.h[0].filter((t,i)=>!g.sel.includes(i));g.sel=[];
+g.playerOpened[0]=true;g.opened=g.playerOpened.some(Boolean);g.h[0]=g.h[0].filter((t,i)=>!g.sel.includes(i));g.sel=[];
 tileView(added?"Taşları mevcut perlerine ekledin.":"Perlerini masaya açtın ("+score+" puan).");
 }
 function okeyWin(){if(!g||g.kind!=='okey'||g.won)return;let a=g.h[0];if(a.length!==14){tileView('Bitirmek için elinde 14 taş olmalı.');return}let pairs=canMakePairs(a);if(pairs){g.won=true;if(window.Puan)Puan.ekle('okey');tileView('7 çift tamamlandı! Okey elini bitirdin.');return}if(meldPartition(a)){g.won=true;if(window.Puan)Puan.ekle('okey');tileView('Taşların geçerli seri ve gruplara ayrılıyor. Okey elini bitirdin!');return}tileView('Henüz bitmedi. Seri, grup veya 7 çift düzenini tamamla.');}
