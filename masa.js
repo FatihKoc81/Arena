@@ -84,7 +84,7 @@ function tiles(id){let d=tdeck(),ind=d.findIndex(t=>t.c!=="joker"),indicator=d.s
 function tileView(msg){
 let n=g.kind==="okey"?"OKEY":"101";
 let seats=[1,2,3].map(p=>'<div class="at-seat">Bot '+p+'<b>'+(g.kind==="yuzbir"&&g.playerOpened[p]?"Per açtı":"Kapalı el")+'</b></div>').join("");
-let laid=g.kind==="yuzbir"?g.laid.map((arr,p)=>arr.length?'<div class="at-muted">'+(p?"Bot "+p:"Sen")+' · Açılan perler</div><div class="at-tablecards">'+arr.map(tileHtml).join("")+'</div>':"").join(""):"";
+let laid=g.kind==="yuzbir"?g.laid.map((sets,p)=>sets.length?'<div class="at-muted">'+(p?"Bot "+p:"Sen")+' · Açılan perler</div>'+sets.map(set=>'<div class="at-tablecards">'+set.map(tileHtml).join("")+'</div>').join(""):"").join(""):"";
 let rackTiles=g.h[0].map((t,i)=>'<button type="button" class="at-tile '+t.c+(g.sel.includes(i)?" selected":"")+'" data-at="tile" data-i="'+i+'" aria-label="'+(t.c==="joker"?"Sahte okey":t.n+" "+t.c)+'"><span>'+(t.c==="joker"?"★":t.n)+'</span></button>').join("");
 show(n,'<div class="at-panel"><div class="at-status" id="at-status">'+(msg||"Taş çek, sonra bir taş seçip at.")+'</div><div class="at-seats">'+seats+'<div class="at-seat">Deste<b>'+g.d.length+' taş</b></div></div><div class="at-board"><div class="at-muted" style="text-align:center">GÖSTERGE · '+tileHtml(g.indicator)+' &nbsp; OKEY · '+g.okey.c+' '+g.okey.n+'</div><div class="at-muted" style="text-align:center;margin-top:10px">SON ATILAN</div><div class="at-tablecards">'+(g.drop.length?tileHtml(g.drop[g.drop.length-1]):"—")+'</div></div>'+laid+'<div class="at-status">SENİN TAŞLARIN · '+g.h[0].length+'</div><div class="at-rack" data-rack="'+g.kind+'"><div class="at-rack-lip"></div><div class="at-hand" aria-label="Taş ıstakası">'+rackTiles+'</div><div class="at-rack-front"></div></div><div class="at-rack-help">Taşı basılı tutup sağa veya sola sürükleyerek yerini değiştir.</div></div>','<button class="at-btn primary" data-at="draw" data-src="deck" '+(g.drawn||g.won?"disabled":"")+'>Ortadan Çek</button><button class="at-btn" data-at="draw" data-src="drop" '+(g.drawn||!g.drop.length||g.won?"disabled":"")+'>Atılanı Al</button><button class="at-btn good" data-at="discard" '+(!g.drawn||!g.sel.length||g.won?"disabled":"")+'>Seçili Taşı At</button>'+(g.kind==="yuzbir"?'<button class="at-btn" data-at="meld" '+(g.won?"disabled":"")+'>'+(g.opened?"Per Aç / Ekle":"Per Aç (101+)")+'</button>':'<button class="at-btn" data-at="okeywin" '+(g.won?"disabled":"")+'>Elimi Kontrol Et</button>')+'<button class="at-btn" data-at="sort">Taşları Sırala</button><button class="at-btn" data-at="next">Yeni El</button>');
 }
@@ -136,18 +136,42 @@ for(let c of ["red","blue","black","yellow"])for(let st=1;st<=13;st++)for(let le
 }
 return all.sort((a,b)=>b.score-a.score||b.ids.length-a.ids.length);
 }
-function bot101Open(p,hand){if(g.playerOpened[p])return false;let candidates=bot101Candidates(hand),used={},score=0;for(let set of candidates){if(set.ids.some(i=>used[i]))continue;set.ids.forEach(i=>used[i]=true);score+=set.score;if(score>=101)break;}if(score<101)return false;let indices=Object.keys(used).map(Number).sort((a,b)=>b-a),laid=[];indices.forEach(i=>laid.unshift(hand[i]));indices.forEach(i=>hand.splice(i,1));g.playerOpened[p]=true;g.laid[p]=g.laid[p].concat(laid);return true;}
-function botTileTurn(p){let hand=g.h[p],top=g.drop[g.drop.length-1],deckTile=g.d[g.d.length-1],useDrop=!!top&&tileUtility(top,hand)>tileUtility(deckTile,hand)+4;let drawn=useDrop?g.drop.pop():g.d.pop();if(!drawn)return;hand.push(drawn);if(g.kind==="yuzbir"&&!g.playerOpened[p])bot101Open(p,hand);if(g.kind==="yuzbir"&&hand.length===0){g.won=true;g.winner=p;return;}let outIndex=0,best=Infinity;for(let i=0;i<hand.length;i++){let rest=hand.filter((_,k)=>k!==i),v=tileUtility(hand[i],rest);if(v<best){best=v;outIndex=i;}}g.drop.push(hand.splice(outIndex,1)[0]);if(g.kind==="yuzbir"&&g.playerOpened[p]&&hand.length===0){g.won=true;g.winner=p;}}
-
+function bot101Open(p,hand){if(g.playerOpened[p])return false;let candidates=bot101Candidates(hand),used={},score=0;for(let set of candidates){if(set.ids.some(i=>used[i]))continue;let added=set.ids.filter(i=>!used[i]);if(Object.keys(used).length+added.length>=hand.length)continue;added.forEach(i=>used[i]=true);score+=set.score;if(score>=101)break;}if(score<101)return false;let indices=Object.keys(used).map(Number).sort((a,b)=>b-a),laid=[];indices.forEach(i=>laid.unshift(hand[i]));indices.forEach(i=>hand.splice(i,1));g.playerOpened[p]=true;g.laid[p].push(laid);return true;}
+function botTileTurn(p){let hand=g.h[p],top=g.drop[g.drop.length-1],deckTile=g.d[g.d.length-1],useDrop=!!top&&tileUtility(top,hand)>tileUtility(deckTile,hand)+4;let drawn=useDrop?g.drop.pop():g.d.pop();if(!drawn)return;hand.push(drawn);if(g.kind==="yuzbir"&&!g.playerOpened[p])bot101Open(p,hand);let outIndex=0,best=Infinity;for(let i=0;i<hand.length;i++){let rest=hand.filter((_,k)=>k!==i),v=tileUtility(hand[i],rest);if(v<best){best=v;outIndex=i;}}g.drop.push(hand.splice(outIndex,1)[0]);if(g.kind==="yuzbir"&&g.playerOpened[p]&&hand.length===0){g.won=true;g.winner=p;}}
 function sortHand(){if(!g||!g.h||!g.h[0])return;const hand=g.h[0],chosen=g.sel.map(i=>hand[i]&&hand[i].id).filter(Boolean);const order={red:0,blue:1,black:2,yellow:3,joker:4};hand.sort((a,b)=>(order[a.c]??9)-(order[b.c]??9)||a.n-b.n||String(a.id).localeCompare(String(b.id)));g.sel=chosen.map(id=>hand.findIndex(t=>t.id===id)).filter(i=>i>=0);tileView('Taşların renge ve sayıya göre sıralandı.');}
 function sel(i){if(!g||!g.h)return;g.sel=g.sel.includes(i)?g.sel.filter(x=>x!==i):g.sel.concat(i);tileView();}
 function draw(src){if(!g||g.drawn)return;let t=src==='drop'&&g.drop.length?g.drop.pop():g.d.pop();if(!t){tileView('Deste bitti. Yeni el başlat.');return}g.h[0].push(t);g.drawn=true;g.sel=[];tileView('Taş çektin. Şimdi bir taş seçip at.');}
 function discard(){if(!g||!g.drawn||!g.sel.length)return;let t=g.h[0].splice(g.sel[0],1)[0];g.drop.push(t);g.drawn=false;g.sel=[];for(let p=1;p<4;p++){if(g.d.length&&!g.won)botTileTurn(p);if(!g.won&&g.kind==="okey"&&g.h[p].length===14&&(canMakePairs(g.h[p])||meldPartition(g.h[p]))){g.won=true;g.winner=p;}if(g.won)break;}if(g.won){if(window.Puan&&g.winner===0)Puan.ekle(g.kind);tileView(g.winner===0?"Harika! Elini tamamladın.":(g.kind==="okey"?"Bot "+g.winner+" Okey elini bitirdi.":"Bot "+g.winner+" 101 elini bitirdi."));return;}if(g.kind==="okey"&&g.h[0].length===14&&(canMakePairs(g.h[0])||meldPartition(g.h[0]))){g.won=true;if(window.Puan)Puan.ekle("okey");tileView("Botlardan önce elini tamamladın! Okey kazandın.");return;}if(g.kind==="yuzbir"&&g.h[0].length===0&&!g.won){g.won=true;if(window.Puan)Puan.ekle("yuzbir");tileView("Harika! 101 elini bitirdin. Kazandın.");return;}tileView("Botlar taş ilişkilerine göre oynadı. Sıra yeniden sende.");}
-function meld(){if(!g||g.kind!=='yuzbir')return;let chosen=g.sel.map(i=>g.h[0][i]).filter(Boolean),score=meldPartitionScore(chosen);if(chosen.length<3||!Number.isFinite(score)||(!g.opened&&score<101)){tileView('101 açmak için seçtiğin taşlar geçerli seri/gruplara ayrılmalı ve toplamları en az 101 olmalı.');return}g.opened=true;g.playerOpened[0]=true;g.laid[0]=g.laid[0].concat(chosen);g.h[0]=g.h[0].filter((t,i)=>!g.sel.includes(i));g.sel=[];tileView('Tebrikler! '+chosen.length+' taşla '+score+' puanlık per açtın.');}
+function meld(){
+if(!g||g.kind!=="yuzbir"||!g.sel.length)return;
+let chosen=g.sel.map(i=>g.h[0][i]).filter(Boolean);if(!chosen.length)return;
+let score=meldPartitionScore(chosen),sets=meldPartitionSets(chosen),added=false;
+if(!g.opened&&(!Number.isFinite(score)||score<101)){tileView("101 açmak için seçtiğin taşlar geçerli seri/gruplara ayrılmalı ve toplamları en az 101 olmalı.");return;}
+if(g.opened&&!Number.isFinite(score)){
+ let updated=g.laid[0].map(set=>set.slice()),ok=true;
+ for(let tile of chosen){let target=updated.findIndex(set=>validTileSet(set.concat(tile)));if(target<0){ok=false;break;}updated[target].push(tile);}
+ if(!ok){tileView("Seçtiğin taş mevcut perlerden hiçbirine eklenemiyor.");return;}
+ g.laid[0]=updated;added=true;
+}else{if(!sets||!sets.length){tileView("Seçtiğin taşlar geçerli per oluşturmuyor.");return;}g.laid[0].push(...sets);}
+g.opened=true;g.playerOpened[0]=true;g.h[0]=g.h[0].filter((t,i)=>!g.sel.includes(i));g.sel=[];
+tileView(added?"Taşları mevcut perlerine ekledin.":"Perlerini masaya açtın ("+score+" puan).");
+}
 function okeyWin(){if(!g||g.kind!=='okey'||g.won)return;let a=g.h[0];if(a.length!==14){tileView('Bitirmek için elinde 14 taş olmalı.');return}let pairs=canMakePairs(a);if(pairs){g.won=true;if(window.Puan)Puan.ekle('okey');tileView('7 çift tamamlandı! Okey elini bitirdin.');return}if(meldPartition(a)){g.won=true;if(window.Puan)Puan.ekle('okey');tileView('Taşların geçerli seri ve gruplara ayrılıyor. Okey elini bitirdin!');return}tileView('Henüz bitmedi. Seri, grup veya 7 çift düzenini tamamla.');}
 function canMakePairs(a){if(a.length!==14)return false;let used=new Array(a.length).fill(false);function go(){let i=used.findIndex(v=>!v);if(i<0)return true;used[i]=true;for(let j=i+1;j<a.length;j++){if(used[j])continue;let x=a[i],y=a[j],match=x.c==='joker'||y.c==='joker'||(x.n===y.n&&x.c===y.c);if(match){used[j]=true;if(go())return true;used[j]=false}}used[i]=false;return false}return go()}
 function meldPartition(a){if(!a.length)return true;if(a.length<3)return false;let first=a[0];for(let size=3;size<=Math.min(13,a.length);size++){for(let ids of combinationsIndices(a.length-1,size-1)){let group=[first,...ids.map(i=>a[i+1])];if(validTileSet(group)){let used=new Set([0,...ids.map(i=>i+1)]),rest=a.filter((t,i)=>!used.has(i));if(meldPartition(rest))return true}}}return false}
 function combinationsIndices(n,k,start=0,prefix=[],out=[]){if(prefix.length===k){out.push(prefix.slice());return out}for(let i=start;i<n;i++){prefix.push(i);combinationsIndices(n,k,i+1,prefix,out);prefix.pop()}return out}
+function meldPartitionSets(a){
+if(!a.length)return [];
+if(a.length<3)return null;
+for(let size=3;size<=Math.min(13,a.length);size++){
+ for(let ids of combinationsIndices(a.length-1,size-1)){
+  let group=[a[0],...ids.map(i=>a[i+1])];if(!validTileSet(group))continue;
+  let used=new Set([0,...ids.map(i=>i+1)]),rest=a.filter((t,i)=>!used.has(i)),tail=meldPartitionSets(rest);
+  if(tail)return [group,...tail];
+ }
+}
+return null;
+}
 function meldPartitionScore(a){
 if(!a.length)return 0;
 if(a.length<3)return -Infinity;
