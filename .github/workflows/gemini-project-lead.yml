@@ -1,5 +1,8 @@
 name: ARENA Gemini Project Lead Audit
 on:
+  push:
+    branches: [ main ]
+    paths: [ '.github/workflows/gemini-project-lead.yml' ]
   workflow_dispatch:
     inputs:
       task:
@@ -28,7 +31,7 @@ jobs:
           gemini_cli_version: latest
           prompt: |
             Sen ARENA projesinin ana teknik liderisin. Önce GEMINI.md dosyasını tamamen oku ve kurallarına uy.
-            Kullanıcı görevi: ${{ inputs.task }}
+            Kullanıcı görevi: ${{ inputs.task || 'Depoyu baştan sona salt okunur denetle. Çalışan oyunları, giriş, Firebase, PWA, Android derleme, mobil yerleşim ve geri tuşu sorunlarını kanıtlarıyla raporla; kod değiştirme.' }}
             Bu iş akışının GitHub izinleri salt okunurdur. Hiçbir dosyayı değiştirme, commit/push/PR oluşturma.
             Depodaki kaynak kodunu, oyun modüllerini, Google/telefon girişini, Firebase ayarlarının mevcut durumunu, PWA/service worker ve Capacitor Android derleme akışını incele.
             Özellikle Milyoner, Passaparola, Kelime Oyunu, İşlem Oyunu ve Rotasyon oyunlarının açılışlarını; mobil ekran uyumunu ve geri tuşu davranışını değerlendir.
