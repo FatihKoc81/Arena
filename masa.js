@@ -147,7 +147,7 @@ function search(start,used,score,picked,tileCount){
   }
   return;
  }
- if(tileCount>=hand.length-1||tileCount>=bestTiles)return;
+ if(tileCount>=hand.length-1||tileCount>bestTiles)return;
  for(let i=start;i<candidates.length&&nodes<=limit;i++){
   let set=candidates[i],mask=0,overlap=false;
   for(let index of set.ids){let bit=1<<index;if((used&bit)!==0){overlap=true;break;}mask|=bit;}
