@@ -138,6 +138,7 @@ return all.sort((a,b)=>b.score-a.score||b.ids.length-a.ids.length);
 }
 function bot101Open(p,hand){
 if(g.playerOpened[p]||hand.length<4)return false;
+// 101 açılışında taş çakışması olmayan en küçük geçerli kombinasyonu ara.
 let candidates=bot101Candidates(hand),chosen=null,nodes=0,bestTiles=Infinity,bestScore=Infinity,limit=50000;
 function search(start,used,score,picked,tileCount){
  if(++nodes>limit)return;
