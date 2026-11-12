@@ -3,7 +3,7 @@ name: Build APK
 
 on:
   push:
-    branches: [main]
+    branches: [main, fix/rack-single-tap-pointer-cleanup]
   workflow_dispatch:
 
 permissions:
@@ -267,10 +267,21 @@ jobs:
           AS=$(ls -d $ANDROID_HOME/build-tools/*/ | tail -1)apksigner
           $AS verify --print-certs Arena.apk | grep -E "SHA-256" || true
 
-      - name: GitHub Release oluştur
+      - name: GitHub Release oluştur (ana sürüm)
+        if: github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ github.run_number }}
           name: ARENA v${{ github.run_number }}
           files: Arena.apk
           make_latest: true
+
+      - name: Test APK yayımla (PR dalı)
+        if: github.ref == 'refs/heads/fix/rack-single-tap-pointer-cleanup'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: test-v${{ github.run_number }}
+          name: ARENA Test v${{ github.run_number }}
+          files: Arena.apk
+          prerelease: true
+          make_latest: false
