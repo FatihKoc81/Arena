@@ -20,6 +20,8 @@ concurrency:
 jobs:
   audit:
     runs-on: ubuntu-latest
+    env:
+      GEMINI_CLI_TRUST_WORKSPACE: "true"
     timeout-minutes: 30
     steps:
       - name: ARENA kaynak kodunu al
