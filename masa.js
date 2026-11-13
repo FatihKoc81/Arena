@@ -58,7 +58,7 @@ root.addEventListener("pointermove",e=>{
 root.addEventListener("pointerup",e=>{
  const d=g&&g._rackDrag;if(!d||d.pointerId!==e.pointerId)return;
  g._rackDrag=null;root.classList.remove("at-rack-dragging");
- if(!d.moved)return;
+ if(!d.moved){g._suppressTileClickUntil=Date.now()+650;sel(d.index);return;}
  g._suppressTileClickUntil=Date.now()+650;
  const hand=g.h[0],from=hand.findIndex(t=>String(t.id)===String(d.id));
  if(from<0)return;
