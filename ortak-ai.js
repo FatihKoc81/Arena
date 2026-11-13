@@ -128,4 +128,5 @@
     sesDurdur: function () {
       if (window.speechSynthesis) window.speechSynthesis.cancel();
     }
-  });)();
+  });
+})();
