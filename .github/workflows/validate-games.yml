@@ -5,6 +5,10 @@ on:
     paths:
       - '*.js'
       - '.github/workflows/validate-games.yml'
+  pull_request:
+    paths:
+      - '*.js'
+      - '.github/workflows/validate-games.yml'
   workflow_dispatch:
 jobs:
   syntax:
