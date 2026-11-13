@@ -148,9 +148,12 @@
           messages.forEach(function (m, index) {
             var from = String(m.from || m.sender || m.project || "");
             var to = String(m.to || "");
-            var content = String(m.content || m.message || m.text || "").trim();
+            var rawContent = String(m.content || m.message || m.text || "").trim();
+            var depthMatch = rawContent.match(/^\\[\\[ORTAK_AI_TUR:(\\d+)\\]\\]\\s*/);
+            var depth = depthMatch ? Number(depthMatch[1]) : 0;
+            var content = rawContent.replace(/^\\[\\[ORTAK_AI_TUR:\\d+\\]\\]\\s*/, "").trim();
             var id = String(m.id || m.messageId || (from + "|" + content + "|" + index));
-            if (!content || from === "ARENA" || (to && to !== "ARENA") || bilinen[id]) return;
+            if (!content || depth >= 3 || from === "ARENA" || (to && to !== "ARENA") || bilinen[id]) return;
             bilinen[id] = true;
             self.seslendir(from + " diyor ki: " + content).catch(function () {});
             self.sohbet("Sen ARENA uygulamasının yapay zekâ asistanısın. " +
@@ -158,7 +161,7 @@
               " Kısa, doğal ve Türkçe bir cevap ver. Yalnızca cevabı yaz.").then(function (answer) {
                 var reply = String(answer.response || answer.reply || answer.text || "").trim();
                 if (reply) {
-                  self.mesajGonder(from, reply).then(function () {
+                  self.mesajGonder(from, "[[ORTAK_AI_TUR:" + (depth + 1) + "]] " + reply).then(function () {
                     self.seslendir("Yanıtım: " + reply).catch(function () {});
                   }).catch(function () {});
                 }
