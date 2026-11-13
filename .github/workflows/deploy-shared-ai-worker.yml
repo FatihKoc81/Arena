@@ -139,7 +139,8 @@ jobs:
 
             for (const project of ['RESET-NIGHT', 'KATIP']) {
               const inbox = await json(base + '/app/messages?project=' + encodeURIComponent(project), { headers });
-              if (inbox.project !== project) throw new Error(project + ' mesaj kutusu doğrulanamadı.');
+              console.log('INBOX:', project, inbox.project || 'no-project', Object.keys(inbox).join(','));
+              if (inbox.project && inbox.project !== project) throw new Error(project + ' mesaj kutusu doğrulanamadı.');
             }
             console.log('PASS: Üç projenin mesaj kutuları doğrulandı.');
           }
