@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - '.github/workflows/shared-ai-auth-live-test.yml'
+      - '.github/workflows/shared-ai-auth-diagnostic.yml'
   workflow_dispatch:
 
 permissions:
