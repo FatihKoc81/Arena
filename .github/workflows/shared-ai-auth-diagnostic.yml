@@ -22,13 +22,16 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           set -euo pipefail
-          node <<'NODE' | npx --yes wrangler secret put FIREBASE_API_KEY --name ortak-ai-merkezi
+          node <<'NODE'
           const fs = require('fs');
           const cfg = fs.readFileSync('firebase-config.js', 'utf8');
-          const match = cfg.match(/apiKey\\s*:\\s*["']([^"']+)["']/);
-          if (!match) throw new Error('Firebase API key bulunamadı.');
-          process.stdout.write(match[1]);
+          const match = cfg.match(/apiKey\s*:\s*["']([^"']+)["']/);
+          if (!match || !match[1].trim()) throw new Error('Firebase API key bulunamadı; Worker Secret değiştirilmedi.');
+          fs.writeFileSync(process.env.RUNNER_TEMP + '/firebase_api_key', match[1].trim(), { mode: 0o600 });
           NODE
+          test -s "$RUNNER_TEMP/firebase_api_key"
+          npx --yes wrangler secret put FIREBASE_API_KEY --name ortak-ai-merkezi < "$RUNNER_TEMP/firebase_api_key"
+          rm -f "$RUNNER_TEMP/firebase_api_key"
       - name: Firebase ve Worker oturum doğrulamasını ayrı ayrı test et
         run: |
           set -euo pipefail
