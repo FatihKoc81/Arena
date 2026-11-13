@@ -1,0 +1,57 @@
+name: Ortak AI authenticated live test
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/shared-ai-auth-live-test.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  authenticated-live-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - name: Firebase anonim oturumu al ve korumalı uçları doğrula
+        env:
+          FIREBASE_API_KEY: ${{ vars.FIREBASE_WEB_API_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "${FIREBASE_API_KEY:-}" ]; then
+            echo "::error::Repository variable FIREBASE_WEB_API_KEY tanımlı değil."
+            exit 1
+          fi
+          node <<'NODE'
+          const base = 'https://ortak-ai-merkezi.fatihkoc7.workers.dev';
+          const key = process.env.FIREBASE_API_KEY;
+          async function json(url, options = {}) {
+            const r = await fetch(url, options);
+            const body = await r.text();
+            let data;
+            try { data = JSON.parse(body); } catch { data = {raw: body}; }
+            if (!r.ok) throw new Error(`HTTP ${r.status}: ${JSON.stringify(data).slice(0,500)}`);
+            return data;
+          }
+          (async () => {
+            const auth = await json('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + encodeURIComponent(key), {
+              method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({returnSecureToken:true})
+            });
+            if (!auth.idToken) throw new Error('Firebase ID token alınamadı.');
+            console.log('PASS: Firebase anonim oturumu açıldı.');
+            const headers = {authorization:'Bearer ' + auth.idToken, 'content-type':'application/json', accept:'application/json'};
+            const health = await json(base + '/health');
+            if (health.status !== 'online') throw new Error('Worker online değil.');
+            console.log('PASS: Worker health online; projeler=' + (health.projects || []).join(','));
+            const messages = await json(base + '/app/messages?project=ARENA', {headers});
+            console.log('PASS: ARENA mesaj kutusu doğrulanmış token ile okundu; yanıt alanları=' + Object.keys(messages).join(','));
+            const answer = await json(base + '/app/chat', {
+              method:'POST', headers, body:JSON.stringify({message:'Bu yalnızca bağlantı doğrulama testidir. Tek cümleyle Türkçe olarak bağlantının çalıştığını bildir.'})
+            });
+            const reply = String(answer.response || answer.reply || answer.text || '').trim();
+            if (!reply) throw new Error('AI sohbet uç noktası boş yanıt verdi: ' + JSON.stringify(answer).slice(0,500));
+            console.log('PASS: Kimliği doğrulanmış AI sohbet yanıtı alındı: ' + reply.slice(0,300));
+          })().catch(e => { console.error(e); process.exit(1); });
+          NODE
