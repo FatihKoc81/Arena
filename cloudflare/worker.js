@@ -60,7 +60,7 @@ async function verifyFirebase(request, env) {
   const idToken = auth.slice(7).trim();
   if (!idToken) return null;
 
-  const endpoint = \`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=\${encodeURIComponent(apiKey)}\`;
+  const endpoint = `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${encodeURIComponent(apiKey)}`;
   const response = await fetch(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -84,13 +84,13 @@ async function saveMessage(env, project, targets, content) {
   };
 
   for (const target of targets) {
-    await env.KV.put(\`inbox:\${target}:\${message.id}\`, JSON.stringify(message));
+    await env.KV.put(`inbox:${target}:${message.id}`, JSON.stringify(message));
   }
   return message;
 }
 
 async function readMessages(env, project) {
-  const result = await env.KV.list({ prefix: \`inbox:\${project}:\`, limit: 100 });
+  const result = await env.KV.list({ prefix: `inbox:${project}:`, limit: 100 });
   const messages = [];
 
   for (const key of result.keys) {
@@ -131,7 +131,7 @@ async function runChat(env, messages, maxTokens = 700) {
       message_keys: choice.message && typeof choice.message === "object" ? Object.keys(choice.message) : [],
       completion_tokens: result?.usage?.completion_tokens ?? null,
     };
-    throw new Error(\`Empty AI response; \${JSON.stringify(diagnostic)}\`);
+    throw new Error(`Empty AI response; ${JSON.stringify(diagnostic)}`);
   }
   return answer;
 }
@@ -191,7 +191,7 @@ export default {
           const answer = await runChat(env, [
             {
               role: "system",
-              content: \`\${SHARED_SYSTEM_PROMPT} Current project context: \${project}.\`,
+              content: `${SHARED_SYSTEM_PROMPT} Current project context: ${project}.`,
             },
             { role: "user", content: message },
           ], 700);
@@ -248,7 +248,7 @@ export default {
     // Administrative endpoints: require the GATEWAY_TOKEN secret.
     const gatewayToken = env.GATEWAY_TOKEN;
     const auth = request.headers.get("Authorization") || "";
-    if (!gatewayToken || auth !== \`Bearer \${gatewayToken}\`) {
+    if (!gatewayToken || auth !== `Bearer ${gatewayToken}`) {
       return reply({ error: "Unauthorized" }, 401);
     }
 
