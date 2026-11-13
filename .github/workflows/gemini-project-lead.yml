@@ -68,7 +68,7 @@ jobs:
           git diff --cached --check
       - name: ChatGPT bağımsız kod denetimi
         env:
-          OPENAI_API_KEY: \${{ secrets.OPENAI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_MODEL: gpt-5-mini
         run: |
           node <<'NODE'
@@ -91,7 +91,7 @@ jobs:
             const payload = {
               model: process.env.OPENAI_MODEL,
               instructions: 'Bağımsız kıdemli yazılım denetçisisin. Gemini tarafından hazırlanan Git diffini incele. Güvenlik, veri kaybı, regresyon, çalışma zamanı hatası ve test eksiklerini ara. İçerik KÂTİP ise finansal verilerin cihaz dışına çıkmaması şartını özellikle denetle. İçerik RESET NIGHT ise Godot 4 3D proje kurallarını ve zombi olmayan insan düşman şartını denetle. İçerik ARENA ise mevcut oyunları ve mobil uyumluluğu koru. Gerçek test yapılmadıysa yapılmış gibi kabul etme. İlk satır yalnızca APPROVED veya REJECTED olsun; ikinci bölümde Türkçe bulgular ve gerekli düzeltmeler yer alsın. Kritik/yüksek önem düzeyinde doğrulanmış sorun varsa REJECTED ver.',
-              input: 'İncelenecek Git diff:\\n\\n' + diff,
+              input: 'İncelenecek Git diff:\n\n' + diff,
               max_output_tokens: 3500
             };
             const response = await fetch('https://api.openai.com/v1/responses', {
@@ -102,18 +102,18 @@ jobs:
             const data = await response.json();
             if (!response.ok) throw new Error('OpenAI API ' + response.status + ': ' + JSON.stringify(data).slice(0, 1200));
             const text = (data.output || []).flatMap(x => x.content || [])
-              .filter(x => x.type === 'output_text').map(x => x.text).join('\\n').trim();
+              .filter(x => x.type === 'output_text').map(x => x.text).join('\n').trim();
             if (!text) throw new Error('ChatGPT boş denetim yanıtı verdi; PR açılmadı.');
-            fs.writeFileSync(reportPath, '## ChatGPT bağımsız kod denetimi\\n\\n' + text + '\\n');
-            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, '## ChatGPT bağımsız denetimi\\n\\n' + text + '\\n');
-            if (!/^APPROVED\\b/i.test(text)) throw new Error('ChatGPT değişiklikleri onaylamadı. PR açılmadı. Denetim raporu iş özeti bölümüne yazıldı.');
+            fs.writeFileSync(reportPath, '## ChatGPT bağımsız kod denetimi\n\n' + text + '\n');
+            fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, '## ChatGPT bağımsız denetimi\n\n' + text + '\n');
+            if (!/^APPROVED\b/i.test(text)) throw new Error('ChatGPT değişiklikleri onaylamadı. PR açılmadı. Denetim raporu iş özeti bölümüne yazıldı.');
             console.log('ChatGPT bağımsız denetimi onayladı.');
           }
           main().catch(error => { console.error(error); process.exit(1); });
           NODE
       - name: Commit, push and open pull request
         env:
-          GH_TOKEN: \${{ github.token }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           if git diff --cached --quiet; then
             echo "Doğrulanabilir uygulama kaynağı değişikliği yok; PR açılmadı."
@@ -122,14 +122,3 @@ jobs:
           git commit -m "AI: implement verified ARENA improvements"
           git push --set-upstream origin "$AI_BRANCH"
           gh pr create --repo "$GITHUB_REPOSITORY" --base main --head "$AI_BRANCH" --title "AI Development Team: ARENA" --body-file "$RUNNER_TEMP/ai-review.md"
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          if [ -z "$(git status --porcelain)" ]; then
-            echo "Gemini made no changes; no PR is needed."
-            exit 0
-          fi
-          git add -A
-          git commit -m "AI: implement verified ARENA improvements"
-          git push --set-upstream origin "$AI_BRANCH"
-          gh pr create --repo "$GITHUB_REPOSITORY" --base main --head "$AI_BRANCH" --title "AI development: ARENA improvements" --body "Gemini autonomous development run $GITHUB_RUN_ID. Review the diff and CI results before merging. Main was not modified."
