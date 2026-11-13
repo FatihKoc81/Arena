@@ -99,7 +99,7 @@
         method: "POST",
         body: JSON.stringify({
           from: "ARENA",
-          to: Array.isArray(to) ? to : [to],
+          to: String(to),
           content: content
         })
       });
