@@ -1,0 +1,45 @@
+name: Shared AI live endpoint check
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/shared-ai-live-check.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  endpoint-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Check public health and protected app routes
+        run: |
+          node <<'NODE'
+          const base = 'https://ortak-ai-merkezi.fatihkoc7.workers.dev';
+          async function check(path, options, accepted, label) {
+            const response = await fetch(base + path, options);
+            const body = await response.text();
+            console.log(label + ': HTTP ' + response.status + ' ' + body.slice(0, 500));
+            if (!accepted.includes(response.status)) {
+              throw new Error(label + ' beklenmeyen HTTP durumu: ' + response.status);
+            }
+            return {status: response.status, body};
+          }
+          (async () => {
+            const health = await check('/health', {headers:{accept:'application/json'}}, [200], 'health');
+            const parsed = JSON.parse(health.body);
+            if (parsed.status !== 'online') throw new Error('Health status online değil.');
+            await check('/app/chat', {
+              method:'POST',
+              headers:{'content-type':'application/json'},
+              body:JSON.stringify({message:'SENTETIK_BAGLANTI_TESTI'})
+            }, [401,403], 'chat auth gate');
+            await check('/app/messages?project=ARENA', {
+              headers:{accept:'application/json'}
+            }, [401,403], 'messages auth gate');
+            console.log('PASS: Worker erişilebilir; uygulama uçları kimlik doğrulama istiyor.');
+          })().catch(error => { console.error(error); process.exit(1); });
+          NODE
