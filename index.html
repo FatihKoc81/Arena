@@ -159,8 +159,6 @@ async function soruSesOku(){
   for(let i=0;i<q[1].length;i++){if(token!==soruSesToken)return;if(i>0)await new Promise(r=>setTimeout(r,650));await say("Şık "+["A","B","C","D"][i]+". "+q[1][i]+".");}
  }catch(e){console.warn("Milyoner sesli okuma hatası:",e);}
 }
-}
-
 
 // CAN: her bölüm CAN_MAX canla başlar. Yanlış cevap 1 can götürür ve aynı sıraya sonraki seriden yeni soru gelir.
 // Can bitince: KAYIP_BEDEL altınla devam / reklamla +1 can / bir alt bölümün 1. sorusundan başla.
