@@ -67,11 +67,6 @@ async function speak(){
   for(let i=0;i<q[1].length;i++){if(token!==voiceToken)return;if(i>0)await new Promise(r=>setTimeout(r,1000));await say(q[1][i]+".");}
  }catch(e){console.warn("ARENA TTS:",e);}
 }
- try{if(window.ArenaTTS&&typeof window.ArenaTTS.speak==="function"){await window.ArenaTTS.speak(text);if(token!==voiceToken)stopVoice();return;}}
- catch(nativeError){console.warn("ARENA yerel seslendirme kullanılamadı:",nativeError);}
- if(!("speechSynthesis" in window)||!("SpeechSynthesisUtterance" in window)){const f=root&&root.querySelector(".dm-feedback");if(f)f.textContent="Bu cihazda seslendirme motoru bulunamadı.";return;}
- try{window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="tr-TR";u.rate=.88;u.pitch=1;u.volume=1;const voices=window.speechSynthesis.getVoices()||[];const tr=voices.find(v=>/^tr([-_]|$)/i.test(v.lang));if(tr)u.voice=tr;u.onerror=function(ev){console.warn("ARENA seslendirme hatası:",ev.error);};window.speechSynthesis.speak(u);}catch(e){console.warn("ARENA seslendirme hatası:",e);}
-}
 function shuffle(a){return a.map(x=>[Math.random(),x]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);}
 function mount(){if(root)return;let st=document.createElement("style");st.textContent=`
 #arenaDiniMillion{position:fixed;inset:0;z-index:100100;display:none;flex-direction:column;overflow:auto;padding:calc(env(safe-area-inset-top) + 10px) 12px calc(env(safe-area-inset-bottom) + 12px);background:radial-gradient(ellipse at 50% 0%,#183b65,#071326 62%,#020711);color:#fff;font-family:system-ui,sans-serif}
