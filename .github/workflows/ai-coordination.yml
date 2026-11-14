@@ -89,7 +89,13 @@ jobs:
               return (data.output||[]).flatMap(o=>o.content||[]).filter(c=>c.type==='output_text').map(c=>c.text).join('\n') || 'GPT yanıt metni döndürmedi.';
             }
 
-            const gemini = await geminiReview();
+            let gemini;
+            try {
+              gemini = await geminiReview();
+            } catch (error) {
+              gemini = 'Gemini incelemesi bu çalıştırmada tamamlanamadı: ' + String(error.message || error);
+              console.warn(gemini);
+            }
             const gpt = await openaiReview(gemini);
             const body = [
               '## ARENA — Çift yapay zekâ incelemesi',

@@ -201,3 +201,34 @@
  #arena-table-modal .at-rack .at-tile{transition:transform .14s ease,box-shadow .14s ease,filter .14s ease!important}
  #arena-table-modal .at-rack .at-tile:active{filter:brightness(1.08)}
 }
+
+
+/* Okey + 101 touch interaction and compact-screen safeguards */
+#arena-table-modal .at-rack .at-tile{
+ touch-action:none!important;
+ -webkit-user-drag:none!important;
+ -webkit-tap-highlight-color:transparent!important;
+}
+#arena-table-modal .at-rack-dragging .at-rack .at-tile{
+ transition:none!important;
+}
+#arena-table-modal .at-rack .at-hand{
+ width:100%!important;
+ min-height:0!important;
+}
+#arena-table-modal .at-rack-help{
+ user-select:none!important;
+ -webkit-user-select:none!important;
+}
+@media(max-width:380px) and (orientation:portrait){
+ #arena-table-modal .at-rack:not([data-rack="yuzbir"]) .at-hand{
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  grid-auto-rows:clamp(42px,12vw,49px)!important;
+  gap:6px!important;
+ }
+ #arena-table-modal .at-rack[data-rack="yuzbir"] .at-hand{
+  grid-template-columns:repeat(8,minmax(0,1fr))!important;
+  grid-auto-rows:clamp(39px,10.5vw,47px)!important;
+  gap:5px!important;
+ }
+}

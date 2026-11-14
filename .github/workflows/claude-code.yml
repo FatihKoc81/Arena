@@ -1,0 +1,92 @@
+name: Claude Code — ARENA Bulut Geliştirici
+
+on:
+  workflow_dispatch:
+    inputs:
+      task:
+        description: "Claude Code'a verilecek geliştirme görevi"
+        required: true
+        type: string
+        default: "ARENA oyunlarını gerçek Android ve mobil tarayıcı kullanımına göre denetle. En kritik oynanabilirlik sorununu düzelt, test et ve taslak PR hazırla."
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
+concurrency:
+  group: claude-arena-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  develop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Claude kimlik bilgisini kontrol et
+        id: auth
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+        run: |
+          if [ -n "$ANTHROPIC_API_KEY" ] || [ -n "$CLAUDE_CODE_OAUTH_TOKEN" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error::GitHub Actions secret olarak ANTHROPIC_API_KEY veya CLAUDE_CODE_OAUTH_TOKEN eklenmeli."
+            exit 1
+          fi
+
+      - name: İzole Claude dalını oluştur
+        run: |
+          git config user.name "Claude Code"
+          git config user.email "claude-code[bot]@users.noreply.github.com"
+          BRANCH="claude/arena-${GITHUB_RUN_ID}"
+          git switch -c "$BRANCH"
+          echo "CLAUDE_BRANCH=$BRANCH" >> "$GITHUB_ENV"
+
+      - name: Claude Code kaynakları geliştirir
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY != '' && secrets.ANTHROPIC_API_KEY || '' }}
+          claude_code_oauth_token: ${{ secrets.ANTHROPIC_API_KEY == '' && secrets.CLAUDE_CODE_OAUTH_TOKEN || '' }}
+          claude_args: --max-turns 20
+          prompt: |
+            ARENA için kıdemli Android/web oyun geliştiricisisin.
+            GÖREV: ${{ inputs.task }}
+            Önce GEMINI.md ve ilgili oyun kaynaklarını oku. Çalışan özellikleri koru.
+            Android telefon ve mobil tarayıcı uyumluluğunu önceliklendir.
+            Gerçek oyun mantığını düzelt; sahte/placeholder çözüm üretme.
+            Sadece bu izole dalda çalış. main dalına push/merge yapma.
+            API anahtarı, Firebase gizlisi veya kullanıcı verisi isteme, okuma ya da çıktıya yazma.
+            KÂTİP finansal kayıtları, banka SMS'leri ve gerçek kullanıcı verileri cihaz dışına çıkmamalı.
+            Testleri gerçekten çalıştır ve Türkçe kısa sonuç özeti ver.
+      
+      - name: JavaScript doğrulaması
+        run: |
+          set -euo pipefail
+          find . -type f -name '*.js' -not -path './node_modules/*' -not -path './.git/*' -print0 | while IFS= read -r -d '' file; do
+            node --check "$file"
+          done
+
+      - name: Değişiklikleri taslak PR olarak gönder
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git add -A
+          git reset -- .github/workflows
+          if git diff --cached --quiet; then
+            echo "Claude Code kaynak değişikliği üretmedi; PR açılmadı."
+            exit 0
+          fi
+          git diff --cached --check
+          git commit -m "Claude Code: ARENA oyun iyileştirmeleri"
+          git push origin "$CLAUDE_BRANCH"
+          gh pr create --draft --base main --head "$CLAUDE_BRANCH" \
+            --title "Claude Code: ARENA oyun iyileştirmeleri" \
+            --body "Claude Code tarafından hazırlanmıştır. JavaScript doğrulaması çalıştırıldı. Bu PR taslaktır; main dalına otomatik birleştirme yapılmaz."
