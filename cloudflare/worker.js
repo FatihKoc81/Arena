@@ -178,6 +178,37 @@ export default {
 
       if (!user) return reply({ error: "Invalid Firebase session" }, 401);
 
+      if (path === "/app/numes/key-check" && request.method === "GET") {
+        try {
+          if (!env.NUMES_API_KEY) return reply({ error: "NUMES_API_KEY secret is not configured" }, 503);
+          const upstream = await fetch("https://api.numes.ai/api/v1/key", {
+            method: "GET",
+            headers: { "Authorization": `Bearer ${env.NUMES_API_KEY}`, "Accept": "application/json" },
+          });
+          const raw = await upstream.text();
+          let data = {};
+          try { data = JSON.parse(raw); } catch {}
+          if (!upstream.ok) {
+            return reply({
+              error: "Numes key verification failed",
+              status: upstream.status,
+              content_type: upstream.headers.get("content-type") || null,
+              detail: String(data?.error?.message || data?.message || raw || "No response body").slice(0, 400),
+            }, upstream.status);
+          }
+          const meta = data?.data || data;
+          return reply({
+            status: "ok",
+            key_type: meta.kind || meta.type || meta.key_type || (meta.billing_currency ? "inference" : "management/unknown"),
+            currency: meta.currency || meta.billing_currency || null,
+            disabled: meta.disabled ?? null,
+            limit_remaining: meta.limit_remaining ?? null,
+          });
+        } catch (error) {
+          return reply({ error: "Numes key verification failed", detail: String(error.message || error).slice(0, 400) }, 502);
+        }
+      }
+
       if (path === "/app/numes/models" && request.method === "GET") {
         try {
           if (!env.NUMES_API_KEY) return reply({ error: "NUMES_API_KEY secret is not configured" }, 503);
