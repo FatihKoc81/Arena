@@ -3900,3 +3900,47 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
 
 /* ARENA category game cards: same compact two-column footprint as category tiles. */
 (function(){if(document.getElementById('arenaCategoryTwoColumnPatch'))return;var s=document.createElement('style');s.id='arenaCategoryTwoColumnPatch';s.textContent='html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-rows:126px!important;gap:9px!important;width:100%!important;max-width:100%!important;overflow:visible!important;align-content:start!important;align-items:stretch!important}html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card{display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;gap:6px!important;width:100%!important;min-width:0!important;max-width:100%!important;height:126px!important;min-height:126px!important;box-sizing:border-box!important;padding:10px!important;border:2px solid #42679c!important;border-radius:19px!important;background:linear-gradient(145deg,#18365f,#0a1731)!important;overflow:hidden!important;text-align:left!important}html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card i{display:block!important;flex:none!important;width:auto!important;height:auto!important;font-size:clamp(28px,8vw,40px)!important;line-height:1!important}html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card span{display:block!important;width:100%!important;min-width:0!important}html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card strong{display:block!important;font-size:clamp(13px,3.8vw,17px)!important;line-height:1.12!important}html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card small{display:block!important;margin-top:4px!important;font-size:clamp(10px,2.8vw,12px)!important;line-height:1.2!important}';document.head.appendChild(s);})();
+
+
+/* 2026-11-14: keep category game cards full-width on narrow and wide phones */
+(function(){
+  if(document.getElementById('arenaCategoryFullWidthFix'))return;
+  var style=document.createElement('style');
+  style.id='arenaCategoryFullWidthFix';
+  style.textContent=`
+    html body #ana #arenaHubHome>.ar-categories.is-open{
+      display:block!important;width:100%!important;max-width:100%!important;
+      min-width:0!important;box-sizing:border-box!important;
+    }
+    html body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list{
+      display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+      grid-auto-rows:auto!important;align-items:stretch!important;
+      justify-items:stretch!important;align-content:start!important;
+      width:100%!important;min-width:0!important;max-width:100%!important;
+      margin:0!important;padding:0 0 16px!important;gap:10px!important;
+      box-sizing:border-box!important;transform:none!important;translate:none!important;
+    }
+    html body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card{
+      display:flex!important;position:relative!important;inset:auto!important;
+      flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;
+      width:100%!important;min-width:0!important;max-width:100%!important;
+      height:auto!important;min-height:112px!important;margin:0!important;
+      padding:12px!important;box-sizing:border-box!important;grid-column:1!important;
+    }
+    html body #ana #arenaHubCategory{
+      display:block!important;width:100%!important;min-width:0!important;
+      max-width:100%!important;box-sizing:border-box!important;
+    }
+    html body #ana #arenaHubCategory .ar-game-list{
+      display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+      width:100%!important;min-width:0!important;max-width:100%!important;
+      justify-items:stretch!important;align-items:stretch!important;
+      box-sizing:border-box!important;
+    }
+    html body #ana #arenaHubCategory .ar-game-card{
+      width:100%!important;min-width:0!important;max-width:100%!important;
+      box-sizing:border-box!important;
+    }
+  `;
+  document.head.appendChild(style);
+})();
