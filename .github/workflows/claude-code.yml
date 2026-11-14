@@ -12,7 +12,6 @@ on:
 permissions:
   contents: write
   pull-requests: write
-  id-token: write
 
 concurrency:
   group: claude-arena-${{ github.ref }}
