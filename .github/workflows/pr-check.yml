@@ -6,6 +6,8 @@ on:
     paths:
       - '**/*.js'
       - '**/*.html'
+      - '**/*.css'
+      - 'tts-bridge-entry.js'
       - '.github/workflows/pr-check.yml'
   workflow_dispatch:
 
@@ -27,6 +29,15 @@ jobs:
           find . -type f -name '*.js' -not -path './node_modules/*' -print0 | while IFS= read -r -d '' file; do
             node --check "$file"
           done
+      - name: Mobil oyun ve ses tercihlerini doğrula
+        run: |
+          set -euo pipefail
+          grep -q 'touch-action:pan-x' masa-premium.css
+          ! grep -q 'say("Şık "' dini-milyoner.js
+          ! grep -q 'say("Şık "' index.html
+          grep -q 'woman|female|kadın' dini-milyoner.js
+          grep -q 'woman|female|kadın' index.html
+
       - name: Ortak AI köprüsünü doğrula
         run: |
           grep -q 'ortak-ai.js' index.html
