@@ -150,7 +150,7 @@ async function soruSesOku(){
    voices=synth.getVoices()||[];
   }
   const tr=voices.filter(v=>/^tr([-_]|$)/i.test(v.lang||""));
-  const male=tr.find(v=>/male|erkek|man|murat|ahmet|yusuf|cem|emre/i.test((v.name||"")+" "+(v.voiceURI||"")));
+  const male=tr.find(v=>/(?:^|[^a-z])(male|man)(?=$|[^a-z])|erkek|murat|ahmet|yusuf|cem|emre/i.test((v.name||"")+" "+(v.voiceURI||"")));
   const natural=tr.find(v=>/google|neural|natural|premium/i.test((v.name||"")+" "+(v.voiceURI||"")));
   const voice=male||natural||tr[0]||null;
   const say=text=>new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang="tr-TR";u.rate=.88;u.pitch=.88;u.volume=1;if(voice)u.voice=voice;u.onend=resolve;u.onerror=resolve;synth.speak(u);});
