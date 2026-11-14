@@ -3,7 +3,7 @@ name: Build APK
 
 on:
   push:
-    branches: [main]
+    branches: [main, fix/arena-web-apk-parity-final]
   workflow_dispatch:
 
 permissions:
@@ -272,5 +272,6 @@ jobs:
         with:
           tag_name: v${{ github.run_number }}
           name: ARENA v${{ github.run_number }}
+          target_commitish: ${{ github.sha }}
           files: Arena.apk
           make_latest: true
