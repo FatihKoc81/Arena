@@ -68,6 +68,7 @@ try{
  if(app&&typeof app.addListener==="function")app.addListener("appStateChange",state=>{if(!state||!state.isActive)stopVoice();});
 }catch(e){}
 
+function normalizeDiniSpeechText(value){return String(value||"").replace(/Kur[’‘\x27]an\s*[-–—]\s*ı\s*Ker[iî]m/gi,"Kur\x27anı Kerim");}
 async function speak(){
  if(!tts||!state||!state.deck[state.i])return;
  const token=++voiceToken,q=state.deck[state.i];
@@ -86,7 +87,7 @@ async function speak(){
   const male=tr.find(v=>!/(woman|female|kadın)/i.test((v.name||"")+" "+(v.voiceURI||""))&&/(?:^|[^a-z])(male|man)(?=$|[^a-z])|erkek|murat|ahmet|yusuf|cem|emre/i.test((v.name||"")+" "+(v.voiceURI||"")));
   const natural=tr.find(v=>/google|neural|natural|premium/i.test((v.name||"")+" "+(v.voiceURI||"")));
   const voice=male||natural||tr[0]||null;
-  const say=text=>new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang="tr-TR";u.rate=.88;u.pitch=.88;u.volume=1;if(voice)u.voice=voice;u.onend=resolve;u.onerror=resolve;synth.speak(u);});
+  const say=text=>new Promise(resolve=>{const u=new SpeechSynthesisUtterance(normalizeDiniSpeechText(text));u.lang="tr-TR";u.rate=.88;u.pitch=.88;u.volume=1;if(voice)u.voice=voice;u.onend=resolve;u.onerror=resolve;synth.speak(u);});
   await say("Soru. "+q[0]);if(!voiceStillActive(token))return;
   await new Promise(r=>setTimeout(r,700));
   for(let i=0;i<q[1].length;i++){if(!voiceStillActive(token))return;if(i>0)await new Promise(r=>setTimeout(r,650));await say(q[1][i]+".");}
