@@ -231,3 +231,24 @@
 #arena-table-modal .at-poker-hole i{display:block;width:16px;height:23px;border:1px solid #e7d2a4;border-radius:3px;background:repeating-linear-gradient(45deg,#173f78 0 3px,#e0eaff 4px,#173f78 6px);box-shadow:0 2px 4px #0008}
 #arena-table-modal .at-poker-seats .at-seat[data-player="0"]{border-color:#f0c45d;background:linear-gradient(145deg,#31563e,#102c24)!important}
 @media(max-width:420px){#arena-table-modal .at-poker-seats{gap:4px!important}#arena-table-modal .at-poker-seats .at-seat{font-size:10px!important;padding:5px 1px!important}}
+
+
+/* 2026-11-14: restore usable scrolling and prevent table-game overlays. */
+#arena-table-modal{overflow-x:hidden!important;overflow-y:auto!important;align-items:stretch!important;-webkit-overflow-scrolling:touch!important}
+#arena-table-modal .at-panel{flex:0 0 auto!important;width:min(100%,1100px)!important;max-width:100%!important;margin:8px auto!important;box-sizing:border-box!important}
+#arena-table-modal .at-board{min-height:clamp(130px,24dvh,220px)!important}
+#arena-table-modal .at-tablecards{min-height:64px!important;align-items:center!important;justify-content:center!important}
+#arena-table-modal .at-hand{min-height:72px!important;align-items:center!important}
+#arena-table-modal .at-actions{display:flex!important;flex:0 0 auto!important;flex-wrap:wrap!important;justify-content:center!important;align-items:center!important;padding-bottom:max(8px,env(safe-area-inset-bottom))!important}
+#arena-table-modal.at-batak{overflow-y:auto!important;overflow-x:hidden!important}
+#arena-table-modal.at-batak .at-batak-table{height:clamp(180px,37dvh,290px)!important;min-height:180px!important;max-height:none!important;flex:0 0 auto!important;margin:50px auto 8px!important}
+#arena-table-modal.at-batak .at-batak-bid{position:relative!important;inset:auto!important;left:auto!important;top:auto!important;transform:none!important;width:min(100%,760px)!important;max-height:none!important;overflow:visible!important;margin:8px auto!important;padding:12px!important;z-index:4!important;box-sizing:border-box!important}
+#arena-table-modal.at-batak .at-batak-bid .at-batak-info{position:static!important;max-width:none!important;margin:0 0 8px!important;text-align:center!important;white-space:normal!important}
+#arena-table-modal.at-batak .at-batak-seat.bottom{bottom:1%!important}
+#arena-table-modal.at-batak .at-batak-center{top:48%!important}
+@media(max-height:520px) and (orientation:landscape){
+ #arena-table-modal.at-batak .at-batak-table{height:clamp(160px,34dvh,230px)!important;min-height:160px!important;margin-top:44px!important}
+ #arena-table-modal.at-batak .at-batak-bid{padding:8px!important;margin:4px auto!important}
+ #arena-table-modal.at-batak .at-bid{gap:5px!important}
+ #arena-table-modal.at-batak .at-bid .at-btn{min-height:36px!important;padding:6px!important}
+}
