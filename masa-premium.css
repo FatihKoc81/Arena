@@ -205,3 +205,19 @@
 
 /* Preserve horizontal rack scrolling on touch screens while keeping pointer drag support. */
 #arena-table-modal .at-rack .at-tile{touch-action:pan-x!important;-webkit-user-drag:none!important;-webkit-tap-highlight-color:transparent!important;}
+
+
+/* 2026-11-14: keep hidden poker cards visibly patterned; prevent Batak seats covering trick cards. */
+#arena-table-modal .at-card.back{
+ background:repeating-linear-gradient(45deg,#173f78 0 5px,#e0eaff 6px,#173f78 8px)!important;
+ color:transparent!important;border:2px solid #d5c39b!important;
+ box-shadow:0 4px 9px #0009,inset 0 0 0 2px #ffffff55!important;
+}
+.at-batak .at-batak-seat.top{top:3%!important;z-index:2!important}
+.at-batak .at-batak-center{top:56%!important;z-index:3!important;width:min(58%,500px)!important;min-height:78px!important}
+.at-batak .at-batak-info{top:79%!important;z-index:2!important;max-width:80%;white-space:normal}
+@media(max-height:520px) and (orientation:landscape){
+ .at-batak .at-batak-seat.top{top:1%!important}
+ .at-batak .at-batak-center{top:55%!important}
+ .at-batak .at-batak-info{top:80%!important}
+}
