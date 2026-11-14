@@ -201,3 +201,7 @@
  #arena-table-modal .at-rack .at-tile{transition:transform .14s ease,box-shadow .14s ease,filter .14s ease!important}
  #arena-table-modal .at-rack .at-tile:active{filter:brightness(1.08)}
 }
+
+
+/* Preserve horizontal rack scrolling on touch screens while keeping pointer drag support. */
+#arena-table-modal .at-rack .at-tile{touch-action:pan-x!important;-webkit-user-drag:none!important;-webkit-tap-highlight-color:transparent!important;}

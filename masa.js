@@ -39,32 +39,43 @@ const css=`#arena-table-modal{position:fixed;inset:0;z-index:30000;background:ra
 .at-batak .at-actions{justify-content:center;flex-shrink:0;margin-top:4px}
 @media(max-height:480px){.at-batak .at-batak-table{margin-top:42px;max-height:calc(100dvh - 130px)}.at-batak .at-batak-hand{padding:3px}.at-batak .at-batak-seat.top{top:-5%}.at-batak .at-batak-seat.bottom{bottom:-8%}}
 .at-board{background:radial-gradient(ellipse,#176344,#0b382e 65%,#08241f);border:5px solid #78532d;border-radius:25px;padding:14px 8px;min-height:150px}.at-seats{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;text-align:center;font-size:11px;color:#d9f6e7;margin-bottom:12px}.at-seat{padding:7px 2px;border:1px solid #ffffff25;border-radius:10px;background:#001b1b66}.at-seat b{display:block;color:#fff;font-size:12px}.at-hand,.at-tablecards{display:flex;flex-wrap:nowrap;gap:5px;justify-content:flex-start;margin:12px 0;max-width:100%;overflow-x:auto;overflow-y:hidden;padding:7px 3px 12px;box-sizing:border-box;scrollbar-width:thin;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}.at-hand>.at-card,.at-hand>.at-tile,.at-tablecards>.at-card,.at-tablecards>.at-tile{flex:0 0 auto}.at-hand .at-card{width:clamp(34px,10vw,48px);height:clamp(52px,15vw,68px);font-size:clamp(15px,4.5vw,19px)}.at-hand .at-tile{width:clamp(32px,9vw,40px);height:clamp(46px,13vw,54px)}.at-tile{width:35px;height:49px;border-radius:7px;background:linear-gradient(160deg,#fffef2,#e6e0c8);border:1px solid #c6bda2;color:#142033;font-weight:900;font-size:19px;display:grid;place-items:center}.at-tile.red,.at-card.red{color:#d21d2b}.at-tile.blue{color:#1766c2}.at-tile.yellow{color:#bd8b00}.at-tile.selected{transform:translateY(-7px);outline:3px solid #ffe27a}.at-card{width:39px;height:56px;background:#fff;border-radius:7px;color:#172033;border:1px solid #b8c3d4;display:grid;place-items:center;font-weight:900;font-size:17px}.at-card.back{background:repeating-linear-gradient(45deg,#173f78,#173f78 5px,#e0eaff 6px,#173f78 8px);color:transparent}.at-status{text-align:center;color:#fff;font-weight:750;padding:8px;min-height:38px}.at-big{font-size:25px;font-weight:950;text-align:center}.at-bid{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}.at-btn:disabled{opacity:.35}`;
-function mount(){if(root)return;let st=document.createElement('style');st.textContent=css;document.head.appendChild(st);root=document.createElement('section');root.id='arena-table-modal';root.hidden=true;document.body.appendChild(root);root.addEventListener('click',e=>{let b=e.target.closest('[data-at]');if(!b)return;let a=b.dataset.at;if(a==='close'){const closedGame=g&&g.kind?g.kind:null;root.hidden=true;g=null;unlockOrientation();const restore=()=>{try{window.dispatchEvent(new CustomEvent('arena:game-close',{detail:{id:closedGame}}));}catch(_){window.dispatchEvent(new Event('arena:game-close'));}};if(typeof requestAnimationFrame==='function')requestAnimationFrame(restore);else setTimeout(restore,0);}else if(a==='lobby')lobby();else if(a==='start')start(b.dataset.game);else if(a==='sort')sortHand();else if(a==='draw')draw(b.dataset.src);else if(a==='tile')sel(+b.dataset.i);else if(a==='discard')discard();else if(a==='bid')bid(+b.dataset.n);else if(a==='passbid')passBid();else if(a==='trump')chooseTrump(b.dataset.suit);else if(a==='card')card(+b.dataset.i);else if(a==='poker-call')pokerAct('call');else if(a==='poker-raise')pokerAct('raise');else if(a==='fold')pokerAct('fold');else if(a==='next')next();else if(a==='meld')meld();else if(a==='okeywin')okeyWin();});bindRackDrag();}
+function mount(){if(root)return;let st=document.createElement('style');st.textContent=css;document.head.appendChild(st);root=document.createElement('section');root.id='arena-table-modal';root.hidden=true;document.body.appendChild(root);root.addEventListener('click',e=>{let b=e.target.closest('[data-at]');if(!b)return;let a=b.dataset.at;if(a==='tile'&&g&&g._suppressTileClickUntil&&Date.now()<g._suppressTileClickUntil){g._suppressTileClickUntil=0;e.preventDefault();return;}if(a==='close'){const closedGame=g&&g.kind?g.kind:null;root.hidden=true;g=null;unlockOrientation();const restore=()=>{try{window.dispatchEvent(new CustomEvent('arena:game-close',{detail:{id:closedGame}}));}catch(_){window.dispatchEvent(new Event('arena:game-close'));}};if(typeof requestAnimationFrame==='function')requestAnimationFrame(restore);else setTimeout(restore,0);}else if(a==='lobby')lobby();else if(a==='start')start(b.dataset.game);else if(a==='sort')sortHand();else if(a==='draw')draw(b.dataset.src);else if(a==='tile')sel(+b.dataset.i);else if(a==='discard')discard();else if(a==='bid')bid(+b.dataset.n);else if(a==='passbid')passBid();else if(a==='trump')chooseTrump(b.dataset.suit);else if(a==='card')card(+b.dataset.i);else if(a==='poker-call')pokerAct('call');else if(a==='poker-raise')pokerAct('raise');else if(a==='fold')pokerAct('fold');else if(a==='next')next();else if(a==='meld')meld();else if(a==='okeywin')okeyWin();});bindRackDrag();}
 function bindRackDrag(){
 if(root.dataset.rackDragBound==="1")return;
 root.dataset.rackDragBound="1";
 root.addEventListener("pointerdown",e=>{
  const tile=e.target.closest(".at-rack .at-tile");
- if(!tile||!g||!g.h||!g.h[0])return;
- g._rackDrag={id:Number(tile.dataset.i),pointerId:e.pointerId,x:e.clientX,y:e.clientY,moved:false};
+ if(!tile||!g||!g.h||!g.h[0]||e.isPrimary===false)return;
+ if(e.pointerType==="mouse"&&e.button!==0)return;
+ g._suppressTileClickUntil=0;
+ g._rackDrag={id:tile.dataset.tileId||"",index:Number(tile.dataset.i),pointerId:e.pointerId,x:e.clientX,y:e.clientY,moved:false};
  try{root.setPointerCapture(e.pointerId);}catch(_){}
 });
 root.addEventListener("pointermove",e=>{
  const d=g&&g._rackDrag;if(!d||d.pointerId!==e.pointerId)return;
- if(Math.hypot(e.clientX-d.x,e.clientY-d.y)>7){d.moved=true;root.classList.add("at-rack-dragging");}
+ if(Math.hypot(e.clientX-d.x,e.clientY-d.y)>8){d.moved=true;root.classList.add("at-rack-dragging");}
 });
 root.addEventListener("pointerup",e=>{
  const d=g&&g._rackDrag;if(!d||d.pointerId!==e.pointerId)return;
  g._rackDrag=null;root.classList.remove("at-rack-dragging");
- if(!d.moved){sel(d.id);return;}
+ if(!d.moved){g._suppressTileClickUntil=Date.now()+650;sel(d.index);return;}
+ g._suppressTileClickUntil=Date.now()+650;
+ const hand=g.h[0],from=hand.findIndex(t=>String(t.id)===String(d.id));
+ if(from<0)return;
  const under=document.elementFromPoint(e.clientX,e.clientY);
  const target=under&&under.closest?under.closest(".at-rack .at-tile"):null;
- const from=d.id,to=target?Number(target.dataset.i):from;
- if(!Number.isInteger(from)||!Number.isInteger(to)||from===to)return;
- const hand=g.h[0],selectedIds=g.sel.map(i=>hand[i]&&hand[i].id).filter(Boolean),tile=hand.splice(from,1)[0];
- if(!tile)return;
- hand.splice(to,0,tile);
- g.sel=selectedIds.map(id=>hand.findIndex(t=>t.id===id)).filter(i=>i>=0);
+ if(!target)return;
+ const targetTileId=target.dataset.tileId;
+ const targetIndex=hand.findIndex(t=>String(t.id)===String(targetTileId));
+ if(targetIndex<0||targetIndex===from)return;
+ const selectedIds=g.sel.map(i=>hand[i]&&hand[i].id).filter(Boolean);
+ const tile=hand.splice(from,1)[0];
+ const rect=target.getBoundingClientRect();
+ let insertAt=targetIndex+(e.clientX>rect.left+rect.width/2?1:0);
+ if(from<insertAt)insertAt--;
+ insertAt=Math.max(0,Math.min(hand.length,insertAt));
+ hand.splice(insertAt,0,tile);
+ g.sel=selectedIds.map(id=>hand.findIndex(t=>String(t.id)===String(id))).filter(i=>i>=0);
  tileView("Taşın ıstakadaki yeri değiştirildi.");
 });
 root.addEventListener("pointercancel",e=>{
@@ -81,7 +92,7 @@ function tileView(msg){
 let n=g.kind==="okey"?"OKEY":"101";
 let seats=[1,2,3].map(p=>'<div class="at-seat">Bot '+p+'<b>'+(g.kind==="yuzbir"&&g.playerOpened[p]?"Per açtı":"Kapalı el")+'</b></div>').join("");
 let laid=g.kind==="yuzbir"?g.laid.map((arr,p)=>arr.length?'<div class="at-muted">'+(p?"Bot "+p:"Sen")+' · Açılan perler</div><div class="at-tablecards">'+arr.map(tileHtml).join("")+'</div>':"").join(""):"";
-let rackTiles=g.h[0].map((t,i)=>'<button type="button" class="at-tile '+t.c+(g.sel.includes(i)?" selected":"")+'" data-at="tile" data-i="'+i+'" aria-label="'+(t.c==="joker"?"Sahte okey":t.n+" "+t.c)+'"><span>'+(t.c==="joker"?"★":t.n)+'</span></button>').join("");
+let rackTiles=g.h[0].map((t,i)=>'<button type="button" class="at-tile '+t.c+(g.sel.includes(i)?" selected":"")+'" data-at="tile" data-i="'+i+'" data-tile-id="'+String(t.id).replace(/"/g,"&quot;")+'" aria-label="'+(t.c==="joker"?"Sahte okey":t.n+" "+t.c)+'"><span>'+(t.c==="joker"?"★":t.n)+'</span></button>').join("");
 show(n,'<div class="at-panel"><div class="at-status" id="at-status">'+(msg||"Taş çek, sonra bir taş seçip at.")+'</div><div class="at-seats">'+seats+'<div class="at-seat">Deste<b>'+g.d.length+' taş</b></div></div><div class="at-board"><div class="at-muted" style="text-align:center">GÖSTERGE · '+tileHtml(g.indicator)+' &nbsp; OKEY · '+g.okey.c+' '+g.okey.n+'</div><div class="at-muted" style="text-align:center;margin-top:10px">SON ATILAN</div><div class="at-tablecards">'+(g.drop.length?tileHtml(g.drop[g.drop.length-1]):"—")+'</div></div>'+laid+'<div class="at-status">SENİN TAŞLARIN · '+g.h[0].length+'</div><div class="at-rack" data-rack="'+g.kind+'"><div class="at-rack-lip"></div><div class="at-hand" aria-label="Taş ıstakası">'+rackTiles+'</div><div class="at-rack-front"></div></div><div class="at-rack-help">Taşı basılı tutup sağa veya sola sürükleyerek yerini değiştir.</div></div>','<button class="at-btn primary" data-at="draw" data-src="deck" '+(g.drawn||g.won?"disabled":"")+'>Ortadan Çek</button><button class="at-btn" data-at="draw" data-src="drop" '+(g.drawn||!g.drop.length||g.won?"disabled":"")+'>Atılanı Al</button><button class="at-btn good" data-at="discard" '+(!g.drawn||!g.sel.length||g.won?"disabled":"")+'>Seçili Taşı At</button>'+(g.kind==="yuzbir"?'<button class="at-btn" data-at="meld" '+(g.won?"disabled":"")+'>'+(g.opened?"Per Aç / Ekle":"Per Aç (101+)")+'</button>':'<button class="at-btn" data-at="okeywin" '+(g.won?"disabled":"")+'>Elimi Kontrol Et</button>')+'<button class="at-btn" data-at="sort">Taşları Sırala</button><button class="at-btn" data-at="next">Yeni El</button>');
 }
 function tileUtility(t,hand){if(!t)return -99;if(t.c==="joker")return 80;let score=0;hand.forEach(x=>{if(!x||x.id===t.id||x.c==="joker")return;if(x.c===t.c&&Math.abs(x.n-t.n)===1)score+=12;if(x.n===t.n&&x.c!==t.c)score+=10;if(x.n===t.n&&x.c===t.c)score+=18;});if(g&&g.okey&&t.c===g.okey.c&&t.n===g.okey.n)score+=55;return score;}
