@@ -293,6 +293,9 @@ export default {
             provider: {
               data_collection: "deny",
               zdr: true,
+              // Never route to a paid endpoint. Both token price ceilings are zero.
+              max_price: { prompt: 0, completion: 0 },
+              allow_fallbacks: false,
             },
           }),
         });
