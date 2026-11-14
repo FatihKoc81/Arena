@@ -150,13 +150,13 @@ async function soruSesOku(){
    voices=synth.getVoices()||[];
   }
   const tr=voices.filter(v=>/^tr([-_]|$)/i.test(v.lang||""));
-  const male=tr.find(v=>/(?:^|[^a-z])(male|man)(?=$|[^a-z])|erkek|murat|ahmet|yusuf|cem|emre/i.test((v.name||"")+" "+(v.voiceURI||"")));
+  const male=tr.find(v=>!/(woman|female|kadın)/i.test((v.name||"")+" "+(v.voiceURI||""))&&/(?:^|[^a-z])(male|man)(?=$|[^a-z])|erkek|murat|ahmet|yusuf|cem|emre/i.test((v.name||"")+" "+(v.voiceURI||"")));
   const natural=tr.find(v=>/google|neural|natural|premium/i.test((v.name||"")+" "+(v.voiceURI||"")));
   const voice=male||natural||tr[0]||null;
   const say=text=>new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang="tr-TR";u.rate=.88;u.pitch=.88;u.volume=1;if(voice)u.voice=voice;u.onend=resolve;u.onerror=resolve;synth.speak(u);});
   await say("Soru. "+q[0]);if(token!==soruSesToken)return;
   await new Promise(r=>setTimeout(r,700));
-  for(let i=0;i<q[1].length;i++){if(token!==soruSesToken)return;if(i>0)await new Promise(r=>setTimeout(r,650));await say("Şık "+["A","B","C","D"][i]+". "+q[1][i]+".");}
+  for(let i=0;i<q[1].length;i++){if(token!==soruSesToken)return;if(i>0)await new Promise(r=>setTimeout(r,650));await say(q[1][i]+".");}
  }catch(e){console.warn("Milyoner sesli okuma hatası:",e);}
 }
 
@@ -536,7 +536,7 @@ document.addEventListener("anasayfa", gKapat);
 <script src="islem.js?v=20261104a"></script>
 <script src="ads.js?v=20261104a"></script>
 <script src="rotasyon.js?v=20261104a"></script>
-<script src="dini-milyoner.js?v=20261114-male-tts1"></script>
+<script src="dini-milyoner.js?v=20261114-male-tts2"></script>
 <script src="masa.js?v=20261112-greenbaize1"></script>
 <script src="mini-oyunlar.js?v=20261110-sudoku-premium1"></script>
 <script src="menu.js?v=20261114-milyoner-launch1"></script>
