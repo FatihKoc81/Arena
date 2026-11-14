@@ -3900,3 +3900,93 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
 
 /* ARENA category game cards: same compact two-column footprint as category tiles. */
 (function(){if(document.getElementById('arenaCategoryTwoColumnPatch'))return;var s=document.createElement('style');s.id='arenaCategoryTwoColumnPatch';s.textContent='html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-rows:126px!important;gap:9px!important;width:100%!important;max-width:100%!important;overflow:visible!important;align-content:start!important;align-items:stretch!important}html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card{display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;gap:6px!important;width:100%!important;min-width:0!important;max-width:100%!important;height:126px!important;min-height:126px!important;box-sizing:border-box!important;padding:10px!important;border:2px solid #42679c!important;border-radius:19px!important;background:linear-gradient(145deg,#18365f,#0a1731)!important;overflow:hidden!important;text-align:left!important}html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card i{display:block!important;flex:none!important;width:auto!important;height:auto!important;font-size:clamp(28px,8vw,40px)!important;line-height:1!important}html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card span{display:block!important;width:100%!important;min-width:0!important}html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card strong{display:block!important;font-size:clamp(13px,3.8vw,17px)!important;line-height:1.12!important}html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card small{display:block!important;margin-top:4px!important;font-size:clamp(10px,2.8vw,12px)!important;line-height:1.2!important}';document.head.appendChild(s);})();
+
+/* 2026-11-14: Reference-matched Oyunlar detail — two-column premium cards. */
+(function(){
+ if(document.getElementById("arenaGamesReferenceLayout20261114"))return;
+ const style=document.createElement("style");
+ style.id="arenaGamesReferenceLayout20261114";
+ style.textContent=`
+  html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open{
+   display:flex!important;flex-direction:column!important;align-items:stretch!important;
+   justify-content:flex-start!important;position:relative!important;inset:auto!important;
+   grid-column:1/-1!important;grid-row:auto!important;
+   width:100%!important;min-width:0!important;max-width:100%!important;
+   height:auto!important;min-height:0!important;max-height:none!important;
+   margin:0!important;padding:0!important;overflow:visible!important;
+   transform:none!important;translate:none!important;box-sizing:border-box!important;
+  }
+  html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-category-head{
+   display:flex!important;flex:0 0 auto!important;align-self:stretch!important;
+   align-items:center!important;justify-content:flex-start!important;gap:10px!important;
+   position:relative!important;inset:auto!important;width:100%!important;
+   min-width:0!important;max-width:100%!important;height:54px!important;min-height:54px!important;
+   margin:0 0 10px!important;padding:6px 12px!important;box-sizing:border-box!important;
+   border:1px solid #d6a84c!important;border-radius:15px!important;
+   background:linear-gradient(100deg,#172f5b,#101a3b 65%,#38234c)!important;
+   color:#fff!important;font-size:clamp(16px,4.5vw,22px)!important;font-weight:950!important;
+   box-shadow:0 0 14px #e9ae3c30,inset 0 1px #fff5!important;
+  }
+  html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-category-head span{
+   display:block!important;min-width:0!important;white-space:nowrap!important;
+  }
+  html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-back{
+   position:relative!important;left:auto!important;top:auto!important;transform:none!important;
+   display:grid!important;place-items:center!important;flex:0 0 38px!important;
+   width:38px!important;height:38px!important;min-height:38px!important;padding:0!important;
+   border:1px solid #d4aa58!important;border-radius:11px!important;
+   background:#0b1c3b!important;color:#fff!important;font-size:22px!important;
+  }
+  html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list{
+   display:grid!important;position:relative!important;inset:auto!important;
+   flex:0 0 auto!important;align-self:stretch!important;
+   grid-template-columns:repeat(2,minmax(0,1fr))!important;
+   grid-auto-rows:minmax(116px,auto)!important;
+   align-content:start!important;align-items:stretch!important;justify-content:stretch!important;
+   gap:9px!important;width:100%!important;min-width:0!important;max-width:100%!important;
+   height:auto!important;min-height:0!important;max-height:none!important;
+   margin:0!important;padding:0 0 20px!important;
+   overflow:visible!important;transform:none!important;translate:none!important;box-sizing:border-box!important;
+  }
+  html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card{
+   display:flex!important;position:relative!important;inset:auto!important;
+   flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;
+   gap:5px!important;grid-column:auto!important;
+   width:100%!important;min-width:0!important;max-width:100%!important;
+   height:auto!important;min-height:116px!important;margin:0!important;padding:9px!important;
+   box-sizing:border-box!important;overflow:hidden!important;
+   border:2px solid #d8ad55!important;border-radius:17px!important;
+   background:radial-gradient(ellipse at 20% 0%,#354d7b 0%,transparent 65%),linear-gradient(145deg,#102c55,#07152e 72%,#24133d)!important;
+   box-shadow:inset 0 1px #fff6,0 4px 12px #0008,0 0 10px #e6b84b24!important;
+   color:#fff!important;text-align:left!important;white-space:normal!important;
+  }
+  html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card i{
+   display:block!important;flex:0 0 auto!important;width:auto!important;height:auto!important;
+   margin:0!important;font-size:clamp(30px,8.5vw,43px)!important;line-height:1!important;
+   font-style:normal!important;filter:drop-shadow(0 3px 4px #000b)!important;
+  }
+  html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card span{
+   display:block!important;width:100%!important;min-width:0!important;
+  }
+  html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card strong{
+   display:block!important;font-size:clamp(12px,3.5vw,16px)!important;
+   line-height:1.12!important;font-weight:950!important;overflow-wrap:anywhere!important;
+  }
+  html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card small{
+   display:block!important;margin-top:4px!important;color:#d4e2ff!important;
+   font-size:clamp(9px,2.7vw,12px)!important;line-height:1.18!important;
+  }
+  html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card.soon{
+   border-style:dashed!important;opacity:.7!important;
+  }
+  @media(max-width:350px){
+   html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important;
+   }
+   html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card{
+    min-height:106px!important;padding:7px!important;
+   }
+  }
+ `;
+ document.head.appendChild(style);
+})();
