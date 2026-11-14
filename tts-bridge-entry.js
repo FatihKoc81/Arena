@@ -1,4 +1,5 @@
 import { TextToSpeech } from '@capacitor-community/text-to-speech';
+// Normalize the canonical Turkish title 'Kur'an-ı Kerim' for TTS so the hyphen is never spoken as a punctuation name.
 let sequence=0;
 let selectedVoice;
 async function getTurkishVoice(){
