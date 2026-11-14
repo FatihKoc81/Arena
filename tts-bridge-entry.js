@@ -9,7 +9,7 @@ async function getTurkishVoice(){
   const candidates=(result.voices||[]).map((v,index)=>({...v,index})).filter(v=>/^tr([-_]|$)/i.test(v.lang||""));
   if(candidates.length){
    candidates.sort((a,b)=>{
-    const male=v=>/(?:^|[^a-z])(male|man)(?=$|[^a-z])|erkek|murat|ahmet|yusuf|cem|emre/i.test((v.voiceURI||"")+" "+(v.name||""))?0:1;
+    const male=v=>!/(woman|female|kadın)/i.test((v.voiceURI||"")+" "+(v.name||""))&&/(?:^|[^a-z])(male|man)(?=$|[^a-z])|erkek|murat|ahmet|yusuf|cem|emre/i.test((v.voiceURI||"")+" "+(v.name||""))?0:1;
     const quality=v=>/google|neural|natural|premium/i.test((v.voiceURI||"")+" "+(v.name||""))?0:1;
     return male(a)-male(b)||quality(a)-quality(b)||(a.localService===b.localService?0:(a.localService?1:-1));
    });
