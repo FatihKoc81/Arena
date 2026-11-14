@@ -88,7 +88,7 @@ async function speak(){
   const male=tr.find(v=>!/(woman|female|kadın)/i.test((v.name||"")+" "+(v.voiceURI||""))&&/(?:^|[^a-z])(male|man)(?=$|[^a-z])|erkek|murat|ahmet|yusuf|cem|emre/i.test((v.name||"")+" "+(v.voiceURI||"")));
   const natural=tr.find(v=>/google|neural|natural|premium/i.test((v.name||"")+" "+(v.voiceURI||"")));
   const voice=male||tr.find(v=>!/(woman|female|kadın)/i.test((v.name||"")+" "+(v.voiceURI||"")) )||natural||tr[0]||null;
-  const say=text=>new Promise(resolve=>{const u=new SpeechSynthesisUtterance(normalizeDiniSpeechText(text));u.lang="tr-TR";u.rate=1.0;u.pitch=1.0;u.volume=1;if(voice)u.voice=voice;u.onend=resolve;u.onerror=resolve;synth.speak(u);});
+  const say=text=>new Promise(resolve=>{const u=new SpeechSynthesisUtterance(normalizeDiniSpeechText(text));u.lang="tr-TR";u.rate=1.1;u.pitch=1.0;u.volume=1;if(voice)u.voice=voice;u.onend=resolve;u.onerror=resolve;synth.speak(u);});
   await say("Soru. "+q[0]);if(!voiceStillActive(token))return;
   await new Promise(r=>setTimeout(r,800));
   for(let i=0;i<q[1].length;i++){if(!voiceStillActive(token))return;if(i>0)await new Promise(r=>setTimeout(r,400));await say(q[1][i]+".");}
