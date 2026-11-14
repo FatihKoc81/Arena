@@ -51,13 +51,29 @@ const questions=[
 ];
 const prizes=["1.000","2.000","3.000","5.000","7.500","15.000","30.000","60.000","125.000","250.000","500.000","1.000.000","2.000.000","5.000.000","10.000.000"];
 let root=null,state=null,timer=null,tts=(()=>{try{return localStorage.getItem('arena_question_voice')!=='0';}catch(e){return true;}})(),voiceToken=0;
-function stopVoice(){voiceToken++;try{if(window.ArenaTTS)window.ArenaTTS.stop()}catch(e){}try{if(window.speechSynthesis)window.speechSynthesis.cancel()}catch(e){}}
+function stopVoice(){
+ voiceToken++;
+ try{if(window.ArenaTTS&&typeof window.ArenaTTS.stop==="function")Promise.resolve(window.ArenaTTS.stop()).catch(()=>{});}catch(e){}
+ try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}
+ try{const p=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.TextToSpeech;if(p&&typeof p.stop==="function")Promise.resolve(p.stop()).catch(()=>{});}catch(e){}
+}
+function voiceStillActive(token){return token===voiceToken&&!!root&&root.classList.contains("open")&&!document.hidden;}
+document.addEventListener("visibilitychange",()=>{if(document.hidden)stopVoice();});
+window.addEventListener("pagehide",stopVoice);
+window.addEventListener("blur",stopVoice);
+window.addEventListener("arena:game-close",stopVoice);
+window.addEventListener("arena:home",stopVoice);
+try{
+ const app=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.App;
+ if(app&&typeof app.addListener==="function")app.addListener("appStateChange",state=>{if(!state||!state.isActive)stopVoice();});
+}catch(e){}
+
 async function speak(){
  if(!tts||!state||!state.deck[state.i])return;
  const token=++voiceToken,q=state.deck[state.i];
  try{if(window.ArenaTTS&&typeof window.ArenaTTS.speakParts==="function"){await window.ArenaTTS.speakParts(q[0],q[1]);if(token!==voiceToken)return;return;}}
- catch(nativeError){console.warn("ARENA native TTS unavailable; using browser speech:",nativeError);}
- if(!("speechSynthesis"in window)||!("SpeechSynthesisUtterance"in window))return;
+ catch(nativeError){if(!voiceStillActive(token))return;console.warn("ARENA native TTS unavailable; using browser speech:",nativeError);}
+ if(!voiceStillActive(token)||!("speechSynthesis"in window)||!("SpeechSynthesisUtterance"in window))return;
  try{
   const synth=window.speechSynthesis;synth.cancel();
   let voices=synth.getVoices()||[];
@@ -65,14 +81,15 @@ async function speak(){
    await Promise.race([new Promise(resolve=>synth.addEventListener("voiceschanged",resolve,{once:true})),new Promise(resolve=>setTimeout(resolve,1200))]);
    voices=synth.getVoices()||[];
   }
+  if(!voiceStillActive(token))return;
   const tr=voices.filter(v=>/^tr([-_]|$)/i.test(v.lang||""));
   const male=tr.find(v=>!/(woman|female|kadın)/i.test((v.name||"")+" "+(v.voiceURI||""))&&/(?:^|[^a-z])(male|man)(?=$|[^a-z])|erkek|murat|ahmet|yusuf|cem|emre/i.test((v.name||"")+" "+(v.voiceURI||"")));
   const natural=tr.find(v=>/google|neural|natural|premium/i.test((v.name||"")+" "+(v.voiceURI||"")));
   const voice=male||natural||tr[0]||null;
   const say=text=>new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang="tr-TR";u.rate=.88;u.pitch=.88;u.volume=1;if(voice)u.voice=voice;u.onend=resolve;u.onerror=resolve;synth.speak(u);});
-  await say("Soru. "+q[0]);if(token!==voiceToken)return;
+  await say("Soru. "+q[0]);if(!voiceStillActive(token))return;
   await new Promise(r=>setTimeout(r,700));
-  for(let i=0;i<q[1].length;i++){if(token!==voiceToken)return;if(i>0)await new Promise(r=>setTimeout(r,650));await say(q[1][i]+".");}
+  for(let i=0;i<q[1].length;i++){if(!voiceStillActive(token))return;if(i>0)await new Promise(r=>setTimeout(r,650));await say(q[1][i]+".");}
  }catch(e){console.warn("ARENA TTS:",e);}
 }
 function shuffle(a){return a.map(x=>[Math.random(),x]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);}
@@ -101,19 +118,119 @@ function mount(){if(root)return;let st=document.createElement("style");st.textCo
 #arenaDiniMillion .dm-pill.gold{border-color:#f3bd43!important;color:#ffe18a!important;background:linear-gradient(145deg,#554018,#201b24)!important}
 #arenaDiniMillion .dm-pill.dm-voice{border-color:#5e9db1!important;color:#d4f1ff!important;background:#103247!important}
 #arenaDiniMillion .dm-feedback{color:#ffe09a!important}
-@media(max-width:390px){#arenaDiniMillion .dm-table{padding:12px!important}#arenaDiniMillion .dm-question{min-height:92px!important;padding:14px 10px!important}}
+/* Match the standard Milyoner play screen; only the felt/background is emerald. */
+#arenaDiniMillion{
+ background:radial-gradient(ellipse at 50% 38%,#176b4b 0%,#0b3d32 45%,#041c22 100%)!important;
+ padding:calc(env(safe-area-inset-top) + 8px) 12px calc(env(safe-area-inset-bottom) + 16px)!important;
+ align-items:center!important;justify-content:flex-start!important;
+}
+#arenaDiniMillion:before{opacity:.08!important}
+#arenaDiniMillion .dm-head{
+ display:flex!important;display:grid!important;
+ grid-template-columns:52px minmax(0,1fr) 52px!important;
+ align-items:center!important;gap:8px!important;
+ width:min(100%,620px)!important;min-height:66px!important;
+ margin:0 auto 12px!important;
+}
+#arenaDiniMillion .dm-icon{
+ display:grid!important;place-items:center!important;
+ width:52px!important;height:48px!important;min-width:52px!important;
+ padding:0!important;border:1px solid #4b6d7e!important;border-radius:14px!important;
+ background:linear-gradient(145deg,#172f43,#091b2c)!important;
+ color:#fff!important;font-size:25px!important;font-weight:900!important;
+}
+#arenaDiniMillion .dm-brand{min-width:0!important;text-align:center!important;font-size:clamp(23px,6vw,30px)!important}
+#arenaDiniMillion .dm-brand small{font-size:10px!important}
+#arenaDiniMillion .dm-table{
+ display:block!important;flex:0 0 auto!important;
+ width:100%!important;max-width:620px!important;min-width:0!important;
+ margin:0 auto!important;padding:clamp(12px,3vw,18px)!important;
+ border:2px solid #557b65!important;border-radius:32px!important;
+ background:linear-gradient(160deg,#071b2b 0%,#07182a 100%)!important;
+ box-shadow:0 0 0 2px #263f37,0 0 24px #1b9b6530!important;
+ box-sizing:border-box!important;
+}
+#arenaDiniMillion .dm-top{
+ display:flex!important;justify-content:space-between!important;align-items:center!important;
+ gap:6px!important;color:#d8e4ff!important;font-size:clamp(13px,3.7vw,17px)!important;
+}
+#arenaDiniMillion .dm-progressbar{
+ height:8px!important;margin:12px 0 20px!important;
+ border:1px solid #426c63!important;border-radius:10px!important;background:#142b37!important;overflow:hidden!important;
+}
+#arenaDiniMillion .dm-progressbar i{display:block!important;height:100%!important;border-radius:10px!important;background:linear-gradient(90deg,#25c47b,#b3efae)!important}
+#arenaDiniMillion .dm-question{
+ min-height:0!important;height:auto!important;margin:0 0 18px!important;padding:18px 14px!important;
+ border:2px solid #547f69!important;border-radius:22px!important;
+ background:linear-gradient(145deg,#102b3d,#0a2032)!important;
+ color:#fff!important;font-family:system-ui,sans-serif!important;
+ font-size:clamp(20px,5.3vw,27px)!important;line-height:1.3!important;font-weight:500!important;
+ box-shadow:none!important;
+}
+#arenaDiniMillion .dm-answers{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:10px!important}
+#arenaDiniMillion .dm-answer{
+ display:flex!important;align-items:center!important;width:100%!important;min-width:0!important;
+ min-height:58px!important;height:auto!important;margin:0!important;padding:12px 14px!important;
+ border:2px solid #557a68!important;border-radius:17px!important;
+ background:#101f39!important;color:#fff!important;
+ text-align:left!important;font:500 clamp(17px,4.6vw,21px)/1.25 system-ui,sans-serif!important;
+ box-shadow:none!important;
+}
+#arenaDiniMillion .dm-answer.correct{background:#145d42!important;border-color:#4bc58b!important}
+#arenaDiniMillion .dm-answer.wrong{background:#742b36!important;border-color:#e77982!important}
+#arenaDiniMillion .dm-tools{
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ gap:8px!important;margin:18px 0 0!important;
+}
+#arenaDiniMillion .dm-tools .dm-btn{
+ min-width:0!important;min-height:52px!important;padding:8px 3px!important;
+ border:2px solid #557a68!important;border-radius:16px!important;
+ background:#222f45!important;color:#fff!important;
+ font:800 clamp(12px,3.3vw,16px)/1.2 system-ui,sans-serif!important;
+ white-space:normal!important;
+}
+#arenaDiniMillion .dm-footer{
+ display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr) minmax(0,1fr)!important;
+ align-items:center!important;gap:8px!important;margin-top:12px!important;
+}
+#arenaDiniMillion .dm-pill{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ box-sizing:border-box!important;min-width:0!important;min-height:44px!important;
+ padding:7px 5px!important;border:2px solid #4a5a9a!important;border-radius:24px!important;
+ background:#101a38!important;color:#fff!important;
+ font:800 clamp(11px,3.2vw,14px)/1.15 system-ui,sans-serif!important;
+ text-align:center!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
+}
+#arenaDiniMillion .dm-pill.gold{border-color:#ffb300!important;color:#ffe27a!important;background:#171b2c!important}
+#arenaDiniMillion .dm-pill.dm-voice{border-color:#4a78ba!important;color:#bfe7ff!important;background:#102443!important}
+#arenaDiniMillion .dm-home{
+ display:block!important;width:100%!important;min-height:66px!important;margin:14px 0 0!important;
+ border:2px solid #59677e!important;border-radius:24px!important;
+ background:#222f45!important;color:#a9b7dc!important;
+ font-size:clamp(20px,5.5vw,27px)!important;font-weight:900!important;
+}
+#arenaDiniMillion .dm-feedback{margin:10px auto 0!important;color:#b6f0d2!important}
+@media(max-width:390px){
+ #arenaDiniMillion{padding-left:10px!important;padding-right:10px!important}
+ #arenaDiniMillion .dm-table{padding:12px!important}
+ #arenaDiniMillion .dm-question{padding:16px 12px!important}
+ #arenaDiniMillion .dm-answer{min-height:54px!important;padding:11px 12px!important}
+ #arenaDiniMillion .dm-tools .dm-btn{min-height:48px!important;font-size:12px!important}
+ #arenaDiniMillion .dm-pill{font-size:11px!important}
+}
 `;document.head.appendChild(st);root=document.createElement("section");root.id="arenaDiniMillion";document.body.appendChild(root);root.addEventListener("click",e=>{let b=e.target.closest("[data-dm]");if(!b)return;let a=b.dataset.dm;if(a==="close"){stopVoice();clearInterval(timer);root.classList.remove("open");window.dispatchEvent(new Event("arena:game-close"));}if(a==="answer")answer(+b.dataset.i);if(a==="voice"){tts=true;try{localStorage.setItem("arena_question_voice","1");}catch(e){}speak();}if(a==="gold"){if(window.Ekonomi&&Ekonomi.dukkan)Ekonomi.dukkan();}if(a==="half")half();if(a==="audience")audience();if(a==="double"){if(!state.used.double&&!state.lock){state.used.double=true;state.double=true;render();}}if(a==="new")start();if(a==="home"){root.classList.remove("open");stopVoice();clearInterval(timer);window.dispatchEvent(new Event("arena:home"));}});}
 function render(msg){
  mount();clearInterval(timer);let q=state.deck[state.i];
  let ad=(window.Ekonomi&&typeof Ekonomi.ad==="function"?Ekonomi.ad():"Oyuncu")||"Oyuncu";
  let altin=(window.Ekonomi&&typeof Ekonomi.altin==="function"?Ekonomi.altin():null);
  ad=String(ad).replace(/[&<>"]/g,"");
- root.innerHTML='<div class="dm-head"><button class="dm-icon" data-dm="home">☰</button><div class="dm-brand">ARENA<small>OYUN PLATFORMU</small></div><button class="dm-icon" data-dm="close">×</button></div>'+
- '<div class="dm-table"><div class="dm-top"><span>Seviye 1</span><span>❤️ '+state.lives+'</span><span>Soru '+(state.i+1)+'/15</span></div>'+
+ root.innerHTML='<div class="dm-head"><button class="dm-icon" data-dm="home" aria-label="Ana menü">☰</button><div class="dm-brand">ARENA<small>OYUN PLATFORMU</small></div><button class="dm-icon" data-dm="close" aria-label="Oyunu kapat">×</button></div>'+
+ '<div class="dm-table"><div class="dm-top"><b>Seviye 1</b><span>❤️ '+state.lives+'</span><b>Soru '+(state.i+1)+'/15</b></div>'+
  '<div class="dm-progressbar"><i style="width:'+((state.i)/15*100)+'%"></i></div>'+
  '<div class="dm-question">'+(msg||q[0])+'</div><div class="dm-answers">'+q[1].map((x,i)=>'<button class="dm-answer" data-dm="answer" data-i="'+i+'" '+(state.lock||state.eliminated.includes(i)?"disabled":"")+'>'+"ABCD"[i]+") "+x+'</button>').join("")+'</div>'+
  '<div class="dm-tools"><button class="dm-btn" data-dm="half" '+(state.used.half?"disabled":"")+'>✂️ 50:50</button><button class="dm-btn" data-dm="audience" '+(state.used.audience?"disabled":"")+'>👥 Seyirci</button><button class="dm-btn" data-dm="double" '+(state.used.double?"disabled":"")+'>🛡️ Çift Cevap</button></div>'+
-  '<div class="dm-footer"><button type="button" class="dm-pill gold" data-dm="gold">🪙 '+(altin==null?"Altın":Number(altin).toLocaleString("tr-TR"))+' +</button><div class="dm-pill">👤 '+ad+'</div><button type="button" class="dm-pill dm-voice" data-dm="voice">🔊 Soruyu dinle</button></div></div>'+
+ '<div class="dm-footer"><button type="button" class="dm-pill gold" data-dm="gold">🪙 '+(altin==null?"Altın":Number(altin).toLocaleString("tr-TR"))+' +</button><div class="dm-pill">👤 '+ad+'</div><button type="button" class="dm-pill dm-voice" data-dm="voice">🔊 Soruyu dinle</button></div>'+
+ '<button type="button" class="dm-home" data-dm="home">Ana Menü</button></div>'+
  (state.feedback?'<div class="dm-feedback">'+state.feedback+'</div>':"");
  root.classList.add("open");if(!state.lock)speak();
 }
