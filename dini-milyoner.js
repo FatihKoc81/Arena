@@ -66,13 +66,13 @@ async function speak(){
    voices=synth.getVoices()||[];
   }
   const tr=voices.filter(v=>/^tr([-_]|$)/i.test(v.lang||""));
-  const male=tr.find(v=>/(?:^|[^a-z])(male|man)(?=$|[^a-z])|erkek|murat|ahmet|yusuf|cem|emre/i.test((v.name||"")+" "+(v.voiceURI||"")));
+  const male=tr.find(v=>!/(woman|female|kadın)/i.test((v.name||"")+" "+(v.voiceURI||""))&&/(?:^|[^a-z])(male|man)(?=$|[^a-z])|erkek|murat|ahmet|yusuf|cem|emre/i.test((v.name||"")+" "+(v.voiceURI||"")));
   const natural=tr.find(v=>/google|neural|natural|premium/i.test((v.name||"")+" "+(v.voiceURI||"")));
   const voice=male||natural||tr[0]||null;
   const say=text=>new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang="tr-TR";u.rate=.88;u.pitch=.88;u.volume=1;if(voice)u.voice=voice;u.onend=resolve;u.onerror=resolve;synth.speak(u);});
   await say("Soru. "+q[0]);if(token!==voiceToken)return;
   await new Promise(r=>setTimeout(r,700));
-  for(let i=0;i<q[1].length;i++){if(token!==voiceToken)return;if(i>0)await new Promise(r=>setTimeout(r,650));await say("Şık "+["A","B","C","D"][i]+". "+q[1][i]+".");}
+  for(let i=0;i<q[1].length;i++){if(token!==voiceToken)return;if(i>0)await new Promise(r=>setTimeout(r,650));await say(q[1][i]+".");}
  }catch(e){console.warn("ARENA TTS:",e);}
 }
 function shuffle(a){return a.map(x=>[Math.random(),x]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);}
