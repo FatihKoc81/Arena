@@ -51,20 +51,47 @@ const questions=[
 ];
 const prizes=["1.000","2.000","3.000","5.000","7.500","15.000","30.000","60.000","125.000","250.000","500.000","1.000.000","2.000.000","5.000.000","10.000.000"];
 let root=null,state=null,timer=null,tts=(()=>{try{return localStorage.getItem('arena_question_voice')!=='0';}catch(e){return true;}})(),voiceToken=0;
-function stopVoice(){voiceToken++;try{if(window.ArenaTTS)window.ArenaTTS.stop()}catch(e){}try{if(window.speechSynthesis)window.speechSynthesis.cancel()}catch(e){}}
+function stopVoice(){
+ voiceToken++;
+ try{if(window.ArenaTTS&&typeof window.ArenaTTS.stop==="function")Promise.resolve(window.ArenaTTS.stop()).catch(()=>{});}catch(e){}
+ try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}
+ try{const p=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.TextToSpeech;if(p&&typeof p.stop==="function")Promise.resolve(p.stop()).catch(()=>{});}catch(e){}
+}
+function voiceStillActive(token){return token===voiceToken&&!!root&&root.classList.contains("open")&&!document.hidden;}
+document.addEventListener("visibilitychange",()=>{if(document.hidden)stopVoice();});
+window.addEventListener("pagehide",stopVoice);
+window.addEventListener("blur",stopVoice);
+window.addEventListener("arena:game-close",stopVoice);
+window.addEventListener("arena:home",stopVoice);
+document.addEventListener("anasayfa",()=>{if(root){root.classList.remove("open");stopVoice();clearInterval(timer);}});
+try{
+ const app=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.App;
+ if(app&&typeof app.addListener==="function")app.addListener("appStateChange",state=>{if(!state||!state.isActive)stopVoice();});
+}catch(e){}
+
+function normalizeDiniSpeechText(value){return String(value||"").replace(/Kur[’‘\x27]an\s*[-–—]\s*ı\s*Ker[iî]m/gi,"Kur\x27anı Kerim");}
 async function speak(){
  if(!tts||!state||!state.deck[state.i])return;
- const token=++voiceToken,q=state.deck[state.i],letters=["A","B","C","D"];
- try{if(window.ArenaTTS&&typeof window.ArenaTTS.speakParts==="function"){await window.ArenaTTS.speakParts(q[0],q[1]);if(token!==voiceToken)stopVoice();return;}}
- catch(nativeError){console.warn("ARENA native TTS unavailable:",nativeError);}
- if(!("speechSynthesis"in window)||!("SpeechSynthesisUtterance"in window))return;
+ const token=++voiceToken,q=state.deck[state.i];
+ try{if(window.ArenaTTS&&typeof window.ArenaTTS.speakParts==="function"){await window.ArenaTTS.speakParts(q[0],q[1]);if(token!==voiceToken)return;return;}}
+ catch(nativeError){if(!voiceStillActive(token))return;console.warn("ARENA native TTS unavailable; using browser speech:",nativeError);}
+ if(!voiceStillActive(token)||!("speechSynthesis"in window)||!("SpeechSynthesisUtterance"in window))return;
  try{
-  window.speechSynthesis.cancel();
-  const voices=window.speechSynthesis.getVoices()||[],tr=voices.find(v=>/^tr([-_]|$)/i.test(v.lang));
-  const say=text=>new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang="tr-TR";u.rate=.80;u.pitch=1;u.volume=1;if(tr)u.voice=tr;u.onend=resolve;u.onerror=resolve;window.speechSynthesis.speak(u);});
-  await say("Soru. "+q[0]);if(token!==voiceToken)return;
-  await new Promise(r=>setTimeout(r,1000));
-  for(let i=0;i<q[1].length;i++){if(token!==voiceToken)return;if(i>0)await new Promise(r=>setTimeout(r,1000));await say(q[1][i]+".");}
+  const synth=window.speechSynthesis;synth.cancel();
+  let voices=synth.getVoices()||[];
+  if(!voices.length&&typeof synth.addEventListener==="function"){
+   await Promise.race([new Promise(resolve=>synth.addEventListener("voiceschanged",resolve,{once:true})),new Promise(resolve=>setTimeout(resolve,1200))]);
+   voices=synth.getVoices()||[];
+  }
+  if(!voiceStillActive(token))return;
+  const tr=voices.filter(v=>/^tr([-_]|$)/i.test(v.lang||""));
+  const male=tr.find(v=>!/(woman|female|kadın)/i.test((v.name||"")+" "+(v.voiceURI||""))&&/(?:^|[^a-z])(male|man)(?=$|[^a-z])|erkek|murat|ahmet|yusuf|cem|emre/i.test((v.name||"")+" "+(v.voiceURI||"")));
+  const natural=tr.find(v=>/google|neural|natural|premium/i.test((v.name||"")+" "+(v.voiceURI||"")));
+  const voice=male||tr.find(v=>!/(woman|female|kadın)/i.test((v.name||"")+" "+(v.voiceURI||"")) )||natural||tr[0]||null;
+  const say=text=>new Promise(resolve=>{const u=new SpeechSynthesisUtterance(normalizeDiniSpeechText(text));u.lang="tr-TR";u.rate=1.1;u.pitch=1.0;u.volume=1;if(voice)u.voice=voice;u.onend=resolve;u.onerror=resolve;synth.speak(u);});
+  await say("Soru. "+q[0]);if(!voiceStillActive(token))return;
+  await new Promise(r=>setTimeout(r,800));
+  for(let i=0;i<q[1].length;i++){if(!voiceStillActive(token))return;if(i>0)await new Promise(r=>setTimeout(r,400));await say(q[1][i]+".");}
  }catch(e){console.warn("ARENA TTS:",e);}
 }
 function shuffle(a){return a.map(x=>[Math.random(),x]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);}
@@ -72,18 +99,141 @@ function mount(){if(root)return;let st=document.createElement("style");st.textCo
 #arenaDiniMillion{position:fixed;inset:0;z-index:100100;display:none;flex-direction:column;overflow:auto;padding:calc(env(safe-area-inset-top) + 10px) 12px calc(env(safe-area-inset-bottom) + 12px);background:radial-gradient(ellipse at 50% 0%,#183b65,#071326 62%,#020711);color:#fff;font-family:system-ui,sans-serif}
 #arenaDiniMillion.open{display:flex}.dm-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.dm-btn{border:1px solid #6998d7;border-radius:13px;padding:10px 13px;background:linear-gradient(145deg,#214e91,#0b2350);color:white;font-weight:850}.dm-brand{text-align:center;font-weight:950;letter-spacing:1px;color:#ffd36b}.dm-brand small{display:block;font-size:10px;color:#bcd5f6}.dm-progress{margin:12px auto;width:min(100%,700px);display:flex;justify-content:space-between;gap:5px;flex-wrap:wrap}.dm-step{font-size:10px;padding:5px 7px;border-radius:7px;background:#12294a;color:#8da9cc}.dm-step.current{background:#f0bd42;color:#17243b;font-weight:900}.dm-step.done{background:#176b50;color:#fff}.dm-table{width:min(100%,720px);margin:0 auto;padding:14px;border:2px solid #4f7bb9;border-radius:22px;background:linear-gradient(145deg,#102b55,#06162e);box-shadow:0 12px 35px #0008}.dm-top{display:flex;justify-content:space-between;align-items:center;color:#ffda83;font-weight:900}.dm-question{margin:18px 0;padding:18px 14px;border:2px solid #8ab8ff;border-radius:18px;background:linear-gradient(145deg,#173d78,#071b42);text-align:center;font-size:clamp(18px,4.8vw,25px);font-weight:850;line-height:1.4}.dm-answers{display:grid;grid-template-columns:1fr 1fr;gap:10px}.dm-answer{min-height:58px;border:2px solid #396cae;border-radius:15px;background:linear-gradient(145deg,#183a6b,#0b1c3b);color:white;text-align:left;padding:10px;font-weight:750}.dm-answer.correct{background:#126b45;border-color:#5ee6a4}.dm-answer.wrong{background:#8c2434;border-color:#ff8290}.dm-answer:disabled{opacity:.65}.dm-tools{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:13px}.dm-tools [data-dm="read"]{flex:0 0 100%;max-width:118px;padding:6px 7px;font-size:11px;line-height:1.15;min-height:34px}.dm-btn:disabled{opacity:.38}.dm-feedback{width:min(100%,720px);margin:8px auto;text-align:center;color:#ffd879;font-weight:800;font-size:14px}.dm-result{text-align:center;padding:18px;font-size:20px;font-weight:900;color:#ffdc83}.dm-ladder{width:min(100%,720px);margin:12px auto;display:grid;grid-template-columns:repeat(5,1fr);gap:5px}.dm-ladder span{padding:6px 3px;border-radius:8px;text-align:center;background:#102442;color:#a9c5e8;font-size:11px}.dm-ladder span.on{background:#e8b943;color:#14243b;font-weight:950}.dm-ladder span.safe{border:1px solid #4ad49a}
 @media(max-width:420px){.dm-answers{grid-template-columns:1fr}.dm-question{margin:12px 0;padding:14px}.dm-ladder{grid-template-columns:repeat(3,1fr)}}
-`;st.textContent += "\n/* Shared Milyoner visual system: identical card, question, answers, jokers and footer. */\n#arenaDiniMillion{background:rgba(2,7,19,.98)!important;justify-content:flex-start!important;align-items:center!important;overflow-y:auto!important;padding:calc(env(safe-area-inset-top) + 8px) 12px calc(env(safe-area-inset-bottom) + 14px)!important;box-sizing:border-box!important}\n#arenaDiniMillion .dm-head{display:none!important}\n#arenaDiniMillion .dm-table{width:100%!important;max-width:460px!important;box-sizing:border-box!important;margin:0 auto!important;background:#070b1d!important;border:2px solid #4a5a9a!important;box-shadow:0 0 22px rgba(74,90,154,.35)!important;border-radius:36px!important;padding:clamp(10px,2.4vh,22px) 18px!important;text-align:center!important}\n#arenaDiniMillion .dm-top{display:flex!important;justify-content:space-between!important;align-items:center!important;gap:5px!important;color:#8e9bc4!important;font-size:15px!important;margin-bottom:10px!important;font-weight:700!important}\n#arenaDiniMillion .dm-progressbar{height:8px!important;background:#27345f!important;border:1px solid #4a5a9a!important;border-radius:8px!important;overflow:hidden!important;margin-bottom:clamp(12px,3vh,24px)!important}\n#arenaDiniMillion .dm-progressbar i{display:block!important;height:100%!important;background:linear-gradient(90deg,#16c9ff,#596bff)!important}\n#arenaDiniMillion .dm-question{font-size:22px!important;line-height:1.28!important;margin:0 0 clamp(12px,2.8vh,22px)!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;font-weight:500!important;color:#fff!important;text-align:center!important;min-height:4.1em!important;display:flex!important;align-items:center!important;justify-content:center!important}\n#arenaDiniMillion .dm-answers{display:flex!important;flex-direction:column!important;gap:0!important}\n#arenaDiniMillion .dm-answer{display:flex!important;justify-content:flex-start!important;align-items:center!important;width:100%!important;min-height:58px!important;box-sizing:border-box!important;text-align:left!important;background:#101a38!important;border:2px solid #4a5a9a!important;border-radius:16px!important;padding:12px 16px!important;margin-bottom:10px!important;color:#fff!important;font-size:17px!important;font-weight:500!important}\n#arenaDiniMillion .dm-tools{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important;margin-top:clamp(8px,2vh,16px)!important}\n#arenaDiniMillion .dm-btn{min-width:0!important;min-height:48px!important;border:2px solid #4a5a9a!important;border-radius:14px!important;padding:10px 4px!important;background:#222f45!important;color:#fff!important;font-size:14px!important;font-weight:750!important;line-height:1.2!important;white-space:normal!important}\n#arenaDiniMillion .dm-footer{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr) minmax(0,1fr)!important;align-items:center!important;gap:8px!important;margin-top:12px!important}\n#arenaDiniMillion .dm-pill{box-sizing:border-box!important;min-width:0!important;min-height:42px!important;border:2px solid #4a5a9a!important;border-radius:24px!important;background:#101a38!important;color:#fff!important;padding:7px 5px!important;font:800 13px/1.15 system-ui,sans-serif!important;text-align:center!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}\n#arenaDiniMillion .dm-pill.gold{border-color:#ffb300!important;color:#ffe27a!important;background:#171b2c!important}\n#arenaDiniMillion .dm-pill.dm-voice{border-color:#4a78ba!important;color:#bfe7ff!important;background:#102443!important}\n@media(max-width:390px){#arenaDiniMillion .dm-table{padding-left:14px!important;padding-right:14px!important}#arenaDiniMillion .dm-question{font-size:20px!important}}\n";st.textContent += "\n#arenaDiniMillion{padding:calc(env(safe-area-inset-top) + 6px) 12px calc(env(safe-area-inset-bottom) + 12px);background:radial-gradient(ellipse at 50% 0%,#10294e 0%,#071326 48%,#020711 100%);box-sizing:border-box}\n.dm-head{width:100%;max-width:460px;min-height:90px;margin:0 auto 12px;display:grid;grid-template-columns:54px 1fr 54px;align-items:center;gap:8px}\n.dm-icon{width:48px;height:48px;border:2px solid #344d7b;border-radius:15px;background:linear-gradient(145deg,#142e55,#07152d);color:#e8f4ff;font-size:25px;font-weight:800;box-shadow:0 4px 14px #0007}\n.dm-brand{text-align:center;font-weight:950;letter-spacing:2px;color:#fff;font-size:26px;text-shadow:0 0 14px #168dff}\n.dm-brand small{display:block;font-size:10px;letter-spacing:1.2px;color:#a9c9ee;font-weight:700;text-shadow:none}\n.dm-table{width:100%;max-width:460px;box-sizing:border-box;margin:0 auto;background:#070b1d;border:2px solid #4a5a9a;box-shadow:0 0 22px rgba(74,90,154,.35);border-radius:36px;padding:clamp(10px,2.4vh,22px) 18px;text-align:center}\n.dm-top{display:flex;justify-content:space-between;align-items:center;gap:5px;color:#8e9bc4;font-size:15px;margin-bottom:10px;font-weight:700}\n.dm-progressbar{height:8px;background:#27345f;border:1px solid #4a5a9a;border-radius:8px;overflow:hidden;margin-bottom:clamp(12px,3vh,24px)}\n.dm-progressbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#16c9ff,#596bff);transition:width .25s}\n.dm-question{font-size:22px;line-height:1.45;margin:0 0 clamp(12px,2.8vh,22px);font-weight:500;color:#fff;text-align:center;min-height:3.2em;display:flex;align-items:center;justify-content:center}\n.dm-answers{display:flex;flex-direction:column;gap:0}\n.dm-answer{display:flex;justify-content:flex-start;align-items:center;gap:8px;width:100%;min-height:58px;box-sizing:border-box;text-align:left;background:#101a38;border:2px solid #4a5a9a;border-radius:16px;padding:12px 16px;margin-bottom:10px;color:#fff;font-size:17px;font-weight:500}\n.dm-answer.correct{background:#14532d;border-color:#22c55e}.dm-answer.wrong{background:#7f1d1d;border-color:#ef4444}.dm-answer:disabled{opacity:.68}\n.dm-tools{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:clamp(8px,2vh,16px)}\n.dm-btn{min-width:0;min-height:48px;border:2px solid #4a5a9a;border-radius:14px;padding:10px 4px;background:#222f45;color:#fff;font-size:14px;font-weight:750;line-height:1.2;white-space:normal}\n.dm-btn:disabled{opacity:.35}\n\n\n.dm-footer{display:flex;justify-content:space-between;gap:8px;margin-top:14px}\n.dm-pill{flex:1;min-width:0;border:2px solid #4a5a9a;border-radius:24px;background:#101a38;color:#fff;padding:8px 6px;font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n.dm-pill.gold{border-color:#ffb300;color:#ffe27a;cursor:pointer;background:#101a38;font-family:inherit}.dm-pill.dm-voice{border-color:#4a5a9a;color:#fff;background:#101a38;cursor:pointer;font-family:inherit;outline:none;box-shadow:none;-webkit-tap-highlight-color:transparent}.dm-pill.dm-voice:focus,.dm-pill.dm-voice:focus-visible{outline:none;box-shadow:none}\n.dm-feedback{max-width:460px;margin:8px auto 0;text-align:center;color:#ffd879;font-weight:800;font-size:14px}\n@media(max-height:760px){.dm-head{min-height:66px;margin-bottom:6px}.dm-brand{font-size:22px}.dm-table{padding:10px 14px}.dm-question{font-size:20px;min-height:2.8em;margin-bottom:10px}.dm-answer{min-height:48px;padding:9px 13px;margin-bottom:7px}.dm-btn{min-height:42px;padding:7px 3px}.dm-tools{margin-top:7px}.dm-footer{margin-top:8px}}\n";document.head.appendChild(st);root=document.createElement("section");root.id="arenaDiniMillion";document.body.appendChild(root);root.addEventListener("click",e=>{let b=e.target.closest("[data-dm]");if(!b)return;let a=b.dataset.dm;if(a==="close"){stopVoice();clearInterval(timer);root.classList.remove("open");window.dispatchEvent(new Event("arena:game-close"));}if(a==="answer")answer(+b.dataset.i);if(a==="voice"){tts=true;try{localStorage.setItem("arena_question_voice","1");}catch(e){}speak();}if(a==="gold"){if(window.Ekonomi&&Ekonomi.dukkan)Ekonomi.dukkan();}if(a==="half")half();if(a==="audience")audience();if(a==="double"){if(!state.used.double&&!state.lock){state.used.double=true;state.double=true;render();}}if(a==="new")start();if(a==="home"){root.classList.remove("open");stopVoice();clearInterval(timer);window.dispatchEvent(new Event("arena:home"));}});}
+`;st.textContent += `
+/* Dini İmtihan premium visual pass: emerald night, warm gold and Islamic geometric accents. */
+#arenaDiniMillion{background:radial-gradient(ellipse at 50% 0%,#174d55 0%,#0b2637 36%,#061326 72%,#020711 100%)!important;justify-content:flex-start!important;align-items:center!important;overflow-y:auto!important;box-sizing:border-box!important}
+#arenaDiniMillion:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.18;background:repeating-linear-gradient(45deg,transparent 0 22px,#d7b56d 23px,#d7b56d 24px,transparent 25px 46px),repeating-linear-gradient(-45deg,transparent 0 22px,#d7b56d 23px,#d7b56d 24px,transparent 25px 46px);mask-image:linear-gradient(to bottom,black,transparent 75%)}
+#arenaDiniMillion .dm-head{display:grid!important;position:relative;z-index:1;min-height:76px;margin:0 auto 10px!important}
+#arenaDiniMillion .dm-brand{color:#ffe2a0!important;font-family:Georgia,serif!important;letter-spacing:2px!important;text-shadow:0 2px 0 #543814,0 0 16px #d6a64a!important}
+#arenaDiniMillion .dm-brand small{color:#d8e7d6!important;letter-spacing:1.5px!important}
+#arenaDiniMillion .dm-icon{border-color:#bd9855!important;background:linear-gradient(145deg,#183b42,#081c2c)!important;box-shadow:inset 0 0 0 1px #fff2,0 5px 14px #0008!important}
+#arenaDiniMillion .dm-table{position:relative;z-index:1;max-width:480px!important;border:3px solid #c69b50!important;border-radius:28px!important;background:linear-gradient(160deg,#123c3b 0%,#0a2632 48%,#07182b 100%)!important;box-shadow:0 0 0 2px #543b22,0 0 28px #d7a94a35,inset 0 0 0 2px #f6d99b55!important;padding:16px!important}
+#arenaDiniMillion .dm-top{color:#f6d78f!important;font-size:clamp(13px,3.8vw,16px)!important}
+#arenaDiniMillion .dm-progressbar{border:1px solid #e0bd72!important;background:#071c27!important;box-shadow:inset 0 1px 4px #0009!important}
+#arenaDiniMillion .dm-progressbar i{background:linear-gradient(90deg,#f1c86e,#fff0b0,#b77b2b)!important}
+#arenaDiniMillion .dm-question{position:relative;border:2px solid #c49a54!important;border-radius:20px!important;padding:18px 14px!important;margin:12px 0 16px!important;min-height:108px!important;background:linear-gradient(145deg,#153d42,#092536 75%)!important;box-shadow:inset 0 0 0 2px #fff2,0 8px 18px #0006!important;color:#fff4d8!important;font-family:Georgia,serif!important;font-weight:700!important}
+#arenaDiniMillion .dm-answer{min-height:56px!important;border:2px solid #b88e4b!important;border-radius:15px!important;background:linear-gradient(100deg,#153d45,#0b2638)!important;color:#fff7e6!important;box-shadow:inset 0 1px #fff2,0 4px 9px #0005!important;font-weight:700!important}
+#arenaDiniMillion .dm-answer.correct{background:linear-gradient(100deg,#18784e,#0b4d38)!important;border-color:#8de0a9!important}
+#arenaDiniMillion .dm-answer.wrong{background:linear-gradient(100deg,#8e2935,#4e1727)!important;border-color:#ff9b91!important}
+#arenaDiniMillion .dm-btn{border-color:#c39b58!important;background:linear-gradient(145deg,#24464a,#102638)!important;color:#ffedc9!important;box-shadow:inset 0 1px #fff2,0 4px 8px #0005!important}
+#arenaDiniMillion .dm-pill{border-color:#a88753!important;background:#102c39!important;color:#fff2d8!important}
+#arenaDiniMillion .dm-pill.gold{border-color:#f3bd43!important;color:#ffe18a!important;background:linear-gradient(145deg,#554018,#201b24)!important}
+#arenaDiniMillion .dm-pill.dm-voice{border-color:#5e9db1!important;color:#d4f1ff!important;background:#103247!important}
+#arenaDiniMillion .dm-feedback{color:#ffe09a!important}
+/* Match the standard Milyoner play screen; only the felt/background is emerald. */
+#arenaDiniMillion{
+ background:radial-gradient(ellipse at 50% 38%,#176b4b 0%,#0b3d32 45%,#041c22 100%)!important;
+ padding:calc(env(safe-area-inset-top) + 8px) 12px calc(env(safe-area-inset-bottom) + 16px)!important;
+ align-items:center!important;justify-content:flex-start!important;
+}
+#arenaDiniMillion:before{opacity:.08!important}
+#arenaDiniMillion .dm-head{
+ display:flex!important;display:grid!important;
+ grid-template-columns:52px minmax(0,1fr) 52px!important;
+ align-items:center!important;gap:8px!important;
+ width:min(100%,620px)!important;min-height:66px!important;
+ margin:0 auto 12px!important;
+}
+#arenaDiniMillion .dm-icon{
+ display:grid!important;place-items:center!important;
+ width:52px!important;height:48px!important;min-width:52px!important;
+ padding:0!important;border:1px solid #4b6d7e!important;border-radius:14px!important;
+ background:linear-gradient(145deg,#172f43,#091b2c)!important;
+ color:#fff!important;font-size:25px!important;font-weight:900!important;
+}
+#arenaDiniMillion .dm-brand{min-width:0!important;text-align:center!important;font-size:clamp(23px,6vw,30px)!important}
+#arenaDiniMillion .dm-brand small{font-size:10px!important}
+#arenaDiniMillion .dm-table{
+ display:block!important;flex:0 0 auto!important;
+ width:100%!important;max-width:620px!important;min-width:0!important;
+ margin:0 auto!important;padding:clamp(12px,3vw,18px)!important;
+ border:2px solid #557b65!important;border-radius:32px!important;
+ background:linear-gradient(160deg,#071b2b 0%,#07182a 100%)!important;
+ box-shadow:0 0 0 2px #263f37,0 0 24px #1b9b6530!important;
+ box-sizing:border-box!important;
+}
+#arenaDiniMillion .dm-top{
+ display:flex!important;justify-content:space-between!important;align-items:center!important;
+ gap:6px!important;color:#d8e4ff!important;font-size:clamp(13px,3.7vw,17px)!important;
+}
+#arenaDiniMillion .dm-progressbar{
+ height:8px!important;margin:12px 0 20px!important;
+ border:1px solid #426c63!important;border-radius:10px!important;background:#142b37!important;overflow:hidden!important;
+}
+#arenaDiniMillion .dm-progressbar i{display:block!important;height:100%!important;border-radius:10px!important;background:linear-gradient(90deg,#25c47b,#b3efae)!important}
+#arenaDiniMillion .dm-question{
+ min-height:0!important;height:auto!important;margin:0 0 18px!important;padding:18px 14px!important;
+ border:2px solid #547f69!important;border-radius:22px!important;
+ background:linear-gradient(145deg,#102b3d,#0a2032)!important;
+ color:#fff!important;font-family:system-ui,sans-serif!important;
+ font-size:clamp(20px,5.3vw,27px)!important;line-height:1.3!important;font-weight:500!important;
+ box-shadow:none!important;
+}
+#arenaDiniMillion .dm-answers{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:10px!important}
+#arenaDiniMillion .dm-answer{
+ display:flex!important;align-items:center!important;width:100%!important;min-width:0!important;
+ min-height:58px!important;height:auto!important;margin:0!important;padding:12px 14px!important;
+ border:2px solid #557a68!important;border-radius:17px!important;
+ background:#101f39!important;color:#fff!important;
+ text-align:left!important;font:500 clamp(17px,4.6vw,21px)/1.25 system-ui,sans-serif!important;
+ box-shadow:none!important;
+}
+#arenaDiniMillion .dm-answer.correct{background:#145d42!important;border-color:#4bc58b!important}
+#arenaDiniMillion .dm-answer.wrong{background:#742b36!important;border-color:#e77982!important}
+#arenaDiniMillion .dm-tools{
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ gap:8px!important;margin:18px 0 0!important;
+}
+#arenaDiniMillion .dm-tools .dm-btn{
+ min-width:0!important;min-height:52px!important;padding:8px 3px!important;
+ border:2px solid #557a68!important;border-radius:16px!important;
+ background:#222f45!important;color:#fff!important;
+ font:800 clamp(12px,3.3vw,16px)/1.2 system-ui,sans-serif!important;
+ white-space:normal!important;
+}
+#arenaDiniMillion .dm-footer{
+ display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr) minmax(0,1fr)!important;
+ align-items:center!important;gap:8px!important;margin-top:12px!important;
+}
+#arenaDiniMillion .dm-pill{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ box-sizing:border-box!important;min-width:0!important;min-height:44px!important;
+ padding:7px 5px!important;border:2px solid #4a5a9a!important;border-radius:24px!important;
+ background:#101a38!important;color:#fff!important;
+ font:800 clamp(11px,3.2vw,14px)/1.15 system-ui,sans-serif!important;
+ text-align:center!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
+}
+#arenaDiniMillion .dm-pill.gold{border-color:#ffb300!important;color:#ffe27a!important;background:#171b2c!important}
+#arenaDiniMillion .dm-pill.dm-player{justify-content:flex-start!important;text-align:left!important;padding-left:10px!important}#arenaDiniMillion .dm-pill.gold{justify-self:center!important;text-align:center!important}
+#arenaDiniMillion .dm-pill.dm-voice{border-color:#4a78ba!important;color:#bfe7ff!important;background:#102443!important}
+#arenaDiniMillion .dm-home{
+ display:block!important;width:100%!important;min-height:66px!important;margin:14px 0 0!important;
+ border:2px solid #59677e!important;border-radius:24px!important;
+ background:#222f45!important;color:#a9b7dc!important;
+ font-size:clamp(20px,5.5vw,27px)!important;font-weight:900!important;
+}
+#arenaDiniMillion .dm-feedback{margin:10px auto 0!important;color:#b6f0d2!important}
+@media(max-width:390px){
+ #arenaDiniMillion{padding-left:10px!important;padding-right:10px!important}
+ #arenaDiniMillion .dm-table{padding:12px!important}
+ #arenaDiniMillion .dm-question{padding:16px 12px!important}
+ #arenaDiniMillion .dm-answer{min-height:54px!important;padding:11px 12px!important}
+ #arenaDiniMillion .dm-tools .dm-btn{min-height:48px!important;font-size:12px!important}
+ #arenaDiniMillion .dm-pill{font-size:11px!important}
+}
+`;document.head.appendChild(st);root=document.createElement("section");root.id="arenaDiniMillion";document.body.appendChild(root);root.addEventListener("click",e=>{let b=e.target.closest("[data-dm]");if(!b)return;let a=b.dataset.dm;if(a==="close"){stopVoice();clearInterval(timer);root.classList.remove("open");window.dispatchEvent(new Event("arena:game-close"));}if(a==="answer")answer(+b.dataset.i);if(a==="voice"){tts=true;try{localStorage.setItem("arena_question_voice","1");}catch(e){}speak();}if(a==="gold"){if(window.Ekonomi&&Ekonomi.dukkan)Ekonomi.dukkan();}if(a==="half")half();if(a==="audience")audience();if(a==="double"){if(!state.used.double&&!state.lock){state.used.double=true;state.double=true;render();}}if(a==="new")start();if(a==="home"){root.classList.remove("open");stopVoice();clearInterval(timer);window.dispatchEvent(new Event("arena:home"));}});}
 function render(msg){
  mount();clearInterval(timer);let q=state.deck[state.i];
  let ad=(window.Ekonomi&&typeof Ekonomi.ad==="function"?Ekonomi.ad():"Oyuncu")||"Oyuncu";
  let altin=(window.Ekonomi&&typeof Ekonomi.altin==="function"?Ekonomi.altin():null);
  ad=String(ad).replace(/[&<>"]/g,"");
- root.innerHTML='<div class="dm-head"><button class="dm-icon" data-dm="home">☰</button><div class="dm-brand">ARENA<small>OYUN PLATFORMU</small></div><button class="dm-icon" data-dm="close">×</button></div>'+
- '<div class="dm-table"><div class="dm-top"><span>Seviye 1</span><span>❤️ '+state.lives+'</span><span>Soru '+(state.i+1)+'/15</span></div>'+
+ root.innerHTML='<div class="dm-head"><button class="dm-icon" data-dm="home" aria-label="Ana menü">☰</button><div class="dm-brand" data-dm="home" role="button" tabindex="0" aria-label="Ana sayfaya dön">ARENA<small>OYUN PLATFORMU</small></div><button class="dm-icon" data-dm="close" aria-label="Oyunu kapat">×</button></div>'+
+ '<div class="dm-table"><div class="dm-top"><b>Seviye 1</b><span>❤️ '+state.lives+'</span><b>Soru '+(state.i+1)+'/15</b></div>'+
  '<div class="dm-progressbar"><i style="width:'+((state.i)/15*100)+'%"></i></div>'+
  '<div class="dm-question">'+(msg||q[0])+'</div><div class="dm-answers">'+q[1].map((x,i)=>'<button class="dm-answer" data-dm="answer" data-i="'+i+'" '+(state.lock||state.eliminated.includes(i)?"disabled":"")+'>'+"ABCD"[i]+") "+x+'</button>').join("")+'</div>'+
  '<div class="dm-tools"><button class="dm-btn" data-dm="half" '+(state.used.half?"disabled":"")+'>✂️ 50:50</button><button class="dm-btn" data-dm="audience" '+(state.used.audience?"disabled":"")+'>👥 Seyirci</button><button class="dm-btn" data-dm="double" '+(state.used.double?"disabled":"")+'>🛡️ Çift Cevap</button></div>'+
-  '<div class="dm-footer"><button type="button" class="dm-pill gold" data-dm="gold">🪙 '+(altin==null?"Altın":Number(altin).toLocaleString("tr-TR"))+' +</button><div class="dm-pill">👤 '+ad+'</div><button type="button" class="dm-pill dm-voice" data-dm="voice">🔊 Soruyu dinle</button></div></div>'+
+ '<div class="dm-footer"><div class="dm-pill dm-player">👤 '+ad+'</div><button type="button" class="dm-pill gold" data-dm="gold">🪙 '+(altin==null?"Altın":Number(altin).toLocaleString("tr-TR"))+' +</button><button type="button" class="dm-pill dm-voice" data-dm="voice">🔊 Soruyu dinle</button></div>'+
+ '<button type="button" class="dm-home" data-dm="home">Ana Menü</button></div>'+
  (state.feedback?'<div class="dm-feedback">'+state.feedback+'</div>':"");
  root.classList.add("open");if(!state.lock)speak();
 }

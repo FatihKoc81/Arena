@@ -8,8 +8,8 @@
 <style>:root,html,body,#cm{color-scheme:only light!important}</style>
 <script>window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();});</script>
 <title>ARENA</title>
-<link rel="stylesheet" href="style.css?v=20261104a">
-<link rel="stylesheet" href="masa-premium.css?v=20261112-greenbaize1">
+<link rel="stylesheet" href="style.css?v=20261114-game-vertical-align1">
+<link rel="stylesheet" href="masa-premium.css?v=20261114-table-layout-repair1">
 <style id="acilisGizle">#ana{visibility:hidden}</style><!-- ana menü, butonlar tamamlanana kadar gizli (eski başlangıç ekranı görünmesin) -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#080c20">
@@ -54,7 +54,7 @@ h1{display:grid!important;grid-template-columns:1fr auto 1fr;justify-content:nor
 #oyun button.oyun-pill{cursor:pointer;outline:none;box-shadow:none;-webkit-tap-highlight-color:transparent}#oyun button.oyun-pill:focus,#oyun button.oyun-pill:focus-visible{outline:none;box-shadow:none}
 #oyun .oyun-pill.gold{border-color:#ffb300;color:#ffe27a;background:#171b2c}
 #oyun .oyun-pill.voice{border-color:#4a78ba;color:#bfe7ff;background:#102443}
-#oyun .oyun-pill.player{display:flex;align-items:center;justify-content:center}
+#oyun .oyun-pill.player{display:flex;align-items:center;justify-content:flex-start;text-align:left;padding-left:10px}#oyun .oyun-pill.gold{justify-self:center;text-align:center}
 </style>
 </head>
 <body>
@@ -79,8 +79,8 @@ h1{display:grid!important;grid-template-columns:1fr auto 1fr;justify-content:nor
 <button class="jok" id="jCift">🛡️ Çift Cevap</button>
 </div>
 <div class="oyun-footer">
-<button type="button" id="oyunAltinBtn" class="oyun-pill gold" aria-label="Altın satın al"></button>
 <div class="oyun-pill player" id="oyunOyuncu"></div>
+<button type="button" id="oyunAltinBtn" class="oyun-pill gold" aria-label="Altın satın al"></button>
 <button type="button" id="oyunSesToggle" class="oyun-pill voice" aria-label="Soruyu dinle">🔊 Soruyu dinle</button>
 </div>
 </section>
@@ -93,7 +93,7 @@ h1{display:grid!important;grid-template-columns:1fr auto 1fr;justify-content:nor
 <button class="btn ikinci" id="sMenu">Ana menü</button>
 </section>
 
-<script src="tts-bridge.js?v=20261111-tts-fix1"></script>
+<script src="tts-bridge.js?v=20261114-tts-rate11"></script>
 <script src="sorular.js?v=20261108-bank1"></script>
 <script src="seriler.js?v=20261104a"></script>
 <script src="ekonomi.js?v=20261104a"></script>
@@ -139,22 +139,27 @@ let soruSesToken = 0;
 function soruSesDurdur(){soruSesToken++;try{if(window.ArenaTTS)window.ArenaTTS.stop();}catch(e){}try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}}
 async function soruSesOku(){
  if(!soruSesAcik||!lv||!lv[soru]||$("oyun").classList.contains("hidden"))return;
- const token=++soruSesToken,q=lv[soru],letters=["A","B","C","D"];
- if(window.ArenaTTS&&typeof window.ArenaTTS.speakParts==="function"){try{await window.ArenaTTS.speakParts(q[0],q[1]);if(token!==soruSesToken)window.ArenaTTS.stop();return;}catch(e){}}
+ const token=++soruSesToken,q=lv[soru];
+ if(window.ArenaTTS&&typeof window.ArenaTTS.speakParts==="function"){try{await window.ArenaTTS.speakParts(q[0],q[1]);if(token!==soruSesToken)return;return;}catch(e){if(token!==soruSesToken)return;console.warn("Yerel TTS kullanılamadı, tarayıcı sesi deneniyor.",e);}}
+ if(token!==soruSesToken||document.hidden||$("oyun").classList.contains("hidden"))return;
  if(!("speechSynthesis"in window)||!("SpeechSynthesisUtterance"in window))return;
  try{
-  window.speechSynthesis.cancel();const voices=window.speechSynthesis.getVoices()||[],tr=voices.find(v=>/^tr([-_]|$)/i.test(v.lang));
-  const say=text=>new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang="tr-TR";u.rate=.80;u.pitch=1;u.volume=1;if(tr)u.voice=tr;u.onend=resolve;u.onerror=resolve;window.speechSynthesis.speak(u);});
+  const synth=window.speechSynthesis;synth.cancel();
+  let voices=synth.getVoices()||[];
+  if(!voices.length&&typeof synth.addEventListener==="function"){
+   await Promise.race([new Promise(resolve=>synth.addEventListener("voiceschanged",resolve,{once:true})),new Promise(resolve=>setTimeout(resolve,1200))]);
+   voices=synth.getVoices()||[];
+  }
+  const tr=voices.filter(v=>/^tr([-_]|$)/i.test(v.lang||""));
+  const male=tr.find(v=>!/(woman|female|kadın)/i.test((v.name||"")+" "+(v.voiceURI||""))&&/(?:^|[^a-z])(male|man)(?=$|[^a-z])|erkek|murat|ahmet|yusuf|cem|emre/i.test((v.name||"")+" "+(v.voiceURI||"")));
+  const natural=tr.find(v=>/google|neural|natural|premium/i.test((v.name||"")+" "+(v.voiceURI||"")));
+  const voice=male||natural||tr[0]||null;
+  const say=text=>new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang="tr-TR";u.rate=1.1;u.pitch=1.0;u.volume=1;if(voice)u.voice=voice;u.onend=resolve;u.onerror=resolve;synth.speak(u);});
   await say("Soru. "+q[0]);if(token!==soruSesToken)return;
-  await new Promise(r=>setTimeout(r,1000));
-  for(let i=0;i<q[1].length;i++){if(token!==soruSesToken)return;if(i>0)await new Promise(r=>setTimeout(r,1000));await say(q[1][i]+".");}
- }catch(e){}
+  await new Promise(r=>setTimeout(r,800));
+  for(let i=0;i<q[1].length;i++){if(token!==soruSesToken)return;if(i>0)await new Promise(r=>setTimeout(r,400));await say(q[1][i]+".");}
+ }catch(e){console.warn("Milyoner sesli okuma hatası:",e);}
 }
-if(window.ArenaTTS){try{await window.ArenaTTS.speak(metin);if(token!==soruSesToken)window.ArenaTTS.stop();return;}catch(e){}}
-if(!("speechSynthesis"in window)||!("SpeechSynthesisUtterance"in window))return;try{window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(metin);u.lang="tr-TR";u.rate=.88;u.pitch=1;u.volume=1;const v=window.speechSynthesis.getVoices()||[],tr=v.find(x=>/^tr([-_]|$)/i.test(x.lang));if(tr)u.voice=tr;window.speechSynthesis.speak(u);}catch(e){}
-}
-
-
 // CAN: her bölüm CAN_MAX canla başlar. Yanlış cevap 1 can götürür ve aynı sıraya sonraki seriden yeni soru gelir.
 // Can bitince: KAYIP_BEDEL altınla devam / reklamla +1 can / bir alt bölümün 1. sorusundan başla.
 const CAN_MAX = 3, KAYIP_BEDEL = 50, BONUS_ARALIK = 3; // BONUS_ARALIK bölümde bir +1 can
@@ -212,11 +217,13 @@ let duel = null;
 document.addEventListener("anasayfa", () => { sureDurdur(); soruSesDurdur(); duel = null; });
 
 function ekran(id) {
+  if(id !== "oyun") soruSesDurdur();
   ["ana", "oyun", "son"].forEach(e => $(e).classList.toggle("hidden", e !== id));
 }
 
 function menu() {
   sureDurdur();
+  soruSesDurdur();
   $("seviye").textContent = st.seviye > SEVIYE_SAYISI ? "Tamamlandı 🏆" : "Seviye " + st.seviye;
   ekran("ana");
   Ekonomi.barYaz();
@@ -375,6 +382,7 @@ function guvenliBaslat() {
     alert("Milyoner hatası: " + e.message);
   }
 }
+window.ArenaMilyoner={ac:guvenliBaslat};
 document.addEventListener("click", e => {
   if (e.target.closest("#basla") || e.target.closest("#sDevam")) guvenliBaslat();
 });
@@ -524,16 +532,16 @@ $("gMenu").onclick = () => { gKapat(); menu(); };
 document.addEventListener("anasayfa", gKapat);
 </script>
 <script src="ortak.js?v=20261108-backfix"></script>
-<script src="passaparola.js?v=20261104a"></script>
+<script src="passaparola.js?v=20261114-game-vertical-align1"></script>
 <script src="kelime.js?v=20261104a"></script>
 <script src="kelimelerim.js?v=20261104a"></script>
 <script src="islem.js?v=20261104a"></script>
 <script src="ads.js?v=20261104a"></script>
 <script src="rotasyon.js?v=20261104a"></script>
-<script src="dini-milyoner.js?v=20261111-islamic-millionaire2"></script>
-<script src="masa.js?v=20261112-greenbaize1"></script>
-<script src="mini-oyunlar.js?v=20261110-sudoku-premium1"></script>
-<script src="menu.js?v=20261110-category-fullwidth-fix2"></script>
+<script src="dini-milyoner.js?v=20261114-dini-rate11"></script>
+<script src="masa.js?v=20261114-okey-tile-repair1"></script>
+<script src="mini-oyunlar.js?v=20261114-backgammon-checkers1"></script>
+<script src="menu.js?v=20261114-category-grid-repair1"></script>
 <script>window.ARENA_APP="arena";</script><!-- sıralama/düello verileri bu adla ayrı tutulur -->
 <script src="firebase-config.js?v=20261104a"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -684,27 +692,27 @@ if ("serviceWorker" in navigator) {
   setTimeout(ac, 3000); // güvenlik: bir dosya yüklenemezse menü yine de açılır
 })();
 </script>
-<script src="test-agent/inline-recorder.js?v=20261110-sharefix3"></script>
+<script src="test-agent/inline-recorder.js?v=20261114-owner-only2"></script>
+
 <script>
+/* Stop every speech engine whenever ARENA leaves the foreground or a game closes. */
 (function(){
-  function ekle(){
-    if(!window.OrtakAIMerkezi || document.getElementById("ortakAiKonusma")) return;
-    var b=document.createElement("button");
-    b.id="ortakAiKonusma";
-    b.type="button";
-    b.textContent="🤖 Diğer uygulamalarla konuş";
-    b.setAttribute("aria-label","Ortak AI konuşmasını başlat veya durdur");
-    b.style.cssText="position:fixed;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:10000;border:1px solid #6ba7c9;border-radius:24px;padding:11px 15px;background:#102b43;color:#fff;font:700 13px system-ui;box-shadow:0 4px 16px #0008";
-    var stop=null;
-    b.addEventListener("click",function(){
-      if(stop){stop();stop=null;b.textContent="🤖 Diğer uygulamalarla konuş";return;}
-      try{stop=window.OrtakAIMerkezi.konusmayiBaslat(12000);b.textContent="🔊 Konuşma açık · Durdur";}
-      catch(e){b.textContent="Bağlantı kurulamadı";setTimeout(function(){b.textContent="🤖 Diğer uygulamalarla konuş"},2200);}
-    });
-    document.body.appendChild(b);
+  let stoppedAt=0;
+  function stopArenaSpeech(){
+    stoppedAt=Date.now();
+    try{if(window.ArenaTTS&&typeof window.ArenaTTS.stop==="function")window.ArenaTTS.stop();}catch(e){}
+    try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}
+    try{const p=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.TextToSpeech;if(p&&typeof p.stop==="function")p.stop();}catch(e){}
   }
-  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",ekle);else ekle();
-  setTimeout(ekle,1500);
+  document.addEventListener("visibilitychange",function(){if(document.hidden)stopArenaSpeech();});
+  window.addEventListener("pagehide",stopArenaSpeech);
+  window.addEventListener("beforeunload",stopArenaSpeech);
+  window.addEventListener("freeze",stopArenaSpeech);
+  window.addEventListener("arena:game-close",stopArenaSpeech);
+  window.addEventListener("arena:home",stopArenaSpeech);
+  window.addEventListener("anasayfa",stopArenaSpeech);
+  const game=document.getElementById("oyun");
+  if(game&&typeof MutationObserver==="function")new MutationObserver(function(){if(game.classList.contains("hidden"))stopArenaSpeech();}).observe(game,{attributes:true,attributeFilter:["class"]});
 })();
 </script>
 </body>

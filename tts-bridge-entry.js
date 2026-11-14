@@ -1,4 +1,5 @@
 import { TextToSpeech } from '@capacitor-community/text-to-speech';
+// Normalize the canonical Turkish title 'Kur'an-ı Kerim' for TTS so the hyphen is never spoken as a punctuation name.
 let sequence=0;
 let selectedVoice;
 async function getTurkishVoice(){
@@ -9,18 +10,19 @@ async function getTurkishVoice(){
   const candidates=(result.voices||[]).map((v,index)=>({...v,index})).filter(v=>/^tr([-_]|$)/i.test(v.lang||""));
   if(candidates.length){
    candidates.sort((a,b)=>{
-    if(a.localService!==b.localService)return a.localService?1:-1;
-    const score=v=>/google|neural|natural|premium/i.test((v.voiceURI||"")+" "+(v.name||""))?0:1;
-    return score(a)-score(b);
+    const male=v=>/(woman|female|kadın)/i.test((v.voiceURI||"")+" "+(v.name||""))?2:/(?:^|[^a-z])(male|man)(?=$|[^a-z])|erkek|murat|ahmet|yusuf|cem|emre/i.test((v.voiceURI||"")+" "+(v.name||""))?0:1;
+    const quality=v=>/google|neural|natural|premium/i.test((v.voiceURI||"")+" "+(v.name||""))?0:1;
+    return male(a)-male(b)||quality(a)-quality(b)||(a.localService===b.localService?0:(a.localService?1:-1));
    });
    selectedVoice=candidates[0].index;
   }
  }catch(e){}
  return selectedVoice;
 }
+function normalizeSpeechText(value){return String(value||"").replace(/Kur[’‘\x27]an\s*[-–—]\s*ı\s*Ker[iî]m/gi,"Kur\x27anı Kerim");}
 const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function say(text,voice){
- const options={text,lang:"tr-TR",rate:0.80,pitch:1,volume:1,queueStrategy:0};
+ const options={text:normalizeSpeechText(text),lang:"tr-TR",rate:1.1,pitch:1,volume:1,queueStrategy:0};
  if(voice!==null&&voice!==undefined)options.voice=voice;
  await TextToSpeech.speak(options);
 }
@@ -32,10 +34,10 @@ window.ArenaTTS={
   if(id!==sequence)return;
   await say("Soru. "+question,voice);
   if(id!==sequence)return;
-  await pause(1000);
+  await pause(800);
   for(let i=0;i<answers.length;i++){
    if(id!==sequence)return;
-   if(i>0)await pause(1000);
+   if(i>0)await pause(400);
    await say(answers[i]+".",voice);
   }
  },
