@@ -22,7 +22,7 @@ async function getTurkishVoice(){
 function normalizeSpeechText(value){return String(value||"").replace(/Kur[’‘\x27]an\s*[-–—]\s*ı\s*Ker[iî]m/gi,"Kur\x27anı Kerim");}
 const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function say(text,voice){
- const options={text:normalizeSpeechText(text),lang:"tr-TR",rate:1.0,pitch:1,volume:1,queueStrategy:0};
+ const options={text:normalizeSpeechText(text),lang:"tr-TR",rate:1.1,pitch:1,volume:1,queueStrategy:0};
  if(voice!==null&&voice!==undefined)options.voice=voice;
  await TextToSpeech.speak(options);
 }
