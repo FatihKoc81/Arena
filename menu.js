@@ -3949,3 +3949,20 @@ html.arena-home-fixed body #ana #arenaHubHome .ar-categories.is-open>.ar-inline-
 html.arena-home-fixed body #ana #arenaHubHome .ar-categories.is-open>.ar-inline-game-list>.ar-game-card small{display:block!important;margin-top:4px!important;color:#d4e2ff!important;font-size:clamp(9px,2.7vw,12px)!important;line-height:1.18!important}
 @media(max-width:360px){html.arena-home-fixed body #ana #arenaHubHome .ar-categories.is-open>.ar-inline-game-list{gap:6px!important}html.arena-home-fixed body #ana #arenaHubHome .ar-categories.is-open>.ar-inline-game-list>.ar-game-card{min-height:108px!important;padding:7px!important}}
 `;document.head.appendChild(s)})();
+/* 2026-11-14: keep the category card centered when it is the only available game,
+   and let the home content scroll above the fixed bottom navigation. */
+(function(){
+ const s=document.createElement('style');s.id='arenaSingleGameAndHomeScrollFix';
+ s.textContent=`
+ html.arena-home-fixed body #ana{
+   bottom:calc(94px + env(safe-area-inset-bottom))!important;
+   overflow-x:hidden!important;overflow-y:auto!important;
+   overscroll-behavior-y:contain!important;-webkit-overflow-scrolling:touch!important;
+ }
+ html.arena-home-fixed body #ana #arenaHubHome .ar-categories.is-open>.ar-inline-game-list>.ar-game-card:only-child{
+   grid-column:1/-1!important;justify-self:center!important;
+   width:min(100%,680px)!important;max-width:680px!important;
+ }
+ `;
+ document.head.appendChild(s);
+})();
