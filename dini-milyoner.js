@@ -63,6 +63,7 @@ window.addEventListener("pagehide",stopVoice);
 window.addEventListener("blur",stopVoice);
 window.addEventListener("arena:game-close",stopVoice);
 window.addEventListener("arena:home",stopVoice);
+document.addEventListener("anasayfa",()=>{if(root){root.classList.remove("open");stopVoice();clearInterval(timer);}});
 try{
  const app=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.App;
  if(app&&typeof app.addListener==="function")app.addListener("appStateChange",state=>{if(!state||!state.isActive)stopVoice();});
@@ -226,7 +227,7 @@ function render(msg){
  let ad=(window.Ekonomi&&typeof Ekonomi.ad==="function"?Ekonomi.ad():"Oyuncu")||"Oyuncu";
  let altin=(window.Ekonomi&&typeof Ekonomi.altin==="function"?Ekonomi.altin():null);
  ad=String(ad).replace(/[&<>"]/g,"");
- root.innerHTML='<div class="dm-head"><button class="dm-icon" data-dm="home" aria-label="Ana menü">☰</button><div class="dm-brand">ARENA<small>OYUN PLATFORMU</small></div><button class="dm-icon" data-dm="close" aria-label="Oyunu kapat">×</button></div>'+
+ root.innerHTML='<div class="dm-head"><button class="dm-icon" data-dm="home" aria-label="Ana menü">☰</button><div class="dm-brand" data-dm="home" role="button" tabindex="0" aria-label="Ana sayfaya dön">ARENA<small>OYUN PLATFORMU</small></div><button class="dm-icon" data-dm="close" aria-label="Oyunu kapat">×</button></div>'+
  '<div class="dm-table"><div class="dm-top"><b>Seviye 1</b><span>❤️ '+state.lives+'</span><b>Soru '+(state.i+1)+'/15</b></div>'+
  '<div class="dm-progressbar"><i style="width:'+((state.i)/15*100)+'%"></i></div>'+
  '<div class="dm-question">'+(msg||q[0])+'</div><div class="dm-answers">'+q[1].map((x,i)=>'<button class="dm-answer" data-dm="answer" data-i="'+i+'" '+(state.lock||state.eliminated.includes(i)?"disabled":"")+'>'+"ABCD"[i]+") "+x+'</button>').join("")+'</div>'+
