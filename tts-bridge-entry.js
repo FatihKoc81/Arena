@@ -34,10 +34,10 @@ window.ArenaTTS={
   if(id!==sequence)return;
   await say("Soru. "+question,voice);
   if(id!==sequence)return;
-  await pause(1000);
+  await pause(800);
   for(let i=0;i<answers.length;i++){
    if(id!==sequence)return;
-   if(i>0)await pause(1000);
+   if(i>0)await pause(400);
    await say(answers[i]+".",voice);
   }
  },
