@@ -192,7 +192,7 @@ jobs:
               'Content-Type': 'application/json',
               Accept: 'application/json'
             };
-            const numes = String(process.env.NUMES_API_KEY || '').replace(/\s/g, '');
+            const numes = await json(base + '/app/numes/models', { headers });
             if (numes.status !== 'ok') throw new Error('Numes katalog testi başarısız: ' + JSON.stringify(numes).slice(0, 900));
             console.log('PASS: Numes API anahtarı kabul edildi; ilgili model sayısı=' + numes.count);
             for (const model of (numes.models || [])) {
