@@ -54,17 +54,25 @@ let root=null,state=null,timer=null,tts=(()=>{try{return localStorage.getItem('a
 function stopVoice(){voiceToken++;try{if(window.ArenaTTS)window.ArenaTTS.stop()}catch(e){}try{if(window.speechSynthesis)window.speechSynthesis.cancel()}catch(e){}}
 async function speak(){
  if(!tts||!state||!state.deck[state.i])return;
- const token=++voiceToken,q=state.deck[state.i],letters=["A","B","C","D"];
- try{if(window.ArenaTTS&&typeof window.ArenaTTS.speakParts==="function"){await window.ArenaTTS.speakParts(q[0],q[1]);if(token!==voiceToken)stopVoice();return;}}
- catch(nativeError){console.warn("ARENA native TTS unavailable:",nativeError);}
+ const token=++voiceToken,q=state.deck[state.i];
+ try{if(window.ArenaTTS&&typeof window.ArenaTTS.speakParts==="function"){await window.ArenaTTS.speakParts(q[0],q[1]);if(token!==voiceToken)return;return;}}
+ catch(nativeError){console.warn("ARENA native TTS unavailable; using browser speech:",nativeError);}
  if(!("speechSynthesis"in window)||!("SpeechSynthesisUtterance"in window))return;
  try{
-  window.speechSynthesis.cancel();
-  const voices=window.speechSynthesis.getVoices()||[],tr=voices.find(v=>/^tr([-_]|$)/i.test(v.lang));
-  const say=text=>new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang="tr-TR";u.rate=.80;u.pitch=1;u.volume=1;if(tr)u.voice=tr;u.onend=resolve;u.onerror=resolve;window.speechSynthesis.speak(u);});
+  const synth=window.speechSynthesis;synth.cancel();
+  let voices=synth.getVoices()||[];
+  if(!voices.length&&typeof synth.addEventListener==="function"){
+   await Promise.race([new Promise(resolve=>synth.addEventListener("voiceschanged",resolve,{once:true})),new Promise(resolve=>setTimeout(resolve,1200))]);
+   voices=synth.getVoices()||[];
+  }
+  const tr=voices.filter(v=>/^tr([-_]|$)/i.test(v.lang||""));
+  const male=tr.find(v=>!/(woman|female|kadın)/i.test((v.name||"")+" "+(v.voiceURI||""))&&/(?:^|[^a-z])(male|man)(?=$|[^a-z])|erkek|murat|ahmet|yusuf|cem|emre/i.test((v.name||"")+" "+(v.voiceURI||"")));
+  const natural=tr.find(v=>/google|neural|natural|premium/i.test((v.name||"")+" "+(v.voiceURI||"")));
+  const voice=male||natural||tr[0]||null;
+  const say=text=>new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang="tr-TR";u.rate=.88;u.pitch=.88;u.volume=1;if(voice)u.voice=voice;u.onend=resolve;u.onerror=resolve;synth.speak(u);});
   await say("Soru. "+q[0]);if(token!==voiceToken)return;
-  await new Promise(r=>setTimeout(r,1000));
-  for(let i=0;i<q[1].length;i++){if(token!==voiceToken)return;if(i>0)await new Promise(r=>setTimeout(r,1000));await say(q[1][i]+".");}
+  await new Promise(r=>setTimeout(r,700));
+  for(let i=0;i<q[1].length;i++){if(token!==voiceToken)return;if(i>0)await new Promise(r=>setTimeout(r,650));await say(q[1][i]+".");}
  }catch(e){console.warn("ARENA TTS:",e);}
 }
 function shuffle(a){return a.map(x=>[Math.random(),x]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);}
