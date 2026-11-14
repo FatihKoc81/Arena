@@ -54,7 +54,7 @@ h1{display:grid!important;grid-template-columns:1fr auto 1fr;justify-content:nor
 #oyun button.oyun-pill{cursor:pointer;outline:none;box-shadow:none;-webkit-tap-highlight-color:transparent}#oyun button.oyun-pill:focus,#oyun button.oyun-pill:focus-visible{outline:none;box-shadow:none}
 #oyun .oyun-pill.gold{border-color:#ffb300;color:#ffe27a;background:#171b2c}
 #oyun .oyun-pill.voice{border-color:#4a78ba;color:#bfe7ff;background:#102443}
-#oyun .oyun-pill.player{display:flex;align-items:center;justify-content:center}
+#oyun .oyun-pill.player{display:flex;align-items:center;justify-content:flex-start;text-align:left;padding-left:10px}#oyun .oyun-pill.gold{justify-self:center;text-align:center}
 </style>
 </head>
 <body>
@@ -79,8 +79,8 @@ h1{display:grid!important;grid-template-columns:1fr auto 1fr;justify-content:nor
 <button class="jok" id="jCift">🛡️ Çift Cevap</button>
 </div>
 <div class="oyun-footer">
-<button type="button" id="oyunAltinBtn" class="oyun-pill gold" aria-label="Altın satın al"></button>
 <div class="oyun-pill player" id="oyunOyuncu"></div>
+<button type="button" id="oyunAltinBtn" class="oyun-pill gold" aria-label="Altın satın al"></button>
 <button type="button" id="oyunSesToggle" class="oyun-pill voice" aria-label="Soruyu dinle">🔊 Soruyu dinle</button>
 </div>
 </section>
