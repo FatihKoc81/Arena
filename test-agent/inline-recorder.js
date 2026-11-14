@@ -2,6 +2,9 @@
 (function(){
 "use strict";
 
+const ADMIN_EMAIL="fatihkoc7@gmail.com";
+let recorderPanel=null,recorderInitialized=false;
+function initRecorder(){
 let endpoint="",key="",device="Android telefon";
 function loadConfig(){endpoint=(localStorage.getItem("arenaTestEndpoint")||"").replace(/\/$/,"");key=localStorage.getItem("arenaTestKey")||"";device=localStorage.getItem("arenaTestDevice")||"Android telefon";return !!(endpoint&&key)}
 const deviceId=localStorage.getItem("arenaTestDeviceId")||("android-"+(crypto.randomUUID?crypto.randomUUID():Date.now()));
@@ -171,4 +174,20 @@ $("air-share").onclick=async()=>{
 $("air-start").onclick=async()=>{if(busy||sid)return;if(!loadConfig()){status("Önce Test Kayıt Merkezi’nde ayarları kaydedin");return}busy=true;try{const d=await api("/session",{deviceId,deviceName:device,startedAt:new Date().toISOString()});sid=d.sessionId;started=Date.now();count=0;localStorage.setItem("arenaTestActiveSession",sid);localStorage.setItem("arenaTestStarted",String(started));localStorage.setItem("arenaTestCount","0");$("air-start").disabled=true;$("air-stop").disabled=false;status("Kayıt başladı");await event("recording_started",{url:location.href,geometryEnabled:true,geometryIntervalMs:250,recorderVersion:"inline-geometry-20261110"});setCollapsed(false);attachRecorder();await startGeometryWatch();window.addEventListener("error",e=>event("app_error",{message:e.message,file:e.filename,line:e.lineno}));window.addEventListener("unhandledrejection",e=>event("promise_error",{message:String(e.reason&&e.reason.message||e.reason)}));}catch(e){status("Başlatılamadı: "+e.message);$("air-start").disabled=false}finally{busy=false}};
 $("air-stop").onclick=async()=>{if(!sid||busy)return;loadConfig();if(!endpoint||!key){status("Kayıt ayarları bulunamadı");return}busy=true;$("air-stop").disabled=true;if(geometryTimer){clearInterval(geometryTimer);geometryTimer=null}try{await event("recording_finished",{eventCount:count,geometryEnabled:true});const id=sid;await api("/session/"+encodeURIComponent(id)+"/finish",{endedAt:new Date().toISOString(),eventCount:count});sid="";localStorage.removeItem("arenaTestActiveSession");localStorage.removeItem("arenaTestStarted");localStorage.removeItem("arenaTestCount");if(listener)document.removeEventListener("click",listener,true);listener=null;$("air-start").disabled=false;status("Gönderildi ✓ · "+count+" olay");cachedLatestReport="";prefetchLatestReport()}catch(e){status("Gönderilemedi: "+e.message);$("air-stop").disabled=false}finally{busy=false}};
 if(sid){$("air-start").disabled=true;$("air-stop").disabled=false;status("Önceki kayıt devam ediyor · "+count+" olay");attachRecorder();setCollapsed(true)}
+}
+function bootAdminRecorder(){
+ if(!window.firebase||!firebase.apps||!firebase.apps.length){setTimeout(bootAdminRecorder,200);return;}
+ try{
+  firebase.auth().onAuthStateChanged(function(user){
+   const allowed=!!(user&&!user.isAnonymous&&String(user.email||"").trim().toLowerCase()===ADMIN_EMAIL);
+   if(allowed){
+    if(!recorderInitialized){recorderInitialized=true;initRecorder();recorderPanel=document.getElementById("arena-inline-recorder");}
+    if(recorderPanel)recorderPanel.style.display="";
+   }else if(recorderPanel){
+    recorderPanel.style.display="none";
+   }
+  });
+ }catch(e){setTimeout(bootAdminRecorder,500);}
+}
+bootAdminRecorder();
 })();
