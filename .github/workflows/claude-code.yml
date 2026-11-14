@@ -12,6 +12,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  id-token: write
 
 concurrency:
   group: claude-arena-${{ github.ref }}
@@ -53,7 +54,6 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY != '' && secrets.ANTHROPIC_API_KEY || '' }}
           claude_code_oauth_token: ${{ secrets.ANTHROPIC_API_KEY == '' && secrets.CLAUDE_CODE_OAUTH_TOKEN || '' }}
-          github_token: ${{ github.token }}
           claude_args: --max-turns 20
           prompt: |
             ARENA için kıdemli Android/web oyun geliştiricisisin.
