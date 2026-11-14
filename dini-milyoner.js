@@ -202,6 +202,7 @@ function mount(){if(root)return;let st=document.createElement("style");st.textCo
  text-align:center!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
 }
 #arenaDiniMillion .dm-pill.gold{border-color:#ffb300!important;color:#ffe27a!important;background:#171b2c!important}
+#arenaDiniMillion .dm-pill.dm-player{justify-content:flex-start!important;text-align:left!important;padding-left:10px!important}#arenaDiniMillion .dm-pill.gold{justify-self:center!important;text-align:center!important}
 #arenaDiniMillion .dm-pill.dm-voice{border-color:#4a78ba!important;color:#bfe7ff!important;background:#102443!important}
 #arenaDiniMillion .dm-home{
  display:block!important;width:100%!important;min-height:66px!important;margin:14px 0 0!important;
@@ -229,7 +230,7 @@ function render(msg){
  '<div class="dm-progressbar"><i style="width:'+((state.i)/15*100)+'%"></i></div>'+
  '<div class="dm-question">'+(msg||q[0])+'</div><div class="dm-answers">'+q[1].map((x,i)=>'<button class="dm-answer" data-dm="answer" data-i="'+i+'" '+(state.lock||state.eliminated.includes(i)?"disabled":"")+'>'+"ABCD"[i]+") "+x+'</button>').join("")+'</div>'+
  '<div class="dm-tools"><button class="dm-btn" data-dm="half" '+(state.used.half?"disabled":"")+'>✂️ 50:50</button><button class="dm-btn" data-dm="audience" '+(state.used.audience?"disabled":"")+'>👥 Seyirci</button><button class="dm-btn" data-dm="double" '+(state.used.double?"disabled":"")+'>🛡️ Çift Cevap</button></div>'+
- '<div class="dm-footer"><button type="button" class="dm-pill gold" data-dm="gold">🪙 '+(altin==null?"Altın":Number(altin).toLocaleString("tr-TR"))+' +</button><div class="dm-pill">👤 '+ad+'</div><button type="button" class="dm-pill dm-voice" data-dm="voice">🔊 Soruyu dinle</button></div>'+
+ '<div class="dm-footer"><div class="dm-pill dm-player">👤 '+ad+'</div><button type="button" class="dm-pill gold" data-dm="gold">🪙 '+(altin==null?"Altın":Number(altin).toLocaleString("tr-TR"))+' +</button><button type="button" class="dm-pill dm-voice" data-dm="voice">🔊 Soruyu dinle</button></div>'+
  '<button type="button" class="dm-home" data-dm="home">Ana Menü</button></div>'+
  (state.feedback?'<div class="dm-feedback">'+state.feedback+'</div>':"");
  root.classList.add("open");if(!state.lock)speak();
