@@ -1475,7 +1475,7 @@
 
   // Başlık: oyunda üstte küçük sabit çubuk (klavye açıkken de görünür), tıklayınca ana sayfa
   const stl = document.createElement("style");
-  stl.textContent = "body.ppOyunda{padding-top:calc(58px + env(safe-area-inset-top))!important;padding-bottom:0}#ppSoru{text-wrap:balance;text-align:center}";
+  stl.textContent = "body.ppOyunda{padding-top:calc(58px + env(safe-area-inset-top) + 4px)!important;padding-bottom:0}body.ppOyunda #pp{margin-top:0!important;transform:translateY(-12px)}#ppSoru{text-wrap:balance;text-align:center}";
   document.head.append(stl);
   const hGuncelle = () => {
     const a = !sec.classList.contains("hidden") && !oyun.classList.contains("hidden");
