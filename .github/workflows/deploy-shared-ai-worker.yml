@@ -27,7 +27,8 @@ jobs:
           set -euo pipefail
           node <<'NODE'
           async function main() {
-            const { CLOUDFLARE_ACCOUNT_ID: account, CLOUDFLARE_API_TOKEN: token, NUMES_API_KEY: numes } = process.env;
+            const { CLOUDFLARE_ACCOUNT_ID: account, CLOUDFLARE_API_TOKEN: token } = process.env;
+            const numes = String(process.env.NUMES_API_KEY || '').replace(/\\s/g, '');
             if (!account || !token) throw new Error('Cloudflare dağıtım bilgileri eksik.');
             if (!numes) {
               console.log('NUMES_API_KEY GitHub secret henüz yok; Numes bağlantısı atlandı.');
@@ -54,7 +55,7 @@ jobs:
           set -euo pipefail
           node <<'NODE'
           async function main() {
-            const key = String(process.env.NUMES_API_KEY || '').replace(/[\\r\\n\\t ]+/g, '');
+            const key = String(process.env.NUMES_API_KEY || '').replace(/\\s/g, '');
             if (!key) throw new Error('NUMES_API_KEY GitHub Actions secret bulunamadı.');
             const response = await fetch('https://api.numes.ai/api/v1/models', {
               headers: { Authorization: 'Bearer ' + key, Accept: 'application/json' }
