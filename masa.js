@@ -32,7 +32,7 @@ const css=`#arena-table-modal{position:fixed;inset:0;z-index:30000;background:ra
 .at-batak .at-batak-hand{width:min(100%,1000px);margin:0 auto;display:flex;justify-content:center;gap:clamp(0px,.35vw,5px);overflow-x:auto;overflow-y:visible;padding:8px 4px 5px;flex-shrink:0}
 .at-batak .at-batak-hand .at-card{width:clamp(36px,5.4vw,62px);height:clamp(56px,8.2vw,86px);font-size:clamp(15px,2.2vw,23px);flex:1 1 0;max-width:68px;min-width:30px;border-radius:8px;box-shadow:0 3px 7px #0007}
 .at-batak .at-batak-hand .at-card:disabled{opacity:.45}
-.at-batak .at-batak-bid{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(82vw,620px);max-height:calc(100dvh - 32px);overflow:auto;padding:16px;border:3px solid #6aa8ff;border-radius:26px;background:linear-gradient(145deg,#102f6e,#061638 65%,#071329);box-shadow:0 12px 35px #000c,inset 0 0 0 2px #ffffff24;z-index:4;text-align:center}
+.at-batak .at-batak-bid{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(82vw,620px);max-height:calc(100dvh - 32px);overflow:auto;z-index:10;padding:16px;border:3px solid #6aa8ff;border-radius:26px;background:linear-gradient(145deg,#102f6e,#061638 65%,#071329);box-shadow:0 12px 35px #000c,inset 0 0 0 2px #ffffff24;z-index:4;text-align:center}
 .at-batak .at-batak-bid h2{margin:0 0 12px;font-size:clamp(17px,3vw,28px)}
 .at-batak .at-bid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
 .at-batak .at-bid .at-btn{min-height:44px;font-size:clamp(14px,2vw,20px);background:linear-gradient(145deg,#2866d7,#102b78);border:2px solid #51b9ff;box-shadow:inset 0 0 10px #8bc7ff44}
