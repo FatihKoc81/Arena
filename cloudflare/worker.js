@@ -252,6 +252,33 @@ export default {
       return reply({ error: "Unauthorized" }, 401);
     }
 
+    if (path === "/numes/models" && request.method === "GET") {
+      try {
+        if (!env.NUMES_API_KEY) return reply({ error: "NUMES_API_KEY secret is not configured" }, 503);
+        const upstream = await fetch("https://api.numes.ai/api/v1/models", {
+          method: "GET",
+          headers: { "Authorization": `Bearer ${env.NUMES_API_KEY}`, "Accept": "application/json" },
+        });
+        const data = await upstream.json().catch(() => ({}));
+        if (!upstream.ok) {
+          const safeError = String(data?.error?.message || data?.message || "Numes model catalogue request failed").slice(0, 400);
+          return reply({ error: "Numes catalogue request failed", status: upstream.status, detail: safeError }, upstream.status);
+        }
+        const rows = Array.isArray(data?.data) ? data.data : Array.isArray(data?.models) ? data.models : [];
+        const wanted = /deepseek|glm|kimi|nemotron/i;
+        const models = rows.filter((item) => wanted.test(String(item.id || item.name || ""))).map((item) => ({
+          id: item.id || item.name || null,
+          name: item.name || null,
+          pricing: item.pricing || null,
+          context_length: item.context_length || null,
+          supported_parameters: item.supported_parameters || [],
+        }));
+        return reply({ status: "ok", count: models.length, models });
+      } catch (error) {
+        return reply({ error: "Numes catalogue request failed", detail: String(error.message || error).slice(0, 400) }, 502);
+      }
+    }
+
     if (path === "/numes/chat" && request.method === "POST") {
       try {
         if (!env.NUMES_API_KEY) return reply({ error: "NUMES_API_KEY secret is not configured" }, 503);
