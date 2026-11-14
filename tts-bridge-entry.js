@@ -10,7 +10,7 @@ async function getTurkishVoice(){
   const candidates=(result.voices||[]).map((v,index)=>({...v,index})).filter(v=>/^tr([-_]|$)/i.test(v.lang||""));
   if(candidates.length){
    candidates.sort((a,b)=>{
-    const male=v=>!/(woman|female|kadın)/i.test((v.voiceURI||"")+" "+(v.name||""))&&/(?:^|[^a-z])(male|man)(?=$|[^a-z])|erkek|murat|ahmet|yusuf|cem|emre/i.test((v.voiceURI||"")+" "+(v.name||""))?0:1;
+    const male=v=>/(woman|female|kadın)/i.test((v.voiceURI||"")+" "+(v.name||""))?2:/(?:^|[^a-z])(male|man)(?=$|[^a-z])|erkek|murat|ahmet|yusuf|cem|emre/i.test((v.voiceURI||"")+" "+(v.name||""))?0:1;
     const quality=v=>/google|neural|natural|premium/i.test((v.voiceURI||"")+" "+(v.name||""))?0:1;
     return male(a)-male(b)||quality(a)-quality(b)||(a.localService===b.localService?0:(a.localService?1:-1));
    });
@@ -22,7 +22,7 @@ async function getTurkishVoice(){
 function normalizeSpeechText(value){return String(value||"").replace(/Kur[’‘\x27]an\s*[-–—]\s*ı\s*Ker[iî]m/gi,"Kur\x27anı Kerim");}
 const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function say(text,voice){
- const options={text:normalizeSpeechText(text),lang:"tr-TR",rate:0.80,pitch:1,volume:1,queueStrategy:0};
+ const options={text:normalizeSpeechText(text),lang:"tr-TR",rate:1.0,pitch:1,volume:1,queueStrategy:0};
  if(voice!==null&&voice!==undefined)options.voice=voice;
  await TextToSpeech.speak(options);
 }
