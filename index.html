@@ -140,7 +140,8 @@ function soruSesDurdur(){soruSesToken++;try{if(window.ArenaTTS)window.ArenaTTS.s
 async function soruSesOku(){
  if(!soruSesAcik||!lv||!lv[soru]||$("oyun").classList.contains("hidden"))return;
  const token=++soruSesToken,q=lv[soru];
- if(window.ArenaTTS&&typeof window.ArenaTTS.speakParts==="function"){try{await window.ArenaTTS.speakParts(q[0],q[1]);if(token!==soruSesToken)return;return;}catch(e){console.warn("Yerel TTS kullanılamadı, tarayıcı sesi deneniyor.",e);}}
+ if(window.ArenaTTS&&typeof window.ArenaTTS.speakParts==="function"){try{await window.ArenaTTS.speakParts(q[0],q[1]);if(token!==soruSesToken)return;return;}catch(e){if(token!==soruSesToken)return;console.warn("Yerel TTS kullanılamadı, tarayıcı sesi deneniyor.",e);}}
+ if(token!==soruSesToken||document.hidden||$("oyun").classList.contains("hidden"))return;
  if(!("speechSynthesis"in window)||!("SpeechSynthesisUtterance"in window))return;
  try{
   const synth=window.speechSynthesis;synth.cancel();
@@ -216,11 +217,13 @@ let duel = null;
 document.addEventListener("anasayfa", () => { sureDurdur(); soruSesDurdur(); duel = null; });
 
 function ekran(id) {
+  if(id !== "oyun") soruSesDurdur();
   ["ana", "oyun", "son"].forEach(e => $(e).classList.toggle("hidden", e !== id));
 }
 
 function menu() {
   sureDurdur();
+  soruSesDurdur();
   $("seviye").textContent = st.seviye > SEVIYE_SAYISI ? "Tamamlandı 🏆" : "Seviye " + st.seviye;
   ekran("ana");
   Ekonomi.barYaz();
@@ -690,26 +693,26 @@ if ("serviceWorker" in navigator) {
 })();
 </script>
 <script src="test-agent/inline-recorder.js?v=20261114-owner-only1"></script>
+
 <script>
+/* Stop every speech engine whenever ARENA leaves the foreground or a game closes. */
 (function(){
-  function ekle(){
-    if(!window.OrtakAIMerkezi || document.getElementById("ortakAiKonusma")) return;
-    var b=document.createElement("button");
-    b.id="ortakAiKonusma";
-    b.type="button";
-    b.textContent="🤖 Diğer uygulamalarla konuş";
-    b.setAttribute("aria-label","Ortak AI konuşmasını başlat veya durdur");
-    b.style.cssText="position:fixed;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:10000;border:1px solid #6ba7c9;border-radius:24px;padding:11px 15px;background:#102b43;color:#fff;font:700 13px system-ui;box-shadow:0 4px 16px #0008";
-    var stop=null;
-    b.addEventListener("click",function(){
-      if(stop){stop();stop=null;b.textContent="🤖 Diğer uygulamalarla konuş";return;}
-      try{stop=window.OrtakAIMerkezi.konusmayiBaslat(12000);b.textContent="🔊 Konuşma açık · Durdur";}
-      catch(e){b.textContent="Bağlantı kurulamadı";setTimeout(function(){b.textContent="🤖 Diğer uygulamalarla konuş"},2200);}
-    });
-    document.body.appendChild(b);
+  let stoppedAt=0;
+  function stopArenaSpeech(){
+    stoppedAt=Date.now();
+    try{if(window.ArenaTTS&&typeof window.ArenaTTS.stop==="function")window.ArenaTTS.stop();}catch(e){}
+    try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}
+    try{const p=window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.TextToSpeech;if(p&&typeof p.stop==="function")p.stop();}catch(e){}
   }
-  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",ekle);else ekle();
-  setTimeout(ekle,1500);
+  document.addEventListener("visibilitychange",function(){if(document.hidden)stopArenaSpeech();});
+  window.addEventListener("pagehide",stopArenaSpeech);
+  window.addEventListener("beforeunload",stopArenaSpeech);
+  window.addEventListener("freeze",stopArenaSpeech);
+  window.addEventListener("arena:game-close",stopArenaSpeech);
+  window.addEventListener("arena:home",stopArenaSpeech);
+  window.addEventListener("anasayfa",stopArenaSpeech);
+  const game=document.getElementById("oyun");
+  if(game&&typeof MutationObserver==="function")new MutationObserver(function(){if(game.classList.contains("hidden"))stopArenaSpeech();}).observe(game,{attributes:true,attributeFilter:["class"]});
 })();
 </script>
 </body>
