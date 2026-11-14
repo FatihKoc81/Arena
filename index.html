@@ -139,19 +139,25 @@ let soruSesToken = 0;
 function soruSesDurdur(){soruSesToken++;try{if(window.ArenaTTS)window.ArenaTTS.stop();}catch(e){}try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}}
 async function soruSesOku(){
  if(!soruSesAcik||!lv||!lv[soru]||$("oyun").classList.contains("hidden"))return;
- const token=++soruSesToken,q=lv[soru],letters=["A","B","C","D"];
- if(window.ArenaTTS&&typeof window.ArenaTTS.speakParts==="function"){try{await window.ArenaTTS.speakParts(q[0],q[1]);if(token!==soruSesToken)window.ArenaTTS.stop();return;}catch(e){}}
+ const token=++soruSesToken,q=lv[soru];
+ if(window.ArenaTTS&&typeof window.ArenaTTS.speakParts==="function"){try{await window.ArenaTTS.speakParts(q[0],q[1]);if(token!==soruSesToken)return;return;}catch(e){console.warn("Yerel TTS kullanılamadı, tarayıcı sesi deneniyor.",e);}}
  if(!("speechSynthesis"in window)||!("SpeechSynthesisUtterance"in window))return;
  try{
-  window.speechSynthesis.cancel();const voices=window.speechSynthesis.getVoices()||[],tr=voices.find(v=>/^tr([-_]|$)/i.test(v.lang));
-  const say=text=>new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang="tr-TR";u.rate=.80;u.pitch=1;u.volume=1;if(tr)u.voice=tr;u.onend=resolve;u.onerror=resolve;window.speechSynthesis.speak(u);});
+  const synth=window.speechSynthesis;synth.cancel();
+  let voices=synth.getVoices()||[];
+  if(!voices.length&&typeof synth.addEventListener==="function"){
+   await Promise.race([new Promise(resolve=>synth.addEventListener("voiceschanged",resolve,{once:true})),new Promise(resolve=>setTimeout(resolve,1200))]);
+   voices=synth.getVoices()||[];
+  }
+  const tr=voices.filter(v=>/^tr([-_]|$)/i.test(v.lang||""));
+  const male=tr.find(v=>!/(woman|female|kadın)/i.test((v.name||"")+" "+(v.voiceURI||""))&&/(?:^|[^a-z])(male|man)(?=$|[^a-z])|erkek|murat|ahmet|yusuf|cem|emre/i.test((v.name||"")+" "+(v.voiceURI||"")));
+  const natural=tr.find(v=>/google|neural|natural|premium/i.test((v.name||"")+" "+(v.voiceURI||"")));
+  const voice=male||natural||tr[0]||null;
+  const say=text=>new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang="tr-TR";u.rate=.88;u.pitch=.88;u.volume=1;if(voice)u.voice=voice;u.onend=resolve;u.onerror=resolve;synth.speak(u);});
   await say("Soru. "+q[0]);if(token!==soruSesToken)return;
-  await new Promise(r=>setTimeout(r,1000));
-  for(let i=0;i<q[1].length;i++){if(token!==soruSesToken)return;if(i>0)await new Promise(r=>setTimeout(r,1000));await say(q[1][i]+".");}
- }catch(e){}
-}
-if(window.ArenaTTS){try{await window.ArenaTTS.speak(metin);if(token!==soruSesToken)window.ArenaTTS.stop();return;}catch(e){}}
-if(!("speechSynthesis"in window)||!("SpeechSynthesisUtterance"in window))return;try{window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(metin);u.lang="tr-TR";u.rate=.88;u.pitch=1;u.volume=1;const v=window.speechSynthesis.getVoices()||[],tr=v.find(x=>/^tr([-_]|$)/i.test(x.lang));if(tr)u.voice=tr;window.speechSynthesis.speak(u);}catch(e){}
+  await new Promise(r=>setTimeout(r,700));
+  for(let i=0;i<q[1].length;i++){if(token!==soruSesToken)return;if(i>0)await new Promise(r=>setTimeout(r,650));await say(q[1][i]+".");}
+ }catch(e){console.warn("Milyoner sesli okuma hatası:",e);}
 }
 
 
@@ -375,6 +381,7 @@ function guvenliBaslat() {
     alert("Milyoner hatası: " + e.message);
   }
 }
+window.ArenaMilyoner={ac:guvenliBaslat};
 document.addEventListener("click", e => {
   if (e.target.closest("#basla") || e.target.closest("#sDevam")) guvenliBaslat();
 });
@@ -530,10 +537,10 @@ document.addEventListener("anasayfa", gKapat);
 <script src="islem.js?v=20261104a"></script>
 <script src="ads.js?v=20261104a"></script>
 <script src="rotasyon.js?v=20261104a"></script>
-<script src="dini-milyoner.js?v=20261111-islamic-millionaire2"></script>
+<script src="dini-milyoner.js?v=20261114-safe-tts1"></script>
 <script src="masa.js?v=20261112-greenbaize1"></script>
 <script src="mini-oyunlar.js?v=20261110-sudoku-premium1"></script>
-<script src="menu.js?v=20261110-category-fullwidth-fix2"></script>
+<script src="menu.js?v=20261114-safe-launch1"></script>
 <script>window.ARENA_APP="arena";</script><!-- sıralama/düello verileri bu adla ayrı tutulur -->
 <script src="firebase-config.js?v=20261104a"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
