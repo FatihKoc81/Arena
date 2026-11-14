@@ -2419,6 +2419,41 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
  document.head.appendChild(fix);
 })();
 
+/* Category grid must use the full viewport width and natural row height on return from a game. */
+(function(){
+ const style=document.createElement('style');style.id='arenaCategoryGridFullWidthFix20261114';
+ style.textContent=`
+ html.arena-home-fixed body #arenaHubHome .ar-categories.is-open{
+   display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+   grid-template-rows:auto minmax(0,1fr)!important;align-items:stretch!important;
+   width:100%!important;min-width:0!important;min-height:0!important;height:100%!important;
+   overflow:hidden!important;
+ }
+ html.arena-home-fixed body #arenaHubHome .ar-categories.is-open>.ar-inline-category-head,
+ html.arena-home-fixed body #arenaHubHome .ar-categories.is-open>.ar-inline-game-list{
+   grid-column:1!important;width:100%!important;min-width:0!important;box-sizing:border-box!important;
+ }
+ html.arena-home-fixed body #arenaHubHome .ar-categories.is-open>.ar-inline-game-list{
+   display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+   grid-auto-flow:row!important;grid-auto-rows:minmax(82px,auto)!important;
+   align-content:start!important;justify-content:stretch!important;gap:8px!important;
+   height:auto!important;min-height:0!important;max-height:100%!important;
+   overflow-x:hidden!important;overflow-y:auto!important;padding:2px 1px 12px!important;
+ }
+ html.arena-home-fixed body #arenaHubHome .ar-categories.is-open .ar-game-card{
+   display:flex!important;flex-direction:row!important;align-items:center!important;
+   justify-content:flex-start!important;width:100%!important;min-width:0!important;
+   min-height:82px!important;height:auto!important;max-height:none!important;
+   box-sizing:border-box!important;overflow:hidden!important;margin:0!important;
+ }
+ html.arena-home-fixed body #arenaHubHome .ar-categories.is-open .ar-game-card>span{min-width:0!important;flex:1 1 auto!important}
+ html.arena-home-fixed body #arenaHubHome .ar-categories.is-open .ar-game-card strong,
+ html.arena-home-fixed body #arenaHubHome .ar-categories.is-open .ar-game-card small{overflow-wrap:anywhere!important;white-space:normal!important}
+ @media(max-width:360px){html.arena-home-fixed body #arenaHubHome .ar-categories.is-open>.ar-inline-game-list{gap:5px!important}html.arena-home-fixed body #arenaHubHome .ar-categories.is-open .ar-game-card{padding:6px!important}}
+ `;
+ document.head.appendChild(style);
+})();
+
 /* Reliable in-app and Android/browser back handling for an open category. */
 (function(){
  function categoryIsOpen(){
