@@ -189,6 +189,13 @@ jobs:
               'Content-Type': 'application/json',
               Accept: 'application/json'
             };
+            const numes = await json(base + '/app/numes/models', { headers });
+            if (numes.status !== 'ok') throw new Error('Numes katalog testi başarısız.');
+            console.log('PASS: Numes API anahtarı kabul edildi; ilgili model sayısı=' + numes.count);
+            for (const model of (numes.models || [])) {
+              console.log('NUMES_MODEL:', model.id, 'PRICING:', JSON.stringify(model.pricing || null));
+            }
+
             const answer = await json(base + '/app/chat', {
               method: 'POST',
               headers,
