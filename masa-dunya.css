@@ -1,0 +1,59 @@
+/* ARENA OYUN DÜNYASI — masa oyunları lobisi + Okey/101 + Poker görünümü (ekran görüntülerine göre) */
+
+/* ===== LOBİ ===== */
+#arena-table-modal.at-world{display:flex!important;flex-direction:column;gap:clamp(6px,1.4vh,12px);padding:calc(env(safe-area-inset-top) + 6px) max(10px,env(safe-area-inset-right)) calc(env(safe-area-inset-bottom) + 8px) max(10px,env(safe-area-inset-left))!important;background:radial-gradient(ellipse at 50% 0,#3a2a78 0,#1a1450 40%,#090a28 100%)!important;overflow:hidden!important;font-family:system-ui,sans-serif!important}
+.at-world .aw-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex:0 0 auto}
+.at-world .aw-back{min-width:44px;min-height:44px;border-radius:50%;border:2px solid #e8bd5b;background:linear-gradient(#2d2470,#120d3a);color:#fff;font-size:18px;font-weight:900}
+.at-world .aw-logo{display:flex;flex-direction:column;align-items:center;line-height:1;text-shadow:0 3px 6px #000}
+.at-world .aw-logo span{font-size:clamp(16px,3.4vh,26px)}
+.at-world .aw-logo strong{font:900 clamp(26px,6vh,46px)/1 Georgia,serif;letter-spacing:.08em;color:#ffe6a3;background:linear-gradient(#fff3c4,#e2a93a 60%,#9a6414);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.at-world .aw-logo small{font-size:clamp(10px,2vh,14px);font-weight:800;color:#ffd978;border:1px solid #e8bd5b88;border-radius:999px;padding:2px 12px;margin-top:3px;background:#1a1450cc}
+.at-world .aw-note{font-size:clamp(9px,1.7vh,12px);color:#cdbfff;text-align:right;line-height:1.35}
+.at-world .aw-big{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(6px,1.2vw,12px);flex:1 1 auto;min-height:0}
+.at-world .aw-card{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;padding:8px 6px 10px;border-radius:16px;border:3px solid #e8bd5b;box-shadow:0 8px 18px #000a,inset 0 0 22px #0006;overflow:hidden;min-height:0;text-align:center}
+.at-world .aw-a{background:radial-gradient(circle at 50% 30%,#1c8a4e,#0a4a2c 70%,#052b1a)}
+.at-world .aw-b{background:radial-gradient(circle at 50% 30%,#7a3bb8,#3d1668 70%,#210a3d)}
+.at-world .aw-c{background:radial-gradient(circle at 50% 30%,#b0713a,#5e341a 70%,#2c170a)}
+.at-world .aw-d{background:radial-gradient(circle at 50% 30%,#c23a3a,#6a1414 70%,#330808)}
+.at-world .aw-e{background:radial-gradient(circle at 50% 30%,#2e9a4a,#0e5430 70%,#06301c)}
+.at-world .aw-art{flex:1;display:grid;place-items:center;font-size:clamp(40px,12vh,86px);filter:drop-shadow(0 6px 6px #0009)}
+.at-world .aw-name{font:900 clamp(16px,3.6vh,26px)/1 Georgia,serif;letter-spacing:.04em;color:#ffe6a3;text-shadow:0 2px 4px #000;background:linear-gradient(#3a2a0a,#1b1204);border:1px solid #e8bd5b;border-radius:8px;padding:4px 10px}
+.at-world .aw-sub{font-size:clamp(9px,1.8vh,12px);color:#e9e2ff}
+.at-world .aw-play{min-height:38px;width:90%;border-radius:999px;border:2px solid #b9ff9a;background:linear-gradient(#52d63e,#1b8a1b);color:#fff;font:900 clamp(13px,2.4vh,17px)/1 system-ui,sans-serif;text-shadow:0 1px 2px #000;box-shadow:0 3px 8px #0008}
+.at-world .aw-small{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:clamp(5px,1vw,10px);flex:0 0 auto}
+.at-world .aw-mini{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:clamp(54px,14vh,88px);padding:4px;border-radius:12px;border:2px solid #b58a50;background:linear-gradient(145deg,#2a2468,#0f0c33);color:#fff;box-shadow:0 5px 10px #0008}
+.at-world .aw-mini span{font-size:clamp(20px,5.5vh,34px)}
+.at-world .aw-mini b{font-size:clamp(10px,2vh,13px);color:#ffe6a3}
+.at-world .aw-mini i{position:absolute;top:3px;right:4px;font-size:9px;font-style:normal;background:#e8bd5b;color:#2a1a00;border-radius:6px;padding:1px 5px;font-weight:900}
+.at-world .aw-bottom{flex:0 0 auto;display:flex;justify-content:center}
+.at-world .aw-hemen{min-height:44px;padding:8px 44px;border-radius:999px;border:3px solid #ffe6a3;background:linear-gradient(#ffd45a,#c47f10);color:#3a2200;font:900 clamp(15px,3vh,22px)/1 Georgia,serif;box-shadow:0 5px 14px #000a,inset 0 1px #fff9}
+.at-world .aw-toast{position:absolute;left:50%;bottom:70px;transform:translateX(-50%);background:#000c;color:#fff;border:1px solid #e8bd5b;border-radius:999px;padding:8px 18px;font-weight:800;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s}
+.at-world .aw-toast.on{opacity:1}
+@media(orientation:portrait){.at-world .aw-big{grid-template-columns:repeat(2,minmax(0,1fr));overflow:auto}.at-world .aw-small{grid-template-columns:repeat(4,minmax(0,1fr))}.at-world .aw-card{min-height:150px}}
+
+/* ===== OKEY / 101 MASASI ===== */
+#arena-table-modal.at-okey{background:radial-gradient(ellipse at 50% 20%,#2a86a6 0,#1b6a8a 55%,#0f4663 100%)!important;overflow:auto!important}
+.at-okey .at-panel{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;margin:0 auto!important;max-width:1250px}
+.at-okey .at-seats{grid-template-columns:repeat(4,1fr)!important;gap:8px!important}
+.at-okey .at-seat{background:linear-gradient(#0d2236ee,#07131fee)!important;border:1px solid #6fb5d4!important;border-radius:12px!important;color:#dff4ff!important}
+.at-okey .at-board{background:linear-gradient(#0c2a48cc,#081c33cc),repeating-linear-gradient(0deg,#ffffff0d 0 1px,transparent 1px 24px),repeating-linear-gradient(90deg,#ffffff0d 0 1px,transparent 1px 24px)!important;border:6px solid #3d90b0!important;border-radius:16px!important;box-shadow:inset 0 0 40px #000a,0 10px 22px #0009!important;min-height:clamp(120px,24vh,220px)}
+.at-okey .at-board:before{display:none}
+.at-okey .at-board:after{content:attr(data-mark);position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font:900 clamp(34px,9vh,78px)/1 Georgia,serif;color:#ffffff14;letter-spacing:.06em;pointer-events:none}
+.at-okey .at-rackrow{display:flex;align-items:flex-end;gap:8px;max-width:1250px;margin:6px auto 0}
+.at-okey .at-rackrow .at-rack{flex:1 1 auto;min-width:0}
+.at-okey .at-side{flex:0 0 auto;width:clamp(58px,9vw,84px);min-height:clamp(70px,13vh,104px);border-radius:12px;border:2px solid #7fc4ea;background:linear-gradient(#1f4f9c,#0a2250);color:#fff;font:900 clamp(11px,1.9vh,15px)/1.15 system-ui,sans-serif;text-align:center;box-shadow:0 5px 10px #0009,inset 0 1px #fff4}
+.at-okey .at-side b{display:block;font-size:clamp(16px,3vh,24px);margin-bottom:3px;color:#ffe27a}
+.at-okey .at-actions .at-btn[data-at="sort"]{display:none!important}
+@media(orientation:portrait){.at-okey .at-seats{grid-template-columns:repeat(2,1fr)!important}.at-okey .at-side{width:52px}}
+
+/* ===== POKER MASASI ===== */
+#arena-table-modal.at-poker{background:radial-gradient(ellipse at 50% 30%,#1c2250 0,#0b0e2c 60%,#04051a 100%)!important}
+.at-poker .at-panel{background:transparent!important;border:0!important;box-shadow:none!important;max-width:1100px;margin:0 auto!important}
+.at-poker .at-board{background:radial-gradient(ellipse at 50% 40%,#d13a2c 0,#a31f1a 55%,#6a0e0e 100%)!important;border:10px solid #2a1a14!important;border-radius:50% / 38%!important;box-shadow:inset 0 0 0 3px #f2b56a,inset 0 0 40px #4008,0 0 0 3px #ffffff22,0 14px 28px #000c!important;min-height:clamp(150px,30vh,260px);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.at-poker .at-board:before{border-radius:50%!important;border-color:#ffffff30!important}
+.at-poker .at-board .at-muted{color:#ffe6c0!important;font-weight:900;letter-spacing:.08em}
+.at-poker .at-tablecards{justify-content:center!important;overflow:visible!important}
+.at-poker .at-seats{grid-template-columns:repeat(4,1fr)!important}
+.at-poker .at-seat{background:linear-gradient(#1b1f4cf0,#0a0c2ef0)!important;border:2px solid #f2b56a!important;border-radius:999px!important;padding:6px 4px!important}
+.at-poker .at-seat b{color:#ffe27a!important}
+.at-poker .at-hand{justify-content:center!important}
