@@ -252,6 +252,69 @@ export default {
       return reply({ error: "Unauthorized" }, 401);
     }
 
+    if (path === "/numes/chat" && request.method === "POST") {
+      try {
+        if (!env.NUMES_API_KEY) return reply({ error: "NUMES_API_KEY secret is not configured" }, 503);
+        const body = await request.json();
+        const project = String(body.project || "");
+        const model = String(body.model || "deepseek/deepseek-v4.1-flash");
+        const prompt = String(body.prompt || "").trim();
+        const allowedModels = new Set([
+          "deepseek/deepseek-v4.1-flash",
+          "dealignai/deepseek-v4.1-flash-uncensored-fp8",
+          "z-ai/glm-5.3-flash",
+          "dealignai/glm-5.3-flash-uncensored-fp8",
+          "dealignai/glm-5.3-uncensored-fp8",
+          "moonshotai/kimi-k3.1-pro",
+          "nvidia/nemotron-3-ultra-550b-a55b",
+        ]);
+
+        // KÂTİP is deliberately excluded: no financial or personal records may leave the device.
+        if (!["ARENA", "RESET-NIGHT"].includes(project)) {
+          return reply({ error: "Numes is disabled for this project" }, 403);
+        }
+        if (!allowedModels.has(model)) return reply({ error: "Model is not allowlisted" }, 400);
+        if (!prompt || prompt.length > 12000) return reply({ error: "Prompt must be 1-12000 characters" }, 400);
+
+        const upstream = await fetch("https://api.numes.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${env.NUMES_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model,
+            messages: [
+              { role: "system", content: `${SHARED_SYSTEM_PROMPT} Current project context: ${project}. Review only supplied source-code context and synthetic test data. Never request secrets or personal data.` },
+              { role: "user", content: prompt },
+            ],
+            max_tokens: 1200,
+            store: false,
+            provider: {
+              data_collection: "deny",
+              zdr: true,
+            },
+          }),
+        });
+
+        const data = await upstream.json().catch(() => ({}));
+        if (!upstream.ok) {
+          const safeError = String(data?.error?.message || data?.message || "Numes upstream request failed").slice(0, 500);
+          return reply({ error: "Numes request failed", status: upstream.status, detail: safeError }, upstream.status === 429 ? 429 : 502);
+        }
+        const answer = candidateText(data?.choices?.[0]?.message?.content);
+        if (!answer) return reply({ error: "Numes returned an empty response" }, 502);
+        return reply({
+          project,
+          model: data.model || model,
+          response: answer,
+          usage: data.usage || null,
+        });
+      } catch (error) {
+        return reply({ error: "Numes request failed", detail: String(error.message || error).slice(0, 500) }, 502);
+      }
+    }
+
     if (path === "/chat" && request.method === "POST") {
       try {
         const body = await request.json();
