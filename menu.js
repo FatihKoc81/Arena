@@ -1247,6 +1247,7 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
    gap:clamp(5px,.8vh,8px)!important;min-height:0!important;height:100%!important;
    overflow:hidden!important;
  }
+ html.arena-home-fixed #arenaHubHome .ar-inline-game-list .ar-game-card:only-child{grid-column:1/-1!important;justify-self:center!important;width:min(100%,680px)!important;max-width:680px!important;}
  html.arena-home-fixed #arenaHubHome .ar-inline-game-list .ar-game-card{
    display:flex!important;flex-direction:row!important;align-items:center!important;
    justify-content:flex-start!important;gap:8px!important;width:100%!important;
