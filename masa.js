@@ -79,7 +79,7 @@ function show(title,body,actions){mount();ensureCss();root.hidden=false;root.inn
 function clearMode(){if(root)root.classList.remove('at-batak','at-okey','at-poker','at-world');}
 function openMini(id){try{if(window.ArenaMiniOyunlar&&window.ArenaMiniOyunlar.varMi(id)){root.hidden=true;unlockOrientation();window.ArenaMiniOyunlar.ac(id);return;}}catch(_){}soonMsg(id);}
 function soonMsg(name){let t=root&&root.querySelector('#at-world-toast');if(!t)return;t.textContent=(name||'Bu oyun')+' yakında eklenecek.';t.classList.add('on');clearTimeout(soonMsg._t);soonMsg._t=setTimeout(()=>t.classList.remove('on'),2200);}
-function lobby(){unlockOrientation();g=null;mount();ensureCss();clearMode();root.classList.add('at-world');
+function lobby(){lockLandscape();g=null;mount();ensureCss();clearMode();root.classList.add('at-world');
 const big=[['okey','OKEY','🀄','a'],['yuzbir','101','🎴','b'],['tavla','TAVLA','🎲','c'],['poker','POKER','🃏','d'],['batak','BATAK','♠️','e']];
 const small=[['satranc','Satranç','♟️',null],['checkers','Dama','⚪','mini'],['bilardo','Bilardo','🎱',null],['wordle','Kelime Oyunu','🔤','mini'],['miniSudoku','Sudoku','🔢','mini'],['nonogram','Bulmaca','🧩','mini'],['arrows','Arrows','➡️',null]];
 const bigHtml=big.map(x=>{const mini=x[0]==='tavla';return '<div class="aw-card aw-'+x[3]+'"><div class="aw-art">'+x[2]+'</div><div class="aw-name">'+x[1]+'</div><div class="aw-sub">Botlara karşı</div><button class="aw-play" data-at="'+(mini?'mini':'start')+'" data-game="'+(mini?'backgammon':x[0])+'">▶ Oyna</button></div>';}).join('');
