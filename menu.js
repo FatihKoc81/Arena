@@ -4436,7 +4436,7 @@ document.head.appendChild(s);})();
  html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list{
    display:grid!important;position:relative!important;
    grid-template-columns:repeat(2,minmax(0,1fr))!important;
-   grid-template-rows:repeat(auto-fit,minmax(0,1fr))!important;
+   grid-template-rows:repeat(4,minmax(0,1fr))!important;
    grid-auto-flow:row!important;grid-auto-rows:minmax(0,1fr)!important;
    align-content:stretch!important;align-items:stretch!important;justify-items:stretch!important;
    flex:1 1 0!important;width:100%!important;height:100%!important;
