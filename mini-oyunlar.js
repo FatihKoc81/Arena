@@ -84,7 +84,7 @@ function sortHtml(){
   if(liquid){h+='<span class="mg-liquid-glass"><span class="mg-liquid-stack">';
    for(var k=0;k<s.cap;k++){var c=t[k];h+='<i class="mg-liquid '+(c||'empty')+'"></i>';}
    h+='</span></span>';}
-  else {h+='<span class="mg-ball-stack">';t.forEach(function(c){h+='<i class="mg-ball '+c+'"></i>';});h+='</span>';}
+  else {h+='<span class="mg-ball-stack" style="height:100%;width:100%;display:flex;flex-direction:column-reverse;align-items:center;justify-content:flex-start;gap:5px;padding:6px 3px;border:2px solid #7599c8;border-radius:28px 28px 12px 12px;background:#081a34;box-sizing:border-box">';t.forEach(function(c){var palette={r:"linear-gradient(145deg,#ff8585,#c51e3a)",g:"linear-gradient(145deg,#8df2b0,#159b5b)",b:"linear-gradient(145deg,#8ad6ff,#1765ca)",y:"linear-gradient(145deg,#fff18a,#d39a13)",p:"linear-gradient(145deg,#e0a0ff,#8534b7)",o:"linear-gradient(145deg,#ffc078,#d65b12)",c:"linear-gradient(145deg,#8af4f0,#168f9d)",m:"linear-gradient(145deg,#ff9acb,#bd2870)"};h+='<i class="mg-ball '+c+'" style="display:block;flex:none;width:clamp(36px,9vw,46px);height:clamp(30px,7.5vw,38px);border-radius:50%;border:1px solid #ffffff70;box-shadow:inset 0 3px 5px #fff7;background:'+(palette[c]||"#fff")+'"></i>';});h+='</span>';}
   h+='</button>';
  });
  h+='</div><div class="mg-msg">'+s.msg+'</div>';
