@@ -1,5 +1,5 @@
 /* Arena servis çalışanı: her zaman önce ağdan/dosyadan taze içerik alır, eski önbellekleri siler (güncellemeler takılı kalmasın). */
-const SURUM = "arena-20261115-passaparola-keyboard-fit2";
+const SURUM = "arena-20261115-category-hide-shortcuts1";
 self.addEventListener("install", () => { self.skipWaiting(); });
 self.addEventListener("activate", (e) => {
   e.waitUntil(
