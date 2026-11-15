@@ -588,9 +588,14 @@ document.addEventListener("anasayfa", gKapat);
     a = document.createElement("a");
     a.className = "apk-btn gizli";
     a.href = APK_ADRES;
-    a.target = "_blank";
-    a.rel = "noopener";
+    a.removeAttribute("target");
     a.textContent = apkUygulamasi ? "⬇ Güncelle" : "⬇ APK";
+    a.setAttribute("aria-label", apkUygulamasi ? "ARENA güncellemesini hemen indir" : "ARENA APK dosyasını indir");
+    a.addEventListener("click", function (e) {
+      // Tek dokunuşta doğrudan APK dosyasına git; sürüm sayfası/ara menü açma.
+      e.preventDefault();
+      window.location.assign(APK_ADRES);
+    });
     (window.altSatir ? window.altSatir() : document.body).appendChild(a);
   }
   // Passaparola oyunda başlık, ana sayfadaki yerine ölçülerek hizalanır
