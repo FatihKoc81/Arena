@@ -205,6 +205,7 @@ jobs:
                 req.setAllowedOverMetered(true);
                 req.setAllowedOverRoaming(false);
                 long id = dm.enqueue(req);
+                getContext().getSharedPreferences("arena_updater", Context.MODE_PRIVATE).edit().putLong("download_id", id).apply();
                 call.resolve(new JSObject().put("downloadId", id).put("message", "Yeni APK indiriliyor. İndirme bitince Android bildirimine dokunun."));
               } catch (Exception e) {
                 call.reject("APK indirme başlatılamadı: " + e.getMessage(), e);
