@@ -195,14 +195,54 @@ function sortEnsureStyle(){
  #arenaMiniGames .mg-math-pad{touch-action:manipulation}
  #arenaMiniGames .mg-math-pad button{user-select:none;-webkit-user-select:none;touch-action:manipulation}
  `;
-document.head.appendChild(st);
-}
 
+document.head.appendChild(st);
+ var polish=document.createElement("style");polish.id="arenaSortContrastFix";
+ polish.textContent=`
+ #arenaMiniGames:has(.mg-sort-screen),#arenaMiniGames:has(.mg-sort-screen) .mg-window,#arenaMiniGames:has(.mg-sort-screen) .mg-main{background:#101827!important}
+ #arenaMiniGames .mg-sort-screen{background:#111a2b!important;background-image:radial-gradient(ellipse at 50% 42%,#263957 0%,#18263d 48%,#101827 100%)!important}
+ #arenaMiniGames .mg-winter-bg:before{background:linear-gradient(170deg,transparent 0 14%,#243b55 15% 42%,#182b42 43% 100%)!important;filter:none!important}
+ #arenaMiniGames .winter-tree{opacity:.12!important;filter:none!important}
+ #arenaMiniGames .winter-tree:before{background:#8ba3bd!important}
+ #arenaMiniGames .winter-tree:after,#arenaMiniGames .winter-star{opacity:.18!important}
+ #arenaMiniGames .winter-candy{opacity:.22!important;filter:grayscale(.65)!important}
+ #arenaMiniGames .winter-flake{background:#b9d5ee!important;box-shadow:0 0 4px #b9d5ee66!important;opacity:.18!important}
+ #arenaMiniGames .mg-sort-topbar{filter:none!important}
+ #arenaMiniGames .mg-sort-icon{background:linear-gradient(145deg,#344b6b,#1b2c46)!important;border:1px solid #7187a5!important;box-shadow:0 3px 8px #0008!important}
+ #arenaMiniGames .mg-sort-level{color:#f2f6fc!important}
+ #arenaMiniGames .mg-sort-stars{color:#ffc94a!important;text-shadow:none!important}
+ #arenaMiniGames .mg-sort-board{filter:none!important}
+ #arenaMiniGames .mg-sort-tube{filter:drop-shadow(0 3px 5px #0009)!important}
+ #arenaMiniGames .mg-sort-tube.sel{filter:drop-shadow(0 0 7px #ffd166)!important;transform:translateY(-6px)!important}
+ #arenaMiniGames .mg-sort-tube.hint{filter:drop-shadow(0 0 8px #55e6ff)!important}
+ #arenaMiniGames .mg-ball-stack{background:linear-gradient(90deg,#ffffff20,#ffffff06 22%,#ffffff0c 78%,#ffffff24),#0c1524!important;border-color:#8da2bb!important;box-shadow:inset 3px 0 5px #ffffff16,inset -3px 0 5px #ffffff16!important;backdrop-filter:none!important}
+ #arenaMiniGames .mg-ball-stack .mg-ball{border:1px solid #ffffffd9!important;background-image:radial-gradient(circle at 28% 20%,#fff 0 5%,#ffffffd9 6% 12%,transparent 24%)!important;box-shadow:inset -5px -7px 9px #0008,inset 2px 2px 5px #ffffff9c,0 2px 4px #000c!important;filter:none!important}
+ #arenaMiniGames .mg-ball-stack .mg-ball.r{background-color:#d7193f!important;background-image:linear-gradient(145deg,#ff657b 0%,#c20d32 72%)!important}
+ #arenaMiniGames .mg-ball-stack .mg-ball.g{background-color:#087f46!important;background-image:linear-gradient(145deg,#39d98a 0%,#087f46 72%)!important}
+ #arenaMiniGames .mg-ball-stack .mg-ball.b{background-color:#1454c5!important;background-image:linear-gradient(145deg,#62a5ff 0%,#123a9c 72%)!important}
+ #arenaMiniGames .mg-ball-stack .mg-ball.y{background-color:#d69a00!important;background-image:linear-gradient(145deg,#ffe05a 0%,#b87500 72%)!important}
+ #arenaMiniGames .mg-ball-stack .mg-ball.p{background-color:#7024ae!important;background-image:linear-gradient(145deg,#c477ff 0%,#641a9e 72%)!important}
+ #arenaMiniGames .mg-ball-stack .mg-ball.o{background-color:#c84b08!important;background-image:linear-gradient(145deg,#ff9a38 0%,#b83b00 72%)!important}
+ #arenaMiniGames .mg-ball-stack .mg-ball.c{background-color:#087d88!important;background-image:linear-gradient(145deg,#42d8df 0%,#08616e 72%)!important}
+ #arenaMiniGames .mg-ball-stack .mg-ball.m{background-color:#b31368!important;background-image:linear-gradient(145deg,#ff63b4 0%,#980b53 72%)!important}
+ #arenaMiniGames .mg-ball-stack .mg-ball.w{background-color:#f4f0df!important;background-image:linear-gradient(145deg,#fffef3 0%,#c9c5b5 78%)!important}
+ #arenaMiniGames .mg-ball-stack .mg-ball.l{background-color:#78b900!important;background-image:linear-gradient(145deg,#d5ff55 0%,#5c9700 72%)!important}
+ #arenaMiniGames .mg-sort-tube.sel .mg-ball-stack{box-shadow:inset 3px 0 5px #ffffff18,0 0 12px #ffd16699!important}
+ #arenaMiniGames .sort-fx{width:4px!important;height:4px!important;box-shadow:0 0 7px 2px var(--fx-color)!important;animation-duration:.42s!important}
+ #arenaMiniGames .mg-ball-stack .mg-ball.sort-land{animation:arenaBallLand .36s ease-out both!important}
+ #arenaMiniGames .mg-sort-msg{color:#e4edf8!important;text-shadow:0 1px 3px #000!important}
+ #arenaMiniGames .mg-sort-bottom button{background:linear-gradient(145deg,#344d70,#1b2d49)!important;box-shadow:0 4px 7px #0009!important}
+ #arenaMiniGames .mg-sort-win{background:#0b1424ed!important;backdrop-filter:blur(3px)}
+ @media(prefers-reduced-motion:reduce){#arenaMiniGames .winter-flake,#arenaMiniGames .mg-ball-stack .mg-ball,#arenaMiniGames .sort-fx{animation:none!important}}
+ `;
+ document.head.appendChild(polish);
+}
+ 
 function sortWinterParticles(){
  var screen=root&&root.querySelector(".mg-sort-screen"),layer=screen&&screen.querySelector(".mg-winter-particles");
  if(!layer||layer.dataset.ready)return;
  layer.dataset.ready="1";
- for(var n=0;n<58;n++){
+ for(var n=0;n<16;n++){
   var p=document.createElement("i");p.className="winter-flake";
   p.style.left=(Math.random()*100)+"%";
   p.style.setProperty("--size",(2+Math.random()*5)+"px");
