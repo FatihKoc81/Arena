@@ -1216,16 +1216,16 @@
   const menuBtn = document.createElement("button");
   menuBtn.className = "btn ikinci oval";
   menuBtn.id = "ppAc";
-  menuBtn.textContent = "Passaparola";
+  menuBtn.textContent = "LexiLoop";
   ana.append(menuBtn);
 
-  // ---------- Passaparola ekranı ----------
+  // ---------- LexiLoop ekranı ----------
   const sec = document.createElement("section");
   sec.className = "kart hidden";
   sec.id = "pp";
   sec.innerHTML = `
     <div id="ppGiris">
-      <h2><svg viewBox="0 0 48 48" width="44" height="44" aria-hidden="true" style="vertical-align:middle;margin-right:8px"><use href="#i-p"/></svg>Passaparola</h2>
+      <h2><svg viewBox="0 0 48 48" width="44" height="44" aria-hidden="true" style="vertical-align:middle;margin-right:8px"><use href="#i-p"/></svg>LexiLoop</h2>
       <p class="alt">28 harf, ${SURE} saniye. Her harfin<br>sorusunu bil, bilemezsen pas geç;<br>pas geçilenlere sonra tekrar dönersin.</p>
       <button class="btn" id="ppBasla">▶️ Başla</button>
       <button class="btn ikinci" id="ppGeri">Ana menü</button>
@@ -1477,12 +1477,12 @@
   const stl = document.createElement("style");
   stl.textContent = `
 body.ppOyunda{padding-top:calc(48px + env(safe-area-inset-top))!important;padding-bottom:0!important;overflow:hidden!important}
-body.ppOyunda #pp.ppK{margin-top:-28px!important;padding:6px 8px!important;box-sizing:border-box!important}
+body.ppOyunda #pp.ppK{margin-top:0!important;padding:8px 8px!important;box-sizing:border-box!important}
 body.ppOyunda #ppSoru{text-wrap:balance;text-align:center}
-html.pp-keyboard-open body.ppOyunda #pp.ppK{margin-top:-36px!important;padding:4px 8px!important;max-height:calc(var(--pp-visual-height, 620px) - 54px)!important;overflow:hidden!important}
-html.pp-keyboard-open body.ppOyunda #ppOyun{transform:scale(.78)!important;transform-origin:top center!important;width:128.2%!important;margin-left:-14.1%!important}
-html.pp-keyboard-open body.ppOyunda #ppHarfler{margin-bottom:-42px!important}
-html.pp-keyboard-open body.ppOyunda #ppSoru{font-size:15px!important;line-height:1.2!important;margin-bottom:6px!important;min-height:0!important}
+html.pp-keyboard-open body.ppOyunda #pp.ppK{margin-top:0!important;padding:4px 8px!important;max-height:calc(var(--pp-visual-height, 620px) - 58px)!important;overflow:hidden!important}
+html.pp-keyboard-open body.ppOyunda #ppOyun{transform:scale(.68)!important;transform-origin:top center!important;width:147.1%!important;margin-left:-23.55%!important}
+html.pp-keyboard-open body.ppOyunda #ppHarfler{margin:0 auto 4px!important;transform:scale(.86);transform-origin:top center;height:215px!important}
+html.pp-keyboard-open body.ppOyunda #ppSoru{font-size:15px!important;line-height:1.2!important;margin:2px 0 6px!important;min-height:0!important;text-align:center!important}
 html.pp-keyboard-open body.ppOyunda #ppCevap{min-height:42px!important;padding:7px!important}
 html.pp-keyboard-open body.ppOyunda #ppGeriBildirim{min-height:14px!important;margin-top:2px!important}
 html.pp-keyboard-open body.ppOyunda .ppSatir{gap:7px!important}
@@ -1521,7 +1521,7 @@ html.pp-keyboard-open body.ppOyunda .ppSatir .btn{margin-top:3px!important;paddi
   });
   // DÜELLO (arena.js): iki oyuncu aynı sorularla oynar, ilk DUELLO_HEDEF harfi bilen kazanır
   (window.ArenaOyunlari = window.ArenaOyunlari || {}).passaparola = {
-    ad: "Passaparola",
+    ad: "LexiLoop",
     baslat: function (d, api) {
       duel = { api: api, elendi: false };
       ana.classList.add("hidden"); sec.classList.remove("hidden");
