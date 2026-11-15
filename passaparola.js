@@ -1480,8 +1480,8 @@ body.ppOyunda{padding-top:calc(48px + env(safe-area-inset-top))!important;paddin
 body.ppOyunda #pp.ppK{margin-top:0!important;padding:8px 8px!important;box-sizing:border-box!important}
 body.ppOyunda #ppSoru{text-wrap:balance;text-align:center}
 html.pp-keyboard-open body.ppOyunda #pp.ppK{margin-top:0!important;padding:4px 8px!important;max-height:calc(var(--pp-visual-height, 620px) - 58px)!important;overflow:hidden!important}
-html.pp-keyboard-open body.ppOyunda #ppOyun{transform:scale(.68)!important;transform-origin:top center!important;width:147.1%!important;margin-left:-23.55%!important}
-html.pp-keyboard-open body.ppOyunda #ppHarfler{margin:0 auto 4px!important;transform:scale(.86);transform-origin:top center;height:215px!important}
+html.pp-keyboard-open body.ppOyunda #ppOyun{transform:scale(.78)!important;transform-origin:top center!important;width:128.2%!important;margin-left:-14.1%!important}
+html.pp-keyboard-open body.ppOyunda #ppHarfler{margin:0 auto 6px!important;transform:none!important;height:250px!important}
 html.pp-keyboard-open body.ppOyunda #ppSoru{font-size:15px!important;line-height:1.2!important;margin:2px 0 6px!important;min-height:0!important;text-align:center!important}
 html.pp-keyboard-open body.ppOyunda #ppCevap{min-height:42px!important;padding:7px!important}
 html.pp-keyboard-open body.ppOyunda #ppGeriBildirim{min-height:14px!important;margin-top:2px!important}
