@@ -65,7 +65,7 @@ function sortInit(){
    var froms=tubes.map(function(t,i){return t.length?i:-1;}).filter(function(i){return i>=0;});
    if(!froms.length)break;
    var from=froms[Math.floor(Math.random()*froms.length)],ball=tubes[from][tubes[from].length-1];
-   var tos=tubes.map(function(t,i){return i!==from&&t.length<cap&&(!t.length||t[t.length-1]===ball)?i:-1;}).filter(function(i){return i>=0;});
+   var tos=tubes.map(function(t,i){return i!==from&&t.length<cap?i:-1;}).filter(function(i){return i>=0;});
    if(!tos.length)continue;
    var to=tos[Math.floor(Math.random()*tos.length)];
    tubes[from].pop();tubes[to].push(ball);
