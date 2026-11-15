@@ -1,4 +1,4 @@
-// KELİME OYUNU (TV'deki Kelime Oyunu tarzı: ipucuna bak, altıgenlerdeki kelimeyi bul)
+// KELİME OYUNU (TV'deki LexiDuel tarzı: ipucuna bak, altıgenlerdeki kelimeyi bul)
 // Kullanım: index.html'de passaparola.js satırından SONRA ekle: <script src="kelime.js"></script>
 (function () {
   const TUR = 10;   // bir oyundaki kelime sayısı
@@ -2890,7 +2890,7 @@
   const ana = document.getElementById("ana");
   const menuBtn = document.createElement("button");
   menuBtn.className = "btn ikinci oval";
-  menuBtn.textContent = "Kelime Oyunu";
+  menuBtn.textContent = "LexiDuel";
   ana.append(menuBtn);
 
   // ---------- Ekran ----------
@@ -2901,7 +2901,7 @@
   sec.id = "kk";
   sec.innerHTML = `
     <div id="kkGiris">
-      <h2><svg viewBox="0 0 48 48" width="44" height="44" aria-hidden="true" style="vertical-align:middle;margin-right:8px"><use href="#i-k"/></svg>Kelime Oyunu</h2>
+      <h2><svg viewBox="0 0 48 48" width="44" height="44" aria-hidden="true" style="vertical-align:middle;margin-right:8px"><use href="#i-k"/></svg>LexiDuel</h2>
       <p class="alt">İpucunu oku, kelimeyi bul.<br>Ne kadar az harf açarsan o kadar çok<br>puan kazanırsın. ${TUR} kelime, her kelime<br>için ${SURE} saniye ve ${HAK} tahmin hakkı var.</p>
       <button class="btn" id="kkBasla">▶️ Başla</button>
       <button class="btn ikinci" id="kkGeri">Ana menü</button>
@@ -2994,7 +2994,7 @@
     ["position", "left", "width", "bottom", "top", "marginTop", "zIndex"].forEach(p => { sec.style[p] = ""; });
   }
   function alta() {
-    // Kelime Oyunu ekranı açık değilken hiçbir şeye dokunma (başlığı Passaparola/ana sayfa yönetiyor;
+    // LexiDuel ekranı açık değilken hiçbir şeye dokunma (başlığı Passaparola/ana sayfa yönetiyor;
     // klavye açılırken resize olayları başlığın hizasını sıfırlayıp sıçratıyordu)
     if (sec.classList.contains("hidden")) return;
     if (!sec.classList.contains("kkK")) { altaSifirla(); baslikHizala(); return; }
@@ -3208,7 +3208,7 @@
   // Başlığa tıklanınca (ortak.js) süreyi durdur ve ana sayfaya dön
   // DÜELLO (arena.js): iki oyuncu aynı kelimelerle oynar, ilk DUELLO_HEDEF kelimeyi bilen kazanır
   (window.ArenaOyunlari = window.ArenaOyunlari || {}).kelime = {
-    ad: "Kelime Oyunu",
+    ad: "LexiDuel",
     baslat: function (d, api) {
       duel = { api: api, elendi: false };
       ana.classList.add("hidden"); sec.classList.remove("hidden");
