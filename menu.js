@@ -19,9 +19,9 @@ okey:{name:'Okey',icon:'🀄',desc:'Dört kişilik masada taşlarını diz, botl
 yuzbir:{name:'101',icon:'🎴',desc:'Gerçek 101 masasında per aç, rakiplerle yarış',re:/__arena_101_never__/i},
 batak:{name:'Batak',icon:'♠️',desc:'İhaleni al, elleri topla',re:/__arena_batak_never__/i},
 poker:{name:'Poker',icon:'🃏',desc:'Texas Hold’em masasına otur',re:/__arena_poker_never__/i},
-milyoner:{name:'Altın Koltuk',icon:'🏆',desc:'Genel kültür ve bilgi yarışması',re:/milyoner|oyuna başla/i},
+milyoner:{name:'Millionaire',icon:'🏆',desc:'Büyük ödül için soruları doğru cevapla',re:/milyoner|oyuna başla/i},
 diniMilyoner:{name:'Dini İmtihan',icon:'🕌',desc:'İslam dini üzerine 15 soruluk bilgi yarışması',re:/__arena_dini_milyoner__/i},
-passaparola:{name:'Harf Düellosu',icon:'🔤',desc:'Harf harf cevapla, süreye karşı yarış',re:/pass.?aparola/i},
+passaparola:{name:'LexiLoop',icon:'🔤',desc:'Harf harf cevapla, süreye karşı yarış',re:/pass.?aparola/i},
 kelime:{name:'Kelime Ustası',icon:'🔤',desc:'İpuçlarından kelimeleri bul',re:/kelime oyunu/i},
 rotasyon:{name:'Harf Rotası',icon:'🧩',desc:'Harfleri birleştir, kelimeleri keşfet',re:/rotasyon/i},
 islem:{name:'İşlem Oyunu',icon:'➗',desc:'Sayılarla hedefe ulaş',re:/işlem oyunu|🔢 işlem/i},
@@ -82,6 +82,7 @@ body:has(#ana.hidden) #arenaNeonNav{display:none!important}.ek-dock,.apk-btn,#al
 @media(max-width:390px){.ar-profile{grid-template-columns:66px minmax(0,1fr) 120px;gap:6px;padding:8px}.ar-avatar{width:62px;height:62px}.ar-wallet-row{font-size:11px;padding:5px}.ar-cat{grid-template-columns:78px minmax(0,1fr);min-height:119px;padding:8px 6px}.ar-cat-icon{font-size:45px}.ar-cat-copy strong{font-size:15px}.ar-cat-copy small{font-size:10px}.ar-daily{grid-template-columns:52px minmax(0,1fr) auto;padding:9px}.ar-daily-target{font-size:36px}.ar-daily-reward{font-size:14px;padding:6px}}
 @media(max-width:350px){.ar-short{font-size:7px}.ar-cat{grid-template-columns:65px minmax(0,1fr);min-height:110px}.ar-cat-icon{font-size:39px}}
 `;document.head.appendChild(st);
+const arenaCardTune=document.createElement('style');arenaCardTune.textContent='#arenaHubHome .ar-inline-game-list .ar-dini-card{transform:translateY(9px)!important;margin-bottom:9px!important}';document.head.appendChild(arenaCardTune);
 
 const fit=document.createElement('style');
 fit.id='arenaReferenceFit';
@@ -294,7 +295,7 @@ function category(id,push){
  const panel=home.querySelector('.ar-categories');if(!panel)return;
  const live=c.games.filter(k=>found[k]||(['okey','yuzbir','batak','poker'].includes(k)&&window.ArenaMasaOyunlari)||(window.ArenaMiniOyunlar&&window.ArenaMiniOyunlar.varMi(k))).map(k=>({id:k,...defs[k]}));
  const categoryArt={bilgi:'knowledge',kelime:'words',masa:'table',sudoku:'logic',sayi:'numbers',renk:'colors',dikkat:'memory',refleks:'reflex'}[id]||'knowledge';
- const cards=live.map(g=>'<button class="ar-game-card" data-launch="'+g.id+'"><i class="ar-game-art"><img loading="eager" decoding="async" src="assets/game-art/'+categoryArt+'.svg" alt=""></i><span><strong>'+g.name+'</strong><small>'+g.desc+'</small></span></button>').join('');
+ const cards=live.map(g=>'<button class="ar-game-card'+(g.id==='diniMilyoner'?' ar-dini-card':'')+'" data-launch="'+g.id+'"><i class="ar-game-art"><img loading="eager" decoding="async" src="assets/game-art/'+categoryArt+'.svg" alt=""></i><span><strong>'+g.name+'</strong><small>'+g.desc+'</small></span></button>').join('');
  const planned=c.planned.map(n=>'<div class="ar-game-card soon"><i>🔒</i><span><strong>'+n+'</strong><small>Yakında eklenecek</small></span></div>').join('');
  panel.classList.add('is-open');panel.dataset.openCategory=id;
  panel.innerHTML='<div class="ar-inline-category-head"><button type="button" class="ar-inline-back" data-category-back aria-label="Kategorilere dön">←</button><span>'+c.icon+' '+c.name+'</span></div><div class="ar-inline-game-list">'+(cards+planned)+'</div>';
