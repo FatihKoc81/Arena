@@ -159,5 +159,6 @@ import * as THREE from 'three';
   }
   window.addEventListener('arena:game-start',ev=>{const id=ev.detail&&ev.detail.id;if(id)externalScene(id);});
   window.addEventListener('arena:home',()=>{const x=document.querySelectorAll('.arena-3d-overlay');x.forEach(e=>e.remove());stop3D();});
-\n  window.Arena3D={mount:init,stop:stop3D,sfx:sfx,music:setMusic,setSfx:setSfx,settings:()=>({musicOn,sfxOn})};
+
+  window.Arena3D={mount:init,stop:stop3D,sfx:sfx,music:setMusic,setSfx:setSfx,settings:()=>({musicOn,sfxOn})};
 })();
