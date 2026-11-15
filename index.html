@@ -194,7 +194,7 @@ function sureBitti() {
 // Yanlış cevap 1 can götürür (soru değişir); canı bitenin düellosu biter.
 let duel = null;
 (window.ArenaOyunlari = window.ArenaOyunlari || {}).milyoner = {
-  ad: "Milyoner",
+  ad: "Millionaire",
   baslat: function (d, api) {
     const seviye = Math.min(1 + (d.seed % 10), SEVIYE_SAYISI), seri = d.seed % SERI_SAYISI;
     duel = { api: api, seviye: seviye, dSeri: seri };
@@ -372,7 +372,7 @@ function guvenliBaslat() {
     }
     baslat();
   } catch (e) {
-    alert("Milyoner hatası: " + e.message);
+    alert("Millionaire hatası: " + e.message);
   }
 }
 document.addEventListener("click", e => {
