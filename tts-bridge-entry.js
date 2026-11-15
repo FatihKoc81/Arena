@@ -20,7 +20,7 @@ async function getTurkishVoice(){
 }
 const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function say(text,voice){
- const options={text,lang:"tr-TR",rate:0.80,pitch:1,volume:1,queueStrategy:0};
+ const options={text,lang:"tr-TR",rate:0.90,pitch:1,volume:1,queueStrategy:0};
  if(voice!==null&&voice!==undefined)options.voice=voice;
  await TextToSpeech.speak(options);
 }
@@ -32,12 +32,7 @@ window.ArenaTTS={
   if(id!==sequence)return;
   await say("Soru. "+question,voice);
   if(id!==sequence)return;
-  await pause(1000);
-  for(let i=0;i<answers.length;i++){
-   if(id!==sequence)return;
-   if(i>0)await pause(1000);
-   await say(answers[i]+".",voice);
-  }
+
  },
  speak:async(text)=>{const voice=await getTurkishVoice();await say(text,voice);},
  stop:async()=>{sequence++;await TextToSpeech.stop();}
