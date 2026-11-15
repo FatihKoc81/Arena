@@ -1475,7 +1475,40 @@
 
   // Başlık: oyunda üstte küçük sabit çubuk (klavye açıkken de görünür), tıklayınca ana sayfa
   const stl = document.createElement("style");
-  stl.textContent = "body.ppOyunda{padding-top:calc(58px + env(safe-area-inset-top))!important;padding-bottom:0}body.ppOyunda #pp.ppK{margin-top:-16px!important}#ppSoru{text-wrap:balance;text-align:center}";
+  stl.textContent = `
+body.ppOyunda{padding-top:calc(48px + env(safe-area-inset-top))!important;padding-bottom:0!important;overflow:hidden!important}
+body.ppOyunda #pp.ppK{margin-top:-28px!important;padding:6px 8px!important;box-sizing:border-box!important}
+body.ppOyunda #ppSoru{text-wrap:balance;text-align:center}
+html.pp-keyboard-open body.ppOyunda #pp.ppK{margin-top:-36px!important;padding:4px 8px!important;max-height:calc(var(--pp-visual-height, 620px) - 54px)!important;overflow:hidden!important}
+html.pp-keyboard-open body.ppOyunda #ppOyun{transform:scale(.78)!important;transform-origin:top center!important;width:128.2%!important;margin-left:-14.1%!important}
+html.pp-keyboard-open body.ppOyunda #ppHarfler{margin-bottom:-42px!important}
+html.pp-keyboard-open body.ppOyunda #ppSoru{font-size:15px!important;line-height:1.2!important;margin-bottom:6px!important;min-height:0!important}
+html.pp-keyboard-open body.ppOyunda #ppCevap{min-height:42px!important;padding:7px!important}
+html.pp-keyboard-open body.ppOyunda #ppGeriBildirim{min-height:14px!important;margin-top:2px!important}
+html.pp-keyboard-open body.ppOyunda .ppSatir{gap:7px!important}
+html.pp-keyboard-open body.ppOyunda .ppSatir .btn{margin-top:3px!important;padding:9px!important;font-size:15px!important}
+`;
+  document.head.append(stl);
+  const ppViewport = () => {
+    const vv = window.visualViewport;
+    const h = Math.round(vv ? vv.height : innerHeight);
+    document.documentElement.style.setProperty("--pp-visual-height", h + "px");
+    const full = Math.max(window.screen ? window.screen.height : innerHeight, innerHeight);
+    const open = full - h > 145;
+    document.documentElement.classList.toggle("pp-keyboard-open", open);
+    if (open && document.body.classList.contains("ppOyunda")) {
+      sec.style.marginTop = "-36px";
+      scrollTo(0, 0);
+    } else if (!open) {
+      sec.style.marginTop = "";
+    }
+  };
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", ppViewport, { passive: true });
+    window.visualViewport.addEventListener("scroll", ppViewport, { passive: true });
+  }
+  window.addEventListener("resize", ppViewport, { passive: true });
+  ppViewport();
   document.head.append(stl);
   const hGuncelle = () => {
     const a = !sec.classList.contains("hidden") && !oyun.classList.contains("hidden");
