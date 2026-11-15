@@ -51,18 +51,20 @@ const finalScoreText = document.getElementById('finalScoreText');
 const checkUpdateBtn = document.getElementById('checkUpdateBtn');
 const updateStatusText = document.getElementById('updateStatusText');
 
-// Navigation
+// Navigation listeners
 navHome.addEventListener('click', () => showView('home'));
 navProfile.addEventListener('click', () => showView('profile'));
 startQuickQuiz.addEventListener('click', startQuiz);
 restartBtn.addEventListener('click', () => showView('home'));
 
 function showView(viewName) {
+    // Tüm ekranları gizle
     homeView.classList.add('hidden');
     quizView.classList.add('hidden');
     resultView.classList.add('hidden');
     profileView.classList.add('hidden');
 
+    // Navigasyon buton stillerini sıfırla
     navHome.className = "px-3 py-1.5 rounded-lg bg-gray-800/50 hover:bg-gray-700 text-sm font-medium transition flex items-center space-x-1.5";
     navProfile.className = "px-3 py-1.5 rounded-lg bg-gray-800/50 hover:bg-gray-700 text-sm font-medium transition flex items-center space-x-1.5";
 
@@ -102,24 +104,26 @@ function loadQuestion() {
         const btn = document.createElement('button');
         btn.className = "w-full text-left p-4 rounded-xl bg-gray-800/60 hover:bg-gray-800 border border-gray-700/50 text-gray-200 font-medium transition";
         btn.textContent = opt;
-        btn.addEventListener('click', () => selectAnswer(index));
+        btn.addEventListener('click', () => selectAnswer(index, btn));
         optionsContainer.appendChild(btn);
     });
 }
 
-function selectAnswer(selectedIndex) {
+function selectAnswer(selectedIndex, selectedBtn) {
     const q = questions[currentQuestionIndex];
     const buttons = optionsContainer.querySelectorAll('button');
 
+    buttons.forEach(b => b.disabled = true);
+
     if (selectedIndex === q.answer) {
-        buttons[selectedIndex].className = "w-full text-left p-4 rounded-xl bg-emerald-600/20 border border-emerald-500 text-emerald-300 font-medium transition";
+        selectedBtn.className = "w-full text-left p-4 rounded-xl bg-emerald-600/20 border border-emerald-500 text-emerald-300 font-medium transition";
         score += 20;
     } else {
-        buttons[selectedIndex].className = "w-full text-left p-4 rounded-xl bg-red-600/20 border border-red-500 text-red-300 font-medium transition";
-        buttons[q.answer].className = "w-full text-left p-4 rounded-xl bg-emerald-600/20 border border-emerald-500 text-emerald-300 font-medium transition";
+        selectedBtn.className = "w-full text-left p-4 rounded-xl bg-red-600/20 border border-red-500 text-red-300 font-medium transition";
+        if (buttons[q.answer]) {
+            buttons[q.answer].className = "w-full text-left p-4 rounded-xl bg-emerald-600/20 border border-emerald-500 text-emerald-300 font-medium transition";
+        }
     }
-
-    buttons.forEach(b => b.disabled = true);
 
     setTimeout(() => {
         currentQuestionIndex++;

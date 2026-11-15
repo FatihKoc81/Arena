@@ -4,13 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ARENA - Bilgi Yarışması</title>
+    <!-- Tailwind Play CDN for instant compilation -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#030712',
+                    }
+                }
+            }
+        }
+    </script>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gray-950 text-gray-100 min-h-screen flex flex-col font-sans">
+<body class="bg-[#030712] text-gray-100 min-h-screen flex flex-col font-sans select-none">
 
     <!-- Top Header -->
-    <header class="bg-gray-900 border-b border-gray-800 px-4 py-3 flex items-center justify-between sticky top-0 z-40">
+    <header class="bg-gray-900 border-b border-gray-800 px-4 py-3 flex items-center justify-between sticky top-0 z-40 shadow-md">
         <div class="flex items-center space-x-3">
             <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
                 <i class="fas fa-trophy text-white"></i>
@@ -33,7 +47,7 @@
     <main class="flex-1 max-w-md w-full mx-auto p-4 flex flex-col justify-center">
 
         <!-- Home / Category View -->
-        <div id="homeView" class="space-y-6">
+        <div id="homeView" class="view-section space-y-6">
             <div class="bg-gradient-to-br from-gray-900 to-gray-900/80 border border-gray-800 rounded-2xl p-6 shadow-xl text-center space-y-3">
                 <h2 class="text-2xl font-bold text-gray-100">Genel Kültür & Bilgi Yarışması</h2>
                 <p class="text-sm text-gray-400">Bilgini sına, en yüksek puanı topla ve zirveye yerleş!</p>
@@ -51,23 +65,23 @@
                             <i class="fas fa-globe"></i>
                         </div>
                         <span class="font-semibold text-sm">Genel Kültür</span>
-                        <span class="text-xs text-gray-500">10 Soru</span>
+                        <span class="text-xs text-gray-500">5 Soru</span>
                     </div>
                     <div class="category-card p-4 rounded-xl bg-gray-900 border border-gray-800 hover:border-orange-500/50 transition cursor-pointer flex flex-col space-y-2" data-cat="science">
                         <div class="w-10 h-10 rounded-lg bg-orange-500/10 text-orange-400 flex items-center justify-center text-lg">
                             <i class="fas fa-atom"></i>
                         </div>
                         <span class="font-semibold text-sm">Bilim & Teknoloji</span>
-                        <span class="text-xs text-gray-500">10 Soru</span>
+                        <span class="text-xs text-gray-500">5 Soru</span>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Quiz Screen -->
-        <div id="quizView" class="hidden space-y-6">
+        <div id="quizView" class="view-section hidden space-y-6">
             <div class="flex items-center justify-between bg-gray-900 border border-gray-800 px-4 py-3 rounded-xl">
-                <span id="questionCounter" class="text-xs font-bold text-amber-400 uppercase tracking-wider">Soru 1 / 10</span>
+                <span id="questionCounter" class="text-xs font-bold text-amber-400 uppercase tracking-wider">Soru 1 / 5</span>
                 <span id="scoreDisplay" class="text-xs font-bold text-gray-300">Puan: 0</span>
             </div>
 
@@ -80,13 +94,13 @@
         </div>
 
         <!-- Result Screen -->
-        <div id="resultView" class="hidden text-center space-y-6 bg-gray-900 border border-gray-800 rounded-2xl p-8 shadow-xl">
+        <div id="resultView" class="view-section hidden text-center space-y-6 bg-gray-900 border border-gray-800 rounded-2xl p-8 shadow-xl">
             <div class="w-16 h-16 bg-amber-500/10 text-amber-400 rounded-2xl mx-auto flex items-center justify-center text-3xl shadow-inner">
                 <i class="fas fa-award"></i>
             </div>
             <div class="space-y-2">
                 <h2 class="text-2xl font-bold text-gray-100">Yarışma Tamamlandı!</h2>
-                <p id="finalScoreText" class="text-amber-400 font-semibold text-lg">Toplam Puanın: 80</p>
+                <p id="finalScoreText" class="text-amber-400 font-semibold text-lg">Toplam Puanın: 0</p>
             </div>
             <button id="restartBtn" class="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold rounded-xl transition">
                 Ana Sayfaya Dön
@@ -94,7 +108,7 @@
         </div>
 
         <!-- Profile View -->
-        <div id="profileView" class="hidden space-y-6">
+        <div id="profileView" class="view-section hidden space-y-6">
             <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-xl space-y-4 text-center">
                 <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-amber-500 to-orange-600 mx-auto flex items-center justify-center text-white text-3xl shadow-lg">
                     <i class="fas fa-user-astronaut"></i>
