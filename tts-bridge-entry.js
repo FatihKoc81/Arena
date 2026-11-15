@@ -1,39 +1,32 @@
 import { TextToSpeech } from '@capacitor-community/text-to-speech';
 let sequence=0;
-let selectedVoice;
-async function getTurkishVoice(){
- if(selectedVoice!==undefined)return selectedVoice;
- selectedVoice=null;
+async function getTurkishVoice(profile){
  try{
   const result=await TextToSpeech.getSupportedVoices();
-  const candidates=(result.voices||[]).map((v,index)=>({...v,index})).filter(v=>/^tr([-_]|$)/i.test(v.lang||""));
-  if(candidates.length){
-   candidates.sort((a,b)=>{
-    if(a.localService!==b.localService)return a.localService?1:-1;
-    const score=v=>/google|neural|natural|premium/i.test((v.voiceURI||"")+" "+(v.name||""))?0:1;
-    return score(a)-score(b);
-   });
-   selectedVoice=candidates[0].index;
-  }
- }catch(e){}
- return selectedVoice;
+  const voices=(result.voices||[]).map((v,index)=>({...v,index})).filter(v=>/^tr([-_]|$)/i.test(v.lang||""));
+  if(!voices.length)return null;
+  const male=/male|erkek|man|baritone|ahmet|mehmet|yusuf|burak/i;
+  const premium=/neural|natural|premium|google/i;
+  voices.sort((a,b)=>{
+   const score=v=>(premium.test((v.name||"")+" "+(v.voiceURI||""))?0:20)+(profile==="male"?(male.test((v.name||"")+" "+(v.voiceURI||""))?0:10):0)+(v.localService?2:0);
+   return score(a)-score(b);
+  });
+  return voices[0].index;
+ }catch(e){return null;}
 }
-const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
-async function say(text,voice){
- const options={text,lang:"tr-TR",rate:0.90,pitch:1,volume:1,queueStrategy:0};
+async function say(text,voice,profile){
+ const options={text,lang:"tr-TR",rate:profile==="male"?0.88:0.92,pitch:profile==="male"?0.88:1.02,volume:1,queueStrategy:0};
  if(voice!==null&&voice!==undefined)options.voice=voice;
  await TextToSpeech.speak(options);
 }
 window.ArenaTTS={
- speakParts:async(question,answers)=>{
+ speakParts:async(question,answers,profile)=>{
   const id=++sequence;
   await TextToSpeech.stop();
-  const voice=await getTurkishVoice();
+  const voice=await getTurkishVoice(profile);
   if(id!==sequence)return;
-  await say("Soru. "+question,voice);
-  if(id!==sequence)return;
-
+  await say("Soru. "+question,voice,profile);
  },
- speak:async(text)=>{const voice=await getTurkishVoice();await say(text,voice);},
+ speak:async(text,profile)=>{const voice=await getTurkishVoice(profile);await say(text,voice,profile);},
  stop:async()=>{sequence++;await TextToSpeech.stop();}
 };
