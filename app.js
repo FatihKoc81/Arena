@@ -1,49 +1,151 @@
-function switchGameModule(moduleName) {
-    const mainMenu = document.getElementById('mainMenu');
-    const gameViewContainer = document.getElementById('gameViewContainer');
-    const titleSpan = document.getElementById('activeModuleTitle');
+// ARENA - Quiz Game Logic
 
-    if (!mainMenu || !gameViewContainer) return;
+const questions = [
+    {
+        question: "Türkiye'nin başkenti neresidir?",
+        options: ["İstanbul", "Ankara", "İzmir", "Bursa"],
+        answer: 1
+    },
+    {
+        question: "Dünyaya en yakın gezegen hangisidir?",
+        options: ["Mars", "Venüs", "Jüpiter", "Satürn"],
+        answer: 1
+    },
+    {
+        question: "Su hangi sıcaklıkta kaynar (deniz seviyesinde)?",
+        options: ["90°C", "100°C", "110°C", "120°C"],
+        answer: 1
+    },
+    {
+        question: "Mavi renkli gezegen olarak bilinen gök cismi hangisidir?",
+        options: ["Neptün", "Dünya", "Uranüs", "Merkür"],
+        answer: 1
+    },
+    {
+        question: "Hangi elementin simgesi 'Fe'dir?",
+        options: ["Bakır", "Altın", "Demir", "Gümüş"],
+        answer: 2
+    }
+];
 
-    mainMenu.style.display = 'none';
-    gameViewContainer.style.display = 'block';
+let currentQuestionIndex = 0;
+let score = 0;
 
-    const titles = {
-        colorSort: 'Renk Sıralama Bulmacası',
-        milyoner: 'Milyoner Bilgi Yarışması',
-        diniImtihan: 'Dini İmtihan Kültür',
-        okey: 'Klasik Okey Masası',
-        okey101: '101 Okey Strateji'
-    };
+// DOM Elements
+const homeView = document.getElementById('homeView');
+const quizView = document.getElementById('quizView');
+const resultView = document.getElementById('resultView');
+const profileView = document.getElementById('profileView');
 
-    if (titleSpan) titleSpan.innerText = titles[moduleName] || 'ARENA';
+const navHome = document.getElementById('navHome');
+const navProfile = document.getElementById('navProfile');
+const startQuickQuiz = document.getElementById('startQuickQuiz');
+const restartBtn = document.getElementById('restartBtn');
 
-    const contentContainer = document.getElementById('activeModuleContent');
-    contentContainer.innerHTML = '';
+const questionCounter = document.getElementById('questionCounter');
+const scoreDisplay = document.getElementById('scoreDisplay');
+const questionText = document.getElementById('questionText');
+const optionsContainer = document.getElementById('optionsContainer');
+const finalScoreText = document.getElementById('finalScoreText');
 
-    if (moduleName === 'colorSort') {
-        ColorSortEngine.initLevel(1);
-    } else if (moduleName === 'milyoner') {
-        MilyonerEngine.startQuiz();
-    } else if (moduleName === 'diniImtihan') {
-        DiniImtihanEngine.startQuiz();
-    } else if (moduleName === 'okey' || moduleName === 'okey101') {
-        renderOkeyPlaceholder(contentContainer, moduleName === 'okey101' ? '101 Okey' : 'Klasik Okey');
+const checkUpdateBtn = document.getElementById('checkUpdateBtn');
+const updateStatusText = document.getElementById('updateStatusText');
+
+// Navigation
+navHome.addEventListener('click', () => showView('home'));
+navProfile.addEventListener('click', () => showView('profile'));
+startQuickQuiz.addEventListener('click', startQuiz);
+restartBtn.addEventListener('click', () => showView('home'));
+
+function showView(viewName) {
+    homeView.classList.add('hidden');
+    quizView.classList.add('hidden');
+    resultView.classList.add('hidden');
+    profileView.classList.add('hidden');
+
+    navHome.className = "px-3 py-1.5 rounded-lg bg-gray-800/50 hover:bg-gray-700 text-sm font-medium transition flex items-center space-x-1.5";
+    navProfile.className = "px-3 py-1.5 rounded-lg bg-gray-800/50 hover:bg-gray-700 text-sm font-medium transition flex items-center space-x-1.5";
+
+    if (viewName === 'home') {
+        homeView.classList.remove('hidden');
+        navHome.className = "px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-sm font-medium transition flex items-center space-x-1.5";
+    } else if (viewName === 'quiz') {
+        quizView.classList.remove('hidden');
+    } else if (viewName === 'result') {
+        resultView.classList.remove('hidden');
+    } else if (viewName === 'profile') {
+        profileView.classList.remove('hidden');
+        navProfile.className = "px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-sm font-medium transition flex items-center space-x-1.5";
     }
 }
 
-function returnToMainMenu() {
-    document.getElementById('gameViewContainer').style.display = 'none';
-    document.getElementById('mainMenu').style.display = 'block';
+function startQuiz() {
+    currentQuestionIndex = 0;
+    score = 0;
+    showView('quiz');
+    loadQuestion();
 }
 
-function renderOkeyPlaceholder(container, modeName) {
-    container.innerHTML = `
-        <div style="text-align:center; padding: 40px 20px; background: rgba(15,45,36,0.9); border-radius: 16px; border: 2px solid #2ed573; box-shadow: 0 10px 30px rgba(0,0,0,0.6);">
-            <div style="font-size: 50px; margin-bottom: 15px;">🀄</div>
-            <h2 style="color: #2ed573; margin-bottom: 10px;">${modeName} Masası Hazırlanıyor</h2>
-            <p style="color: #a4b0be; font-size: 14px; margin-bottom: 20px;">Ahşap ıstakalar, fildişi taşlar ve yapay zeka bot motoru aktif ediliyor.</p>
-            <button class="premium-btn" onclick="alert('Okey masası simülasyonu başlatıldı!')">Masaya Otur</button>
-        </div>
-    `;
+function loadQuestion() {
+    if (currentQuestionIndex >= questions.length) {
+        showResult();
+        return;
+    }
+
+    const q = questions[currentQuestionIndex];
+    questionCounter.textContent = `Soru ${currentQuestionIndex + 1} / ${questions.length}`;
+    scoreDisplay.textContent = `Puan: ${score}`;
+    questionText.textContent = q.question;
+    optionsContainer.innerHTML = '';
+
+    q.options.forEach((opt, index) => {
+        const btn = document.createElement('button');
+        btn.className = "w-full text-left p-4 rounded-xl bg-gray-800/60 hover:bg-gray-800 border border-gray-700/50 text-gray-200 font-medium transition";
+        btn.textContent = opt;
+        btn.addEventListener('click', () => selectAnswer(index));
+        optionsContainer.appendChild(btn);
+    });
 }
+
+function selectAnswer(selectedIndex) {
+    const q = questions[currentQuestionIndex];
+    const buttons = optionsContainer.querySelectorAll('button');
+
+    if (selectedIndex === q.answer) {
+        buttons[selectedIndex].className = "w-full text-left p-4 rounded-xl bg-emerald-600/20 border border-emerald-500 text-emerald-300 font-medium transition";
+        score += 20;
+    } else {
+        buttons[selectedIndex].className = "w-full text-left p-4 rounded-xl bg-red-600/20 border border-red-500 text-red-300 font-medium transition";
+        buttons[q.answer].className = "w-full text-left p-4 rounded-xl bg-emerald-600/20 border border-emerald-500 text-emerald-300 font-medium transition";
+    }
+
+    buttons.forEach(b => b.disabled = true);
+
+    setTimeout(() => {
+        currentQuestionIndex++;
+        loadQuestion();
+    }, 1200);
+}
+
+function showResult() {
+    showView('result');
+    finalScoreText.textContent = `Toplam Puanın: ${score} / 100`;
+}
+
+// Update Check
+checkUpdateBtn.addEventListener('click', async () => {
+    updateStatusText.textContent = "Güncellemeler kontrol ediliyor...";
+    try {
+        const response = await fetch('version.json', { cache: 'no-store' });
+        const data = await response.json();
+        const currentVersion = "1.0.1";
+        
+        if (data.version !== currentVersion) {
+            updateStatusText.innerHTML = `Yeni sürüm bulundu! (${data.version}) <a href="${data.downloadUrl}" target="_blank" class="text-amber-400 underline font-bold">İndir</a>`;
+        } else {
+            updateStatusText.textContent = "Uygulamanız güncel!";
+        }
+    } catch (err) {
+        updateStatusText.textContent = "Güncelleme kontrol edilemedi (Çevrimdışı).";
+    }
+});
