@@ -1,0 +1,116 @@
+/* Yüksek Grafik 3D Cam Tüpler ve Toplar */
+.tubes-container {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 24px;
+}
+
+.tube {
+    width: 52px;
+    height: 185px;
+    background: linear-gradient(to right, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 50%, rgba(0,0,0,0.3) 100%);
+    border: 3px solid rgba(255, 255, 255, 0.25);
+    border-top: none;
+    border-radius: 0 0 18px 18px;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    padding: 6px;
+    cursor: pointer;
+    box-shadow: inset 0 0 12px rgba(255,255,255,0.1), 0 10px 20px rgba(0,0,0,0.5);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s;
+    position: relative;
+}
+
+.tube::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 4px;
+    width: 6px;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.4), transparent);
+    border-radius: 3px;
+    pointer-events: none;
+}
+
+.tube.selected {
+    border-color: #f1c40f;
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: inset 0 0 15px rgba(241, 196, 15, 0.3), 0 15px 30px rgba(241, 196, 15, 0.3);
+}
+
+/* 3D Küresel Gerçekçi Toplar */
+.ball {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    margin-bottom: 6px;
+    position: relative;
+    box-shadow: inset -4px -4px 8px rgba(0,0,0,0.6), inset 2px 2px 6px rgba(255,255,255,0.6), 0 4px 8px rgba(0,0,0,0.4);
+    animation: dropBall 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes dropBall {
+    0% { transform: translateY(-40px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+.ball-red { background: radial-gradient(circle at 35% 35%, #ff6b6b, #c0392b); }
+.ball-blue { background: radial-gradient(circle at 35% 35%, #48dbfb, #0984e3); }
+.ball-green { background: radial-gradient(circle at 35% 35%, #1dd1a1, #00b894); }
+.ball-yellow { background: radial-gradient(circle at 35% 35%, #feca57, #f39c12); }
+.ball-purple { background: radial-gradient(circle at 35% 35%, #9b59b6, #8e44ad); }
+
+/* Yarışma Stüdyo Stilleri */
+.milyoner-wrapper, .dini-wrapper {
+    padding: 16px;
+    text-align: center;
+    background: rgba(15, 20, 30, 0.85);
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+}
+
+.question-box {
+    background: linear-gradient(135deg, #1e272c, #2f3542);
+    padding: 22px;
+    border-radius: 14px;
+    font-size: 17px;
+    font-weight: 700;
+    margin: 16px 0;
+    border: 1px solid rgba(52, 152, 219, 0.3);
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.4);
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.option-btn {
+    background: linear-gradient(135deg, #2f3542, #1e272c);
+    color: #f1f2f6;
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 15px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: left;
+    padding-left: 20px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+    transition: all 0.2s ease;
+}
+
+.option-btn:hover {
+    border-color: #3742fa;
+    background: linear-gradient(135deg, #3742fa, #2f3542);
+}
+
+.option-btn:active {
+    transform: scale(0.98);
+}
