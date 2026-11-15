@@ -131,7 +131,7 @@ function sortAction(a,i){
  if(a==="sort-next"&&s.done){if(s.level<200)localStorage.setItem(sortKey(),String(s.level+1));else localStorage.setItem(sortKey(),"200");sortInit();s.msg=s.level===200?"200 seviyeyi bitirdin! Renk ustasısın.":"Seviye "+(s.level-1)+" tamamlandı. Daha zor seviye açıldı.";return;}
  if(a==="sort-undo"){if(s.history.length){var prev=s.history.pop();s.tubes=prev.tubes;s.moves=prev.moves;s.done=false;s.sel=-1;s.hint=null;s.msg="Son hamle geri alındı.";}return;}
  if(a==="sort-hint"){var found=null;for(var x=0;x<s.tubes.length&&!found;x++){var f=s.tubes[x];if(!f.length)continue;var col=f[f.length-1];for(var y=0;y<s.tubes.length;y++){var t=s.tubes[y];if(x!==y&&t.length<s.cap&&(!t.length||t[t.length-1]===col)){found=[x,y];break;}}}s.hint=found;s.msg=found?"Işıklı tüpler arasında taşıma yap.":"Şu an uygun hamle yok.";return;}
- if(a==="sort-extra"){if(s.tubes.length<Math.min(12,Math.ceil(s.level/20)+s.tubes.length)){s.tubes.push([]);s.extraTubes++;s.msg="Ek tüp açıldı.";}else if(s.extraTubes<3){s.tubes.push([]);s.extraTubes++;s.msg="Ek tüp açıldı.";}else s.msg="Bu seviyede ek tüp sınırına ulaştın.";return;}
+ if(a==="sort-extra"){if(s.extraTubes<3){s.tubes.push([]);s.extraTubes++;s.msg="Ek tüp açıldı.";}else s.msg="Bu seviyede ek tüp sınırına ulaştın.";return;}
  if(a!=="sort-tube"||s.done)return;
  if(s.sel<0){if(s.tubes[i].length)s.sel=i;else s.msg="Önce dolu bir tüp seç.";return;}
  if(s.sel===i){s.sel=-1;return;}
