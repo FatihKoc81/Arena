@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - '*.js'
+      - '*.mjs'
       - '.github/workflows/validate-games.yml'
   workflow_dispatch:
 jobs:
