@@ -5,3 +5,69 @@
 .okey-tile-realistic{background:linear-gradient(145deg,#fffefa 0%,#f4efe5 48%,#d9d0c2 100%);border:1px solid #b8aa98;border-radius:6px;color:#18243a;box-shadow:0 4px 6px #0004,inset 0 2px 0 #fff,inset 0 -2px 3px #a89a8870;text-shadow:0 1px #fff9;font-weight:800}
 #arenaMiniGames .mg-sort-tube{filter:drop-shadow(0 5px 5px #0006)}
 #arenaMiniGames .mg-sort-tube .mg-ball{box-shadow:inset -4px -5px 7px #06152c55,inset 2px 2px 5px #fff9,0 2px 4px #0007}
+
+
+/* ===== Premium Okey / 101 table and rack ===== */
+.okey-rack{
+ background:linear-gradient(180deg,#5c3a21 0%,#3b2314 100%),radial-gradient(circle,rgba(255,255,255,.05) 0%,rgba(0,0,0,.3) 100%);
+ background-blend-mode:overlay;border-radius:14px;
+ box-shadow:0 12px 30px rgba(0,0,0,.6),inset 0 4px 8px rgba(255,255,255,.15),inset 0 -6px 12px rgba(0,0,0,.6);
+ padding:10px 14px;display:flex;flex-direction:column;gap:8px;width:100%;max-width:720px;margin:10px auto;
+ border:3px solid #231208;position:relative;box-sizing:border-box;
+}
+.rack-row{
+ display:flex;gap:5px;min-height:75px;
+ background:linear-gradient(to bottom,rgba(0,0,0,.4),rgba(0,0,0,.2));
+ border-radius:8px;padding:6px;
+ box-shadow:inset 0 3px 6px rgba(0,0,0,.7),0 1px 0 rgba(255,255,255,.1);
+ overflow-x:auto;scrollbar-width:none;box-sizing:border-box;
+}
+.rack-row::-webkit-scrollbar{display:none}
+.okey-tile{
+ width:44px;height:64px;flex:0 0 44px;box-sizing:border-box;
+ background:linear-gradient(135deg,#fffef9 0%,#f4efe1 40%,#dfd5be 100%);
+ border-radius:6px;border:1px solid #b5a48d;
+ box-shadow:0 4px 8px rgba(0,0,0,.35),inset 0 1px 2px rgba(255,255,255,.9),inset 0 -3px 6px rgba(0,0,0,.15);
+ display:flex;flex-direction:column;align-items:center;justify-content:center;
+ position:relative;cursor:pointer;user-select:none;
+ transition:transform .2s cubic-bezier(.175,.885,.32,1.275),box-shadow .2s ease;
+}
+.okey-tile:active,.okey-tile.selected{
+ transform:translateY(-8px) scale(1.06);
+ box-shadow:0 10px 20px rgba(0,0,0,.45),inset 0 1px 2px rgba(255,255,255,.9);
+ z-index:10;
+}
+.tile-number{
+ font-size:26px;font-weight:900;font-family:"Arial Black",Gadget,sans-serif;
+ line-height:1;text-shadow:0 1px 1px rgba(255,255,255,.7),0 -1px 0 rgba(0,0,0,.1);
+}
+.tile-black{color:#1c1c1c}.tile-red{color:#d63031}.tile-blue{color:#0984e3}.tile-green{color:#00b894}
+.tile-joker{color:#e17055;font-size:20px;font-weight:bold}
+.game-table-felt{
+ width:100%;min-height:380px;box-sizing:border-box;
+ background:radial-gradient(circle at center,#1b4d3e 0%,#0f2e24 100%);
+ border-radius:16px;box-shadow:inset 0 10px 30px rgba(0,0,0,.6),0 6px 15px rgba(0,0,0,.4);
+ display:flex;align-items:center;justify-content:center;padding:20px;position:relative;border:4px solid #10231d;
+}
+.table-center-zone{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;max-width:300px}
+.discard-drop-zone{
+ width:110px;height:110px;background:rgba(10,30,24,.6);border:2px dashed rgba(212,175,55,.5);
+ border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+ cursor:pointer;position:relative;box-shadow:inset 0 4px 10px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3);
+ transition:all .3s cubic-bezier(.175,.885,.32,1.275);
+}
+.discard-drop-zone.active-target,.discard-drop-zone:hover{
+ border-color:#f1c40f;background:rgba(15,45,36,.8);transform:scale(1.05);
+ box-shadow:inset 0 4px 15px rgba(0,0,0,.6),0 0 20px rgba(241,196,15,.4);
+}
+.discard-content{display:flex;flex-direction:column;align-items:center;pointer-events:none}
+.discard-icon{font-size:24px;margin-bottom:2px;opacity:.8}
+.discard-text{font-size:12px;font-weight:bold;color:#d4af37;text-transform:uppercase;letter-spacing:.5px;text-shadow:0 1px 2px rgba(0,0,0,.8)}
+.discard-drop-zone .okey-tile{position:absolute;transform:scale(.85);box-shadow:0 8px 16px rgba(0,0,0,.5)}
+@media(max-width:420px){
+ .okey-rack{padding:8px 6px;border-width:2px}
+ .rack-row{gap:3px;padding:5px}
+ .okey-tile{width:36px;height:54px;flex-basis:36px}
+ .tile-number{font-size:22px}
+ .game-table-felt{min-height:300px;padding:12px}
+}
