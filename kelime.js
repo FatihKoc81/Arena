@@ -2883,6 +2883,29 @@
   #kkGeriBildirim{min-height:22px!important;margin-top:6px!important}
   .kkTitre{animation:kkt .3s}
   @keyframes kkt{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+  /* LexiDuel premium word challenge layout */
+  #kk.kkK{background:radial-gradient(ellipse at 50% 0%,#263f70 0%,#111e3d 48%,#080f23 100%)!important;border:1px solid #6688c4!important;border-radius:26px!important;box-shadow:0 16px 38px #0009,inset 0 1px 0 #ffffff30!important;color:#f4f7ff!important}
+  #kkGiris h2{font-size:clamp(25px,6vw,34px)!important;font-weight:950!important;letter-spacing:.2px!important;color:#fff!important;text-shadow:0 3px 14px #65aaff66!important}
+  #kkGiris .alt{color:#c3d4f3!important;line-height:1.55!important}
+  #kkBilgi{display:flex!important;align-items:center!important;gap:8px!important;margin-bottom:12px!important}
+  #kkBilgi>*{padding:7px 11px!important;border:1px solid #526fa5!important;border-radius:999px!important;background:#18294a!important;color:#dce9ff!important;font-weight:850!important}
+  #kkHeks{gap:6px!important;margin:14px auto!important;max-width:440px!important}
+  #kkHeks .kkH{width:clamp(38px,10vw,54px)!important;height:clamp(42px,11vw,59px)!important;clip-path:polygon(25% 3%,75% 3%,100% 50%,75% 97%,25% 97%,0 50%)!important;background:linear-gradient(145deg,#6799df,#2e5597)!important;border:1px solid #b5d4ff!important;box-shadow:inset 0 2px 5px #ffffff66,0 4px 8px #0006!important;font-size:clamp(17px,4.5vw,23px)!important;text-shadow:0 1px 3px #10264a!important}
+  #kkHeks .kkH.a{background:linear-gradient(145deg,#fff4c9,#e7b95c)!important;color:#30203d!important;border-color:#fff2bd!important;text-shadow:none!important}
+  #kkHeks .kkH.d{background:linear-gradient(145deg,#65e6ad,#15956c)!important;border-color:#a8ffe0!important}
+  #kkHeks .kkH.y{background:linear-gradient(145deg,#ff9eaa,#c83d5c)!important;border-color:#ffc2ce!important}
+  #kkBilgi2{display:flex!important;justify-content:space-between!important;align-items:center!important;margin:10px 2px!important;color:#c6d7f4!important;font-weight:850!important}
+  #kkIpucu{padding:16px 14px!important;margin:12px 0!important;border:1px solid #526fa5!important;border-radius:18px!important;background:linear-gradient(145deg,#1b3156,#101d38)!important;color:#f4f7ff!important;font-size:clamp(16px,4.4vw,20px)!important;line-height:1.4!important;box-shadow:inset 0 1px 0 #ffffff1c!important}
+  #kkCevap{min-height:54px!important;border:2px solid #6c92ce!important;border-radius:16px!important;background:#080f22!important;color:#fff!important;font-size:21px!important;font-weight:850!important;box-shadow:inset 0 3px 10px #0008!important}
+  #kkCevap:focus{border-color:#a8d1ff!important;box-shadow:0 0 0 3px #6caaff30,inset 0 3px 10px #0008!important}
+  .kkSatir{gap:9px!important;margin-top:12px!important}
+  .kkSatir .btn{flex:1!important;min-height:50px!important;border:1px solid #8db9f4!important;border-radius:15px!important;background:linear-gradient(145deg,#548bd0,#1b4b8b)!important;color:#fff!important;font-weight:900!important;box-shadow:inset 0 1px 0 #ffffff66,0 5px 10px #0006!important}
+  .kkSatir .btn.ikinci{background:linear-gradient(145deg,#344967,#1a2a44)!important;border-color:#7188aa!important}
+  #kkGeriBildirim{color:#ffdf93!important;font-weight:900!important}
+  #kkSon h2{color:#fff!important;font-weight:950!important}
+  @media(max-height:700px){#kk.kkK{padding:10px!important}#kkHeks{gap:4px!important;margin:8px auto!important}#kkHeks .kkH{width:clamp(33px,8.8vw,46px)!important;height:clamp(36px,9.5vw,50px)!important}#kkIpucu{padding:11px!important;margin:8px 0!important}}
+
   `;
   document.head.append(css);
 
