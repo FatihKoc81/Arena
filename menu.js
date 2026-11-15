@@ -290,7 +290,8 @@ function category(id,push){
  findGames();
  const panel=home.querySelector('.ar-categories');if(!panel)return;
  const live=c.games.filter(k=>found[k]||(['okey','yuzbir','batak','poker'].includes(k)&&window.ArenaMasaOyunlari)||(window.ArenaMiniOyunlar&&window.ArenaMiniOyunlar.varMi(k))).map(k=>({id:k,...defs[k]}));
- const categoryArt={bilgi:'knowledge',kelime:'words',masa:'table',sudoku:'logic',sayi:'numbers',renk:'colors',dikkat:'memory',refleks:'reflex'}[id]||'knowledge';\n const cards=live.map(g=>'<button class="ar-game-card" data-launch="'+g.id+'"><i class="ar-game-art"><img loading="eager" decoding="async" src="assets/game-art/'+categoryArt+'.svg" alt=""></i><span><strong>'+g.name+'</strong><small>'+g.desc+'</small></span></button>').join('');
+ const categoryArt={bilgi:'knowledge',kelime:'words',masa:'table',sudoku:'logic',sayi:'numbers',renk:'colors',dikkat:'memory',refleks:'reflex'}[id]||'knowledge';
+ const cards=live.map(g=>'<button class="ar-game-card" data-launch="'+g.id+'"><i class="ar-game-art"><img loading="eager" decoding="async" src="assets/game-art/'+categoryArt+'.svg" alt=""></i><span><strong>'+g.name+'</strong><small>'+g.desc+'</small></span></button>').join('');
  const planned=c.planned.map(n=>'<div class="ar-game-card soon"><i>🔒</i><span><strong>'+n+'</strong><small>Yakında eklenecek</small></span></div>').join('');
  panel.classList.add('is-open');panel.dataset.openCategory=id;
  panel.innerHTML='<div class="ar-inline-category-head"><button type="button" class="ar-inline-back" data-category-back aria-label="Kategorilere dön">←</button><span>'+c.icon+' '+c.name+'</span></div><div class="ar-inline-game-list">'+(cards+planned)+'</div>';
