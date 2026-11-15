@@ -55,7 +55,29 @@
 
   // ---------- yardımcılar ----------
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
-  function adim() { return (window.Ekonomi && window.Ekonomi.ad && window.Ekonomi.ad()) || "Oyuncu"; }
+  function adGecerli(ad) { return !!ad && ad !== "Oyuncu" && !/^Oyuncu[0-9]{4}$/.test(ad); }
+  function adim() {
+    var ad = window.Ekonomi && window.Ekonomi.ad && window.Ekonomi.ad();
+    if (adGecerli(ad)) return ad;
+    try {
+      var u = firebase && firebase.auth && firebase.auth().currentUser;
+      if (u && !u.isAnonymous && u.displayName) return String(u.displayName).trim().slice(0, 18) || "Oyuncu";
+    } catch (e) {}
+    return ad || "Oyuncu";
+  }
+  function ligIsimleriniTamamla(liste, hafta, lig, grup) {
+    if (!liste || !liste.length) return Promise.resolve(liste || []);
+    return Promise.all(liste.map(function (x) {
+      if (adGecerli(x.ad)) return Promise.resolve(x);
+      return kok.child("users/" + x.uid + "/ad").once("value").then(function (snap) {
+        var ad = snap.val();
+        if (!adGecerli(ad)) return x;
+        x.ad = ad;
+        // Eski lig kaydındaki genel "Oyuncu" metnini gerçek, herkese açık profil adıyla onar.
+        return kok.child("ligPuan/" + hafta + "/" + lig + "/" + grup + "/" + x.uid + "/ad").set(ad).then(function () { return x; }).catch(function () { return x; });
+      }).catch(function () { return x; });
+    }));
+  }
   function fmt(n) { return (n || 0).toLocaleString("tr-TR"); }
   function simdi() { return Date.now() + offset; }
   function ts() { return firebase.database.ServerValue.TIMESTAMP; }
@@ -285,10 +307,16 @@
     ligGrup = [];
     if (L.grup < 0) { yenile(); return; }
     ligRef = kok.child("ligPuan/" + L.hafta + "/" + L.lig + "/" + L.grup).orderByChild("p").limitToLast(LIG_KISI);
+    var dinlenenHafta = L.hafta, dinlenenLig = L.lig, dinlenenGrup = L.grup;
     ligRef.on("value", function (s) {
       var a = [];
       s.forEach(function (c) { var v = c.val() || {}; if ((v.p || 0) > 0) a.push({ uid: c.key, ad: v.ad || "Oyuncu", p: v.p }); });
-      a.reverse(); ligGrup = a; yenile();
+      a.reverse();
+      ligIsimleriniTamamla(a, dinlenenHafta, dinlenenLig, dinlenenGrup).then(function (son) {
+        // Önceki lig/hafta dinleyicisinin geç gelen sonucu yeni ekranı ezmesin.
+        if (L.hafta !== dinlenenHafta || L.lig !== dinlenenLig || L.grup !== dinlenenGrup) return;
+        ligGrup = son; yenile();
+      });
     });
   }
   // Bu hafta ilk puanını alan oyuncuyu o liginin dolmamış grubuna yerleştirir (100 kişilik)
@@ -1251,7 +1279,7 @@
     mk("arSiralama", "🏅", "Sıralama", "#7a5a00", 7, function () { ac("siralama"); });
   }
 
-  window.onEkonomiAd = function () { kullaniciYaz(true); };
+  window.onEkonomiAd = function () { kullaniciYaz(true); if (L.hp > 0) ligYaz(); };
   Puan.degisti(function () { kullaniciYaz(); });
 
   window.Arena = {
