@@ -432,7 +432,7 @@ menu();
 <div id="gecis" aria-hidden="true">
 <canvas id="gKonfeti"></canvas>
 <div class="g-ust"><span class="g-pil">⭐ <span id="gPuan">0</span></span><span class="g-pil"><span id="gSeri">0</span> 🔥</span></div>
-<div class="g-bas" id="gBaslik">MİLYONER</div>
+<div class="g-bas" id="gBaslik">MILLIONAIRE</div>
 <div class="g-daire"><b id="gNo">1</b><span>SEVİYE</span></div>
 <p class="g-soz" id="gSoz"></p>
 <div class="g-et">BONUS CAN</div>
@@ -500,7 +500,7 @@ function konfeti() {
 function gecisAc(hepsi, bonus) {
   const no = hepsi ? SEVIYE_SAYISI : st.seviye - 1, k = st.biten % BONUS_ARALIK, yapilan = Math.min(st.seviye - 1, SEVIYE_SAYISI);
   $("gSeri").textContent = st.biten;
-  $("gBaslik").textContent = hepsi ? "BÜYÜK ÖDÜL" : "MİLYONER";
+  $("gBaslik").textContent = hepsi ? "GRAND PRIZE" : "MILLIONAIRE";
   $("gNo").textContent = no;
   $("gSoz").innerHTML = bonus ? "❤️ +1 can kazandın!<small>Sıradaki bölüme " + (CAN_MAX + st.bonus) + " canla başlıyorsun</small>" : GOZ[Math.floor(Math.random() * GOZ.length)];
   $("gT1").textContent = (bonus ? BONUS_ARALIK : k) + "/" + BONUS_ARALIK;
