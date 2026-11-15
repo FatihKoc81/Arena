@@ -119,7 +119,7 @@ function sortHtml(){
 }
 function sortAction(a,i){
  if(a==="sort-settings"){s.msg="Ayarlar";return;}
- if(a==="sort-theme"){s.theme=(s.theme||0)+1;var themes=["#202124","#171b25","#24201d"];var screen=root&&root.querySelector(".mg-sort-screen");if(screen)screen.style.backgroundColor=themes[s.theme%themes.length];return;}
+ if(a==="sort-theme"){s.theme=(s.theme||0)+1;return;}
  if(a==="sort-retry"){sortInit();return;}
  if(a==="sort-next"&&s.done){if(s.level<200)localStorage.setItem(sortKey(),String(s.level+1));else localStorage.setItem(sortKey(),"200");sortInit();s.msg=s.level===200?"200 seviyeyi bitirdin! Renk ustasısın.":"Seviye "+(s.level-1)+" tamamlandı. Daha zor seviye açıldı.";return;}
  if(a==="sort-undo"){if(s.history.length){var prev=s.history.pop();s.tubes=prev.tubes;s.moves=prev.moves;s.done=false;s.sel=-1;s.hint=null;s.msg="Son hamle geri alındı.";}return;}
