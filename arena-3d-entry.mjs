@@ -22,7 +22,7 @@ import * as THREE from 'three';
     /memory/.test(id) ? 'dikkat' : 'refleks';
 
   let renderer, scene, camera, root, raf = 0, active = false, canvas, host;
-  let audio, musicGain, musicTimer = 0, musicGame = '', musicOn = true, sfxOn = true, step = 0;
+  let audio, musicGain, musicTimer = 0, musicGame = '', musicOn = true, sfxOn = true, step = 0;\n  try { musicOn=localStorage.getItem('arenaMusic')!=='off'; sfxOn=localStorage.getItem('arenaSfx')!=='off'; } catch(e) {}
   const mats = {};
   function mat(hex, metalness=.28, roughness=.28) {
     const key = hex + metalness + roughness;
@@ -44,7 +44,7 @@ import * as THREE from 'three';
     const gold=mat('#f7bd35',.78,.2),bright=mat('#fff0a4',.72,.16),dark=mat('#8b4a12',.55,.3);
     const profile=[new THREE.Vector2(.18,0),new THREE.Vector2(.27,.08),new THREE.Vector2(.34,.28),new THREE.Vector2(.42,.57),new THREE.Vector2(.35,.72),new THREE.Vector2(.16,.78),new THREE.Vector2(.12,.78)];
     const cup=addMesh(g,new THREE.LatheGeometry(profile,48),gold,0,.1,0);
-    cup.rotation.x=Math.PI;
+    cup.rotation.x=0;
     const rim=torus(g,'#ffe48a',0,.86,0,.37,.055);
     const h1=torus(g,'#e8a82a',-.42,.48,0,.19,.065);h1.rotation.y=Math.PI/2;
     const h2=torus(g,'#e8a82a',.42,.48,0,.19,.065);h2.rotation.y=Math.PI/2;
@@ -144,8 +144,8 @@ import * as THREE from 'three';
   function startMusic(id){if(musicGame===id&&musicTimer)return;stopMusic();musicGame=id;if(!musicOn)return;const c=getAudio();if(!c)return;const notes=scales[colorFor(id)]||scales.bilgi;step=0;const play=()=>{if(!active||!musicOn)return;const n=notes[step%notes.length];tone(n,0.36,'triangle',.018);tone(n/2,.48,'sine',.012,.02);step++;musicTimer=window.setTimeout(play,520);};play();}
   function stopMusic(){if(musicTimer)clearTimeout(musicTimer);musicTimer=0;}
   function sfx(id,action='tap'){if(!sfxOn)return;const map={tap:[520,.07],move:[660,.12],success:[784,.2],win:[988,.34],back:[390,.11],error:[180,.22],drop:[440,.1],reset:[330,.13]};const v=map[action]||map.tap;tone(v[0],v[1],action==='win'?'triangle':'sine',.055);if(action==='win'){tone(1175,.3,'triangle',.045,.13);tone(1480,.36,'triangle',.04,.27);}}
-  function setMusic(v,id){musicOn=!!v;if(musicOn&&active)startMusic(id||'milyoner');else stopMusic();}
-  function setSfx(v){sfxOn=!!v;}
+  function setMusic(v,id){musicOn=!!v;try{localStorage.setItem('arenaMusic',musicOn?'on':'off');}catch(e){}if(musicOn&&active)startMusic(id||'milyoner');else stopMusic();}
+  function setSfx(v){sfxOn=!!v;try{localStorage.setItem('arenaSfx',sfxOn?'on':'off');}catch(e){}}
   
   function externalScene(id){
     if(document.querySelector('#arenaMiniGames.open'))return;
