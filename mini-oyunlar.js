@@ -74,43 +74,77 @@ function sortInit(){
    var to=tos[Math.floor(Math.random()*tos.length)];
    tubes[from].pop();tubes[to].push(ball);
  }
- s={level:level,tubes:tubes,sel:-1,moves:0,msg:"Bir tüpe dokun, üstteki rengi başka tüpe taşı.",done:false,cap:cap};
+ s={level:level,tubes:tubes,sel:-1,moves:0,msg:"Aynı renkteki topları tüplerde birleştir.",done:false,cap:cap,history:[],hint:null,extraTubes:0};
 }
 function sortWon(){return s.tubes.every(function(t){return !t.length||(t.length===s.cap&&t.every(function(c){return c===t[0];}));});}
+function sortRemember(){s.history.push({tubes:s.tubes.map(function(t){return t.slice();}),moves:s.moves});if(s.history.length>100)s.history.shift();}
+function sortEnsureStyle(){
+ if(document.getElementById("arenaWaterSortVideoStyle"))return;
+ var st=document.createElement("style");st.id="arenaWaterSortVideoStyle";
+ st.textContent=`
+ #arenaMiniGames .mg-main:has(.mg-sort-board){background-color:#171925;background-image:linear-gradient(45deg,#ffffff08 25%,transparent 25%,transparent 75%,#ffffff08 75%),linear-gradient(45deg,#ffffff08 25%,transparent 25%,transparent 75%,#ffffff08 75%);background-position:0 0,16px 16px;background-size:32px 32px}
+ #arenaMiniGames .mg-sort-hud{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 auto 12px;padding:8px 10px;border-radius:14px;background:linear-gradient(180deg,#293249,#111827);border:1px solid #65728a;color:#fff}
+ #arenaMiniGames .mg-sort-hud .stars{color:#ffd44e;font-size:clamp(14px,4vw,20px);letter-spacing:1px;white-space:nowrap}
+ #arenaMiniGames .mg-sort-hud .progress{flex:1;min-width:30px;height:8px;border-radius:9px;background:#3b465d;overflow:hidden}
+ #arenaMiniGames .mg-sort-hud .progress i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,#ffd34e,#ff9b31)}
+ #arenaMiniGames .mg-sort-hud .lv{font-weight:900;font-size:13px;white-space:nowrap}
+ #arenaMiniGames .mg-sort-board{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));align-items:end;justify-items:center;gap:clamp(12px,4vw,22px) clamp(6px,2.2vw,12px);width:100%;max-width:500px;margin:20px auto 14px;padding:12px 4px;box-sizing:border-box}
+ #arenaMiniGames .mg-sort-tube{position:relative;width:clamp(46px,18vw,68px);height:clamp(145px,43vw,194px);padding:0 4px 5px;border:0;background:transparent;display:flex;align-items:flex-end;justify-content:center;filter:drop-shadow(0 5px 5px #0008);transition:transform .18s ease,filter .18s ease}
+ #arenaMiniGames .mg-sort-tube:before{content:"";position:absolute;left:3px;right:3px;top:0;height:10px;border:2px solid #e1e8ef;border-radius:50%;background:linear-gradient(180deg,#ffffff55,#ffffff0a);z-index:2;box-shadow:0 0 5px #ffffff55}
+ #arenaMiniGames .mg-sort-tube.sel{transform:translateY(-9px);filter:drop-shadow(0 0 9px #ffe06a)}
+ #arenaMiniGames .mg-sort-tube.hint{filter:drop-shadow(0 0 11px #49e6ff)}
+ #arenaMiniGames .mg-ball-stack{position:relative;height:100%;width:100%;display:flex;flex-direction:column-reverse;align-items:center;justify-content:flex-start;gap:clamp(1px,.7vw,4px);padding:9px 2px 5px;border:2px solid #d5e2ec;border-top:1px solid #f7fbff;border-radius:8px 8px 19px 19px;background:linear-gradient(90deg,#ffffff3b 0%,#ffffff08 16%,#ffffff12 72%,#ffffff42 100%),linear-gradient(180deg,#24344a35,#08101f55);box-shadow:inset 4px 0 7px #ffffff24,inset -4px 0 7px #ffffff22,0 0 5px #ffffff30;box-sizing:border-box;overflow:hidden}
+ #arenaMiniGames .mg-ball-stack:after{content:"";position:absolute;top:8px;bottom:8px;left:8px;width:3px;border-radius:5px;background:linear-gradient(180deg,#ffffffb0,#ffffff10);pointer-events:none}
+ #arenaMiniGames .mg-ball-stack .mg-ball{display:block;width:clamp(30px,7.8vw,44px);height:auto;aspect-ratio:1;flex:none;border-radius:50%;border:1px solid #ffffffb0;box-shadow:inset -4px -6px 9px #0005,inset 2px 2px 5px #ffffff8a,0 3px 5px #0009;background-image:radial-gradient(circle at 28% 22%,#fff 0 4%,#ffffffd9 5% 10%,transparent 22%),radial-gradient(circle at 36% 30%,#ffffff88,transparent 48%);animation:arenaBallPop .2s ease both}
+ @keyframes arenaBallPop{from{transform:translateY(-8px) scale(.86);opacity:.65}to{transform:translateY(0) scale(1);opacity:1}}
+ #arenaMiniGames .mg-sort-tools{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;max-width:390px;margin:12px auto 8px}
+ #arenaMiniGames .mg-sort-tools button{min-height:58px;border:1px solid #7488ae;border-radius:16px;background:linear-gradient(180deg,#425a86,#1d3155);color:#fff;font-size:23px;font-weight:900;box-shadow:0 4px 0 #0b1426}
+ #arenaMiniGames .mg-sort-tools button small{display:block;font-size:10px;font-weight:800;letter-spacing:.2px}
+ #arenaMiniGames .mg-sort-tools button:disabled{opacity:.35}
+ #arenaMiniGames .mg-sort-msg{text-align:center;min-height:25px;color:#e6eaf5;font-weight:800;margin:8px 0}
+ @media(max-width:360px){#arenaMiniGames .mg-sort-board{gap:12px 4px}#arenaMiniGames .mg-sort-tube{width:clamp(42px,17vw,58px);height:clamp(138px,41vw,166px)}#arenaMiniGames .mg-ball-stack .mg-ball{width:clamp(26px,7vw,34px)}}
+ `;
+ document.head.appendChild(st);
+}
 function sortHtml(){
- var liquid=id==="liquidSort",ball=id==="ballSort",level=s.level;
- var h=stats(["Seviye "+level+"/200","Hamle "+s.moves,"Renk "+Math.min(8,3+Math.floor((level-1)/3))]);
+ sortEnsureStyle();
+ var liquid=id==="liquidSort",level=s.level,progress=(level%5)*20;
+ var h='<div class="mg-sort-hud"><span class="lv">LV.'+level+'</span><span class="stars">★★★</span><span class="progress"><i style="width:'+progress+'%"></i></span><b>★ '+(Math.max(0,200-level)*2+28)+'</b></div>';
+ h+=stats(["Hamle "+s.moves,"Renk "+Math.min(8,3+Math.floor((level-1)/3))]);
  h+='<div class="mg-sort-board '+(liquid?'liquid':'balls')+'">';
  s.tubes.forEach(function(t,i){
-  h+='<button class="mg-sort-tube'+(s.sel===i?' sel':'')+'" data-mg="sort-tube" data-i="'+i+'" aria-label="Tüp '+(i+1)+'">';
+  h+='<button class="mg-sort-tube'+(s.sel===i?' sel':'')+(s.hint&&s.hint.indexOf(i)>=0?' hint':'')+'" data-mg="sort-tube" data-i="'+i+'" aria-label="Tüp '+(i+1)+'">';
   if(liquid){h+='<span class="mg-liquid-glass"><span class="mg-liquid-stack">';
    for(var k=0;k<s.cap;k++){var c=t[k];h+='<i class="mg-liquid '+(c||'empty')+'"></i>';}
    h+='</span></span>';}
   else {h+='<span class="mg-ball-stack">';t.forEach(function(c){h+='<i class="mg-ball '+c+'"></i>';});h+='</span>';}
   h+='</button>';
  });
- h+='</div><div class="mg-msg">'+s.msg+'</div>';
- h+='<button class="mg-btn" data-mg="sort-retry">↻ Tekrar dene</button>';
+ h+='</div><div class="mg-sort-msg">'+s.msg+'</div>';
+ h+='<div class="mg-sort-tools"><button data-mg="sort-undo" '+(!s.history.length?'disabled':'')+'>↶<small>GERİ AL</small></button><button data-mg="sort-hint">✦<small>İPUCU</small></button><button data-mg="sort-extra">＋<small>EK TÜP</small></button></div>';
+ h+='<button class="mg-btn" data-mg="sort-retry">↻ Yeniden başlat</button>';
  if(s.done)h+='<button class="mg-btn gold" data-mg="sort-next">Sonraki seviye →</button>';
  return h;
 }
 function sortAction(a,i){
  if(a==="sort-retry"){sortInit();return;}
  if(a==="sort-next"&&s.done){if(s.level<200)localStorage.setItem(sortKey(),String(s.level+1));else localStorage.setItem(sortKey(),"200");sortInit();s.msg=s.level===200?"200 seviyeyi bitirdin! Renk ustasısın.":"Seviye "+(s.level-1)+" tamamlandı. Daha zor seviye açıldı.";return;}
+ if(a==="sort-undo"){if(s.history.length){var prev=s.history.pop();s.tubes=prev.tubes;s.moves=prev.moves;s.done=false;s.sel=-1;s.hint=null;s.msg="Son hamle geri alındı.";}return;}
+ if(a==="sort-hint"){var found=null;for(var x=0;x<s.tubes.length&&!found;x++){var f=s.tubes[x];if(!f.length)continue;var col=f[f.length-1];for(var y=0;y<s.tubes.length;y++){var t=s.tubes[y];if(x!==y&&t.length<s.cap&&(!t.length||t[t.length-1]===col)){found=[x,y];break;}}}s.hint=found;s.msg=found?"Işıklı tüpler arasında taşıma yap.":"Şu an uygun hamle yok.";return;}
+ if(a==="sort-extra"){if(s.tubes.length<Math.min(12,Math.ceil(s.level/20)+s.tubes.length)){s.tubes.push([]);s.extraTubes++;s.msg="Ek tüp açıldı.";}else if(s.extraTubes<3){s.tubes.push([]);s.extraTubes++;s.msg="Ek tüp açıldı.";}else s.msg="Bu seviyede ek tüp sınırına ulaştın.";return;}
  if(a!=="sort-tube"||s.done)return;
  if(s.sel<0){if(s.tubes[i].length)s.sel=i;else s.msg="Önce dolu bir tüp seç.";return;}
  if(s.sel===i){s.sel=-1;return;}
  var from=s.tubes[s.sel],to=s.tubes[i],ball=from[from.length-1];
  if(ball&&to.length<s.cap&&(!to.length||to[to.length-1]===ball)){
+  sortRemember();
   var transfer=1;
-  /* Top oyunlarında üst üste duran aynı renk grubu tek hamlede aktarılır. */
-  if(id!=="liquidSort"){
-   while(transfer<from.length&&from[from.length-1-transfer]===ball)transfer++;
-  }
+  if(id!=="liquidSort"){while(transfer<from.length&&from[from.length-1-transfer]===ball)transfer++;}
   transfer=Math.min(transfer,s.cap-to.length);
   for(var move=0;move<transfer;move++)to.push(from.pop());
   s.moves++;s.msg=transfer>1?transfer+" aynı renk top birlikte taşındı.":"Güzel hamle!";
-  if(sortWon()){s.done=true;s.msg="Harika! Seviye "+s.level+" tamamlandı. Sonraki seviyeye geçebilirsin.";}
+  s.hint=null;
+  if(sortWon()){s.done=true;s.msg="Harika! Seviye "+s.level+" tamamlandı. Sonraki seviyeye geçebilirsin.";localStorage.setItem(sortKey(),String(Math.min(200,s.level+1)));}
  }else s.msg="Bu renk buraya taşınamaz.";
  s.sel=-1;
 }
