@@ -98,11 +98,16 @@ function sortAction(a,i){
  if(a!=="sort-tube"||s.done)return;
  if(s.sel<0){if(s.tubes[i].length)s.sel=i;else s.msg="Önce dolu bir tüp seç.";return;}
  if(s.sel===i){s.sel=-1;return;}
- var from=s.tubes[s.sel],to=s.tubes[i],ball=from[from.length-1];
- if(ball&&to.length<s.cap&&(!to.length||to[to.length-1]===ball)){
-  from.pop();to.push(ball);s.moves++;s.msg="Güzel hamle!";
+ var from=s.tubes[s.sel],to=s.tubes[i],ball=from[from.length-1],count=0;
+ if(ball){
+  for(var z=from.length-1;z>=0&&from[z]===ball;z--)count++;
+ }
+ if(ball&&to.length+count<=s.cap&&(!to.length||to[to.length-1]===ball)){
+  for(var n=0;n<count;n++)to.push(from.pop());
+  s.moves++;s.msg=count>1?count+" aynı renk top birlikte taşındı.":"Güzel hamle!";
   if(sortWon()){s.done=true;s.msg="Harika! Seviye "+s.level+" tamamlandı. Sonraki seviyeye geçebilirsin.";}
- }else s.msg="Bu renk buraya taşınamaz.";
+ }else if(ball&&to.length+count>s.cap)s.msg="Bu tüpte "+count+" top için yeterli yer yok.";
+ else s.msg="Bu renk buraya taşınamaz.";
  s.sel=-1;
 }
 
