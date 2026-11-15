@@ -378,6 +378,7 @@ function guvenliBaslat() {
 document.addEventListener("click", e => {
   if (e.target.closest("#basla") || e.target.closest("#sDevam")) guvenliBaslat();
 });
+window.ArenaLaunchMilyoner = function(){ try { guvenliBaslat(); var g=document.getElementById("oyun"); return !!(g && !g.classList.contains("hidden")); } catch(e) { console.error("Milyoner başlatılamadı",e); return false; } };
 
 $("jYarim").onclick = () => {
   if (kilit || !jok.yarim) return;
@@ -533,7 +534,7 @@ document.addEventListener("anasayfa", gKapat);
 <script src="dini-milyoner.js?v=20261115-voice-answer1"></script>
 <script src="masa.js?v=20261115-landscape-lobby-restore1"></script>
 <script src="mini-oyunlar.js?v=20261115-ball-group-effects1"></script>
-<script src="menu.js?v=20261115-category-back-milyoner-fix1"></script>
+<script src="menu.js?v=20261115-category-names-launch-fix1"></script>
 <script>window.ARENA_APP="arena";</script><!-- sıralama/düello verileri bu adla ayrı tutulur -->
 <script src="firebase-config.js?v=20261104a"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
