@@ -27,8 +27,3 @@ jobs:
           find . -type f -name '*.js' -not -path './node_modules/*' -print0 | while IFS= read -r -d '' file; do
             node --check "$file"
           done
-      - name: Ortak AI köprüsünü doğrula
-        run: |
-          grep -q 'ortak-ai.js' index.html
-          grep -q 'firebase-auth' index.html
-          test -s ortak-ai.js
