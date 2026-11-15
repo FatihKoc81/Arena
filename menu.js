@@ -230,6 +230,31 @@ const arenaHomePolish=document.createElement('style');arenaHomePolish.id='arenaH
 #arenaHubHome .ar-short{min-height:62px}
 @media(max-width:360px){#arenaHubHome .ar-cat{grid-template-columns:62px minmax(0,1fr);min-height:78px;padding:6px}#arenaHubHome .ar-cat-icon{font-size:34px}#arenaHubHome .ar-short{font-size:8px}}
 `;document.head.appendChild(arenaHomePolish);
+/* Compact home grid: show all nine category tiles above the fixed bottom navigation on phones. */
+const arenaAllCategoriesFit=document.createElement('style');
+arenaAllCategoriesFit.id='arenaAllCategoriesFit';
+arenaAllCategoriesFit.textContent=`
+@media(max-width:390px) and (max-height:900px){
+ #arenaHubHome{justify-content:flex-start!important;gap:5px!important;padding-top:2px!important;padding-bottom:4px!important}
+ #arenaHubHome .ar-profile{height:50px!important;min-height:50px!important;margin:0!important}
+ #arenaHubHome .ar-avatar{width:48px!important;height:48px!important}
+ #arenaHubHome .ar-league{height:48px!important}
+ #arenaHubHome .ar-league img{height:46px!important}
+ #arenaHubHome .ar-shortcuts{height:48px!important;min-height:48px!important;margin:0!important;gap:4px!important}
+ #arenaHubHome .ar-short{height:48px!important;min-height:48px!important;padding:2px 1px!important;gap:2px!important;font-size:7px!important}
+ #arenaHubHome .ar-short i{font-size:18px!important}
+ #arenaHubHome .ar-categories{grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-rows:56px!important;gap:5px!important;margin:0!important}
+ #arenaHubHome .ar-cat{height:56px!important;min-height:56px!important;max-height:56px!important;grid-template-columns:43px minmax(0,1fr)!important;padding:3px 5px!important;gap:3px!important;border-radius:11px!important;border-width:1px!important}
+ #arenaHubHome .ar-cat-icon{width:41px!important;height:48px!important}
+ #arenaHubHome .ar-cat-copy strong{font-size:11px!important;line-height:1.05!important}
+ #arenaHubHome .ar-cat-copy small{font-size:8px!important;line-height:1.05!important;margin-top:2px!important}
+ #arenaNeonNav{bottom:calc(2px + env(safe-area-inset-bottom))!important}
+ #arenaNeonNav button{height:50px!important;min-height:50px!important;font-size:8px!important;gap:1px!important}
+ #arenaNeonNav button i{font-size:19px!important}
+}
+`;
+document.head.appendChild(arenaAllCategoriesFit);
+
 
 
 
