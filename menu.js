@@ -4562,3 +4562,26 @@ document.head.appendChild(st);})();
  `;
  document.head.appendChild(st);
 })();
+
+/* 2026-11-15: hide home quick shortcuts while a category is open. */
+(function(){
+  if(document.getElementById('arenaCategoryHideShortcuts20261115'))return;
+  var st=document.createElement('style');
+  st.id='arenaCategoryHideShortcuts20261115';
+  st.textContent=`
+    html.arena-home-fixed body #ana #arenaHubHome:has(>.ar-categories.is-open)>.ar-shortcuts{
+      display:none!important;visibility:hidden!important;
+      height:0!important;min-height:0!important;max-height:0!important;
+      margin:0!important;padding:0!important;overflow:hidden!important;
+    }
+    html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open{
+      top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top) + 107px)!important;
+    }
+    @media(max-height:720px){
+      html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open{
+        top:calc(var(--bas-yuk,58px) + env(safe-area-inset-top) + 94px)!important;
+      }
+    }
+  `;
+  document.head.appendChild(st);
+})();
