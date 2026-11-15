@@ -3,376 +3,463 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ARENA - Ultra HD Premium Oyun Platformu</title>
+    <title>ARENA - Premium Oyun & Bilgi Platformu</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
 
         * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
         body { 
             margin: 0; padding: 0; 
-            background: #04060b; 
+            background: #04060f; 
             font-family: 'Outfit', sans-serif; 
             color: #fff; 
             min-height: 100vh;
             overflow-x: hidden;
+            padding-bottom: 75px;
         }
 
-        /* Atmosferik Arka Plan Işıklandırması */
+        /* Atmosferik Arka Plan */
         .ambient-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 20%, rgba(20, 30, 48, 0.7) 0%, rgba(4, 6, 11, 0.98) 70%);
+            background: radial-gradient(circle at 50% 15%, rgba(15, 32, 67, 0.8) 0%, rgba(4, 6, 15, 0.99) 75%);
             z-index: -1;
             pointer-events: none;
         }
 
-        .arena-menu-container { padding: 24px 16px; max-width: 480px; margin: 0 auto; }
-        
-        .menu-header { text-align: center; margin-bottom: 30px; }
-        .logo-badge { 
-            display: inline-block; 
-            background: linear-gradient(135deg, #ff4757, #ff6b81); 
-            color: white; font-size: 11px; font-weight: 900; 
-            padding: 6px 16px; border-radius: 30px; 
-            letter-spacing: 1.5px; margin-bottom: 12px;
-            box-shadow: 0 6px 20px rgba(255, 71, 87, 0.4);
-            text-transform: uppercase;
-        }
-        .menu-header h1 { font-size: 32px; font-weight: 900; margin: 0; letter-spacing: 0.5px; background: linear-gradient(180deg, #fff 30%, #a4b0be 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .menu-header p { color: #718093; font-size: 13px; margin-top: 6px; font-weight: 600; }
+        .app-container { max-width: 480px; margin: 0 auto; padding: 14px; }
 
-        /* Kusursuz 2 Sütunlu Grid (5. Kart Tam Genişlik) */
-        .game-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
-        .game-card { 
-            background: linear-gradient(145deg, rgba(22, 27, 34, 0.95), rgba(13, 17, 23, 0.98)); 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-radius: 20px; padding: 22px 14px; 
-            display: flex; flex-direction: column; align-items: center; text-align: center; 
-            cursor: pointer; position: relative; overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        /* ÜST PROFİL BAR */
+        .profile-card {
+            background: linear-gradient(135deg, rgba(22, 32, 54, 0.95), rgba(10, 16, 30, 0.98));
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 20px; padding: 12px 14px;
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            margin-bottom: 14px; position: relative; overflow: hidden;
+        }
+        .profile-card::after {
+            content: ''; position: absolute; top: 0; right: 0; width: 120px; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,215,0,0.05));
+            pointer-events: none;
+        }
+        .profile-left { display: flex; align-items: center; gap: 12px; }
+        .avatar-box {
+            width: 52px; height: 52px; border-radius: 50%;
+            background: linear-gradient(135deg, #f1c40f, #d4af37);
+            padding: 2px; position: relative;
+            box-shadow: 0 4px 15px rgba(241,196,15,0.4);
+        }
+        .avatar-box img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+        .avatar-badge {
+            position: absolute; bottom: -2px; right: -2px; background: #e74c3c;
+            color: #fff; font-size: 9px; font-weight: 800; padding: 1px 5px; border-radius: 10px;
+            border: 1.5px solid #0f1622;
+        }
+        .user-info h3 { margin: 0; font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 5px; color: #fff; }
+        .user-info h3 span { color: #f1c40f; }
+        .level-row { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+        .level-pill { background: linear-gradient(135deg, #3498db, #2980b9); font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px; }
+        .xp-text { font-size: 10px; color: #a4b0be; font-weight: 600; }
+        
+        .currencies { display: flex; flex-direction: column; gap: 5px; align-items: flex-end; }
+        .currency-pill {
+            background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1);
+            padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; gap: 6px;
+            font-size: 13px; font-weight: 800; color: #f1c40f;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+        .currency-pill.heart { color: #ff4757; }
+        .currency-pill span { font-size: 11px; cursor: pointer; background: rgba(255,255,255,0.15); width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+        /* HEADER / LOGO */
+        .main-header { text-align: center; margin: 16px 0; position: relative; }
+        .logo-crown { font-size: 20px; filter: drop-shadow(0 2px 6px rgba(241,196,15,0.6)); margin-bottom: -8px; display: block; }
+        .main-logo { 
+            font-size: 30px; font-weight: 900; letter-spacing: 2px; margin: 0;
+            background: linear-gradient(180deg, #ffffff 20%, #d4af37 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 4px 20px rgba(212,175,55,0.3);
+        }
+        .logo-sub { font-size: 11px; color: #8c9eff; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; margin-top: 2px; }
+
+        /* HIZLI ÖZELLİK BUTONLARI (5'li Menü) */
+        .quick-features { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 16px; }
+        .quick-btn {
+            background: linear-gradient(145deg, rgba(22, 28, 45, 0.9), rgba(12, 17, 29, 0.95));
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 14px;
+            padding: 10px 4px; text-align: center; cursor: pointer;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+            transition: transform 0.2s;
+        }
+        .quick-btn:active { transform: scale(0.94); }
+        .quick-icon { font-size: 20px; margin-bottom: 4px; display: block; }
+        .quick-btn span { font-size: 10px; font-weight: 700; color: #d1d8e0; display: block; }
+
+        /* BÖLÜM BAŞLIĞI */
+        .section-title-box {
+            background: linear-gradient(90deg, transparent, rgba(241,196,15,0.15), transparent);
+            border-top: 1px solid rgba(241,196,15,0.3); border-bottom: 1px solid rgba(241,196,15,0.3);
+            text-align: center; padding: 8px 0; margin: 18px 0 14px 0;
+            font-size: 14px; font-weight: 900; letter-spacing: 2px; color: #f1c40f;
+            text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+
+        /* OYUN KARTLARI GRID (2 Sütun) */
+        .games-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+        .game-card {
+            background: linear-gradient(145deg, rgba(20, 27, 43, 0.95), rgba(10, 14, 25, 0.98));
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 18px; padding: 16px 12px;
+            display: flex; align-items: center; gap: 12px; cursor: pointer;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            position: relative; overflow: hidden;
             transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .game-card:active { transform: scale(0.95); }
-        .game-card:hover { border-color: rgba(52, 152, 219, 0.6); box-shadow: 0 15px 35px rgba(52, 152, 219, 0.25); }
-        
-        .game-card:nth-child(5) { grid-column: span 2; flex-direction: row; text-align: left; padding: 18px 24px; gap: 20px; }
-        .game-card:nth-child(5) .card-icon-box { margin-bottom: 0; }
+        .game-card:hover { border-color: rgba(241,196,15,0.6); box-shadow: 0 12px 30px rgba(241,196,15,0.2); }
 
-        .card-icon-box {
-            width: 56px; height: 56px; border-radius: 16px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.03));
+        .game-icon-wrap {
+            width: 48px; height: 48px; border-radius: 14px;
             display: flex; align-items: center; justify-content: center;
-            margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.12);
-            box-shadow: inset 0 2px 4px rgba(255,255,255,0.1);
+            font-size: 26px; flex-shrink: 0;
+            box-shadow: inset 0 2px 6px rgba(255,255,255,0.2);
         }
-        .card-icon-box svg { width: 32px; height: 32px; fill: #f1f2f6; }
+        .icon-milyoner { background: linear-gradient(135deg, #f39c12, #d35400); }
+        .icon-passaparola { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+        .icon-dini { background: linear-gradient(135deg, #1abc9c, #16a085); }
+        .icon-renk { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .icon-hizli { background: linear-gradient(135deg, #e67e22, #d35400); }
+        .icon-duello { background: linear-gradient(135deg, #34495e, #2c3e50); }
+        .icon-genel { background: linear-gradient(135deg, #2980b9, #2471a3); }
+        .icon-okey { background: linear-gradient(135deg, #27ae60, #1e8449); }
 
-        .game-card h3 { font-size: 16px; margin: 4px 0; color: #f1f2f6; font-weight: 800; }
-        .game-card p { font-size: 11px; color: #a4b0be; margin: 0; line-height: 1.35; font-weight: 600; }
+        .game-details h4 { margin: 0 0 3px 0; font-size: 14px; font-weight: 800; color: #fff; }
+        .game-details p { margin: 0; font-size: 10px; color: #a4b0be; line-height: 1.3; font-weight: 600; }
 
-        .okey-card { border-left: 4px solid #2ed573; }
-        .okey-101-card { border-left: 4px solid #ffa502; }
-
-        /* Oyun Görünüm Alanı */
-        .game-view-container { padding: 16px; max-width: 550px; margin: 0 auto; }
-        .game-top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: rgba(255,255,255,0.05); padding: 12px 18px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(10px); }
-        .back-to-menu-btn { background: linear-gradient(135deg, #ff4757, #ff6b81); color: white; border: none; padding: 8px 16px; border-radius: 10px; font-weight: 800; font-size: 13px; cursor: pointer; box-shadow: 0 4px 15px rgba(255,71,87,0.4); }
-        .active-module-title { font-size: 15px; font-weight: 800; color: #f1f2f6; }
-
-        /* Yüksek Grafik Renk Sıralama Tüpleri */
-        .tubes-container { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 25px; }
-        .tube { 
-            width: 58px; height: 200px; 
-            background: linear-gradient(90deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.04) 40%, rgba(0,0,0,0.6) 100%); 
-            border: 3px solid rgba(255, 255, 255, 0.3); border-top: none; border-radius: 0 0 22px 22px; 
-            display: flex; flex-direction: column-reverse; align-items: center; padding: 6px; 
-            cursor: pointer; position: relative; box-shadow: inset 0 0 18px rgba(255,255,255,0.15), 0 15px 30px rgba(0,0,0,0.7);
+        /* ALT NAVİGASYON BAR */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: rgba(8, 12, 22, 0.95); backdrop-filter: blur(15px);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex; justify-content: space-around; padding: 8px 0;
+            z-index: 1000; box-shadow: 0 -10px 30px rgba(0,0,0,0.8);
         }
-        .tube::before { content: ''; position: absolute; top: 0; left: 4px; width: 6px; height: 100%; background: linear-gradient(to bottom, rgba(255,255,255,0.5), transparent); border-radius: 3px; }
-        .tube.selected { border-color: #f1c40f; transform: translateY(-12px) scale(1.03); box-shadow: inset 0 0 22px rgba(241, 196, 15, 0.5), 0 20px 40px rgba(241, 196, 15, 0.4); }
-
-        .ball { width: 42px; height: 42px; border-radius: 50%; margin-bottom: 6px; box-shadow: inset -6px -6px 12px rgba(0,0,0,0.6), inset 3px 3px 8px rgba(255,255,255,0.8), 0 6px 14px rgba(0,0,0,0.5); }
-        .ball-red { background: radial-gradient(circle at 35% 35%, #ff6b6b, #c0392b); }
-        .ball-blue { background: radial-gradient(circle at 35% 35%, #48dbfb, #0984e3); }
-        .ball-green { background: radial-gradient(circle at 35% 35%, #1dd1a1, #00b894); }
-        .ball-yellow { background: radial-gradient(circle at 35% 35%, #feca57, #f39c12); }
-
-        /* Yarışma Stüdyo Stilleri */
-        .milyoner-wrapper, .dini-wrapper { padding: 22px; text-align: center; background: linear-gradient(145deg, #161f2c, #0b1017); border-radius: 22px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 40px rgba(0,0,0,0.8); }
-        .question-box { background: linear-gradient(135deg, #1e272c, #111418); padding: 26px; border-radius: 16px; font-size: 18px; font-weight: 800; margin: 18px 0; border: 1px solid rgba(52, 152, 219, 0.4); box-shadow: inset 0 2px 8px rgba(0,0,0,0.6); color: #f1f2f6; }
-        .options-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
-        .option-btn { background: linear-gradient(135deg, #222f3e, #1e272c); color: #f1f2f6; border: 1px solid rgba(255,255,255,0.12); padding: 16px; border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer; text-align: left; padding-left: 20px; box-shadow: 0 6px 16px rgba(0,0,0,0.35); transition: all 0.2s; }
-        .option-btn:hover { border-color: #3498db; background: linear-gradient(135deg, #2980b9, #1e272c); }
-
-        /* Yüksek Grafik Okey Masası ve Ahşap Istaka */
-        .okey-table-felt {
-            background: radial-gradient(circle at center, #1b4d3e 0%, #0c221b 100%);
-            border-radius: 22px; padding: 22px; border: 4px solid #06110d;
-            box-shadow: inset 0 12px 35px rgba(0,0,0,0.85), 0 15px 35px rgba(0,0,0,0.6);
-            text-align: center;
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; gap: 3px;
+            cursor: pointer; color: #718093; font-size: 10px; font-weight: 700;
+            transition: color 0.2s;
         }
-        .okey-rack-wood {
-            background: linear-gradient(180deg, #5c3a21 0%, #2f1c0e 100%);
-            border-radius: 16px; padding: 14px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.85), inset 0 4px 10px rgba(255,255,255,0.3), inset 0 -8px 15px rgba(0,0,0,0.8);
-            border: 3px solid #1a0f07; display: flex; gap: 8px; overflow-x: auto; margin-top: 15px; min-height: 100px; align-items: center;
-        }
-        .okey-tile-3d {
-            width: 50px; height: 70px;
-            background: linear-gradient(135deg, #fffef9 0%, #f4efe1 40%, #dfd5be 100%);
-            border-radius: 8px; border: 1px solid #b5a48d;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.55), inset 0 1px 2px rgba(255, 255, 255, 0.9), inset 0 -4px 8px rgba(0, 0, 0, 0.25);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); flex-shrink: 0;
-        }
-        .okey-tile-3d:active, .okey-tile-3d.selected { transform: translateY(-10px) scale(1.06); box-shadow: 0 12px 25px rgba(0,0,0,0.7); border-color: #f1c40f; }
-        .tile-num { font-size: 28px; font-weight: 900; line-height: 1; text-shadow: 0 1px 1px rgba(255,255,255,0.85); }
-        .t-red { color: #d63031; } .t-black { color: #1c1c1c; } .t-blue { color: #0984e3; } .t-green { color: #00b894; }
+        .nav-item.active { color: #f1c40f; }
+        .nav-icon { font-size: 20px; }
 
-        .premium-btn {
-            background: linear-gradient(135deg, #0984e3, #0066cc); color: white; border: none;
-            padding: 12px 24px; border-radius: 12px; font-size: 15px; font-weight: 800;
-            cursor: pointer; box-shadow: 0 8px 20px rgba(9, 132, 227, 0.4); transition: transform 0.2s;
+        /* OYUN GÖRÜNÜM MODALI / EKRANI */
+        .game-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #04060f; z-index: 2000; display: none;
+            flex-direction: column; padding: 16px; overflow-y: auto;
         }
-        .premium-btn:active { transform: scale(0.96); }
+        .game-top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255,255,255,0.06); padding: 12px 18px; border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px;
+        }
+        .back-btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b); color: #fff;
+            border: none; padding: 8px 16px; border-radius: 10px; font-weight: 800; cursor: pointer;
+        }
+        .game-title-header { font-size: 16px; font-weight: 800; color: #f1c40f; }
+
+        /* Modül Stilleri */
+        .quiz-container { background: linear-gradient(145deg, #162035, #0a101d); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); text-align: center; }
+        .question-box { background: rgba(0,0,0,0.4); padding: 24px; border-radius: 14px; font-size: 17px; font-weight: 800; margin: 15px 0; border: 1px solid rgba(52,152,219,0.3); color: #fff; }
+        .options-list { display: flex; flex-direction: column; gap: 10px; }
+        .option-item {
+            background: linear-gradient(135deg, #22304a, #162035); color: #fff;
+            border: 1px solid rgba(255,255,255,0.15); padding: 14px 18px; border-radius: 12px;
+            font-size: 15px; font-weight: 700; cursor: pointer; text-align: left;
+            transition: all 0.2s;
+        }
+        .option-item:hover { border-color: #f1c40f; background: linear-gradient(135deg, #2980b9, #162035); }
+
+        /* Renk Sıralama Tüpler */
+        .tubes-wrapper { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+        .tube {
+            width: 52px; height: 180px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.03) 40%, rgba(0,0,0,0.7) 100%);
+            border: 3px solid rgba(255,255,255,0.3); border-top: none; border-radius: 0 0 18px 18px;
+            display: flex; flex-direction: column-reverse; align-items: center; padding: 6px; cursor: pointer;
+            box-shadow: inset 0 0 15px rgba(255,255,255,0.1), 0 10px 25px rgba(0,0,0,0.8);
+        }
+        .tube.selected { border-color: #f1c40f; transform: translateY(-10px); }
+        .ball { width: 38px; height: 38px; border-radius: 50%; margin-bottom: 5px; box-shadow: inset -4px -4px 8px rgba(0,0,0,0.6), inset 3px 3px 6px rgba(255,255,255,0.8); }
+        .b-red { background: radial-gradient(circle at 35% 35%, #ff6b6b, #c0392b); }
+        .b-blue { background: radial-gradient(circle at 35% 35%, #48dbfb, #0984e3); }
+        .b-green { background: radial-gradient(circle at 35% 35%, #1dd1a1, #00b894); }
+        .b-yellow { background: radial-gradient(circle at 35% 35%, #feca57, #f39c12); }
+
+        .action-btn { background: linear-gradient(135deg, #f1c40f, #d4af37); color: #04060f; border: none; padding: 12px 24px; border-radius: 12px; font-weight: 900; font-size: 14px; cursor: pointer; margin-top: 20px; box-shadow: 0 5px 15px rgba(241,196,15,0.4); }
     </style>
 </head>
 <body>
 
     <div class="ambient-bg"></div>
 
-    <div id="mainMenu" class="arena-menu-container">
-        <header class="menu-header">
-            <div class="logo-badge">🔥 ARENA ULTRA HD</div>
-            <h1>PREMIUM OYUNLAR</h1>
-            <p>Honor 400 Pro Optimizasyonlu UI</p>
-        </header>
-
-        <div class="game-grid">
-            <div class="game-card" onclick="switchGameModule('colorSort')">
-                <div class="card-icon-box">
-                    <svg viewBox="0 0 24 24"><path d="M6 2h12v2H6zm2 4h8v2H8zm-2 4h12v10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V10zm2 2v8h8v-8H8z"/></svg>
+    <div class="app-container">
+        <!-- ÜST PROFİL KARTI -->
+        <div class="profile-card">
+            <div class="profile-left">
+                <div class="avatar-box">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" alt="Avatar">
+                    <div class="avatar-badge">PRO</div>
                 </div>
-                <div>
-                    <h3>Renk Sıralama</h3>
-                    <p>3D Cam Tüpler & Grup Taşıma</p>
+                <div class="user-info">
+                    <h3>Fatih KOÇ <span>⭐</span></h3>
+                    <div class="level-row">
+                        <div class="level-pill">Seviye 2</div>
+                        <div class="xp-text">260 / 2.000 XP</div>
+                    </div>
+                </div>
+            </div>
+            <div class="currencies">
+                <div class="currency-pill">🪙 50.150 <span onclick="alert('Altın eklendi!')">+</span></div>
+                <div class="currency-pill heart">❤️ 3 / 3 <span onclick="alert('Can yenilendi!')">+</span></div>
+            </div>
+        </div>
+
+        <!-- LOGO HEADER -->
+        <div class="main-header">
+            <span class="logo-crown">👑</span>
+            <h1 class="main-logo">ARENA</h1>
+            <div class="logo-sub">OYUN PLATFORMU</div>
+        </div>
+
+        <!-- HIZLI ÖZELLİKLER -->
+        <div class="quick-features">
+            <div class="quick-btn" onclick="alert('Günlük Ödül alındı: +500 Altın!')">
+                <span class="quick-icon">🎁</span>
+                <span>Günlük Ödül</span>
+            </div>
+            <div class="quick-btn" onclick="alert('Günlük Görevler açıldı!')">
+                <span class="quick-icon">📋</span>
+                <span>Günlük Görev</span>
+            </div>
+            <div class="quick-btn" onclick="alert('Başarılar listesi yükleniyor...')">
+                <span class="quick-icon">🏆</span>
+                <span>Başarılar</span>
+            </div>
+            <div class="quick-btn" onclick="alert('Sezon 3 aktif!')">
+                <span class="quick-icon">📅</span>
+                <span>Sezon</span>
+            </div>
+            <div class="quick-btn" onclick="alert('Market açılıyor...')">
+                <span class="quick-icon">🛒</span>
+                <span>Market</span>
+            </div>
+        </div>
+
+        <!-- ZİHİN MEYDANI BAŞLIĞI -->
+        <div class="section-title-box">
+            <span>🧠</span> ZİHİN MEYDANI <span>🧠</span>
+        </div>
+
+        <!-- OYUN KARTLARI (GRID) -->
+        <div class="games-grid">
+            <div class="game-card" onclick="openGame('milyoner')">
+                <div class="game-icon-wrap icon-milyoner">🏆</div>
+                <div class="game-details">
+                    <h4>Milyoner</h4>
+                    <p>Genel kültür ve bilgi yarışması</p>
                 </div>
             </div>
 
-            <div class="game-card" onclick="switchGameModule('milyoner')">
-                <div class="card-icon-box">
-                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-                </div>
-                <div>
-                    <h3>Milyoner</h3>
-                    <p>Stüdyo Atmosferi & Jokerler</p>
+            <div class="game-card" onclick="openGame('passaparola')">
+                <div class="game-icon-wrap icon-passaparola">🅰️</div>
+                <div class="game-details">
+                    <h4>Passaparola</h4>
+                    <p>Harf harf cevapla, süreye karşı yarış</p>
                 </div>
             </div>
 
-            <div class="game-card" onclick="switchGameModule('diniImtihan')">
-                <div class="card-icon-box">
-                    <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0-2-.9-2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-                </div>
-                <div>
-                    <h3>Dini İmtihan</h3>
-                    <p>Kültürel & Bilgi Soruları</p>
+            <div class="game-card" onclick="openGame('dini')">
+                <div class="game-icon-wrap icon-dini">🕌</div>
+                <div class="game-details">
+                    <h4>Dini İmtihan</h4>
+                    <p>Dini bilgilerle bilgi yarışması</p>
                 </div>
             </div>
 
-            <div class="game-card okey-card" onclick="switchGameModule('okey')">
-                <div class="card-icon-box">
-                    <svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"/></svg>
-                </div>
-                <div>
-                    <h3>Klasik Okey</h3>
-                    <p>Ahşap Istaka & Fildişi Taşlar</p>
+            <div class="game-card" onclick="openGame('renk')">
+                <div class="game-icon-wrap icon-renk">🧪</div>
+                <div class="game-details">
+                    <h4>Renk Sıralama</h4>
+                    <p>Renkleri doğru sıraya koy, zekanı test et</p>
                 </div>
             </div>
 
-            <div class="game-card okey-101-card" onclick="switchGameModule('okey101')">
-                <div class="card-icon-box">
-                    <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/></svg>
+            <div class="game-card" onclick="openGame('hizli')">
+                <div class="game-icon-wrap icon-hizli">⏱️</div>
+                <div class="game-details">
+                    <h4>Hızlı Karar</h4>
+                    <p>Sınırlı sürede doğru cevabı bul</p>
                 </div>
-                <div>
-                    <h3>101 Okey</h3>
-                    <p>Stratejik Çift Açma & Bot AI</p>
+            </div>
+
+            <div class="game-card" onclick="openGame('duello')">
+                <div class="game-icon-wrap icon-duello">⚔️</div>
+                <div class="game-details">
+                    <h4>Bilgi Düellosu</h4>
+                    <p>Rakibinle bilgini karşılaştır</p>
+                </div>
+            </div>
+
+            <div class="game-card" onclick="openGame('genel')">
+                <div class="game-icon-wrap icon-genel">🌍</div>
+                <div class="game-details">
+                    <h4>Genel Kültür</h4>
+                    <p>Tüm konulardan seçme sorular</p>
+                </div>
+            </div>
+
+            <div class="game-card" onclick="openGame('okey')">
+                <div class="game-icon-wrap icon-okey">🀄</div>
+                <div class="game-details">
+                    <h4>Klasik Okey</h4>
+                    <p>Ahşap istaka & fildişi taşlar</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="gameViewContainer" class="game-view-container" style="display: none;">
-        <div class="game-top-nav">
-            <button class="back-to-menu-btn" onclick="returnToMainMenu()">⬅️ Ana Menü</button>
-            <span id="activeModuleTitle" class="active-module-title">ARENA</span>
+    <!-- ALT NAVİGASYON -->
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchNav(this)">
+            <span class="nav-icon">🏠</span>
+            <span>Ana Sayfa</span>
         </div>
-        <div id="activeModuleContent"></div>
+        <div class="nav-item" onclick="switchNav(this)">
+            <span class="nav-icon">🎮</span>
+            <span>Oyunlar</span>
+        </div>
+        <div class="nav-item" onclick="switchNav(this)">
+            <span class="nav-icon">🏆</span>
+            <span>Lig</span>
+        </div>
+        <div class="nav-item" onclick="switchNav(this)">
+            <span class="nav-icon">⚔️</span>
+            <span>Meydan Oku</span>
+        </div>
+        <div class="nav-item" onclick="switchNav(this)">
+            <span class="nav-icon">👥</span>
+            <span>Arkadaşlar</span>
+        </div>
+        <div class="nav-item" onclick="switchNav(this)">
+            <span class="nav-icon">👤</span>
+            <span>Profil</span>
+        </div>
+    </div>
+
+    <!-- OYUN EKRANI (MODAL) -->
+    <div id="gameScreen" class="game-screen">
+        <div class="game-top-bar">
+            <button class="back-btn" onclick="closeGame()">⬅️ Menü</button>
+            <span id="gameModalTitle" class="game-title-header">ARENA OYUN</span>
+        </div>
+        <div id="gameModalContent" style="flex:1; display:flex; flex-direction:column; justify-content:center;"></div>
     </div>
 
     <script>
-        function switchGameModule(moduleName) {
-            document.getElementById('mainMenu').style.display = 'none';
-            document.getElementById('gameViewContainer').style.display = 'block';
-            const titleSpan = document.getElementById('activeModuleTitle');
-
-            if (moduleName === 'colorSort') {
-                titleSpan.innerText = "Renk Sıralama";
-                ColorSortEngine.initLevel(1);
-            } else if (moduleName === 'milyoner') {
-                titleSpan.innerText = "Milyoner Bilgi Yarışması";
-                MilyonerEngine.startQuiz();
-            } else if (moduleName === 'diniImtihan') {
-                titleSpan.innerText = "Dini İmtihan";
-                DiniImtihanEngine.startQuiz();
-            } else if (moduleName === 'okey' || moduleName === 'okey101') {
-                titleSpan.innerText = moduleName === 'okey101' ? "101 Okey Masası" : "Klasik Okey Masası";
-                OkeyGameEngine.initTable(moduleName === 'okey101' ? '101 Okey' : 'Klasik Okey');
-            }
+        function switchNav(el) {
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
         }
 
-        function returnToMainMenu() {
-            document.getElementById('gameViewContainer').style.display = 'none';
-            document.getElementById('mainMenu').style.display = 'block';
-        }
+        function openGame(type) {
+            document.getElementById('gameScreen').style.display = 'flex';
+            const title = document.getElementById('gameModalTitle');
+            const content = document.getElementById('gameModalContent');
 
-        const ColorSortEngine = {
-            tubes: [], selectedTubeIndex: null, moveCount: 0, currentLevel: 1,
-            initLevel(lvl) {
-                this.currentLevel = lvl; this.moveCount = 0; this.selectedTubeIndex = null;
-                this.tubes = [['red', 'blue', 'red', 'blue'], ['blue', 'red', 'blue', 'red'], [], []];
-                this.render();
-            },
-            handleTubeClick(idx) {
-                if (this.selectedTubeIndex === null) {
-                    if (this.tubes[idx].length === 0) return;
-                    this.selectedTubeIndex = idx;
-                } else {
-                    if (this.selectedTubeIndex !== idx && this.tubes[idx].length < 4) {
-                        let ball = this.tubes[this.selectedTubeIndex].pop();
-                        this.tubes[idx].push(ball);
-                        this.moveCount++;
-                    }
-                    this.selectedTubeIndex = null;
-                }
-                this.render();
-            },
-            render() {
-                let html = `<div style="text-align:center;"><p style="color:#feca57; font-weight:800;">Seviye ${this.currentLevel} | Hamle: ${this.moveCount}</p><div class="tubes-container">`;
-                this.tubes.forEach((tube, idx) => {
-                    html += `<div class="tube ${this.selectedTubeIndex === idx ? 'selected' : ''}" onclick="ColorSortEngine.handleTubeClick(${idx})">`;
-                    tube.forEach(c => { html += `<div class="ball ball-${c}"></div>`; });
-                    html += `</div>`;
-                });
-                html += `</div><div style="margin-top:25px;"><button class="premium-btn" onclick="ColorSortEngine.initLevel(1)">Yeniden Başlat</button></div></div>`;
-                document.getElementById('activeModuleContent').innerHTML = html;
-            }
-        };
-
-        const MilyonerEngine = {
-            idx: 0, score: 0,
-            q: [
-                { q: "Türkiye'nin başkenti neresidir?", o: ["İstanbul", "Ankara", "İzmir", "Bursa"], a: 1 },
-                { q: "Güneş sistemindeki en büyük gezegen hangisidir?", o: ["Mars", "Jüpiter", "Satürn", "Venüs"], a: 1 }
-            ],
-            startQuiz() { this.idx = 0; this.score = 0; this.render(); },
-            render() {
-                if (this.idx >= this.q.length) {
-                    document.getElementById('activeModuleContent').innerHTML = `<div class="milyoner-wrapper"><h2>🏆 Tebrikler!</h2><p style="font-size:18px; color:#feca57; margin:15px 0;">Skor: ${this.score} ₺</p><button class="premium-btn" onclick="MilyonerEngine.startQuiz()">Yeniden Oyna</button></div>`;
-                    return;
-                }
-                let curr = this.q[this.idx];
-                let html = `<div class="milyoner-wrapper"><div style="color:#747d8c; font-size:13px; font-weight:700; margin-bottom:10px;">Soru ${this.idx + 1} / ${this.q.length}</div><div class="question-box">${curr.q}</div><div class="options-grid">`;
-                curr.o.forEach((opt, i) => { html += `<button class="option-btn" onclick="MilyonerEngine.answer(${i})">${String.fromCharCode(65+i)}. ${opt}</button>`; });
-                html += `</div></div>`;
-                document.getElementById('activeModuleContent').innerHTML = html;
-            },
-            answer(i) {
-                if (i === this.q[this.idx].a) { this.score += 1000; this.idx++; this.render(); }
-                else { alert("❌ Yanlış cevap!"); returnToMainMenu(); }
-            }
-        };
-
-        const DiniImtihanEngine = {
-            idx: 0, score: 0,
-            q: [
-                { q: "İslam'ın şartları kaç tanedir?", o: ["3", "4", "5", "6"], a: 2 },
-                { q: "İlk insan ve ilk peygamber kimdir?", o: ["Hz. İbrahim", "Hz. Adem", "Hz. Nuh", "Hz. Musa"], a: 1 }
-            ],
-            startQuiz() { this.idx = 0; this.score = 0; this.render(); },
-            render() {
-                if (this.idx >= this.q.length) {
-                    document.getElementById('activeModuleContent').innerHTML = `<div class="dini-wrapper"><h2>🌟 İmtihan Bitti!</h2><p style="font-size:18px; color:#2ed573; margin:15px 0;">Doğru: ${this.score} / ${this.q.length}</p><button class="premium-btn" onclick="DiniImtihanEngine.startQuiz()">Yeniden Başla</button></div>`;
-                    return;
-                }
-                let curr = this.q[this.idx];
-                let html = `<div class="dini-wrapper"><div style="color:#747d8c; font-size:13px; font-weight:700; margin-bottom:10px;">Soru ${this.idx + 1} / ${this.q.length}</div><div class="question-box">${curr.q}</div><div class="options-grid">`;
-                curr.o.forEach((opt, i) => { html += `<button class="option-btn" onclick="DiniImtihanEngine.answer(${i})">${String.fromCharCode(65+i)}. ${opt}</button>`; });
-                html += `</div></div>`;
-                document.getElementById('activeModuleContent').innerHTML = html;
-            },
-            answer(i) {
-                if (i === this.q[this.idx].a) { this.score++; }
-                this.idx++; this.render();
-            }
-        };
-
-        const OkeyGameEngine = {
-            mode: 'Klasik',
-            hand: [
-                {color: 'red', val: 7}, {color: 'black', val: 10}, {color: 'blue', val: 12},
-                {color: 'green', val: 1}, {color: 'red', val: 5}, {color: 'black', val: 3}
-            ],
-            discardPile: [{color: 'blue', val: 5}],
-            selectedIdx: null,
-            initTable(modeName) {
-                this.mode = modeName; this.selectedIdx = null; this.render();
-            },
-            selectTile(idx) {
-                this.selectedIdx = (this.selectedIdx === idx) ? null : idx; this.render();
-            },
-            discardTile() {
-                if (this.selectedIdx !== null) {
-                    let removed = this.hand.splice(this.selectedIdx, 1)[0];
-                    this.discardPile.push(removed); this.selectedIdx = null; this.render();
-                } else { alert("Atmak için önce ıstakadan bir taş seçin!"); }
-            },
-            drawTile() {
-                if (this.hand.length >= 15) { alert("Istaka dolu!"); return; }
-                const cols = ['red', 'black', 'blue', 'green'];
-                this.hand.push({ color: cols[Math.floor(Math.random()*cols.length)], val: Math.floor(Math.random()*13)+1 });
-                this.render();
-            },
-            render() {
-                let lastDiscard = this.discardPile[this.discardPile.length - 1];
-                let html = `
-                    <div class="okey-table-felt">
-                        <h3 style="color: #2ed573; margin-top:0; font-size: 20px; font-weight:800;">🀄 ${this.mode} Masası</h3>
-                        <p style="font-size: 12px; color: #a4b0be; margin-bottom: 15px; font-weight:600;">Taş seçip masaya atabilir ya da desteden çekebilirsiniz.</p>
-                        <div style="display: flex; justify-content: center; gap: 20px; align-items: center; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 14px;">
-                            <div style="text-align: center; cursor: pointer;" onclick="OkeyGameEngine.drawTile()">
-                                <div style="width: 44px; height: 60px; background: linear-gradient(135deg, #2c3e50, #1a252f); border: 2px solid #485460; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 6px 15px rgba(0,0,0,0.6);">🀄</div>
-                                <span style="font-size: 11px; color: #d4af37; font-weight: 800; margin-top: 6px; display: block;">Desteden Çek</span>
-                            </div>
-                            <div style="text-align: center;">
-                                <div class="okey-tile-3d t-${lastDiscard.color}" style="margin: 0 auto; transform: scale(0.9);">
-                                    <span class="tile-num">${lastDiscard.val}</span>
-                                </div>
-                                <span style="font-size: 11px; color: #d4af37; font-weight: 800; margin-top: 6px; display: block;">Atılan Taş</span>
-                            </div>
+            if (type === 'milyoner' || type === 'genel' || type === 'hizli' || type === 'duello') {
+                title.innerText = "Milyoner Bilgi Yarışması";
+                content.innerHTML = `
+                    <div class="quiz-container">
+                        <div style="color:#f1c40f; font-size:13px; font-weight:800; margin-bottom:8px;">Soru 1 / 10</div>
+                        <div class="question-box">Türkiye'nin başkenti neresidir?</div>
+                        <div class="options-list">
+                            <div class="option-item" onclick="alert('Doğru Cevap!')">A) İstanbul</div>
+                            <div class="option-item" onclick="alert('Tebrikler, Doğru!')" style="border-color:#2ed573;">B) Ankara</div>
+                            <div class="option-item" onclick="alert('Yanlış Cevap!')">C) İzmir</div>
+                            <div class="option-item" onclick="alert('Yanlış Cevap!')">D) Bursa</div>
                         </div>
-                        <div style="margin-bottom: 15px;">
-                            <button class="premium-btn" onclick="OkeyGameEngine.discardTile()" style="background: linear-gradient(135deg, #e74c3c, #c0392b);">Seçilen Taşı Masaya At</button>
-                        </div>
-                        <div style="font-size: 13px; font-weight: 800; color: #d4af37; text-align: left; margin-bottom: 6px;">Istakanız (${this.hand.length} Taş):</div>
-                        <div class="okey-rack-wood">
+                    </div>
                 `;
-                this.hand.forEach((tile, idx) => {
-                    let sel = (this.selectedIdx === idx) ? 'selected' : '';
-                    html += `<div class="okey-tile-3d ${sel}" onclick="OkeyGameEngine.selectTile(${idx})"><span class="tile-num t-${tile.color}">${tile.val}</span></div>`;
-                });
-                html += `</div></div>`;
-                document.getElementById('activeModuleContent').innerHTML = html;
+            } else if (type === 'dini') {
+                title.innerText = "Dini İmtihan";
+                content.innerHTML = `
+                    <div class="quiz-container">
+                        <div style="color:#1abc9c; font-size:13px; font-weight:800; margin-bottom:8px;">Dini Bilgiler İmtihanı</div>
+                        <div class="question-box">İslam'ın şartları kaç tanedir?</div>
+                        <div class="options-list">
+                            <div class="option-item">A) 3</div>
+                            <div class="option-item">B) 4</div>
+                            <div class="option-item" style="border-color:#2ed573;" onclick="alert('Doğru!')">C) 5</div>
+                            <div class="option-item">D) 6</div>
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'renk') {
+                title.innerText = "Renk Sıralama Bulmacası";
+                content.innerHTML = `
+                    <div class="quiz-container" style="text-align:center;">
+                        <p style="color:#f1c40f; font-weight:800;">Tüplere tıklayarak renkleri eşleştirin!</p>
+                        <div class="tubes-wrapper">
+                            <div class="tube selected">
+                                <div class="ball b-red"></div>
+                                <div class="ball b-blue"></div>
+                                <div class="ball b-red"></div>
+                                <div class="ball b-blue"></div>
+                            </div>
+                            <div class="tube">
+                                <div class="ball b-blue"></div>
+                                <div class="ball b-red"></div>
+                                <div class="ball b-blue"></div>
+                                <div class="ball b-red"></div>
+                            </div>
+                            <div class="tube"></div>
+                        </div>
+                        <button class="action-btn" onclick="alert('Seviye tamamlandı!')">Yeniden Başlat</button>
+                    </div>
+                `;
+            } else if (type === 'okey') {
+                title.innerText = "Klasik Okey Masası";
+                content.innerHTML = `
+                    <div class="quiz-container" style="text-align:center;">
+                        <h3 style="color:#2ed573;">🀄 Ahşap Istaka & Fildişi Taşlar</h3>
+                        <p style="color:#a4b0be; font-size:12px;">Okey oyunu masası aktif edildi.</p>
+                        <div style="background:#1b4d3e; padding:20px; border-radius:14px; margin-top:20px; border:2px solid #0c221b;">
+                            <div style="display:flex; gap:6px; justify-content:center; background:#5c3a21; padding:12px; border-radius:10px;">
+                                <div style="width:40px;height:55px;background:#fff;border-radius:6px;color:#d63031;font-weight:900;font-size:22px;display:flex;align-items:center;justify-content:center;">7</div>
+                                <div style="width:40px;height:55px;background:#fff;border-radius:6px;color:#1c1c1c;font-weight:900;font-size:22px;display:flex;align-items:center;justify-content:center;">10</div>
+                                <div style="width:40px;height:55px;background:#fff;border-radius:6px;color:#0984e3;font-weight:900;font-size:22px;display:flex;align-items:center;justify-content:center;">12</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                title.innerText = "Passaparola Yarışması";
+                content.innerHTML = `
+                    <div class="quiz-package">
+                        <div style="font-size:40px; font-weight:900; color:#f1c40f; margin-bottom:10px;">A</div>
+                        <div class="question-box">Ankara'nın başkent olduğu ülke?</div>
+                        <input type="text" placeholder="Cevabınızı yazın..." style="width:100%; padding:14px; border-radius:10px; border:1px solid #3498db; background:#04060f; color:#fff; font-size:16px; text-align:center; margin-bottom:15px;">
+                        <button class="action-btn" onclick="alert('Cevap kontrol edildi!')">Cevapla</button>
+                    </div>
+                `;
             }
-        };
+        }
+
+        function closeGame() {
+            document.getElementById('gameScreen').style.display = 'none';
+        }
     </script>
 </body>
 </html>
