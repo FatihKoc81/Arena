@@ -4251,3 +4251,80 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
  `;
  document.head.appendChild(s);
 })();
+
+
+/* 2026-11-15: FINAL FIX — Milyoner/category cards were being squeezed and
+   pushed to the right by conflicting legacy grid/flex rules. */
+(function(){
+ if(document.getElementById('arenaMilyonerCategoryWidthFix20261115'))return;
+ var style=document.createElement('style');
+ style.id='arenaMilyonerCategoryWidthFix20261115';
+ style.textContent=`
+  html.arena-home-fixed body #ana #arenaHubHome{
+    display:flex!important;flex-direction:column!important;align-items:stretch!important;
+    justify-content:flex-start!important;width:100%!important;max-width:none!important;
+    min-width:0!important;box-sizing:border-box!important;
+  }
+  html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open{
+    display:flex!important;flex:1 1 auto!important;flex-direction:column!important;
+    align-items:stretch!important;justify-content:flex-start!important;
+    position:static!important;inset:auto!important;float:none!important;
+    width:100%!important;max-width:none!important;min-width:0!important;
+    height:auto!important;min-height:0!important;max-height:none!important;
+    margin:0!important;padding:0!important;gap:10px!important;
+    overflow:visible!important;transform:none!important;translate:none!important;
+    box-sizing:border-box!important;
+  }
+  html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-category-head{
+    display:flex!important;flex:0 0 auto!important;align-items:center!important;
+    align-self:stretch!important;position:static!important;inset:auto!important;
+    width:100%!important;max-width:none!important;min-width:0!important;
+    min-height:54px!important;margin:0!important;padding:0!important;
+    box-sizing:border-box!important;transform:none!important;translate:none!important;
+  }
+  html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list{
+    display:grid!important;position:static!important;float:none!important;
+    flex:0 0 auto!important;align-self:stretch!important;justify-self:stretch!important;
+    grid-template-columns:minmax(0,1fr)!important;grid-auto-flow:row!important;
+    grid-auto-rows:auto!important;align-content:start!important;align-items:stretch!important;
+    width:100%!important;max-width:none!important;min-width:0!important;
+    height:auto!important;min-height:0!important;max-height:none!important;
+    margin:0!important;padding:0!important;gap:10px!important;
+    overflow:visible!important;transform:none!important;translate:none!important;
+    box-sizing:border-box!important;
+  }
+  html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card{
+    display:grid!important;position:static!important;float:none!important;
+    grid-column:1!important;grid-row:auto!important;
+    grid-template-columns:58px minmax(0,1fr)!important;
+    align-items:center!important;justify-content:stretch!important;
+    justify-self:stretch!important;align-self:stretch!important;
+    width:100%!important;max-width:none!important;min-width:0!important;
+    height:auto!important;min-height:104px!important;margin:0!important;
+    padding:12px 14px!important;gap:10px!important;box-sizing:border-box!important;
+    overflow:hidden!important;transform:none!important;translate:none!important;
+    border-radius:18px!important;text-align:left!important;
+  }
+  html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card>i{
+    display:grid!important;place-items:center!important;
+    width:54px!important;height:54px!important;min-width:54px!important;
+    margin:0!important;font-size:38px!important;line-height:1!important;
+  }
+  html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card>span{
+    display:block!important;width:auto!important;min-width:0!important;
+    flex:1 1 auto!important;overflow-wrap:anywhere!important;
+  }
+  html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card strong{
+    display:block!important;font-size:17px!important;line-height:1.15!important;
+    white-space:normal!important;overflow-wrap:anywhere!important;
+  }
+  html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card small{
+    display:block!important;margin-top:5px!important;font-size:13px!important;
+    line-height:1.25!important;white-space:normal!important;overflow-wrap:anywhere!important;
+  }
+  html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card.soon{
+    opacity:.68!important;
+  }
+ `;
+ document.head.appendChild(style);
+})();
