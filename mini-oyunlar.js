@@ -59,7 +59,7 @@ function memHtml(){var h=stats(["Hamle: "+s.moves,"Eşleşme: "+s.doneCards.leng
 function sortKey(){return "arenaSortLevel_"+id;}
 function sortLevel(){return Math.max(1,Math.min(200,Number(localStorage.getItem(sortKey())||1)));}
 function sortInit(){
- var level=sortLevel(),colors=["r","g","b","y","p","o","c","m"],count=Math.min(8,3+Math.floor((level-1)/28)),cap=4;
+ var level=sortLevel(),colors=["r","g","b","y","p","o","c","m"],count=Math.min(8,3+Math.floor((level-1)/3)),cap=4;
  var tubes=colors.slice(0,count).map(function(c){return [c,c,c,c];});
  tubes.push([],[]);
  var steps=18+level*4;
@@ -77,7 +77,7 @@ function sortInit(){
 function sortWon(){return s.tubes.every(function(t){return !t.length||(t.length===s.cap&&t.every(function(c){return c===t[0];}));});}
 function sortHtml(){
  var liquid=id==="liquidSort",ball=id==="ballSort",level=s.level;
- var h=stats(["Seviye "+level+"/200","Hamle "+s.moves,"Renk "+Math.min(8,3+Math.floor((level-1)/28))]);
+ var h=stats(["Seviye "+level+"/200","Hamle "+s.moves,"Renk "+Math.min(8,3+Math.floor((level-1)/3))]);
  h+='<div class="mg-sort-board '+(liquid?'liquid':'balls')+'">';
  s.tubes.forEach(function(t,i){
   h+='<button class="mg-sort-tube'+(s.sel===i?' sel':'')+'" data-mg="sort-tube" data-i="'+i+'" aria-label="Tüp '+(i+1)+'">';
