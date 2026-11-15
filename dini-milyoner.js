@@ -55,16 +55,15 @@ function stopVoice(){voiceToken++;try{if(window.ArenaTTS)window.ArenaTTS.stop()}
 async function speak(){
  if(!tts||!state||!state.deck[state.i])return;
  const token=++voiceToken,q=state.deck[state.i],letters=["A","B","C","D"];
- try{if(window.ArenaTTS&&typeof window.ArenaTTS.speakParts==="function"){await window.ArenaTTS.speakParts(q[0],q[1]);if(token!==voiceToken)stopVoice();return;}}
+ try{if(window.ArenaTTS&&typeof window.ArenaTTS.speakParts==="function"){await window.ArenaTTS.speakParts(q[0],[],"male");if(token!==voiceToken)stopVoice();return;}}
  catch(nativeError){console.warn("ARENA native TTS unavailable:",nativeError);}
  if(!("speechSynthesis"in window)||!("SpeechSynthesisUtterance"in window))return;
  try{
   window.speechSynthesis.cancel();
   const voices=window.speechSynthesis.getVoices()||[],tr=voices.find(v=>/^tr([-_]|$)/i.test(v.lang));
-  const say=text=>new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang="tr-TR";u.rate=.80;u.pitch=1;u.volume=1;if(tr)u.voice=tr;u.onend=resolve;u.onerror=resolve;window.speechSynthesis.speak(u);});
+  const male=/male|erkek|man|baritone|ahmet|mehmet|yusuf|burak/i;const mv=voices.filter(v=>/^tr([-_]|$)/i.test(v.lang));mv.sort((a,b)=>(male.test(b.name+" "+b.voiceURI)?1:0)-(male.test(a.name+" "+a.voiceURI)?1:0));const say=text=>new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang="tr-TR";u.rate=.88;u.pitch=.88;u.volume=1;if(mv[0])u.voice=mv[0];u.onend=resolve;u.onerror=resolve;window.speechSynthesis.speak(u);});
   await say("Soru. "+q[0]);if(token!==voiceToken)return;
-  await new Promise(r=>setTimeout(r,1000));
-  for(let i=0;i<q[1].length;i++){if(token!==voiceToken)return;if(i>0)await new Promise(r=>setTimeout(r,1000));await say(q[1][i]+".");}
+  
  }catch(e){console.warn("ARENA TTS:",e);}
 }
 function shuffle(a){return a.map(x=>[Math.random(),x]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);}
