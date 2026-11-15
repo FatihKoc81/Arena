@@ -29,7 +29,7 @@ jobs:
 
       - name: TTS köprüsünü derle
         run: npx esbuild tts-bridge-entry.js --bundle --format=iife --platform=browser --outfile=tts-bridge.js
-
+\n      - name: Three.js oyun motorunu derle ve web sürümüne yayımla\n        run: |\n          set -e\n          npx esbuild arena-3d-entry.js --bundle --minify --format=iife --platform=browser --outfile=arena-3d.js\n          git config user.name "github-actions[bot]"\n          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"\n          git add arena-3d.js\n          if ! git diff --cached --quiet; then git commit -m "build: publish bundled offline 3D game engine"; git push; fi\n
       - name: Web dosyalarını hazırla
         run: |
           WEB=$(node -p "require('./capacitor.config.json').webDir || 'www'")
