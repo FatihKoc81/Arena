@@ -62,12 +62,14 @@ function sortInit(){
  var level=sortLevel(),colors=["r","g","b","y","p","o","c","m"],count=Math.min(8,3+Math.floor((level-1)/3)),cap=4;
  var tubes=colors.slice(0,count).map(function(c){return [c,c,c,c];});
  tubes.push([],[]);
- var steps=18+level*4;
- for(var k=0;k<steps;k++){
-   var froms=tubes.map(function(t,i){return t.length?i:-1;}).filter(function(i){return i>=0;});
+ var steps=24+level*5,guard=0;
+ /* Solvedan geriye doğru yalnızca tersine çevrilebilir karıştırma:
+    kaynakta alttaki renk aynı kalır; böylece her üretilen bulmaca çözülebilir. */
+ for(var k=0;k<steps&&guard<steps*20;k++,guard++){
+   var froms=tubes.map(function(t,i){return t.length&&(t.length===1||t[t.length-2]===t[t.length-1])?i:-1;}).filter(function(i){return i>=0;});
    if(!froms.length)break;
    var from=froms[Math.floor(Math.random()*froms.length)],ball=tubes[from][tubes[from].length-1];
-   var tos=tubes.map(function(t,i){return i!==from&&t.length<cap?i:-1;}).filter(function(i){return i>=0;});
+   var tos=tubes.map(function(t,i){return i!==from&&t.length<cap&&(t.length===0||t[t.length-1]!==ball)?i:-1;}).filter(function(i){return i>=0;});
    if(!tos.length)continue;
    var to=tos[Math.floor(Math.random()*tos.length)];
    tubes[from].pop();tubes[to].push(ball);
