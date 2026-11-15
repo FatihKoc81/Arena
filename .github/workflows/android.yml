@@ -144,6 +144,161 @@ jobs:
           grep -i admob android/capacitor.settings.gradle || { echo "HATA: AdMob eklentisi Android projesine eklenmedi"; exit 1; }
           grep -i "capacitor-app" android/capacitor.settings.gradle || { echo "HATA: Geri tuşu eklentisi (@capacitor/app) Android projesine eklenmedi"; exit 1; }
 
+      - name: ARENA tek dokunuş APK güncelleyicisini ekle
+        run: |
+          set -e
+          ID=$(node -p "require('./capacitor.config.json').appId")
+          PKG_PATH=$(echo "$ID" | tr '.' '/')
+          SRC="android/app/src/main/java/$PKG_PATH"
+          mkdir -p "$SRC"
+          cat > "$SRC/ArenaUpdaterPlugin.java" <<'JAVA'
+          package com.fatihkoc.arena.mobile;
+
+          import android.Manifest;
+          import android.app.DownloadManager;
+          import android.content.Context;
+          import android.net.Uri;
+          import android.os.Environment;
+          import android.webkit.URLUtil;
+          import com.getcapacitor.*;
+          import com.getcapacitor.annotation.*;
+          import java.util.*;
+          import org.json.JSONObject;
+
+          @CapacitorPlugin(name = "ArenaUpdater", permissions = {
+            @Permission(alias = "notifications", strings = { Manifest.permission.POST_NOTIFICATIONS })
+          })
+          public class ArenaUpdaterPlugin extends Plugin {
+            @PluginMethod
+            public void startDownload(PluginCall call) {
+              if (android.os.Build.VERSION.SDK_INT >= 33 &&
+                  getPermissionState("notifications") != PermissionState.GRANTED) {
+                requestPermissionForAlias("notifications", call, "notificationPermissionResult");
+                return;
+              }
+              enqueue(call);
+            }
+
+            @PermissionCallback
+            private void notificationPermissionResult(PluginCall call) {
+              if (android.os.Build.VERSION.SDK_INT >= 33 &&
+                  getPermissionState("notifications") != PermissionState.GRANTED) {
+                call.reject("İndirme bildirimi için bildirim izni gerekli.");
+                return;
+              }
+              enqueue(call);
+            }
+
+            private void enqueue(PluginCall call) {
+              try {
+                String url = call.getString("url", "https://github.com/FatihKoc81/Arena/releases/latest/download/Arena.apk");
+                if (!URLUtil.isHttpsUrl(url) || !url.contains("github.com/FatihKoc81/Arena/")) {
+                  call.reject("Güvenli olmayan güncelleme adresi."); return;
+                }
+                DownloadManager dm = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
+                DownloadManager.Request req = new DownloadManager.Request(Uri.parse(url));
+                req.setTitle("ARENA güncellemesi");
+                req.setDescription("Yeni APK indiriliyor. Tamamlanınca bildirime dokunun.");
+                req.setMimeType("application/vnd.android.package-archive");
+                req.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
+                req.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "ARENA-update.apk");
+                req.setAllowedOverMetered(true);
+                req.setAllowedOverRoaming(false);
+                long id = dm.enqueue(req);
+                call.resolve(new JSObject().put("downloadId", id).put("message", "Yeni APK indiriliyor. İndirme bitince Android bildirimine dokunun."));
+              } catch (Exception e) {
+                call.reject("APK indirme başlatılamadı: " + e.getMessage(), e);
+              }
+            }
+          }
+          JAVA
+          cat > "$SRC/ArenaDownloadReceiver.java" <<'JAVA'
+          package com.fatihkoc.arena.mobile;
+
+          import android.app.*;
+          import android.content.*;
+          import android.net.Uri;
+          import android.os.Build;
+          import android.app.DownloadManager;
+
+          public class ArenaDownloadReceiver extends BroadcastReceiver {
+            @Override public void onReceive(Context context, Intent intent) {
+              if (!DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(intent.getAction())) return;
+              long id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
+              android.content.SharedPreferences prefs = context.getSharedPreferences("arena_updater", Context.MODE_PRIVATE);
+              if (id < 0 || id != prefs.getLong("download_id", -2)) return;
+              DownloadManager dm = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+              DownloadManager.Query q = new DownloadManager.Query().setFilterById(id);
+              android.database.Cursor c = dm.query(q);
+              boolean ok = false;
+              if (c != null) { try { ok = c.moveToFirst() && c.getInt(c.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL; } finally { c.close(); } }
+              if (!ok) return;
+              String channel = "arena_updates";
+              if (Build.VERSION.SDK_INT >= 26) {
+                NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                nm.createNotificationChannel(new NotificationChannel(channel, "ARENA güncellemeleri", NotificationManager.IMPORTANCE_HIGH));
+              }
+              Intent open = new Intent(context, ArenaInstallActivity.class).putExtra("download_id", id);
+              PendingIntent pi = PendingIntent.getActivity(context, (int)id, open, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+              Notification.Builder b = Build.VERSION.SDK_INT >= 26 ? new Notification.Builder(context, channel) : new Notification.Builder(context);
+              b.setSmallIcon(context.getApplicationInfo().icon)
+               .setContentTitle("ARENA güncellemesi hazır")
+               .setContentText("Kurulumu başlatmak için dokunun.")
+               .setAutoCancel(true).setContentIntent(pi);
+              ((NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE)).notify(963, b.build());
+            }
+          }
+          JAVA
+          cat > "$SRC/ArenaInstallActivity.java" <<'JAVA'
+          package com.fatihkoc.arena.mobile;
+
+          import android.app.Activity;
+          import android.app.DownloadManager;
+          import android.content.*;
+          import android.net.Uri;
+          import android.os.Build;
+          import android.os.Bundle;
+          import android.provider.Settings;
+          import android.widget.Toast;
+
+          public class ArenaInstallActivity extends Activity {
+            @Override protected void onCreate(Bundle state) {
+              super.onCreate(state);
+              long id = getIntent().getLongExtra("download_id", -1);
+              DownloadManager dm = (DownloadManager)getSystemService(DOWNLOAD_SERVICE);
+              Uri uri = dm.getUriForDownloadedFile(id);
+              if (uri == null) { Toast.makeText(this, "İndirilen APK bulunamadı.", Toast.LENGTH_LONG).show(); finish(); return; }
+              if (Build.VERSION.SDK_INT >= 26 && !getPackageManager().canRequestPackageInstalls()) {
+                Toast.makeText(this, "ARENA için bilinmeyen uygulama yükleme iznini açın, sonra bildirime tekrar dokunun.", Toast.LENGTH_LONG).show();
+                Intent settings = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:" + getPackageName()));
+                startActivity(settings); finish(); return;
+              }
+              Intent install = new Intent(Intent.ACTION_VIEW);
+              install.setDataAndType(uri, "application/vnd.android.package-archive");
+              install.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+              try { startActivity(install); } catch (Exception e) { Toast.makeText(this, "APK kurulum ekranı açılamadı: " + e.getMessage(), Toast.LENGTH_LONG).show(); }
+              finish();
+            }
+          }
+          JAVA
+          node - "$ID" <<'NODE'
+          const fs=require('fs');
+          const id=process.argv[2], mf='android/app/src/main/AndroidManifest.xml';
+          let x=fs.readFileSync(mf,'utf8');
+          if(!x.includes('android.permission.REQUEST_INSTALL_PACKAGES')) x=x.replace('<application','<uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>\n    <application');
+          if(!x.includes('ArenaDownloadReceiver')) x=x.replace('</application>', '  <receiver android:name=".ArenaDownloadReceiver" android:exported="false"><intent-filter><action android:name="android.intent.action.DOWNLOAD_COMPLETE"/></intent-filter></receiver>\n  <activity android:name=".ArenaInstallActivity" android:exported="false" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>\n</application>');
+          fs.writeFileSync(mf,x);
+          const main='android/app/src/main/java/'+id.replace(/\\./g,'/')+'/MainActivity.java';
+          if(fs.existsSync(main)){
+            let a=fs.readFileSync(main,'utf8');
+            if(!a.includes('ArenaUpdaterPlugin')) {
+              a=a.replace('import com.getcapacitor.BridgeActivity;','import com.getcapacitor.BridgeActivity;\nimport com.fatihkoc.arena.mobile.ArenaUpdaterPlugin;');
+              a=a.replace('public class MainActivity extends BridgeActivity {','public class MainActivity extends BridgeActivity {\n    @Override public void onCreate(android.os.Bundle savedInstanceState) {\n        registerPlugin(ArenaUpdaterPlugin.class);\n        super.onCreate(savedInstanceState);\n    }');
+              fs.writeFileSync(main,a);
+            }
+          } else { throw new Error('MainActivity.java bulunamadı: '+main); }
+          NODE
+          echo "Native one-tap APK updater registered."
       - name: Paket adını Gradle'a uygula
         run: |
           ID=$(node -p "require('./capacitor.config.json').appId")
