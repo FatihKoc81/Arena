@@ -1,0 +1,1 @@
+ARENA visual effect definitions. CSS gradients and shadows are used as the mobile-compatible shader fallback.

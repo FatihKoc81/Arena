@@ -1,0 +1,7 @@
+/* ARENA realism layer — lightweight, mobile-first and scoped */
+.sort-ball-realistic{width:clamp(28px,8vw,50px);height:clamp(28px,8vw,50px);flex:0 0 auto;border-radius:50%;background:radial-gradient(circle at 28% 24%,#fff 0 4%,#b8ffd1 8%,#4ade80 34%,#15803d 78%,#064e3b 100%);border:1px solid #ffffff80;box-shadow:inset -5px -6px 10px #052e1680,inset 3px 3px 7px #ffffffb0,0 4px 8px #0008;position:relative;transition:transform .28s cubic-bezier(.175,.885,.32,1.275),filter .2s}
+.sort-ball-realistic:after{content:"";position:absolute;left:22%;top:14%;width:28%;height:17%;border-radius:50%;background:#fff9;filter:blur(2px);transform:rotate(-35deg)}
+.sort-ball-realistic.is-selected{transform:translateY(-10px) scale(1.08);filter:drop-shadow(0 0 8px #facc15)}
+.okey-tile-realistic{background:linear-gradient(145deg,#fffefa 0%,#f4efe5 48%,#d9d0c2 100%);border:1px solid #b8aa98;border-radius:6px;color:#18243a;box-shadow:0 4px 6px #0004,inset 0 2px 0 #fff,inset 0 -2px 3px #a89a8870;text-shadow:0 1px #fff9;font-weight:800}
+#arenaMiniGames .mg-sort-tube{filter:drop-shadow(0 5px 5px #0006)}
+#arenaMiniGames .mg-sort-tube .mg-ball{box-shadow:inset -4px -5px 7px #06152c55,inset 2px 2px 5px #fff9,0 2px 4px #0007}

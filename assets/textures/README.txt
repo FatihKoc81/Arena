@@ -1,0 +1,1 @@
+ARENA texture assets. Keep original, compressed WebP/PNG textures here. Runtime CSS fallbacks are provided in css/realism.css.
