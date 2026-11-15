@@ -4,13 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ARENA - Premium Mobil Oyun Platformu</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/realism.css">
+    <style>
+        * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; padding: 0; background: #090d16; font-family: 'Segoe UI', Roboto, sans-serif; color: #fff; min-height: 100vh; }
+        
+        .arena-menu-container { padding: 20px 16px; max-width: 500px; margin: 0 auto; }
+        .menu-header { text-align: center; margin-bottom: 24px; }
+        .logo-badge { display: inline-block; background: linear-gradient(135deg, #ff7675, #d63031); color: white; font-size: 11px; font-weight: 800; padding: 4px 12px; border-radius: 20px; margin-bottom: 8px; }
+        .menu-header h1 { font-size: 26px; font-weight: 900; margin: 0; color: #fff; }
+        .menu-header p { color: #747d8c; font-size: 13px; margin-top: 6px; }
+
+        /* 2 Sütunlu Sağlam Grid Yapısı */
+        .game-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+        
+        .game-card { background: rgba(30, 39, 46, 0.85); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 18px 12px; display: flex; flex-direction: column; align-items: center; text-align: center; cursor: pointer; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4); transition: transform 0.2s; }
+        .game-card:active { transform: scale(0.95); }
+        
+        .card-icon { font-size: 38px; margin-bottom: 8px; }
+        .game-card h3 { font-size: 15px; margin: 4px 0; color: #f1f2f6; font-weight: 700; }
+        .game-card p { font-size: 11px; color: #a4b0be; margin: 0; line-height: 1.3; }
+
+        .okey-card { border-left: 3px solid #2ed573; }
+        .okey-101-card { border-left: 3px solid #ffa502; }
+
+        /* Oyun Görünüm Alanı */
+        .game-view-container { padding: 16px; max-width: 600px; margin: 0 auto; }
+        .game-top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; background: rgba(255,255,255,0.05); padding: 8px 14px; border-radius: 12px; }
+        .back-to-menu-btn { background: #ff4757; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; }
+        .active-module-title { font-size: 14px; font-weight: bold; color: #dfe4ea; }
+
+        /* Tüp ve Top Stilleri */
+        .tubes-container { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+        .tube { width: 45px; height: 160px; border: 3px solid rgba(255,255,255,0.2); border-top: none; border-radius: 0 0 15px 15px; display: flex; flex-direction: column-reverse; align-items: center; padding: 4px; background: rgba(255,255,255,0.03); cursor: pointer; }
+        .tube.selected { border-color: #f1c40f; transform: translateY(-8px); }
+        .ball { width: 35px; height: 35px; border-radius: 50%; margin-bottom: 4px; box-shadow: inset -3px -3px 6px rgba(0,0,0,0.5); }
+        .ball-red { background: #e74c3c; }
+        .ball-blue { background: #3498db; }
+        .ball-green { background: #2ecc71; }
+        .ball-yellow { background: #f1c40f; }
+
+        /* Yarışma Stilleri */
+        .milyoner-wrapper, .dini-wrapper { padding: 16px; text-align: center; background: rgba(15, 20, 30, 0.9); border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); }
+        .question-box { background: #2f3542; padding: 20px; border-radius: 12px; font-size: 17px; font-weight: bold; margin: 16px 0; border: 1px solid #3498db; }
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .option-btn { background: #2f3542; color: #fff; border: 1px solid rgba(255,255,255,0.1); padding: 14px; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer; text-align: left; padding-left: 16px; }
+        .premium-btn { background: #3742fa; color: white; border: none; padding: 12px 20px; border-radius: 10px; font-size: 15px; font-weight: bold; cursor: pointer; }
+    </style>
 </head>
 <body>
-
-    <!-- Göz Alıcı Arkaplan Işık Efektleri -->
-    <div class="bg-glow-effect"></div>
 
     <!-- Ana Menü Ekranı -->
     <div id="mainMenu" class="arena-menu-container">
@@ -21,41 +62,31 @@
         </header>
 
         <div class="game-grid">
-            <!-- Renk Sıralama -->
             <div class="game-card" onclick="switchGameModule('colorSort')">
-                <div class="card-glow"></div>
                 <div class="card-icon">🧪</div>
                 <h3>Renk Sıralama</h3>
                 <p>3D Cam Tüpler & Grup Taşıma</p>
             </div>
 
-            <!-- Milyoner Bilgi Yarışması -->
             <div class="game-card" onclick="switchGameModule('milyoner')">
-                <div class="card-glow"></div>
                 <div class="card-icon">💰</div>
                 <h3>Milyoner</h3>
                 <p>Stüdyo Atmosferi & Jokerler</p>
             </div>
 
-            <!-- Dini İmtihan -->
             <div class="game-card" onclick="switchGameModule('diniImtihan')">
-                <div class="card-glow"></div>
                 <div class="card-icon">📖</div>
                 <h3>Dini İmtihan</h3>
                 <p>Kültürel & Bilgi Soruları</p>
             </div>
 
-            <!-- Okey -->
             <div class="game-card okey-card" onclick="switchGameModule('okey')">
-                <div class="card-glow"></div>
                 <div class="card-icon">🀄</div>
                 <h3>Klasik Okey</h3>
                 <p>Ahşap Istaka & Fildişi Taşlar</p>
             </div>
 
-            <!-- 101 Okey -->
             <div class="game-card okey-101-card" onclick="switchGameModule('okey101')">
-                <div class="card-glow"></div>
                 <div class="card-icon">🎯</div>
                 <h3>101 Okey</h3>
                 <p>Stratejik Çift Açma & Bot AI</p>
@@ -76,6 +107,5 @@
     <script src="js/color-sort.js"></script>
     <script src="js/milyoner.js"></script>
     <script src="js/dini-imtihan.js"></script>
-    <script src="js/okey.js"></script>
 </body>
 </html>
