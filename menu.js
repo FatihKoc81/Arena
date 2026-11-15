@@ -4,41 +4,41 @@
 const ana=document.getElementById('ana'),title=document.querySelector('body>h1');
 if(!ana||ana.dataset.arenaReference==='1')return;ana.dataset.arenaReference='1';
 const cats=[
-{id:'bilgi',name:'Zihin Meydanı',icon:'🧠',desc:'Bilgini sına, zirveye çık',count:'3 Hazır',color:'violet',games:['milyoner','diniMilyoner','passaparola'],planned:['Hızlı Karar','Bilgi Düellosu','Genel Kültür']},
-{id:'kelime',name:'Kelime Üssü',icon:'🔤',desc:'Harflerle kelimeler üret',count:'4 Hazır',color:'blue',games:['kelime','rotasyon','wordScramble','wordle'],planned:['Kelime Zinciri']},
-{id:'masa',name:'Oyun Masası',icon:'🎲',desc:'Sevilen masa oyunları bir arada',count:'6 Hazır',color:'green',games:['okey','yuzbir','batak','poker','backgammon','checkers'],planned:['Satranç']},
-{id:'sudoku',name:'Akıl Labirenti',icon:'🧊',desc:'Akıl yürüt, desenleri çöz',count:'2 Hazır',color:'orange',games:['miniSudoku','nonogram'],planned:['Kakuro','Mantık Izgarası','Şekil Dizileri']},
-{id:'sayi',name:'Şifre Avı',icon:'🧩',desc:'Zekânı kullan, bulmacaları çöz',count:'6 Hazır',color:'pink',games:['islem','mathSprint','game2048','ticTacToe','connectFour','minesweeper'],planned:['Sayı Çaprazı']},
-{id:'renk',name:'Renk Ustası',icon:'⚗️',desc:'Renkleri ayır, doğru sıraya diz',count:'1 Hazır',color:'cyan',games:['colorSort','liquidSort','ballSort','colorMemory','colorHunt'],planned:[]},
-{id:'dikkat',name:'Hafıza Gücü',icon:'🧠',desc:'Ayrıntıları fark et, hafızanı sına',count:'1 Hazır',color:'indigo',games:['memory'],planned:['Görsel Hafıza','Nesneyi Bul','7 Fark Bul']},
-{id:'refleks',name:'Hız Parkuru',icon:'⚡',desc:'Hızını ve tepkini test et',count:'2 Hazır',color:'red',games:['reflexTap','snake'],planned:['Hızlı Dokun','Renk Tepkisi','Hızlı Eşleştirme']}
+{id:'bilgi',name:'Bilgi Arenası',icon:'🧠',desc:'Bilgini sına, zirveye çık',count:'3 Hazır',color:'violet',games:['milyoner','diniMilyoner','passaparola'],planned:['Hızlı Karar','Bilgi Düellosu','Genel Kültür']},
+{id:'kelime',name:'Kelime İstasyonu',icon:'🔤',desc:'Harflerle kelimeler üret',count:'4 Hazır',color:'blue',games:['kelime','rotasyon','wordScramble','wordle'],planned:['Kelime Zinciri']},
+{id:'masa',name:'Masa Düellosu',icon:'🎲',desc:'Sevilen masa oyunları bir arada',count:'6 Hazır',color:'green',games:['okey','yuzbir','batak','poker','backgammon','checkers'],planned:['Satranç']},
+{id:'sudoku',name:'Mantık Merkezi',icon:'🧊',desc:'Akıl yürüt, desenleri çöz',count:'2 Hazır',color:'orange',games:['miniSudoku','nonogram'],planned:['Kakuro','Mantık Izgarası','Şekil Dizileri']},
+{id:'sayi',name:'Sayı & Strateji',icon:'🧩',desc:'Zekânı kullan, bulmacaları çöz',count:'6 Hazır',color:'pink',games:['islem','mathSprint','game2048','ticTacToe','connectFour','minesweeper'],planned:['Sayı Çaprazı']},
+{id:'renk',name:'Renk Laboratuvarı',icon:'⚗️',desc:'Renkleri ayır, doğru sıraya diz',count:'1 Hazır',color:'cyan',games:['colorSort','liquidSort','ballSort','colorMemory','colorHunt'],planned:[]},
+{id:'dikkat',name:'Hafıza Arenası',icon:'🧠',desc:'Ayrıntıları fark et, hafızanı sına',count:'1 Hazır',color:'indigo',games:['memory'],planned:['Görsel Hafıza','Nesneyi Bul','7 Fark Bul']},
+{id:'refleks',name:'Refleks Bölgesi',icon:'⚡',desc:'Hızını ve tepkini test et',count:'2 Hazır',color:'red',games:['reflexTap','snake'],planned:['Hızlı Dokun','Renk Tepkisi','Hızlı Eşleştirme']}
 ];
 const defs={
 okey:{name:'Okey',icon:'🀄',desc:'Dört kişilik masada taşlarını diz, botlara karşı oyna',re:/__arena_okey_never__/i},
 yuzbir:{name:'101',icon:'🎴',desc:'Gerçek 101 masasında per aç, rakiplerle yarış',re:/__arena_101_never__/i},
 batak:{name:'Batak',icon:'♠️',desc:'İhaleni al, elleri topla',re:/__arena_batak_never__/i},
 poker:{name:'Poker',icon:'🃏',desc:'Texas Hold’em masasına otur',re:/__arena_poker_never__/i},
-milyoner:{name:'Milyoner',icon:'🏆',desc:'Genel kültür ve bilgi yarışması',re:/milyoner|oyuna başla/i},
+milyoner:{name:'Altın Koltuk',icon:'🏆',desc:'Genel kültür ve bilgi yarışması',re:/milyoner|oyuna başla/i},
 diniMilyoner:{name:'Dini İmtihan',icon:'🕌',desc:'İslam dini üzerine 15 soruluk bilgi yarışması',re:/__arena_dini_milyoner__/i},
-passaparola:{name:'Passaparola',icon:'🔤',desc:'Harf harf cevapla, süreye karşı yarış',re:/pass.?aparola/i},
-kelime:{name:'Kelime Oyunu',icon:'🔤',desc:'İpuçlarından kelimeleri bul',re:/kelime oyunu/i},
-rotasyon:{name:'Rotasyon',icon:'🧩',desc:'Harfleri birleştir, kelimeleri keşfet',re:/rotasyon/i},
+passaparola:{name:'Harf Düellosu',icon:'🔤',desc:'Harf harf cevapla, süreye karşı yarış',re:/pass.?aparola/i},
+kelime:{name:'Kelime Ustası',icon:'🔤',desc:'İpuçlarından kelimeleri bul',re:/kelime oyunu/i},
+rotasyon:{name:'Harf Rotası',icon:'🧩',desc:'Harfleri birleştir, kelimeleri keşfet',re:/rotasyon/i},
 islem:{name:'İşlem Oyunu',icon:'➗',desc:'Sayılarla hedefe ulaş',re:/işlem oyunu|🔢 işlem/i},
-wordScramble:{name:'Kelime Karıştırma',icon:'🔤',desc:'Karışık harflerden kelimeyi bul',re:/__arena_extra_word__/i},
-wordle:{name:'Kelime Tahmin',icon:'🟩',desc:'Altı denemede beş harfli kelimeyi bul',re:/__arena_wordle__/i},
-checkers:{name:'Dama',icon:'⚫',desc:'Zorunlu alma ve taş yükseltmeyle rakibi yen',re:/__arena_checkers__/i},
-backgammon:{name:'Tavla',icon:'🎲',desc:'Zarlarını kullan, taşlarını topla',re:/__arena_backgammon__/i},
-miniSudoku:{name:'Klasik Sudoku 9×9',icon:'🔢',desc:'1–9 rakamlarıyla klasik Sudoku çöz',re:/__arena_extra_sudoku__/i},
-nonogram:{name:'Nonogram 7×7',icon:'🧩',desc:'Satır ve sütun ipuçlarıyla resmi çöz',re:/__arena_nonogram__/i},
-mathSprint:{name:'Matematik Sprinti',icon:'➗',desc:'30 saniyede işlemleri çöz',re:/__arena_extra_math__/i},
-game2048:{name:'2048',icon:'🔢',desc:'Aynı sayıları birleştirerek 2048’e ulaş',re:/__arena_extra_2048__/i},
-ticTacToe:{name:'XOX Ustası',icon:'❎',desc:'Botuna karşı üç taşı sırala',re:/__arena_extra_xo__/i},
-connectFour:{name:'Dört Taş',icon:'🔴',desc:'Dört taşı yan yana getir',re:/__arena_extra_c4__/i},
-minesweeper:{name:'Mayın Tarlası',icon:'💣',desc:'Sayı ipuçlarıyla mayınları bul',re:/__arena_extra_mines__/i},
-colorSort:{name:'Renk Sıralama',icon:'🧪',desc:'200 giderek zorlaşan seviyede parlak topları ayır',re:/__arena_extra_color__/i},liquidSort:{name:'Su Sıralama',icon:'💧',desc:'Renkli sıvıları 200 seviyede tüplere ayır',re:/__arena_extra_liquid__/i},ballSort:{name:'Top Sıralama',icon:'🔵',desc:'Renkli parlak topları 200 seviyede grupla',re:/__arena_extra_ball__/i},
-colorMemory:{name:'Renk Hafızası',icon:'🧠',desc:'Renk dizisini ezberle · 20 seviye',re:/__arena_extra_cmemory__/i},colorHunt:{name:'Renk Avı',icon:'🎨',desc:'Farklı renk tonunu bul · 20 seviye',re:/__arena_extra_chunt__/i},
-memory:{name:'Hafıza Kartları',icon:'🧠',desc:'Aynı sembolleri eşleştir',re:/__arena_extra_memory__/i},
-reflexTap:{name:'Refleks Testi',icon:'⚡',desc:'Yeşil ekrana zamanında dokun',re:/__arena_extra_reflex__/i}
+wordScramble:{name:'Harf Karmaşası',icon:'🔤',desc:'Karışık harflerden kelimeyi bul',re:/__arena_extra_word__/i},
+wordle:{name:'Kelime Dedektifi',icon:'🟩',desc:'Altı denemede beş harfli kelimeyi bul',re:/__arena_wordle__/i},
+checkers:{name:'Dama Düellosu',icon:'⚫',desc:'Zorunlu alma ve taş yükseltmeyle rakibi yen',re:/__arena_checkers__/i},
+backgammon:{name:'Tavla Ustası',icon:'🎲',desc:'Zarlarını kullan, taşlarını topla',re:/__arena_backgammon__/i},
+miniSudoku:{name:'Sudoku Pro 9×9',icon:'🔢',desc:'1–9 rakamlarıyla klasik Sudoku çöz',re:/__arena_extra_sudoku__/i},
+nonogram:{name:'Piksel Bulmaca',icon:'🧩',desc:'Satır ve sütun ipuçlarıyla resmi çöz',re:/__arena_nonogram__/i},
+mathSprint:{name:'Zihin Sprinti',icon:'➗',desc:'30 saniyede işlemleri çöz',re:/__arena_extra_math__/i},
+game2048:{name:'Sayı Birleştir',icon:'🔢',desc:'Aynı sayıları birleştirerek 2048’e ulaş',re:/__arena_extra_2048__/i},
+ticTacToe:{name:'XOX Düellosu',icon:'❎',desc:'Botuna karşı üç taşı sırala',re:/__arena_extra_xo__/i},
+connectFour:{name:'Dörtlü Düello',icon:'🔴',desc:'Dört taşı yan yana getir',re:/__arena_extra_c4__/i},
+minesweeper:{name:'Mayın Avcısı',icon:'💣',desc:'Sayı ipuçlarıyla mayınları bul',re:/__arena_extra_mines__/i},
+colorSort:{name:'Renk Tüpleri',icon:'🧪',desc:'200 giderek zorlaşan seviyede parlak topları ayır',re:/__arena_extra_color__/i},liquidSort:{name:'Renk Akışı',icon:'💧',desc:'Renkli sıvıları 200 seviyede tüplere ayır',re:/__arena_extra_liquid__/i},ballSort:{name:'Renk Küreleri',icon:'🔵',desc:'Renkli parlak topları 200 seviyede grupla',re:/__arena_extra_ball__/i},
+colorMemory:{name:'Renk Hafızası',icon:'🧠',desc:'Renk dizisini ezberle · 20 seviye',re:/__arena_extra_cmemory__/i},colorHunt:{name:'Ton Avı',icon:'🎨',desc:'Farklı renk tonunu bul · 20 seviye',re:/__arena_extra_chunt__/i},
+memory:{name:'Eşleştirme Ustası',icon:'🧠',desc:'Aynı sembolleri eşleştir',re:/__arena_extra_memory__/i},
+reflexTap:{name:'Refleks Arenası',icon:'⚡',desc:'Yeşil ekrana zamanında dokun',re:/__arena_extra_reflex__/i}
 };
 const st=document.createElement('style');st.id='arenaReferenceDesign';st.textContent=`
 body{background:#020713!important;color:#f7f9ff!important;padding:calc(var(--bas-yuk,58px) + env(safe-area-inset-top) + 8px) 0 calc(94px + env(safe-area-inset-bottom))!important;display:block!important;min-height:100dvh!important}
@@ -300,7 +300,7 @@ panel.querySelectorAll('[data-launch]').forEach(function(card){
  view.hidden=true;home.hidden=false;document.documentElement.classList.add('arena-home-fixed');navActive('games');
  if(push)try{history.pushState({arenaCategory:id},'','#kategori-'+id);}catch(_){}
 }
-function launchGame(id){document.documentElement.classList.remove('arena-home-fixed');let opened=false;try{if(id==='milyoner'){if(typeof window.guvenliBaslat==='function')window.guvenliBaslat();else if(typeof window.baslat==='function')window.baslat();else{const start=document.getElementById('basla');if(start)start.click();}const game=document.getElementById('oyun');opened=!!(game&&!game.classList.contains('hidden'));}else if(['okey','yuzbir','batak','poker'].includes(id)&&window.ArenaMasaOyunlari&&typeof window.ArenaMasaOyunlari.ac==='function'){window.ArenaMasaOyunlari.ac(id);opened=true;}else if(window.ArenaMiniOyunlar&&window.ArenaMiniOyunlar.varMi(id)){opened=window.ArenaMiniOyunlar.ac(id)!==false;}else{findGames();let b=found[id];if(!b||!document.contains(b)){const d=defs[id];if(d){b=Array.from(ana.querySelectorAll('button')).find(x=>!home.contains(x)&&!view.contains(x)&&d.re.test((x.id==='basla'?'Milyoner ':'')+(x.textContent||'').replace(/\\s+/g,' ')));if(b)found[id]=b;}}if(b&&typeof b.click==='function'&&!b.disabled){b.click();opened=true;}}}catch(err){console.error('ARENA oyun başlatma hatası:',id,err);}if(opened){try{window.dispatchEvent(new CustomEvent('arena:game-start',{detail:{id:id}}));}catch(_){}return;}soon('Bu oyun şu anda açılamadı: '+(defs[id]?.name||id));}
+function launchGame(id){let opened=false;try{if(id==='milyoner'){if(typeof window.ArenaLaunchMilyoner==='function')opened=window.ArenaLaunchMilyoner()===true;else if(typeof window.guvenliBaslat==='function'){window.guvenliBaslat();const game=document.getElementById('oyun');opened=!!(game&&!game.classList.contains('hidden'));}else{const start=document.getElementById('basla');if(start){start.click();const game=document.getElementById('oyun');opened=!!(game&&!game.classList.contains('hidden'));}}}else if(['okey','yuzbir','batak','poker'].includes(id)&&window.ArenaMasaOyunlari&&typeof window.ArenaMasaOyunlari.ac==='function'){window.ArenaMasaOyunlari.ac(id);opened=true;}else if(window.ArenaMiniOyunlar&&window.ArenaMiniOyunlar.varMi(id)){opened=window.ArenaMiniOyunlar.ac(id)!==false;}else{findGames();let b=found[id];if(!b||!document.contains(b)){const d=defs[id];if(d){b=Array.from(ana.querySelectorAll('button')).find(x=>!home.contains(x)&&!view.contains(x)&&d.re.test((x.id==='basla'?'Milyoner ':'')+(x.textContent||'').replace(/\\s+/g,' ')));if(b)found[id]=b;}}if(b&&typeof b.click==='function'&&!b.disabled){b.click();opened=true;}}}catch(err){console.error('ARENA oyun başlatma hatası:',id,err);}if(opened){document.documentElement.classList.remove('arena-home-fixed');try{window.dispatchEvent(new CustomEvent('arena:game-start',{detail:{id:id}}));}catch(_){}return;}document.documentElement.classList.add('arena-home-fixed');soon('Bu oyun şu anda açılamadı: '+(defs[id]?.name||id));}
 function dailyMission(){const el=document.querySelector('#arenaHubHome .ar-daily');if(!el)return;let key='arenaDailyGames_'+new Date().getFullYear()+'-'+(new Date().getMonth()+1)+'-'+new Date().getDate(),data={games:[],claimed:false};try{data=JSON.parse(localStorage.getItem(key)||'null')||data;}catch(_){}const count=Math.min(3,(data.games||[]).length),small=el.querySelector('.ar-daily-copy small'),bar=el.querySelector('.ar-progress i'),reward=el.querySelector('.ar-daily-reward');if(small)small.textContent=count>=3?'Görev tamamlandı! Günlük ödülünü kazandın.':count+'/3 farklı oyun oynadın.';if(bar)bar.style.width=(count/3*100)+'%';if(reward)reward.textContent=count>=3?'✓ Tamamlandı':'🪙 +150';}
 window.addEventListener('arena:game-start',e=>{const id=e.detail&&e.detail.id;if(!id)return;let key='arenaDailyGames_'+new Date().getFullYear()+'-'+(new Date().getMonth()+1)+'-'+new Date().getDate(),data={games:[],claimed:false};try{data=JSON.parse(localStorage.getItem(key)||'null')||data;}catch(_){}data.games=Array.from(new Set([...(data.games||[]),id]));if(data.games.length>=3&&!data.claimed){data.claimed=true;try{if(window.Ekonomi&&Ekonomi.ekle){Ekonomi.ekle(150);profile();}}catch(_){}}try{localStorage.setItem(key,JSON.stringify(data));}catch(_){}dailyMission();});
 function league(){if(window.Arena&&Arena.ac)Arena.ac('siralama');else alert('Lig sıralaması yüklenemedi.');}
@@ -4397,3 +4397,13 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
  `;
  document.head.appendChild(st);
 })();
+
+/* final mobile category layout guard */
+(function(){if(document.getElementById('arenaFinalCategoryLayoutGuard'))return;
+var s=document.createElement('style');s.id='arenaFinalCategoryLayoutGuard';
+s.textContent='html.arena-home-fixed body #ana #arenaHubHome{display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;width:100%!important;max-width:none!important;min-width:0!important;grid-template-columns:minmax(0,1fr)!important;overflow:hidden!important}'+
+'html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open{display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;width:100%!important;max-width:none!important;min-width:0!important;flex:1 1 auto!important;position:relative!important;inset:auto!important;overflow-y:auto!important;overflow-x:hidden!important;box-sizing:border-box!important}'+
+'html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list{display:grid!important;grid-template-columns:minmax(0,1fr)!important;grid-auto-flow:row!important;align-items:stretch!important;justify-items:stretch!important;width:100%!important;max-width:none!important;min-width:0!important;flex:0 0 auto!important;margin:0!important;padding:0 2px 18px!important;gap:10px!important;box-sizing:border-box!important}'+
+'html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card{display:grid!important;grid-column:1!important;width:100%!important;max-width:none!important;min-width:0!important;justify-self:stretch!important;box-sizing:border-box!important}'+
+'html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-category-head>.ar-inline-back{z-index:100000!important;pointer-events:auto!important;touch-action:manipulation!important}';
+document.head.appendChild(s);})();
