@@ -1,721 +1,81 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="color-scheme" content="only light">
-<meta name="supported-color-schemes" content="light">
-<style>:root,html,body,#cm{color-scheme:only light!important}</style>
-<script>window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();});</script>
-<title>ARENA</title>
-<link rel="stylesheet" href="style.css?v=20261104a">
-<link rel="stylesheet" href="masa-premium.css?v=20261112-greenbaize1">
-<link rel="stylesheet" href="masa-dunya.css?v=20261115-exitfix1">
-<link rel="stylesheet" href="css/realism.css?v=1">
-<link rel="stylesheet" href="css/animations.css?v=1">
-<style id="acilisGizle">#ana{visibility:hidden}</style><!-- ana menü, butonlar tamamlanana kadar gizli (eski başlangıç ekranı görünmesin) -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#080c20">
-<link rel="icon" type="image/png" href="icon-192.png?v=4">
-<link rel="apple-touch-icon" href="icon-192.png?v=4">
-<style id="arenaYeni">
-h1{display:grid!important;grid-template-columns:1fr auto 1fr;justify-content:normal!important}h1 .hl{font-style:normal;justify-self:end;margin-right:.3em}h1 .hl.hs{justify-self:start;margin:0 0 0 .3em;transform:scaleX(-1)}
-#soruMetni{height:4.4em!important;min-height:0!important;display:flex!important;flex-direction:column;align-items:center;justify-content:center;overflow:visible;line-height:1.28!important;text-align:center}
-#soruMetni .sl{display:block;white-space:nowrap;font-size:var(--qs,1em)}
-#gecis{display:none;position:fixed;inset:0;z-index:9999;flex-direction:column;align-items:center;padding:calc(14px + env(safe-area-inset-top)) 16px calc(18px + env(safe-area-inset-bottom));box-sizing:border-box;color:#fff;overflow-x:hidden;overflow-y:auto;background:radial-gradient(circle at 50% 38%,#17b0ee 0%,#0b78c2 34%,#06457f 70%,#041f3d 100%)}
-#gecis.ac{display:flex}
-#gKonfeti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
-.g-ust{width:100%;display:flex;justify-content:space-between}
-.g-pil{background:#062a52;border:2px solid #2d5a8a;border-radius:24px;padding:6px 16px;font-size:24px;font-weight:900}
-.g-bas{margin:3vh -.3em 2vh 0;font-size:clamp(28px,9vw,44px);font-weight:300;letter-spacing:.3em;color:#a9def7}
-.g-daire{width:min(54vw,230px);aspect-ratio:1;flex:none;border-radius:50%;background:rgba(255,255,255,.2);display:flex;flex-direction:column;align-items:center;justify-content:center;animation:gPop .8s cubic-bezier(.2,1.6,.4,1) both,gHalka 1.6s .8s ease-out infinite}
-.g-daire b{font-size:clamp(64px,22vw,104px);line-height:1;font-weight:900}
-.g-daire span{font-size:clamp(20px,6vw,30px);font-weight:900;letter-spacing:.04em}
-@keyframes gPop{0%{transform:scale(.2) rotate(-12deg);opacity:0}100%{transform:none;opacity:1}}
-@keyframes gHalka{0%{box-shadow:0 0 0 0 rgba(255,214,64,.65)}100%{box-shadow:0 0 0 34px rgba(255,214,64,0)}}
-.g-soz{margin:2.5vh 0 1vh;text-align:center;font-size:clamp(22px,6.5vw,30px);font-weight:900;color:#ffe27a;text-shadow:0 2px 0 rgba(0,0,0,.35);animation:gSoz .6s .5s both}
-.g-soz small{display:block;font-size:.55em;font-weight:700;color:#d8f0ff;margin-top:4px}
-@keyframes gSoz{0%{transform:translateY(16px) scale(.8);opacity:0}100%{transform:none;opacity:1}}
-.g-et{margin:1.6vh 0 4px;font-size:clamp(16px,4.6vw,22px);font-weight:900;letter-spacing:.05em}
-.g-bar{position:relative;flex:none;width:76%;max-width:420px;height:clamp(34px,6vh,46px);border:4px solid #3b5878;border-radius:26px;background:#02142b}
-.g-bar i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:22px;background:linear-gradient(#5cf03d,#2fb81c);transition:width 1.1s cubic-bezier(.2,.9,.3,1)}
-.g-bar em{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:900;font-size:clamp(18px,5vw,26px);z-index:1}
-.g-bar u{position:absolute;right:-16px;top:50%;transform:translateY(-50%);font-size:44px;text-decoration:none;z-index:1}
-.g-alt{margin-top:auto;padding-top:16px;width:100%;max-width:520px;display:flex;align-items:center;gap:12px}
-.g-btn{flex:1;border:0;border-radius:40px;padding:14px 0;background:linear-gradient(#41dc27,#2db816);color:#fff;font-size:clamp(28px,8vw,42px);font-weight:900;box-shadow:0 7px 0 #1d7d10;animation:gNab 1.2s 1.4s ease-in-out infinite}
-.g-btn:active{animation:none;transform:translateY(4px);box-shadow:0 3px 0 #1d7d10}
-@keyframes gNab{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
-.g-ev{width:68px;height:68px;flex:none;border-radius:50%;border:3px solid #44627f;background:rgba(0,0,0,.35);font-size:32px}
-</style>
-
-<style id="arenaMiniTTSLayout">
-#oyun .jokerler{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px!important}
-
-#oyun .jokerler #jYarim{grid-column:1;grid-row:1}#oyun .jokerler #jSeyirci{grid-column:2;grid-row:1}#oyun .jokerler #jCift{grid-column:3;grid-row:1}
-#oyun .oyun-footer{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr) minmax(0,1fr);align-items:center;gap:8px;margin-top:12px}
-#oyun .oyun-pill{box-sizing:border-box;min-width:0;min-height:42px;border:2px solid #4a5a9a;border-radius:24px;background:#101a38;color:#fff;padding:7px 5px;font:800 13px/1.15 system-ui,sans-serif;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#oyun button.oyun-pill{cursor:pointer;outline:none;box-shadow:none;-webkit-tap-highlight-color:transparent}#oyun button.oyun-pill:focus,#oyun button.oyun-pill:focus-visible{outline:none;box-shadow:none}
-#oyun .oyun-pill.gold{border-color:#ffb300;color:#ffe27a;background:#171b2c}
-#oyun .oyun-pill.voice{border-color:#4a78ba;color:#bfe7ff;background:#102443}
-#oyun .oyun-pill.player{display:flex;align-items:center;justify-content:center}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ARENA - Premium Mobil Oyun Platformu</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/realism.css">
 </head>
 <body>
-<h1><i class="hl">⚡</i><span>ARENA</span><i class="hl hs">⚡</i></h1>
 
-<main class="kart" id="ana">
-<div class="pill" id="seviye">Seviye 1</div>
+    <!-- Göz Alıcı Arkaplan Işık Efektleri -->
+    <div class="bg-glow-effect"></div>
 
-<button class="btn" id="basla">🎯 Oyuna Başla</button>
-<button class="btn ikinci" id="sifirla">🔄 İlerlemeyi Sıfırla</button>
-</main>
+    <!-- Ana Menü Ekranı -->
+    <div id="mainMenu" class="arena-menu-container">
+        <header class="menu-header">
+            <div class="logo-badge">🔥 ARENA v2.0</div>
+            <h1>PREMIUM OYUNLAR</h1>
+            <p>Yüksek Grafikler ve Akıcı Deneyim</p>
+        </header>
 
-<section class="kart hidden" id="oyun">
-<div class="ust"><b id="oSeviye"></b><span id="oCan"></span><span id="sayac"></span></div>
-<div class="cubuk"><div id="bar"></div></div>
-<p id="soruMetni"></p>
+        <div class="game-grid">
+            <!-- Renk Sıralama -->
+            <div class="game-card" onclick="switchGameModule('colorSort')">
+                <div class="card-glow"></div>
+                <div class="card-icon">🧪</div>
+                <h3>Renk Sıralama</h3>
+                <p>3D Cam Tüpler & Grup Taşıma</p>
+            </div>
 
-<div id="secenekler"></div>
-<div class="jokerler">
-<button class="jok" id="jYarim">✂️ 50:50</button>
-<button class="jok" id="jSeyirci">👥 Seyirci</button>
-<button class="jok" id="jCift">🛡️ Çift Cevap</button>
-</div>
-<div class="oyun-footer">
-<button type="button" id="oyunAltinBtn" class="oyun-pill gold" aria-label="Altın satın al"></button>
-<div class="oyun-pill player" id="oyunOyuncu"></div>
-<button type="button" id="oyunSesToggle" class="oyun-pill voice" aria-label="Soruyu dinle">🔊 Soruyu dinle</button>
-</div>
-</section>
+            <!-- Milyoner Bilgi Yarışması -->
+            <div class="game-card" onclick="switchGameModule('milyoner')">
+                <div class="card-glow"></div>
+                <div class="card-icon">💰</div>
+                <h3>Milyoner</h3>
+                <p>Stüdyo Atmosferi & Jokerler</p>
+            </div>
 
-<section class="kart hidden" id="son">
-<h2 id="sBaslik"></h2>
-<p class="alt" id="sMetin"></p>
-<button class="btn hidden" id="sReklam">📺 Reklam izle, Devam et</button>
-<button class="btn" id="sDevam"></button>
-<button class="btn ikinci" id="sMenu">Ana menü</button>
-</section>
+            <!-- Dini İmtihan -->
+            <div class="game-card" onclick="switchGameModule('diniImtihan')">
+                <div class="card-glow"></div>
+                <div class="card-icon">📖</div>
+                <h3>Dini İmtihan</h3>
+                <p>Kültürel & Bilgi Soruları</p>
+            </div>
 
-<script src="tts-bridge.js?v=20261115-newsreader-voice2"></script>
-<script src="sorular.js?v=20261108-bank1"></script>
-<script src="seriler.js?v=20261104a"></script>
-<script src="ekonomi.js?v=20261104a"></script>
-<script src="puan.js?v=20261108-classic1"></script>
-<script>
-// milyonerSorulari {seviye1:[{soru,secenekler,cevap}]} -> SORULAR [[soru,[secenekler],dogruIndex]]
-var SORULAR = (function () {
-  if (typeof milyonerSorulari === "undefined") return typeof window.SORULAR !== "undefined" ? window.SORULAR : [];
-  return Object.keys(milyonerSorulari)
-    .sort((a, b) => parseInt(a.replace(/\D/g, "")) - parseInt(b.replace(/\D/g, "")))
-    .map(k => milyonerSorulari[k].map(q => {
-      const sec = q.secenekler || q.seceler || q.secenek || q.siklar || [];
-      let d = sec.findIndex(s => String(s).trim() === String(q.cevap).trim());
-      if (d < 0) d = 0;
-      return [q.soru, sec, d];
-    }));
-})();
-// 20 seri x 100 seviye: seriler.js yoksa ya da soru havuzu değiştiyse eski sıralı düzene döner
-var HAVUZ = (typeof milyonerSorulari !== "undefined") ? SORULAR.flat() : [];
-var SERI = (typeof MILYONER_SERILER !== "undefined" && MILYONER_SERILER.havuz === HAVUZ.length) ? MILYONER_SERILER.seri : null;
-var SEVIYE_SAYISI = SERI ? SERI[0].length : SORULAR.length;
-var SERI_SAYISI = SERI ? SERI.length : 1;
-function seviyeSorulari(seri, seviye) {
-  if (!SERI) return SORULAR[seviye - 1];
-  return SERI[seri % SERI.length][seviye - 1].map(function (i) { return HAVUZ[i]; });
-}
-</script>
-<script>
-const KEY = "arenaMobileProgress";
-const $ = id => document.getElementById(id);
-let st = { seviye: 1, seri: 0 };
-try { st = JSON.parse(localStorage.getItem(KEY)) || st; } catch (e) {}
-if (typeof st.seri !== "number") st.seri = 0;
-if (typeof st.puan !== "number") st.puan = 0; // eski sistem (doğru cevap başına +10); yeni puanlama puan.js'de
-if (Puan.ilk && st.puan > 0) Puan.ekle("milyoner", Math.round(st.puan / 10)); // eski puanı yeni sisteme taşı (bir kez)
-if (typeof st.biten !== "number") st.biten = 0; // tamamlanan bölüm sayısı
-if (typeof st.bonus !== "number") st.bonus = 0; // her 3 bölümde kazanılan, sonraki bölüme taşınan can
-const kaydet = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} };
+            <!-- Okey -->
+            <div class="game-card okey-card" onclick="switchGameModule('okey')">
+                <div class="card-glow"></div>
+                <div class="card-icon">🀄</div>
+                <h3>Klasik Okey</h3>
+                <p>Ahşap Istaka & Fildişi Taşlar</p>
+            </div>
 
-let lv, soru, kilit, jok, butonlar, ciftAktif;
-let soruSesAcik = (()=>{try{return localStorage.getItem('arena_question_voice')!=='0';}catch(e){return true;}})();
-let soruSesToken = 0, cevapRecognition=null;
-function soruSesDurdur(){soruSesToken++;try{if(cevapRecognition){cevapRecognition.onend=null;cevapRecognition.stop();cevapRecognition=null;}}catch(e){}try{if(window.ArenaTTS)window.ArenaTTS.stop();}catch(e){}try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}}
-async function soruSesOku(){
- if(!soruSesAcik||!lv||!lv[soru]||$("oyun").classList.contains("hidden"))return;
- const token=++soruSesToken,q=lv[soru],letters=["A","B","C","D"];
- if(window.ArenaTTS&&typeof window.ArenaTTS.speakParts==="function"){try{await window.ArenaTTS.speakParts(q[0],[]);if(token!==soruSesToken)window.ArenaTTS.stop();return;}catch(e){}}
- if(!("speechSynthesis"in window)||!("SpeechSynthesisUtterance"in window))return;
- try{
-  window.speechSynthesis.cancel();const voices=window.speechSynthesis.getVoices()||[],tr=voices.find(v=>/^tr([-_]|$)/i.test(v.lang));
-  const say=text=>new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang="tr-TR";u.rate=.80;u.pitch=1;u.volume=1;if(tr)u.voice=tr;u.onend=resolve;u.onerror=resolve;window.speechSynthesis.speak(u);});
-  await say("Soru. "+q[0]);if(token!==soruSesToken)return;
-  
- }catch(e){}
-}
-if(window.ArenaTTS){try{await window.ArenaTTS.speak(metin);if(token!==soruSesToken)window.ArenaTTS.stop();return;}catch(e){}}
-if(!("speechSynthesis"in window)||!("SpeechSynthesisUtterance"in window))return;try{window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(metin);u.lang="tr-TR";u.rate=.88;u.pitch=1;u.volume=1;const v=window.speechSynthesis.getVoices()||[],tr=v.find(x=>/^tr([-_]|$)/i.test(x.lang));if(tr)u.voice=tr;window.speechSynthesis.speak(u);}catch(e){}
-}
+            <!-- 101 Okey -->
+            <div class="game-card okey-101-card" onclick="switchGameModule('okey101')">
+                <div class="card-glow"></div>
+                <div class="card-icon">🎯</div>
+                <h3>101 Okey</h3>
+                <p>Stratejik Çift Açma & Bot AI</p>
+            </div>
+        </div>
+    </div>
 
+    <!-- Dinamik Oyun Görünüm Alanı -->
+    <div id="gameViewContainer" class="game-view-container" style="display: none;">
+        <div class="game-top-nav">
+            <button class="back-to-menu-btn" onclick="returnToMainMenu()">⬅️ Ana Menü</button>
+            <span id="activeModuleTitle" class="active-module-title">ARENA</span>
+        </div>
+        <div id="activeModuleContent"></div>
+    </div>
 
-// CAN: her bölüm CAN_MAX canla başlar. Yanlış cevap 1 can götürür ve aynı sıraya sonraki seriden yeni soru gelir.
-// Can bitince: KAYIP_BEDEL altınla devam / reklamla +1 can / bir alt bölümün 1. sorusundan başla.
-const CAN_MAX = 3, KAYIP_BEDEL = 50, BONUS_ARALIK = 3; // BONUS_ARALIK bölümde bir +1 can
-let can = CAN_MAX;
-const canYaz = () => { $("oCan").textContent = "❤️ " + can; };
-
-// SÜRELİ SORULAR: her seviyenin ilk SURELI_SORU sorusu SURE_SN saniye sürelidir (süre dolunca yanlış sayılır)
-const SURE_SN = 20, SURELI_SORU = 5;
-let sureT = null, kalan = 0;
-function sayacYaz() {
-  const el = $("sayac");
-  el.textContent = "Soru " + (soru + 1) + "/" + lv.length + (sureT ? " · ⏱ " + kalan : "");
-  el.classList.toggle("az", !!sureT && kalan <= 5);
-}
-function sureDurdur() { if (sureT) { clearInterval(sureT); sureT = null; } }
-function sureBaslat() {
-  sureDurdur();
-  if (soru >= SURELI_SORU) return;
-  kalan = SURE_SN;
-  sureT = setInterval(() => {
-    kalan--;
-    if (kalan <= 0) { sureDurdur(); sureBitti(); return; }
-    sayacYaz();
-  }, 1000);
-  sayacYaz();
-}
-function sureBitti() {
-  if (kilit) return;
-  kilit = true;
-  soruSesDurdur();
-  butonlar[lv[soru][2]].classList.add("dogru");
-  $("sayac").textContent = "⏰ Süre doldu";
-  setTimeout(yanlisCan, 1300);
-}
-
-// DÜELLO (arena.js): iki oyuncu AYNI seviyeyi aynı anda oynar, bitirmeyi ilk başaran kazanır.
-// Yanlış cevap 1 can götürür (soru değişir); canı bitenin düellosu biter.
-let duel = null;
-(window.ArenaOyunlari = window.ArenaOyunlari || {}).milyoner = {
-  ad: "Milyoner",
-  baslat: function (d, api) {
-    const seviye = Math.min(1 + (d.seed % 10), SEVIYE_SAYISI), seri = d.seed % SERI_SAYISI;
-    duel = { api: api, seviye: seviye, dSeri: seri };
-    lv = seviyeSorulari(seri, seviye);
-    soru = 0; can = CAN_MAX; canYaz();
-    jok = { yarim: 1, seyirci: 1, cift: 1 }; ciftAktif = false;
-    $("oSeviye").textContent = "⚔️ Düello";
-    ["jYarim", "jSeyirci", "jCift"].forEach(j => $(j).disabled = false);
-    api.ilerle(0, lv.length);
-    ekran("oyun");
-    goster();
-  },
-  dur: function () { duel = null; sureDurdur(); }
-};
-document.addEventListener("anasayfa", () => { sureDurdur(); soruSesDurdur(); duel = null; });
-
-function ekran(id) {
-  ["ana", "oyun", "son"].forEach(e => $(e).classList.toggle("hidden", e !== id));
-}
-
-function menu() {
-  sureDurdur();
-  $("seviye").textContent = st.seviye > SEVIYE_SAYISI ? "Tamamlandı 🏆" : "Seviye " + st.seviye;
-  ekran("ana");
-  Ekonomi.barYaz();
-}
-
-function baslat() {
-  if (st.seviye > SEVIYE_SAYISI) { st.seviye = 1; st.seri = (st.seri + 1) % SERI_SAYISI; kaydet(); }
-  // Yarım bırakılan bölüme geri dönünce aynı sorular gelmesin (ve süre hilesi olmasın): her girişte sonraki seri
-  if (st.acik) st.seri = (st.seri + 1) % SERI_SAYISI;
-  st.acik = true;
-  lv = seviyeSorulari(st.seri, st.seviye);
-  soru = 0;
-  can = CAN_MAX + st.bonus; st.bonus = 0; kaydet(); canYaz();
-  jok = { yarim: 1, seyirci: 1, cift: 1 };
-  ciftAktif = false;
-  $("oSeviye").textContent = "Seviye " + st.seviye;
-  ["jYarim", "jSeyirci", "jCift"].forEach(j => $(j).disabled = false);
-  ekran("oyun");
-  goster();
-}
-
-// Soruyu ortadan bölür: üst satır alttan uzun olmaz
-function bol(metin) {
-  const orta = Math.floor(metin.length / 2);
-  const i = metin.lastIndexOf(" ", orta);
-  if (i === -1) return metin;
-  return metin.slice(0, i) + "<br>" + metin.slice(i + 1);
-}
-
-function goster() {
-  const q = lv[soru];
-  kilit = false;
-  ciftAktif = false; // çift cevap sadece joker basılan soru için geçerli
-  sureDurdur(); sayacYaz();
-  $("bar").style.width = (soru / lv.length * 100) + "%";
-  soruYaz(q[0]);
-  const kutu = $("secenekler");
-  kutu.innerHTML = "";
-  butonlar = q[1].map((t, i) => {
-    const b = document.createElement("button");
-    b.className = "sec";
-    b.append("ABCD"[i] + ") " + t);
-    b.onclick = () => cevapla(i);
-    kutu.append(b);
-    return b;
-  });
-  
-  const altinBtn=$("oyunAltinBtn"),oyuncuEl=$("oyunOyuncu"),sesToggle=$("oyunSesToggle");
-  if(altinBtn){altinBtn.textContent="🪙 "+(window.Ekonomi&&Ekonomi.altin?Number(Ekonomi.altin()).toLocaleString("tr-TR"):"0")+" +";altinBtn.onclick=()=>{if(window.Ekonomi&&Ekonomi.dukkan)Ekonomi.dukkan();};}
-  if(oyuncuEl)oyuncuEl.textContent="👤 "+((window.Ekonomi&&Ekonomi.ad)?Ekonomi.ad():"Oyuncu");
-  if(sesToggle){sesToggle.textContent="🔊 Soruyu dinle";sesToggle.onclick=()=>{soruSesAcik=true;try{localStorage.setItem("arena_question_voice","1");}catch(e){}soruSesOku();};}let mic=document.getElementById("oyunMikrofon");if(!mic){mic=document.createElement("button");mic.type="button";mic.id="oyunMikrofon";mic.className="oyun-pill voice";mic.textContent="🎙️ Cevapla";$("oyun").querySelector(".oyun-footer").appendChild(mic);}mic.onclick=()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){alert("Bu tarayıcı sesli cevap özelliğini desteklemiyor.");return;}soruSesDurdur();const rec=new SR();cevapRecognition=rec;rec.lang="tr-TR";rec.continuous=false;rec.interimResults=false;rec.maxAlternatives=4;mic.textContent="🎙️ Dinliyorum…";rec.onresult=e=>{if(cevapRecognition!==rec||!lv||kilit)return;const norm=s=>String(s||"").toLocaleLowerCase("tr-TR").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/ı/g,"i").replace(/[^a-z0-9 ]/g," ").replace(/\\s+/g," ").trim();const opts=lv[soru][1],alts=Array.from(e.results[0]||[]).map(x=>norm(x.transcript));let ix=-1;for(const t of alts){const m=t.match(/^(a|be|b|ce|c|de|d)(?: sikki| sik| secenegi)?$/);if(m){ix={a:0,be:1,b:1,ce:2,c:2,de:3,d:3}[m[1]];break;}const hits=opts.map((o,i)=>({i,n:norm(o)})).filter(o=>o.n.length>2&&(t.includes(o.n)||o.n.includes(t)));if(hits.length===1){ix=hits[0].i;break;}}if(ix>=0)cevapla(ix);else mic.textContent="🎙️ Tekrar dene";};rec.onerror=()=>mic.textContent="🎙️ Cevapla";rec.onend=()=>{if(cevapRecognition===rec)cevapRecognition=null;mic.textContent="🎙️ Cevapla";};try{rec.start();}catch(e){cevapRecognition=null;mic.textContent="🎙️ Cevapla";}};
-  sureBaslat();
-  if(soruSesAcik)setTimeout(soruSesOku,350);
-}
-
-function sonraki() {
-  soru++;
-  if (duel) {
-    duel.api.ilerle(Math.min(soru, lv.length), lv.length);
-    if (soru >= lv.length) { sureDurdur(); duel.api.bitti(); return; }
-    goster(); return;
-  }
-  soru >= lv.length ? bitir(true) : goster();
-}
-
-function cevapla(i) {
-  if (kilit) return;
-  const dogru = lv[soru][2];
-
-  // Çift cevap aktifken ilk yanlış cevap: yanlış şıkkı kaldır, ikinci hak ver
-  if (i !== dogru && ciftAktif) {
-    ciftAktif = false;
-    butonlar[i].disabled = true;
-    butonlar[i].classList.add("yanlis");
-    setTimeout(() => butonlar[i].classList.add("gizli"), 500);
-    return;
-  }
-
-  kilit = true;
-  soruSesDurdur();
-  sureDurdur();
-  butonlar[dogru].classList.add("dogru");
-  if (i === dogru) { Puan.ekle("milyoner"); return void setTimeout(sonraki, 900); }
-  butonlar[i].classList.add("yanlis");
-  setTimeout(yanlisCan, 1300);
-}
-
-function bitir() {
-  $("bar").style.width = "100%";
-  st.seviye++; st.biten++; st.acik = false;
-  const bonus = st.biten % BONUS_ARALIK === 0;
-  if (bonus) st.bonus++;
-  kaydet();
-  const hepsi = st.seviye > SEVIYE_SAYISI;
-  $("sBaslik").textContent = hepsi ? "🏆 Büyük ödül senin!" : "🎉 Seviye geçildi!";
-  $("sMetin").textContent = (hepsi ? "Tüm seviyeleri tamamladın." : "Sıradaki: Seviye " + st.seviye) +
-    (bonus ? " ❤️ +1 can kazandın: sıradaki bölüme " + (CAN_MAX + st.bonus) + " canla başlıyorsun." : " Yeni bölüme " + CAN_MAX + " canla başlarsın.");
-  $("sDevam").textContent = hepsi ? "Baştan oyna" : "Sonraki seviye";
-  $("sReklam").classList.add("hidden");
-  $("sDevam").classList.remove("ikinci");
-  ekran("son");
-  Ekonomi.barYaz();
-  gecisAc(hepsi, bonus);
-}
-
-// Yanlış cevap: 1 can gider; seri ilerler (aynı sıraya yeni soru gelir)
-function yanlisCan() {
-  can--; canYaz();
-  if (duel) { // düello: aynı sıraya başka bir soru gelir, can bitince elenir
-    if (can > 0) {
-      duel.dSeri = (duel.dSeri + 1) % SERI_SAYISI;
-      const yeni = seviyeSorulari(duel.dSeri, duel.seviye)[soru];
-      lv = lv.slice(); if (yeni) lv[soru] = yeni;
-      goster();
-    } else { sureDurdur(); duel.api.elendi(); }
-    return;
-  }
-  st.seri = (st.seri + 1) % SERI_SAYISI; kaydet();
-  if (can > 0) { lv = seviyeSorulari(st.seri, st.seviye); goster(); }
-  else kayipSor();
-}
-// Kaldığın sorudan devam: yeni seriden yeni soru, jokerler korunur
-function devamEt(n) {
-  can = n; canYaz();
-  lv = seviyeSorulari(st.seri, st.seviye);
-  ekran("oyun"); goster();
-}
-function altBolum() {
-  if (st.seviye > 1) st.seviye--;
-  kaydet(); baslat();
-}
-function kayipSor() {
-  const alt = st.seviye > 1;
-  Ekonomi.sor("Canın bitti! 💔",
-    "Altınla ya da reklam izleyerek kaldığın sorudan devam edebilir, ya da " + (alt ? "bir alt bölümün 1. sorusundan" : "bölümün 1. sorusundan") + " başlayabilirsin.", [
-    { h: '<span class="ek-chip">🪙 ' + KAYIP_BEDEL + '</span>Devam et', f: () => {
-      if (Ekonomi.altin() >= KAYIP_BEDEL) { Ekonomi.ekle(-KAYIP_BEDEL); devamEt(CAN_MAX); }
-      else Ekonomi.dukkan(kayipSor, "Altının yetmiyor");
-    } },
-    { h: '<span class="ek-chip">📺</span>Can kazan', c: "alt", f: () => {
-      Ekonomi.reklam("odul", ok => { if (ok) devamEt(1); else kayipSor(); });
-    } },
-    { t: alt ? "⬇️ Bir alt bölümden başla" : "🔄 Bölümü baştan başla", c: "gri", f: altBolum },
-    { t: "Ana menü", c: "gri", f: menu }
-  ]);
-}
-
-function guvenliBaslat() {
-  try {
-    if (typeof SORULAR === "undefined" || !SORULAR.length) {
-      alert("Sorular yüklenemedi. Sayfayı yenileyip tekrar dene.");
-      return;
-    }
-    baslat();
-  } catch (e) {
-    alert("Milyoner hatası: " + e.message);
-  }
-}
-document.addEventListener("click", e => {
-  if (e.target.closest("#basla") || e.target.closest("#sDevam")) guvenliBaslat();
-});
-
-$("jYarim").onclick = () => {
-  if (kilit || !jok.yarim) return;
-  jok.yarim = 0;
-  $("jYarim").disabled = true;
-  const dogru = lv[soru][2];
-  const yanlislar = [0, 1, 2, 3].filter(i => i !== dogru).sort(() => Math.random() - .5);
-  yanlislar.slice(0, 2).forEach(i => butonlar[i].classList.add("gizli"));
-};
-
-$("jSeyirci").onclick = () => {
-  if (kilit || !jok.seyirci) return;
-  jok.seyirci = 0;
-  $("jSeyirci").disabled = true;
-  const dogru = lv[soru][2];
-  const acik = [0, 1, 2, 3].filter(i => !butonlar[i].classList.contains("gizli"));
-  let kalan = 100;
-  const d = 45 + Math.floor(Math.random() * 30);
-  const yuzde = {};
-  yuzde[dogru] = d;
-  kalan -= d;
-  const digerleri = acik.filter(i => i !== dogru);
-  digerleri.forEach((i, n) => {
-    const p = n === digerleri.length - 1 ? kalan : Math.floor(Math.random() * kalan);
-    yuzde[i] = p;
-    kalan -= p;
-  });
-  acik.forEach(i => {
-    const s = document.createElement("span");
-    s.textContent = " %" + yuzde[i];
-    butonlar[i].append(s);
-  });
-};
-
-// ÇİFT CEVAP: bu soruda iki cevap hakkı verir
-$("jCift").onclick = () => {
-  if (kilit || !jok.cift) return;
-  jok.cift = 0;
-  ciftAktif = true;
-  $("jCift").disabled = true;
-};
-
-$("sMenu").onclick = menu;
-const seviyeYazi = () => "🏁 Seviye " + Math.min(st.seviye, SEVIYE_SAYISI);
-Ekonomi.bar($("ana"), seviyeYazi, "in");
-// Oyun içi ekonomi çubuğu kaldırıldı: altın ve profil oyun-footer içinde zaten gösteriliyor.
-Ekonomi.dock($("ana"), () => Puan.toplam(), seviyeYazi, () => (window.Arena ? Arena.siraYazi() : "Puan")); // ana sayfanın altı: ad+seviye, altın, premium, toplam puan + sıra
-menu();
-</script>
-
-<div id="gecis" aria-hidden="true">
-<canvas id="gKonfeti"></canvas>
-<div class="g-ust"><span class="g-pil">⭐ <span id="gPuan">0</span></span><span class="g-pil"><span id="gSeri">0</span> 🔥</span></div>
-<div class="g-bas" id="gBaslik">MİLYONER</div>
-<div class="g-daire"><b id="gNo">1</b><span>SEVİYE</span></div>
-<p class="g-soz" id="gSoz"></p>
-<div class="g-et">BONUS CAN</div>
-<div class="g-bar"><i id="gB1"></i><em id="gT1"></em><u>🎁</u></div>
-<div class="g-et" id="gEt2">SERİ 1</div>
-<div class="g-bar"><i id="gB2"></i><em id="gT2"></em><u>🏆</u></div>
-<div class="g-alt"><button class="g-ev" id="gMenu">🏠</button><button class="g-btn" id="gDevam">SEVİYE 2</button></div>
-</div>
-<script>
-// ===== Soru metni: dengeli satırlar (üst satır alttan uzun olmaz), uzunsa sadece o soruda küçülür; kutu sabit yükseklikte =====
-function bolN(w, n, o) {
-  let en = null, ek = 1e18;
-  (function rec(i, acc) {
-    const kalan = n - acc.length;
-    if (kalan === 1) {
-      const s = acc.concat(w.slice(i).join(" ")), g = s.map(o), mx = Math.max.apply(null, g);
-      const ort = g.reduce((a, x) => a + x, 0) / n;
-      let k = mx + g.reduce((a, x) => a + Math.abs(x - ort), 0) * .5;
-      if (n === 2 && g[0] > g[1]) k += 1e4;
-      if (k < ek) { ek = k; en = s; }
-      return;
-    }
-    for (let j = i + 1; j <= w.length - kalan + 1; j++) rec(j, acc.concat(w.slice(i, j).join(" ")));
-  })(0, []);
-  return en;
-}
-function soruYaz(m) {
-  const el = $("soruMetni"); el._m = m;
-  const W = el.clientWidth - 6, H = el.clientHeight;
-  if (W < 60 || /[<&]/.test(m)) { el.innerHTML = bol(m); return; }
-  el.style.removeProperty("--qs");
-  const cs = getComputedStyle(el), b = parseFloat(cs.fontSize);
-  const c = (soruYaz.c = soruYaz.c || document.createElement("canvas").getContext("2d"));
-  c.font = cs.fontWeight + " " + b + "px " + cs.fontFamily;
-  const o = s => c.measureText(s).width, w = m.split(" ");
-  let sat = [m], ol = Math.min(1, W / o(m));
-  if (o(m) > W * .95) {
-    let en = -1;
-    for (let n = 2; n <= 4 && n <= w.length; n++) {
-      const s = bolN(w, n, o);
-      const x = Math.min(1, W / Math.max.apply(null, s.map(o)), H / (n * b * 1.28));
-      if (x > en + .001) { en = x; sat = s; ol = x; }
-      if (x >= .85) break;
-    }
-  }
-  el.style.setProperty("--qs", Math.max(ol, .6).toFixed(3) + "em");
-  el.innerHTML = sat.map(s => '<span class="sl">' + s + "</span>").join("");
-}
-window.addEventListener("resize", () => { const e = $("soruMetni"); if (e._m && e.offsetParent) soruYaz(e._m); });
-
-// ===== Seviye geçildi: kutlama ekranı =====
-const GOZ = ["Harikasın! 🔥", "Durdurulamıyorsun! 💪", "Bilgin konuşuyor! 🧠", "Zirve biraz daha yakın! 🏔️", "Arena seni tanıdı! ⚔️", "Bu seviye senin oldu! 🎯"];
-function konfeti() {
-  const cv = $("gKonfeti"), x = cv.getContext("2d"), d = window.devicePixelRatio || 1;
-  cv.width = innerWidth * d; cv.height = innerHeight * d; x.scale(d, d);
-  const R = ["#ffd23f", "#ff4d6d", "#4dd2ff", "#7cfc00", "#ffffff", "#ff9f1c"];
-  const P = Array.from({ length: 110 }, () => ({ x: innerWidth / 2, y: innerHeight * .42, vx: (Math.random() - .5) * 16, vy: -Math.random() * 16 - 4, s: 5 + Math.random() * 7, r: Math.random() * 6, vr: (Math.random() - .5) * .4, c: R[Math.random() * R.length | 0] }));
-  let f = 0;
-  (function ciz() {
-    x.clearRect(0, 0, innerWidth, innerHeight);
-    P.forEach(p => { p.vy += .35; p.vx *= .992; p.x += p.vx; p.y += p.vy; p.r += p.vr; x.save(); x.translate(p.x, p.y); x.rotate(p.r); x.fillStyle = p.c; x.fillRect(-p.s / 2, -p.s / 3, p.s, p.s * .6); x.restore(); });
-    if (++f < 170 && $("gecis").classList.contains("ac")) requestAnimationFrame(ciz); else x.clearRect(0, 0, innerWidth, innerHeight);
-  })();
-}
-function gecisAc(hepsi, bonus) {
-  const no = hepsi ? SEVIYE_SAYISI : st.seviye - 1, k = st.biten % BONUS_ARALIK, yapilan = Math.min(st.seviye - 1, SEVIYE_SAYISI);
-  $("gSeri").textContent = st.biten;
-  $("gBaslik").textContent = hepsi ? "BÜYÜK ÖDÜL" : "MİLYONER";
-  $("gNo").textContent = no;
-  $("gSoz").innerHTML = bonus ? "❤️ +1 can kazandın!<small>Sıradaki bölüme " + (CAN_MAX + st.bonus) + " canla başlıyorsun</small>" : GOZ[Math.floor(Math.random() * GOZ.length)];
-  $("gT1").textContent = (bonus ? BONUS_ARALIK : k) + "/" + BONUS_ARALIK;
-  $("gEt2").textContent = "SERİ " + (st.seri + 1);
-  $("gT2").textContent = yapilan + "/" + SEVIYE_SAYISI;
-  $("gDevam").textContent = hepsi ? "BAŞTAN OYNA" : "SEVİYE " + st.seviye;
-  $("gB1").style.width = "0"; $("gB2").style.width = "0";
-  $("gecis").classList.add("ac");
-  setTimeout(() => {
-    $("gB1").style.width = (bonus ? 100 : k / BONUS_ARALIK * 100) + "%";
-    $("gB2").style.width = Math.max(yapilan / SEVIYE_SAYISI * 100, 3) + "%";
-  }, 450);
-  let hedef = 0; try { hedef = Puan.toplam() || 0; } catch (e) {}
-  const t0 = performance.now();
-  (function say(t) { const q = Math.min(1, (t - t0) / 900); $("gPuan").textContent = Math.round(hedef * q); if (q < 1) requestAnimationFrame(say); })(t0);
-  konfeti();
-  try { navigator.vibrate && navigator.vibrate([70, 50, 70, 50, 140]); } catch (e) {}
-}
-function gKapat() { $("gecis").classList.remove("ac"); }
-$("gDevam").onclick = () => { gKapat(); guvenliBaslat(); };
-$("gMenu").onclick = () => { gKapat(); menu(); };
-document.addEventListener("anasayfa", gKapat);
-</script>
-<script src="ortak.js?v=20261108-backfix"></script>
-<script src="passaparola.js?v=20261104a"></script>
-<script src="kelime.js?v=20261104a"></script>
-<script src="kelimelerim.js?v=20261104a"></script>
-<script src="islem.js?v=20261104a"></script>
-<script src="ads.js?v=20261104a"></script>
-<script src="rotasyon.js?v=20261104a"></script>
-<script src="dini-milyoner.js?v=20261115-voice-answer1"></script>
-<script src="js/okey-rules.js?v=20261115-1"></script>
-<script src="js/okey-audio.js?v=20261115-1"></script>
-<script src="masa.js?v=20261115-landscape-lobby-restore1"></script>
-<script src="js/fx-engine.js?v=1"></script>
-<script src="mini-oyunlar.js?v=20261115-groupmove1"></script>
-<script src="menu.js?v=20261115-groupmove1"></script>
-<script>window.ARENA_APP="arena";</script><!-- sıralama/düello verileri bu adla ayrı tutulur -->
-<script src="firebase-config.js?v=20261104a"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="auth.js?v=20261108-google-auth-native-fix1"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging-compat.js"></script>
-<script src="arena.js?v=20261108-featured-ranking-fix"></script>
-<script src="ortak-ai.js?v=20261113-1"></script>
-<script>
-// Sayfa kaymasın (menü, oyun, sonuç ekranları) + sol alta APK indirme / güncelleme butonu
-// Tarayıcıda "⬇ APK", uygulamanın içinde aynı yerde "⬇ Güncelle" yazar.
-(function () {
-  var APK_ADRES = "https://github.com/FatihKoc81/Arena/releases/latest/download/Arena.apk"; // doğrudan indirme: sürüm sayfası açılmaz
-  var apkUygulamasi = !!window.Capacitor;
-  var uygulamaIci = !!(apkUygulamasi || (window.matchMedia && matchMedia("(display-mode: standalone)").matches));
-  var stl = document.createElement("style");
-  stl.textContent =
-    ".apk-btn{}" +
-    ".ar-pg{height:60px!important;min-height:60px!important;font-size:19px!important;border-radius:16px!important}" +
-    ".surum{display:none!important}" +
-    ".apk-btn:active{opacity:.7}.apk-btn.gizli{display:none}" +
-    "html.menu-kilit,html.menu-kilit body{overflow:hidden!important;overscroll-behavior:none!important;height:100%!important}" +
-    "html.menu-kilit body{position:fixed!important;top:0;left:0;right:0;width:100%}" +
-    // Kısa ekranlarda (tarayıcı çubukları açıkken) oyun ekranı sığsın diye boşlukları azalt
-    "@media (max-height:800px){#oyun,#son{margin-top:8px!important;padding-top:14px!important;padding-bottom:14px!important}#oyun .sec,#son .btn{padding-top:10px!important;padding-bottom:10px!important}}" +
-    "body:has(#ana.hidden) .apk-btn,body:has(#ana.hidden) #altSatir,body:has(#ana.hidden) .ar-adb{display:none!important}" +
-    "body.ppOyunda{padding-top:calc(58px + env(safe-area-inset-top))!important}" +
-    // Kelime Oyunu: başlık Passaparola ile aynı; kart içeriğe göre kısalır (boşluklar azaltıldı)
-    "body.kkOyunda{padding-top:calc(58px + env(safe-area-inset-top))!important;padding-bottom:10px!important}" +
-    "body.kkOyunda #kk{margin-top:0!important}" +
-    "body.kkOyunda #kkHeks{margin-top:4px;margin-bottom:4px}" +
-    "body.kkOyunda #kkIpucu{margin-top:6px;margin-bottom:8px;padding:0}" +
-    // Altıgenlerin üstünde kaç harfli olduğu yazar (sayıyı CSS sayacı hesaplar)
-    "#kkHeks{counter-reset:kkh}#kkHeks .kkH{counter-increment:kkh}" +
-    "#kkHeks::after{content:counter(kkh) \" Harfli\";order:-1;flex:0 0 100%;text-align:center;color:#8e9bc4;font-size:15px;font-weight:700;margin-bottom:4px}" +
-    "";
-  document.head.appendChild(stl);
-  // Kelime Oyunu ekranı açıkken body'ye kkOyunda sınıfı ekle
-  var kk = document.getElementById("kk"), ko = document.getElementById("kkOyun");
-  function kkG() {
-    document.body.classList.toggle("kkOyunda", !!(kk && ko && !kk.classList.contains("hidden") && !ko.classList.contains("hidden")));
-  }
-  if (kk && ko) {
-    new MutationObserver(kkG).observe(kk, { attributes: true, attributeFilter: ["class"] });
-    new MutationObserver(kkG).observe(ko, { attributes: true, attributeFilter: ["class"] });
-  }
-  var ios = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-  var a = null;
-  // APK uygulamasında "Güncelle", tarayıcıda "APK"; yüklenmiş web uygulamasında (PWA) görünmez
-  if (!ios && (apkUygulamasi || !uygulamaIci)) {
-    a = document.createElement("a");
-    a.className = "apk-btn gizli";
-    a.href = APK_ADRES;
-    a.removeAttribute("target");
-    a.textContent = apkUygulamasi ? "⬇ Güncelle" : "⬇ APK";
-    a.setAttribute("aria-label", apkUygulamasi ? "ARENA güncellemesini hemen indir" : "ARENA APK dosyasını indir");
-    a.addEventListener("click", function (e) {
-      // Tek dokunuşta doğrudan APK dosyasına git; sürüm sayfası/ara menü açma.
-      e.preventDefault();
-      window.location.assign(APK_ADRES);
-    });
-    (window.altSatir ? window.altSatir() : document.body).appendChild(a);
-  }
-  // Passaparola oyunda başlık, ana sayfadaki yerine ölçülerek hizalanır
-  var homeTop = null, ppSet = false;
-  function ppHizala() {} // başlık artık CSS ile sabit; kaydırma/ölçme gerekmiyor
-  // Kilit kararı sadece ekran/yükseklik değişince verilir (sürekli açıp kapatma titremeye ve yazıların kaybolmasına yol açıyordu)
-  var sonAnahtar = "";
-  function guncelle() {
-    ppHizala();
-    var ana = document.getElementById("ana");
-    var gor = !!(ana && !ana.classList.contains("hidden") && getComputedStyle(ana).display !== "none");
-    if (a) a.classList.toggle("gizli", !gor);
-    // Ana menüde alt bölüm artık belge akışındadır; ekranı kilitlemek kaydırmayı engeller.
-    // İçerik sığmıyorsa doğal sayfa kaydırmasıyla tüm oyun kartları ve alt butonlar görünür.
-    if (gor) {
-      // Menü tek ekrana sığıyorsa kaymayı kilitle; içerik uzunsa doğal kaydırmaya izin ver.
-      var tasiyor = document.documentElement.scrollHeight > window.innerHeight + 4;
-      document.documentElement.classList.toggle("menu-kilit", !tasiyor);
-      sonAnahtar = "";
-      return;
-    }
-    var gorunen = [];
-    document.querySelectorAll(".kart").forEach(function (k) {
-      if (k.classList.contains("hidden") || getComputedStyle(k).display === "none") return;
-      gorunen.push(k.id + ":" + k.offsetHeight);
-    });
-    var anahtar = window.innerHeight + "|" + gorunen.join(",");
-    if (anahtar === sonAnahtar) return;
-    sonAnahtar = anahtar;
-    var kl = document.documentElement.classList;
-    kl.remove("menu-kilit"); // doğal yerleşimi ölç
-    var alt = 0;
-    document.querySelectorAll(".kart").forEach(function (k) {
-      if (k.classList.contains("hidden") || getComputedStyle(k).display === "none") return;
-      alt = Math.max(alt, k.getBoundingClientRect().bottom + window.scrollY);
-    });
-    // Ekrana sığıyorsa sayfa kaymasın; sığmıyorsa (çok küçük ekran) kaydırmaya izin ver
-    var pay = gor ? 56 : 12;
-    var kilit = alt > 0 && (alt + pay <= window.innerHeight + 24);
-    kl.toggle("menu-kilit", kilit);
-    if (kilit && window.scrollY) window.scrollTo(0, 0);
-  }
-  // Zıplamanın asıl sebebi: ekran açılınca hizalama 500 ms'lik zamanlayıcıyı bekliyordu.
-  // Artık body sınıfı değişir değişmez (ilk çizimden önce) hemen hizalanır.
-  new MutationObserver(ppHizala).observe(document.body, { attributes: true, attributeFilter: ["class"] });
-  window.addEventListener("resize", guncelle);
-  window.addEventListener("scroll", function () {
-    if (document.documentElement.classList.contains("menu-kilit") && document.documentElement.scrollHeight <= window.innerHeight + 4 && window.scrollY) window.scrollTo(0, 0);
-  });
-  // Sayfa kilitliyken bile kaydırılabilir bir liste (Sıralama, pencereler) içindeki kaydırma engellenmez
-  function kayanVar(el) {
-    for (; el && el !== document.body && el.nodeType === 1; el = el.parentElement) {
-      var cs = getComputedStyle(el);
-      if (/(auto|scroll)/.test(cs.overflowY) && el.scrollHeight > el.clientHeight + 1) return true;
-    }
-    return false;
-  }
-  document.addEventListener("touchmove", function (e) {
-    if (document.documentElement.classList.contains("menu-kilit") && document.documentElement.scrollHeight <= window.innerHeight + 4 && !(e.target.closest && e.target.closest("input,textarea")) && !kayanVar(e.target)) e.preventDefault();
-  }, { passive: false });
-  guncelle();
-  setInterval(guncelle, 500);
-})();
-</script>
-<script>
-if ("serviceWorker" in navigator) {
-  const eskiKontrol = navigator.serviceWorker.controller;
-  let yenilendi = false;
-  navigator.serviceWorker.addEventListener("controllerchange", () => {
-    if (!eskiKontrol || yenilendi) return;
-    yenilendi = true;
-    location.reload();
-  });
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("sw.js", { updateViaCache: "none" })
-      .then(reg => {
-        reg.update();
-        document.addEventListener("visibilitychange", () => {
-          if (!document.hidden) reg.update();
-        });
-      })
-      .catch(() => {});
-  });
-}
-</script>
-<script>
-// Tüm oyun dosyaları menüye butonlarını ekleyip bitirince (load) ana menü bir kerede görünür.
-(function () {
-  function ac() { var s = document.getElementById("acilisGizle"); if (s) s.remove(); }
-  window.addEventListener("load", function () { requestAnimationFrame(function () { requestAnimationFrame(ac); }); });
-  setTimeout(ac, 3000); // güvenlik: bir dosya yüklenemezse menü yine de açılır
-})();
-</script>
-<script src="test-agent/inline-recorder.js?v=20261114-admin-only3"></script>
-<script>
-(function(){
-  function ekle(){
-    if(!window.OrtakAIMerkezi || document.getElementById("ortakAiKonusma")) return;
-    var b=document.createElement("button");
-    b.id="ortakAiKonusma";
-    b.type="button";
-    b.textContent="🤖 Diğer uygulamalarla konuş";
-    b.setAttribute("aria-label","Ortak AI konuşmasını başlat veya durdur");
-    b.style.cssText="position:fixed;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));z-index:10000;border:1px solid #6ba7c9;border-radius:24px;padding:11px 15px;background:#102b43;color:#fff;font:700 13px system-ui;box-shadow:0 4px 16px #0008";
-    var stop=null;
-    b.addEventListener("click",function(){
-      if(stop){stop();stop=null;b.textContent="🤖 Diğer uygulamalarla konuş";return;}
-      try{stop=window.OrtakAIMerkezi.konusmayiBaslat(12000);b.textContent="🔊 Konuşma açık · Durdur";}
-      catch(e){b.textContent="Bağlantı kurulamadı";setTimeout(function(){b.textContent="🤖 Diğer uygulamalarla konuş"},2200);}
-    });
-    document.body.appendChild(b);
-  }
-  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",ekle);else ekle();
-  setTimeout(ekle,1500);
-})();
-</script>
+    <script src="js/app.js"></script>
+    <script src="js/color-sort.js"></script>
+    <script src="js/milyoner.js"></script>
+    <script src="js/dini-imtihan.js"></script>
+    <script src="js/okey.js"></script>
 </body>
 </html>
