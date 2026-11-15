@@ -4106,11 +4106,11 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
  if(document.getElementById('arenaCategoryGridLayoutFix'))return;
  const s=document.createElement('style');s.id='arenaCategoryGridLayoutFix';
  s.textContent=`
- #arenaHubHome .ar-categories.is-open{display:block!important;width:100%!important;grid-template-columns:minmax(0,1fr)!important;gap:8px!important}
- #arenaHubHome .ar-categories.is-open .ar-inline-category-head{display:flex!important;width:100%!important;min-width:0!important;margin:0 0 8px!important}
- #arenaHubHome .ar-categories.is-open .ar-inline-game-list{display:grid!important;width:100%!important;max-width:none!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-rows:minmax(112px,auto)!important;gap:9px!important;height:auto!important;min-height:0!important;overflow:visible!important;align-content:start!important}
- #arenaHubHome .ar-categories.is-open .ar-inline-game-list>.ar-game-card{width:100%!important;min-width:0!important;min-height:112px!important;height:auto!important;box-sizing:border-box!important}
- @media(max-width:340px){#arenaHubHome .ar-categories.is-open .ar-inline-game-list{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important}}
+ html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open{display:flex!important;flex:1 1 auto!important;flex-direction:column!important;width:100%!important;min-width:0!important;min-height:0!important;max-height:100%!important;overflow:hidden!important;gap:8px!important}
+ html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-category-head{display:flex!important;flex:0 0 56px!important;width:100%!important;min-width:0!important;margin:0!important}
+ html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list{display:grid!important;flex:1 1 auto!important;width:100%!important;max-width:none!important;min-width:0!important;min-height:0!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-rows:minmax(112px,auto)!important;gap:9px!important;overflow-x:hidden!important;overflow-y:auto!important;align-content:start!important;box-sizing:border-box!important}
+ html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card{display:flex!important;width:100%!important;min-width:0!important;min-height:112px!important;height:auto!important;box-sizing:border-box!important}
+ @media(max-width:340px){html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important}}
  `;
  document.head.appendChild(s);
 })();
