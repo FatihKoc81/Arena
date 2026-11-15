@@ -248,8 +248,8 @@ function sortAction(a,i){
  if(ball&&to.length<s.cap&&(!to.length||to[to.length-1]===ball)){
   sortRemember();
   var transfer=1;
-  /* Move the complete connected top group of the same color in one action. */
-  transfer=1; // Her dokunuşta yalnızca tek top taşınır; aynı renkteki alt toplar yerinde kalır.
+  /* Aynı renkteki üst küre grubu tek hamlede aktarılır. */
+  while(transfer<from.length&&from[from.length-1-transfer]===ball)transfer++;
   transfer=Math.min(transfer,s.cap-to.length);
   s.lastMove={from:s.sel,to:i,count:transfer,at:Date.now()};
   for(var move=0;move<transfer;move++)to.push(from.pop());
