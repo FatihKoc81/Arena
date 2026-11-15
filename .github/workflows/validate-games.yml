@@ -14,7 +14,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Check Three.js module syntax\n        run: node --check arena-3d-entry.mjs\n      - name: Check JavaScript syntax
+      - name: Check Three.js module syntax
+        run: node --check arena-3d-entry.mjs
+      - name: Check JavaScript syntax
         run: |
           set -e
           for f in *.js; do
