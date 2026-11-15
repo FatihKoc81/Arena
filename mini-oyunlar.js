@@ -6,6 +6,8 @@ var root=null,id="",s=null,timers=[];
 G.ticTacToe={title:"XOX Ustası",desc:"Minimax botuna karşı üç taşı sırala.",icon:"❎"};
 G.connectFour={title:"Dört Taş",desc:"Botla dört taşı yan yana getir.",icon:"🔴"};
 G.minesweeper={title:"Mayın Tarlası",desc:"Sayı ipuçlarıyla mayınları bul.",icon:"💣"};
+G.colorMemory={title:"Renk Hafızası",desc:"Renk dizisini ezberle. 20 seviye.",icon:"🧠"};
+G.colorHunt={title:"Renk Avı",desc:"Farklı tonu bul. 20 seviye.",icon:"🎨"};
 function xoInit(){s={b:Array(9).fill(""),turn:"X",done:false,msg:"Sen X'sin. İlk hamle sende.",score:0};}
 function xoWinner(b){var lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];for(var i=0;i<lines.length;i++){var l=lines[i];if(b[l[0]]&&b[l[0]]===b[l[1]]&&b[l[1]]===b[l[2]])return b[l[0]];}return b.every(Boolean)?"draw":"";}
 function xoSolve(b,bot){var w=xoWinner(b);if(w==="O")return 10;if(w==="X")return -10;if(w==="draw")return 0;var vals=[];b.forEach(function(v,i){if(!v){var n=b.slice();n[i]=bot;vals.push(xoSolve(n,bot==="O"?"X":"O"));}});return bot==="O"?Math.max.apply(null,vals):Math.min.apply(null,vals);}
