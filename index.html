@@ -136,19 +136,18 @@ const kaydet = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } ca
 
 let lv, soru, kilit, jok, butonlar, ciftAktif;
 let soruSesAcik = (()=>{try{return localStorage.getItem('arena_question_voice')!=='0';}catch(e){return true;}})();
-let soruSesToken = 0;
-function soruSesDurdur(){soruSesToken++;try{if(window.ArenaTTS)window.ArenaTTS.stop();}catch(e){}try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}}
+let soruSesToken = 0, cevapRecognition=null;
+function soruSesDurdur(){soruSesToken++;try{if(cevapRecognition){cevapRecognition.onend=null;cevapRecognition.stop();cevapRecognition=null;}}catch(e){}try{if(window.ArenaTTS)window.ArenaTTS.stop();}catch(e){}try{if(window.speechSynthesis)window.speechSynthesis.cancel();}catch(e){}}
 async function soruSesOku(){
  if(!soruSesAcik||!lv||!lv[soru]||$("oyun").classList.contains("hidden"))return;
  const token=++soruSesToken,q=lv[soru],letters=["A","B","C","D"];
- if(window.ArenaTTS&&typeof window.ArenaTTS.speakParts==="function"){try{await window.ArenaTTS.speakParts(q[0],q[1]);if(token!==soruSesToken)window.ArenaTTS.stop();return;}catch(e){}}
+ if(window.ArenaTTS&&typeof window.ArenaTTS.speakParts==="function"){try{await window.ArenaTTS.speakParts(q[0],[]);if(token!==soruSesToken)window.ArenaTTS.stop();return;}catch(e){}}
  if(!("speechSynthesis"in window)||!("SpeechSynthesisUtterance"in window))return;
  try{
   window.speechSynthesis.cancel();const voices=window.speechSynthesis.getVoices()||[],tr=voices.find(v=>/^tr([-_]|$)/i.test(v.lang));
   const say=text=>new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang="tr-TR";u.rate=.80;u.pitch=1;u.volume=1;if(tr)u.voice=tr;u.onend=resolve;u.onerror=resolve;window.speechSynthesis.speak(u);});
   await say("Soru. "+q[0]);if(token!==soruSesToken)return;
-  await new Promise(r=>setTimeout(r,1000));
-  for(let i=0;i<q[1].length;i++){if(token!==soruSesToken)return;if(i>0)await new Promise(r=>setTimeout(r,1000));await say(q[1][i]+".");}
+  
  }catch(e){}
 }
 if(window.ArenaTTS){try{await window.ArenaTTS.speak(metin);if(token!==soruSesToken)window.ArenaTTS.stop();return;}catch(e){}}
@@ -268,7 +267,7 @@ function goster() {
   const altinBtn=$("oyunAltinBtn"),oyuncuEl=$("oyunOyuncu"),sesToggle=$("oyunSesToggle");
   if(altinBtn){altinBtn.textContent="🪙 "+(window.Ekonomi&&Ekonomi.altin?Number(Ekonomi.altin()).toLocaleString("tr-TR"):"0")+" +";altinBtn.onclick=()=>{if(window.Ekonomi&&Ekonomi.dukkan)Ekonomi.dukkan();};}
   if(oyuncuEl)oyuncuEl.textContent="👤 "+((window.Ekonomi&&Ekonomi.ad)?Ekonomi.ad():"Oyuncu");
-  if(sesToggle){sesToggle.textContent="🔊 Soruyu dinle";sesToggle.onclick=()=>{soruSesAcik=true;try{localStorage.setItem("arena_question_voice","1");}catch(e){}soruSesOku();};}
+  if(sesToggle){sesToggle.textContent="🔊 Soruyu dinle";sesToggle.onclick=()=>{soruSesAcik=true;try{localStorage.setItem("arena_question_voice","1");}catch(e){}soruSesOku();};}let mic=document.getElementById("oyunMikrofon");if(!mic){mic=document.createElement("button");mic.type="button";mic.id="oyunMikrofon";mic.className="oyun-pill voice";mic.textContent="🎙️ Cevapla";$("oyun").querySelector(".oyun-footer").appendChild(mic);}mic.onclick=()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){alert("Bu tarayıcı sesli cevap özelliğini desteklemiyor.");return;}soruSesDurdur();const rec=new SR();cevapRecognition=rec;rec.lang="tr-TR";rec.continuous=false;rec.interimResults=false;rec.maxAlternatives=4;mic.textContent="🎙️ Dinliyorum…";rec.onresult=e=>{if(cevapRecognition!==rec||!lv||kilit)return;const norm=s=>String(s||"").toLocaleLowerCase("tr-TR").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/ı/g,"i").replace(/[^a-z0-9 ]/g," ").replace(/\\s+/g," ").trim();const opts=lv[soru][1],alts=Array.from(e.results[0]||[]).map(x=>norm(x.transcript));let ix=-1;for(const t of alts){const m=t.match(/^(a|be|b|ce|c|de|d)(?: sikki| sik| secenegi)?$/);if(m){ix={a:0,be:1,b:1,ce:2,c:2,de:3,d:3}[m[1]];break;}const hits=opts.map((o,i)=>({i,n:norm(o)})).filter(o=>o.n.length>2&&(t.includes(o.n)||o.n.includes(t)));if(hits.length===1){ix=hits[0].i;break;}}if(ix>=0)cevapla(ix);else mic.textContent="🎙️ Tekrar dene";};rec.onerror=()=>mic.textContent="🎙️ Cevapla";rec.onend=()=>{if(cevapRecognition===rec)cevapRecognition=null;mic.textContent="🎙️ Cevapla";};try{rec.start();}catch(e){cevapRecognition=null;mic.textContent="🎙️ Cevapla";}};
   sureBaslat();
   if(soruSesAcik)setTimeout(soruSesOku,350);
 }
