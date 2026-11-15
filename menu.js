@@ -10,6 +10,7 @@ const cats=[
 {id:'sudoku',name:'Mantık Merkezi',icon:'🧊',desc:'Akıl yürüt, desenleri çöz',count:'2 Hazır',color:'orange',games:['miniSudoku','nonogram'],planned:['Kakuro','Mantık Izgarası','Şekil Dizileri']},
 {id:'sayi',name:'Sayı & Strateji',icon:'🧩',desc:'Zekânı kullan, bulmacaları çöz',count:'6 Hazır',color:'pink',games:['islem','mathSprint','game2048','ticTacToe','connectFour','minesweeper'],planned:['Sayı Çaprazı']},
 {id:'renk',name:'Renk Ustası',icon:'⚗️',desc:'Renkleri ayır, doğru sıraya diz',count:'1 Hazır',color:'cyan',games:['colorSort','liquidSort','ballSort','colorMemory','colorHunt'],planned:[]},
+ {id:'bulmaca',name:'Bulmaca Dünyası',icon:'🚌',desc:'Trafiği çöz, rafları düzenle',count:'2 Hazır',color:'orange',games:['carJam','matchTriple'],planned:[]},
 {id:'dikkat',name:'Hafıza Arenası',icon:'🧠',desc:'Ayrıntıları fark et, hafızanı sına',count:'1 Hazır',color:'indigo',games:['memory'],planned:['Görsel Hafıza','Nesneyi Bul','7 Fark Bul']},
 {id:'refleks',name:'Refleks Bölgesi',icon:'⚡',desc:'Hızını ve tepkini test et',count:'2 Hazır',color:'red',games:['reflexTap','snake'],planned:['Hızlı Dokun','Renk Tepkisi','Hızlı Eşleştirme']}
 ];
@@ -36,6 +37,8 @@ ticTacToe:{name:'XOX Düellosu',icon:'❎',desc:'Botuna karşı üç taşı sır
 connectFour:{name:'Dörtlü Düello',icon:'🔴',desc:'Dört taşı yan yana getir',re:/__arena_extra_c4__/i},
 minesweeper:{name:'Mayın Avcısı',icon:'💣',desc:'Sayı ipuçlarıyla mayınları bul',re:/__arena_extra_mines__/i},
 colorSort:{name:'Renk Tüpleri',icon:'🧪',desc:'200 giderek zorlaşan seviyede parlak topları ayır',re:/__arena_extra_color__/i},liquidSort:{name:'Renk Akışı',icon:'💧',desc:'Renkli sıvıları 200 seviyede tüplere ayır',re:/__arena_extra_liquid__/i},ballSort:{name:'Renk Küreleri',icon:'🔵',desc:'Renkli parlak topları 200 seviyede grupla',re:/__arena_extra_ball__/i},
+carJam:{name:'Car Jam',icon:'🚌',desc:'Araçları kaydır, otobüse yol aç',re:/__arena_car_jam__/i},
+matchTriple:{name:'Match Triple',icon:'🛍️',desc:'Raflardaki ürünleri üçlü eşleştir',re:/__arena_match_triple__/i},
 colorMemory:{name:'Renk Hafızası',icon:'🧠',desc:'Renk dizisini ezberle · 20 seviye',re:/__arena_extra_cmemory__/i},colorHunt:{name:'Ton Avı',icon:'🎨',desc:'Farklı renk tonunu bul · 20 seviye',re:/__arena_extra_chunt__/i},
 memory:{name:'Eşleştirme Ustası',icon:'🧠',desc:'Aynı sembolleri eşleştir',re:/__arena_extra_memory__/i},
 reflexTap:{name:'Refleks Arenası',icon:'⚡',desc:'Yeşil ekrana zamanında dokun',re:/__arena_extra_reflex__/i}
