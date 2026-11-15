@@ -4254,3 +4254,44 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
 
 /* Mobile category/game list alignment repair */
 const arenaCategoryLayoutFix=document.createElement('style');arenaCategoryLayoutFix.textContent=`html.arena-home-fixed #arenaHubHome .ar-categories.is-open{display:flex!important;flex-direction:column!important;align-items:stretch!important;width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important;gap:10px!important}html.arena-home-fixed #arenaHubHome .ar-inline-category-head{width:100%!important;flex:0 0 auto!important;box-sizing:border-box!important}html.arena-home-fixed #arenaHubHome .ar-inline-game-list{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-rows:minmax(112px,auto)!important;align-content:start!important;gap:10px!important;width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important;box-sizing:border-box!important}html.arena-home-fixed #arenaHubHome .ar-inline-game-list .ar-game-card{width:100%!important;min-width:0!important;min-height:112px!important;height:auto!important;box-sizing:border-box!important;flex-direction:column!important;align-items:flex-start!important;justify-content:space-between!important;padding:12px!important}html.arena-home-fixed #arenaHubHome .ar-inline-game-list .ar-game-card i{font-size:32px!important}html.arena-home-fixed #arenaHubHome .ar-inline-game-list .ar-game-card strong,html.arena-home-fixed #arenaHubHome .ar-inline-game-list .ar-game-card small{white-space:normal!important;overflow-wrap:anywhere!important}`;document.head.appendChild(arenaCategoryLayoutFix);
+
+/* 2026-11-15: hard fix category panel's accidental two-column parent grid.
+   The heading occupied column one while the game list was placed in column two. */
+(function(){
+ if(document.getElementById('arenaCategoryFullWidthRepair20261115'))return;
+ const style=document.createElement('style');
+ style.id='arenaCategoryFullWidthRepair20261115';
+ style.textContent=`
+  html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    grid-template-rows:58px minmax(0,1fr)!important;
+    grid-auto-flow:row!important;
+    width:100%!important;min-width:0!important;max-width:100%!important;
+    justify-self:stretch!important;align-self:stretch!important;
+    margin:0!important;padding:0!important;box-sizing:border-box!important;
+    overflow:hidden!important;
+  }
+  html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-category-head{
+    grid-column:1/-1!important;grid-row:1!important;
+    width:100%!important;min-width:0!important;max-width:100%!important;
+    justify-self:stretch!important;box-sizing:border-box!important;
+  }
+  html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list{
+    grid-column:1/-1!important;grid-row:2!important;
+    display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    grid-auto-flow:row!important;align-content:start!important;align-items:stretch!important;
+    width:100%!important;min-width:0!important;max-width:100%!important;
+    height:100%!important;min-height:0!important;max-height:100%!important;
+    justify-self:stretch!important;box-sizing:border-box!important;
+    overflow-y:auto!important;overflow-x:hidden!important;
+    padding:0 0 8px!important;gap:10px!important;
+  }
+  html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list>.ar-game-card{
+    grid-column:auto!important;justify-self:stretch!important;
+    width:100%!important;min-width:0!important;max-width:100%!important;
+    height:auto!important;min-height:108px!important;box-sizing:border-box!important;
+  }
+ `;
+ document.head.appendChild(style);
+})();
