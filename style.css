@@ -1,4 +1,3 @@
-/* Kesin gizleme kuralı - Çakışmaları önler */
 .hidden {
     display: none !important;
 }

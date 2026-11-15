@@ -31,7 +31,6 @@ const questions = [
 let currentQuestionIndex = 0;
 let score = 0;
 
-// DOM Elements
 const homeView = document.getElementById('homeView');
 const quizView = document.getElementById('quizView');
 const resultView = document.getElementById('resultView');
@@ -51,33 +50,30 @@ const finalScoreText = document.getElementById('finalScoreText');
 const checkUpdateBtn = document.getElementById('checkUpdateBtn');
 const updateStatusText = document.getElementById('updateStatusText');
 
-// Navigation listeners
 navHome.addEventListener('click', () => showView('home'));
 navProfile.addEventListener('click', () => showView('profile'));
 startQuickQuiz.addEventListener('click', startQuiz);
 restartBtn.addEventListener('click', () => showView('home'));
 
 function showView(viewName) {
-    // Tüm ekranları gizle
     homeView.classList.add('hidden');
     quizView.classList.add('hidden');
     resultView.classList.add('hidden');
     profileView.classList.add('hidden');
 
-    // Navigasyon buton stillerini sıfırla
-    navHome.className = "px-3 py-1.5 rounded-lg bg-gray-800/50 hover:bg-gray-700 text-sm font-medium transition flex items-center space-x-1.5";
-    navProfile.className = "px-3 py-1.5 rounded-lg bg-gray-800/50 hover:bg-gray-700 text-sm font-medium transition flex items-center space-x-1.5";
+    navHome.className = "px-3.5 py-1.5 rounded-lg bg-gray-800/50 hover:bg-gray-700 text-sm font-medium transition flex items-center space-x-1.5 shadow";
+    navProfile.className = "px-3.5 py-1.5 rounded-lg bg-gray-800/50 hover:bg-gray-700 text-sm font-medium transition flex items-center space-x-1.5 shadow";
 
     if (viewName === 'home') {
         homeView.classList.remove('hidden');
-        navHome.className = "px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-sm font-medium transition flex items-center space-x-1.5";
+        navHome.className = "px-3.5 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-sm font-medium transition flex items-center space-x-1.5 shadow";
     } else if (viewName === 'quiz') {
         quizView.classList.remove('hidden');
     } else if (viewName === 'result') {
         resultView.classList.remove('hidden');
     } else if (viewName === 'profile') {
         profileView.classList.remove('hidden');
-        navProfile.className = "px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-sm font-medium transition flex items-center space-x-1.5";
+        navProfile.className = "px-3.5 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-sm font-medium transition flex items-center space-x-1.5 shadow";
     }
 }
 
@@ -102,7 +98,7 @@ function loadQuestion() {
 
     q.options.forEach((opt, index) => {
         const btn = document.createElement('button');
-        btn.className = "w-full text-left p-4 rounded-xl bg-gray-800/60 hover:bg-gray-800 border border-gray-700/50 text-gray-200 font-medium transition";
+        btn.className = "w-full text-left p-4 rounded-2xl bg-gray-800/80 hover:bg-gray-800 border border-gray-700/60 text-gray-200 font-medium transition shadow";
         btn.textContent = opt;
         btn.addEventListener('click', () => selectAnswer(index, btn));
         optionsContainer.appendChild(btn);
@@ -116,12 +112,12 @@ function selectAnswer(selectedIndex, selectedBtn) {
     buttons.forEach(b => b.disabled = true);
 
     if (selectedIndex === q.answer) {
-        selectedBtn.className = "w-full text-left p-4 rounded-xl bg-emerald-600/20 border border-emerald-500 text-emerald-300 font-medium transition";
+        selectedBtn.className = "w-full text-left p-4 rounded-2xl bg-emerald-600/20 border border-emerald-500 text-emerald-300 font-medium transition shadow";
         score += 20;
     } else {
-        selectedBtn.className = "w-full text-left p-4 rounded-xl bg-red-600/20 border border-red-500 text-red-300 font-medium transition";
+        selectedBtn.className = "w-full text-left p-4 rounded-2xl bg-red-600/20 border border-red-500 text-red-300 font-medium transition shadow";
         if (buttons[q.answer]) {
-            buttons[q.answer].className = "w-full text-left p-4 rounded-xl bg-emerald-600/20 border border-emerald-500 text-emerald-300 font-medium transition";
+            buttons[q.answer].className = "w-full text-left p-4 rounded-2xl bg-emerald-600/20 border border-emerald-500 text-emerald-300 font-medium transition shadow";
         }
     }
 
@@ -133,10 +129,9 @@ function selectAnswer(selectedIndex, selectedBtn) {
 
 function showResult() {
     showView('result');
-    finalScoreText.textContent = `Toplam Puanın: ${score} / 100`;
+        finalScoreText.textContent = `Toplam Puanın: ${score} / 100`;
 }
 
-// Update Check
 checkUpdateBtn.addEventListener('click', async () => {
     updateStatusText.textContent = "Güncellemeler kontrol ediliyor...";
     try {
