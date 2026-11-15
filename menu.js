@@ -4105,12 +4105,12 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
 (function(){
  if(document.getElementById('arenaCategoryGridLayoutFix'))return;
  const s=document.createElement('style');s.id='arenaCategoryGridLayoutFix';
- s.textContent='
+ s.textContent=`
  #arenaHubHome .ar-categories.is-open{display:block!important;width:100%!important;grid-template-columns:minmax(0,1fr)!important;gap:8px!important}
  #arenaHubHome .ar-categories.is-open .ar-inline-category-head{display:flex!important;width:100%!important;min-width:0!important;margin:0 0 8px!important}
  #arenaHubHome .ar-categories.is-open .ar-inline-game-list{display:grid!important;width:100%!important;max-width:none!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-rows:minmax(112px,auto)!important;gap:9px!important;height:auto!important;min-height:0!important;overflow:visible!important;align-content:start!important}
  #arenaHubHome .ar-categories.is-open .ar-inline-game-list>.ar-game-card{width:100%!important;min-width:0!important;min-height:112px!important;height:auto!important;box-sizing:border-box!important}
  @media(max-width:340px){#arenaHubHome .ar-categories.is-open .ar-inline-game-list{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important}}
- ';
+ `;
  document.head.appendChild(s);
 })();
