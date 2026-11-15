@@ -168,7 +168,7 @@ function sortAction(a,i){
   sortRemember();
   var transfer=1;
   /* Move the complete connected top group of the same color in one action. */
-  while(transfer<from.length&&from[from.length-1-transfer]===ball)transfer++;
+  transfer=1; // Her dokunuşta yalnızca tek top taşınır; aynı renkteki alt toplar yerinde kalır.
   transfer=Math.min(transfer,s.cap-to.length);
   s.lastMove={from:s.sel,to:i,count:transfer,at:Date.now()};
   for(var move=0;move<transfer;move++)to.push(from.pop());
