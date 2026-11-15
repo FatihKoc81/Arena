@@ -22,7 +22,8 @@ import * as THREE from 'three';
     /memory/.test(id) ? 'dikkat' : 'refleks';
 
   let renderer, scene, camera, root, raf = 0, active = false, canvas, host;
-  let audio, musicGain, musicTimer = 0, musicGame = '', musicOn = true, sfxOn = true, step = 0;\n  try { musicOn=localStorage.getItem('arenaMusic')!=='off'; sfxOn=localStorage.getItem('arenaSfx')!=='off'; } catch(e) {}
+  let audio, musicGain, musicTimer = 0, musicGame = '', musicOn = true, sfxOn = true, step = 0;
+  try { musicOn=localStorage.getItem('arenaMusic')!=='off'; sfxOn=localStorage.getItem('arenaSfx')!=='off'; } catch(e) {}
   const mats = {};
   function mat(hex, metalness=.28, roughness=.28) {
     const key = hex + metalness + roughness;
