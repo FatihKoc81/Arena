@@ -308,7 +308,7 @@ function account(){if(window.Hesap&&Hesap.ac)Hesap.ac();else if(window.ArenaAuth
 function soon(n){if(window.Ekonomi&&Ekonomi.sor)Ekonomi.sor(n,'Bu bölüm sonraki geliştirme aşamasında açılacak.',[{t:'Tamam',c:'gri'}]);else alert(n+' bölümü yakında açılacak.');}
 home.addEventListener('click',e=>{const back=e.target.closest('[data-category-back]');if(back){e.preventDefault();restoreCategories();return;}const launch=e.target.closest('[data-launch]');if(launch){e.preventDefault();launchGame(launch.dataset.launch);return;}const c=e.target.closest('[data-category]');if(c){category(c.dataset.category,true);return;}const a=e.target.closest('[data-action]');if(a){const k=a.dataset.action;if(k==='update'){const a=document.createElement('a');a.href='https://github.com/FatihKoc81/Arena/releases/latest/download/Arena.apk';a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();return;}if(k==='allgames'){navActive('games');return;}if(k==='league')return league();if(k==='friends')return soon('Arkadaşlar');if(k==='menu')return arenaOpenMenu();if(k==='settings'||k==='profile'||k==='login')return account();const names={reward:'Günlük Ödül',tasks:'Günlük Görevler',achievements:'Başarılar',season:'Sezon',market:'Market / Altın Satın Al'};return soon(names[k]||'ARENA');}const f=e.target.closest('[data-feature]');if(f){launchGame(f.dataset.feature);}});
 view.addEventListener('click',e=>{const b=e.target.closest('.ar-back');if(b){e.preventDefault();view.hidden=true;home.hidden=false;document.documentElement.classList.add('arena-home-fixed');navActive('home');ana.scrollTop=0;try{history.replaceState({arenaHome:true},'',location.pathname+location.search);}catch(_){}return;}const l=e.target.closest('[data-launch]');if(l)launchGame(l.dataset.launch);});
-if(!document.getElementById('arenaNeonNav')){const nav=document.createElement('nav');nav.id='arenaNeonNav';nav.innerHTML='<button class="active" data-nav="home"><i>⌂</i>Ana Sayfa</button><button data-nav="games"><i>🎮</i>Oyunlar</button><button data-nav="league"><i>🏆</i>Lig</button><button data-nav="challenge"><i>⚔️</i>Meydan Oku</button><button data-nav="friends"><i>👥</i>Arkadaşlar</button><button data-nav="profile"><i>♟</i>Profil</button>';document.body.appendChild(nav);nav.addEventListener('click',e=>{const b=e.target.closest('[data-nav]');if(!b)return;const k=b.dataset.nav;if(k==='home')return goHome();if(k==='games'){document.documentElement.classList.add('arena-home-fixed');view.hidden=true;home.hidden=false;navActive('games');return;}navActive(k);if(k==='league')league();else if(k==='challenge')challenge();else if(k==='friends')soon('Arkadaşlar');else account();});}
+if(!document.getElementById('arenaNeonNav')){const nav=document.createElement('nav');nav.id='arenaNeonNav';nav.innerHTML='<button class="active" data-nav="home"><i>⌂</i>Ana Sayfa</button><button data-nav="games"><i>🎮</i>Oyunlar</button><button data-nav="league"><i>🥇</i>Lig</button><button data-nav="challenge"><i>⚔️</i>Meydan Oku</button><button data-nav="friends"><i>👥</i>Arkadaşlar</button><button data-nav="profile"><i>♟</i>Profil</button>';document.body.appendChild(nav);nav.addEventListener('click',e=>{const b=e.target.closest('[data-nav]');if(!b)return;const k=b.dataset.nav;if(k==='home')return goHome();if(k==='games'){document.documentElement.classList.add('arena-home-fixed');view.hidden=true;home.hidden=false;navActive('games');return;}navActive(k);if(k==='league')league();else if(k==='challenge')challenge();else if(k==='friends')soon('Arkadaşlar');else account();});}
 if(title)title.addEventListener('click',e=>{const hs=e.target.closest('[data-header-hotspot]');if(hs){e.preventDefault();e.stopImmediatePropagation();const k=hs.dataset.headerHotspot;if(k==='home')goHome();else if(k==='settings')account();else if(k==='notifications')soon('Bildirimler');else if(k==='menu')arenaOpenMenu();return;}e.preventDefault();e.stopImmediatePropagation();goHome();},true);
 home.querySelector('.ar-brand').addEventListener('click',goHome);
 findGames();new MutationObserver(findGames).observe(ana,{childList:true,subtree:true});
@@ -4035,6 +4035,68 @@ var st=document.createElement('style');st.id='arenaRuntimeRecovery';st.textConte
       html.arena-home-fixed body #ana #arenaHubHome .ar-short:active,
       html.arena-home-fixed body #ana #arenaHubHome .ar-feature:active{transform:scale(.975)!important;filter:brightness(1.12)!important}
     }
+  `;
+  document.head.appendChild(style);
+})();
+
+
+/* 2026-11-15: FIXED HOME VIEWPORT + IMMUTABLE SHORTCUT STRIP */
+(function(){
+  if(document.getElementById('arenaFixedViewportAndShortcutStrip20261115'))return;
+  var style=document.createElement('style');
+  style.id='arenaFixedViewportAndShortcutStrip20261115';
+  style.textContent=`
+    html.arena-home-fixed,html.arena-home-fixed body{
+      height:100%!important;min-height:100%!important;max-height:100%!important;
+      overflow:hidden!important;overscroll-behavior:none!important;
+    }
+    html.arena-home-fixed body{
+      position:fixed!important;inset:0!important;width:100%!important;
+      touch-action:pan-x!important;
+    }
+    html.arena-home-fixed body #ana{
+      overflow:hidden!important;overscroll-behavior:none!important;
+      touch-action:pan-x!important;
+    }
+    html.arena-home-fixed body #ana #arenaHubHome>.ar-shortcuts{
+      position:relative!important;z-index:4!important;
+      flex:0 0 74px!important;min-height:74px!important;
+      height:74px!important;max-height:74px!important;
+      grid-row:2!important;align-self:stretch!important;
+      transform:none!important;translate:none!important;
+      animation:none!important;transition:none!important;
+      contain:layout paint!important;
+    }
+    html.arena-home-fixed body #ana #arenaHubHome>.ar-shortcuts>.ar-short{
+      flex:1 1 0!important;min-width:0!important;
+      height:74px!important;min-height:74px!important;max-height:74px!important;
+      transform:none!important;translate:none!important;
+      animation:none!important;transition:none!important;
+      box-sizing:border-box!important;
+    }
+    html.arena-home-fixed body #ana #arenaHubHome>.ar-shortcuts>.ar-short i{
+      flex:0 0 auto!important;line-height:1!important;
+      font-size:25px!important;transform:none!important;
+    }
+    html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open{
+      display:flex!important;flex:1 1 auto!important;flex-direction:column!important;
+      min-height:0!important;max-height:100%!important;
+      overflow:hidden!important;overscroll-behavior:contain!important;
+    }
+    html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-game-list{
+      flex:1 1 auto!important;min-height:0!important;
+      max-height:100%!important;overflow-x:hidden!important;overflow-y:auto!important;
+      overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;
+      touch-action:pan-y!important;
+    }
+    html.arena-home-fixed body #ana #arenaHubHome>.ar-categories.is-open>.ar-inline-category-head{
+      flex:0 0 56px!important;min-height:56px!important;
+    }
+    html.arena-home-fixed body #ana #arenaHubHome>.ar-shortcuts,
+    html.arena-home-fixed body #ana #arenaHubHome>.ar-shortcuts *{
+      transition-property:color,background-color,border-color,box-shadow!important;
+    }
+    #arenaNeonNav{overscroll-behavior:none!important}
   `;
   document.head.appendChild(style);
 })();
