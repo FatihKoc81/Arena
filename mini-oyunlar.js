@@ -102,7 +102,14 @@ function sortAction(a,i){
  if(s.sel===i){s.sel=-1;return;}
  var from=s.tubes[s.sel],to=s.tubes[i],ball=from[from.length-1];
  if(ball&&to.length<s.cap&&(!to.length||to[to.length-1]===ball)){
-  from.pop();to.push(ball);s.moves++;s.msg="Güzel hamle!";
+  var transfer=1;
+  /* Top oyunlarında üst üste duran aynı renk grubu tek hamlede aktarılır. */
+  if(id!=="liquidSort"){
+   while(transfer<from.length&&from[from.length-1-transfer]===ball)transfer++;
+  }
+  transfer=Math.min(transfer,s.cap-to.length);
+  for(var move=0;move<transfer;move++)to.push(from.pop());
+  s.moves++;s.msg=transfer>1?transfer+" aynı renk top birlikte taşındı.":"Güzel hamle!";
   if(sortWon()){s.done=true;s.msg="Harika! Seviye "+s.level+" tamamlandı. Sonraki seviyeye geçebilirsin.";}
  }else s.msg="Bu renk buraya taşınamaz.";
  s.sel=-1;
