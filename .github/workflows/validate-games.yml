@@ -17,7 +17,7 @@ jobs:
       - name: Check JavaScript syntax
         run: |
           set -e
-          for f in menu.js masa.js mini-oyunlar.js ekonomi.js arena.js kelime.js kelimelerim.js passaparola.js rotasyon.js islem.js ads.js; do
+          for f in *.js; do
             echo "Checking $f"
             node --check "$f"
           done
