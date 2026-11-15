@@ -36,7 +36,7 @@ jobs:
           if [ "$WEB" != "." ]; then
             mkdir -p "$WEB"
             cp index.html style.css masa-premium.css manifest.json sw.js *.js icon-*.png *.webp "$WEB"/ 2>/dev/null || true
-            cp -r assets "$WEB"/ 2>/dev/null || true
+            cp -r assets css js "$WEB"/ 2>/dev/null || true
           fi
 
       - name: Paket adını yazdır
