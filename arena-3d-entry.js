@@ -22,7 +22,7 @@ import * as THREE from 'three';
     /memory/.test(id) ? 'dikkat' : 'refleks';
 
   let renderer, scene, camera, root, raf = 0, active = false, canvas, host;
-  let audio, musicGain, musicTimer = 0, musicOn = true, sfxOn = true, step = 0;
+  let audio, musicGain, musicTimer = 0, musicGame = '', musicOn = true, sfxOn = true, step = 0;
   const mats = {};
   function mat(hex, metalness=.28, roughness=.28) {
     const key = hex + metalness + roughness;
@@ -131,20 +131,32 @@ import * as THREE from 'three';
       const rim=new THREE.PointLight(0x49aaff,8,8);rim.position.set(1.7,1.2,-1);scene.add(rim);
       const type=colorFor(id),model=makeModel(id);root=new THREE.Group();root.add(model);scene.add(root);
       const glow=new THREE.PointLight(palette[type][0],3.2,4);glow.position.set(0,0,1.3);scene.add(glow);
-      active=true;let start=performance.now();
+      active=true;startMusic(id);let start=performance.now();
       const tick=now=>{if(!active||!renderer)return;const t=(now-start)/1000;root.rotation.y=Math.sin(t*.7)*.22;root.rotation.x=Math.sin(t*.9)*.055;root.position.y=Math.sin(t*1.5)*.045;model.rotation.y+=.003;renderer.render(scene,camera);raf=requestAnimationFrame(tick);};
       cancelAnimationFrame(raf);raf=requestAnimationFrame(tick);
       return true;
     } catch(e){console.warn('ARENA 3D init:',e);return false;}
   }
-  function stop3D(){active=false;cancelAnimationFrame(raf);if(renderer){renderer.dispose();renderer=null;}if(scene){scene.traverse(o=>{if(o.geometry)o.geometry.dispose();});scene=null;}root=null;}
+  function stop3D(){active=false;stopMusic();musicGame='';cancelAnimationFrame(raf);if(renderer){renderer.dispose();renderer=null;}if(scene){scene.traverse(o=>{if(o.geometry)o.geometry.dispose();});scene=null;}root=null;}
   function getAudio(){if(!audio){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;audio=new C();musicGain=audio.createGain();musicGain.gain.value=.13;musicGain.connect(audio.destination);}if(audio.state==='suspended')audio.resume();return audio;}
   function tone(freq,dur=.16,wave='sine',volume=.05,when=0){const c=getAudio();if(!c)return;const o=c.createOscillator(),g=c.createGain(),t=c.currentTime+when;o.type=wave;o.frequency.setValueAtTime(freq,t);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(volume,t+.018);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+dur+.03);}
   const scales={bilgi:[392,494,587,784,587,494],kelime:[330,392,440,523,440,392],masa:[262,330,392,523,392,330],sudoku:[294,370,440,587,440,370],sayi:[349,440,523,698,523,440],renk:[392,494,659,784,659,494],dikkat:[262,330,392,494,392,330],refleks:[440,554,659,880,659,554]};
-  function startMusic(id){stopMusic();if(!musicOn)return;const c=getAudio();if(!c)return;const notes=scales[colorFor(id)]||scales.bilgi;step=0;const play=()=>{if(!active||!musicOn)return;const n=notes[step%notes.length];tone(n,0.36,'triangle',.018);tone(n/2,.48,'sine',.012,.02);step++;musicTimer=window.setTimeout(play,520);};play();}
+  function startMusic(id){if(musicGame===id&&musicTimer)return;stopMusic();musicGame=id;if(!musicOn)return;const c=getAudio();if(!c)return;const notes=scales[colorFor(id)]||scales.bilgi;step=0;const play=()=>{if(!active||!musicOn)return;const n=notes[step%notes.length];tone(n,0.36,'triangle',.018);tone(n/2,.48,'sine',.012,.02);step++;musicTimer=window.setTimeout(play,520);};play();}
   function stopMusic(){if(musicTimer)clearTimeout(musicTimer);musicTimer=0;}
   function sfx(id,action='tap'){if(!sfxOn)return;const map={tap:[520,.07],move:[660,.12],success:[784,.2],win:[988,.34],back:[390,.11],error:[180,.22],drop:[440,.1],reset:[330,.13]};const v=map[action]||map.tap;tone(v[0],v[1],action==='win'?'triangle':'sine',.055);if(action==='win'){tone(1175,.3,'triangle',.045,.13);tone(1480,.36,'triangle',.04,.27);}}
   function setMusic(v,id){musicOn=!!v;if(musicOn&&active)startMusic(id||'milyoner');else stopMusic();}
   function setSfx(v){sfxOn=!!v;}
-  window.Arena3D={mount:init,stop:stop3D,sfx:sfx,music:setMusic,setSfx:setSfx,settings:()=>({musicOn,sfxOn})};
+  
+  function externalScene(id){
+    if(document.querySelector('#arenaMiniGames.open'))return;
+    const target=document.querySelector('#arena-table-modal:not([hidden])')||document.querySelector('#oyun:not(.hidden)');
+    if(!target)return;
+    let wrap=target.querySelector('.arena-3d-overlay');
+    if(!wrap){wrap=document.createElement('div');wrap.className='arena-3d-overlay';wrap.innerHTML='<canvas aria-label="3D oyun modeli"></canvas><div><button data-a3d="music">♫</button><button data-a3d="sfx">🔊</button></div>';target.appendChild(wrap);}
+    const cv=wrap.querySelector('canvas');if(cv) {init(cv,id);const b=wrap.querySelector('[data-a3d="music"]'),e=wrap.querySelector('[data-a3d="sfx"]');const q=window.Arena3D.settings();b.textContent=q.musicOn?'♫':'♪';e.textContent=q.sfxOn?'🔊':'🔇';}
+    wrap.onclick=ev=>{const b=ev.target.closest('[data-a3d]');if(!b)return;const q=window.Arena3D.settings();if(b.dataset.a3d==='music'){setMusic(!q.musicOn,id);b.textContent=q.musicOn?'♪':'♫';}else{setSfx(!q.sfxOn);b.textContent=q.sfxOn?'🔇':'🔊';}};
+  }
+  window.addEventListener('arena:game-start',ev=>{const id=ev.detail&&ev.detail.id;if(id)externalScene(id);});
+  window.addEventListener('arena:home',()=>{const x=document.querySelectorAll('.arena-3d-overlay');x.forEach(e=>e.remove());stop3D();});
+\n  window.Arena3D={mount:init,stop:stop3D,sfx:sfx,music:setMusic,setSfx:setSfx,settings:()=>({musicOn,sfxOn})};
 })();
