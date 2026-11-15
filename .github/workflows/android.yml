@@ -289,7 +289,7 @@ jobs:
           if(!x.includes('android.permission.REQUEST_INSTALL_PACKAGES')) x=x.replace('<application','<uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>\n    <application');
           if(!x.includes('ArenaDownloadReceiver')) x=x.replace('</application>', '  <receiver android:name=".ArenaDownloadReceiver" android:exported="false"><intent-filter><action android:name="android.intent.action.DOWNLOAD_COMPLETE"/></intent-filter></receiver>\n  <activity android:name=".ArenaInstallActivity" android:exported="false" android:theme="@android:style/Theme.Translucent.NoTitleBar"/>\n</application>');
           fs.writeFileSync(mf,x);
-          const main='android/app/src/main/java/'+id.replace(/\\./g,'/')+'/MainActivity.java';
+          const main='android/app/src/main/java/'+id.split('.').join('/')+'/MainActivity.java';
           if(fs.existsSync(main)){
             let a=fs.readFileSync(main,'utf8');
             if(!a.includes('ArenaUpdaterPlugin')) {
