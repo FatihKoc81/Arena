@@ -1,26 +1,38 @@
-# ARENA — Android APK öncelikli geliştirme görevi
+# ARENA — kapsamlı Android APK kalite ve tasarım yenilemesi
 
-Claude Code baş geliştiricidir. Gemini yalnızca teknik yardımcındır. GPT-6 koordinasyon ve bağımsız denetim yapar. Kullanıcı doğrudan main'e commit ve otomatik APK üretimine açıkça izin verdi.
+Kullanıcının açık talebi: ARENA'yı düzgün ve gözle görülür biçimde güncelle. Önceki küçük/kozmetik değişiklikler beğenilmedi. Bu kez yalnızca birkaç parlak efekt ekleme; uygulamanın tamamında tutarlı, kaliteli ve gerçekten çalışan bir ürün deneyimi oluştur.
 
-## Kapsam kararı: WEB GELİŞTİRMESİ DURDURULDU
-- Kullanıcı web sitesi/PWA geliştirmesini şimdilik istemiyor. Ayrı web sitesi, masaüstü tarayıcı, SEO, PWA, web yayını veya web tasarım eşitliği için çalışma yapma.
-- Yalnızca kurulabilir Android APK'nın kalitesine ve çalışmasına odaklan.
-- ARENA şu anda Capacitor/WebView tabanlı bir Android APK'dır. APK'nın içindeki arayüz HTML/CSS/JavaScript ile paketleniyor olabilir; bu dosyaları yalnızca APK'nın iç deneyimini geliştirmek için değiştir. Ayrı web dağıtımını hedefleme.
-- Android APK'ya dahil edilen görsel, ses, efekt ve oyun varlıkları yüksek kaliteli olmalı; düşük çözünürlüklü placeholder kullanma. Lisanslı veya özgün varlık kullan, varlık lisanslarını ve kaynaklarını not et.
-- Görselleri yüksek çözünürlükte hazırla ancak Android bellek, APK boyutu ve yükleme süresine göre WebP/AVIF ve uygun ses sıkıştırmasıyla optimize et. Kaliteyi bozacak aşırı sıkıştırma yapma.
-- Menü, oyun ve efekt seslerini gerçek ses dosyalarıyla entegre et; sessiz/otomatik oynatma kısıtlarını Android dokunma etkileşimiyle doğru yönet. Ses aç/kapat, ses seviyesi ve uygulama arka plana geçişini test et.
-- Akıcı animasyon, dokunma geri bildirimi, doğru ekran yönü, farklı Android ekran yoğunlukları, performans ve uygulama yaşam döngüsünü gözet.
+## Kesin sınırlar
+- Yalnızca kurulabilir Android APK. Ayrı web/PWA/masaüstü/SEO geliştirmesi yapma.
+- Capacitor WebView içindeki HTML/CSS/JS, yalnızca APK deneyimini iyileştirmek için değiştirilebilir.
+- Mevcut oyunları, Firebase, Google/telefon oturum açma, misafir kullanımı, kayıtlı ilerleme, reklam/ödül sistemlerini bozma veya kaldırma.
+- Mevcut işlevi olmayan profil, lig, görev, arkadaş, bildirim, çok oyunculu gibi sahte kartlar/rozetler üretme. Çalışmayan özellikleri çalışıyormuş gibi gösterme.
+- Kullanıcının quiz içerik yasaklarını ve Türkçe metin tercihlerini koru.
+- RESET NIGHT beklemede. Bu görev yalnızca ARENA içindir.
 
-## Bu turun dar kapsamı: APK ana menüsü ve Milyoner
-1. Önce main dalındaki gerçek kaynakları, Android Capacitor yapılandırmasını, açık PR #20 ve #21'i ve APK workflow'unu incele. PR'ları körlemesine birleştirme.
-2. PR #21'deki ana menü geliştirmelerini ve PR #20'deki Milyoner düzeltmelerini yalnızca mevcut main ile uyumlu, test edilebilir ve gerileme yaratmayacak kısımlarını kontrollü şekilde değerlendir. Uygun olanları doğrudan main'e taşı; PR oluşturma.
-3. APK ana menüsünü premium kaliteye yükselt: net yüksek çözünürlüklü görseller, tutarlı özgün ikonlar, katmanlı arka plan, zarif ışık/cam efektleri, akıcı geçişler ve dokunma animasyonları.
-4. Menü müziği, buton sesleri ve Milyoner için doğru/yanlış cevap, joker ve seviye geçiş efektlerini kaliteli gerçek ses varlıklarıyla uygula. Kullanıcı ayarlarından sesleri kapatabilsin.
-5. Milyoner'in soru/cevap akışını, jokerlerini, süre ve oyun sonu durumlarını Android APK içinde doğrula; bu turda yalnızca en kritik tek oyun hatasını düzelt.
-6. Android'e özgü sorunları kontrol et: ses odağı, geri tuşu, ekran yönü, güvenli alanlar, dokunma hedefleri, uygulama duraklatma/devam, offline paketlenmiş varlıklar ve performans.
-7. İlgili JS sözdizimi/test kontrollerini ve Android APK derlemesini çalıştır. Gerçek cihaz testi yapılmadıysa bunu açıkça belirt.
-8. Her tutarlı ve test edilmiş değişikliği doğrudan main'e commit et ve push et. PR açma. API anahtarlarını veya imzalama sırlarını asla commit etme.
-9. Push sonrasında Build APK Actions çalışmasını bekle/incele. APK artifact veya release gerçekten oluştuysa doğrulanmış indirme bağlantısını raporla. Derleme başarısızsa logu incele, bir odaklı düzeltme yap ve yeniden doğrula; sınırsız deneme yapma.
-10. Gemini'den hedefli Android incelemesi, test tasarımı ve hata analizi iste. Son uygulama kararları ve kod sahipliği sende.
+## Önce teşhis
+1. Main dalındaki tüm ana ekran, kategori ekranı, oyun başlatma akışı, oyun ekranları, ayarlar, profil, Firebase/kimlik doğrulama, Android yapılandırması ve APK workflow'unu incele.
+2. Kullanıcının önceki şikâyetlerini ve açık PR #20/#21'i incele. PR #21'de assets/game-art/*.svg referansları var fakat PR dosya listesinde bu dosyalar bulunmuyor; eksik varlıkları kontrol et. PR'ları körlemesine birleştirme.
+3. Şu anki APK'nın gerçek görünümüyle kodu karşılaştır. Yalnızca kod satırı sayısını artırmak için değişiklik yapma.
 
-Bu turda Okey/101, diğer oyunlar, web sitesi, PWA veya masaüstü tarayıcı geliştirmesine geçme. Önce Android APK ana menüsü ve Milyoner deneyimini kaliteli, kararlı ve doğrulanabilir hale getir.
+## Tasarım hedefi — uygulamanın tamamında
+- ARENA için tek ve tutarlı premium görsel dil kur: koyu lacivert/füme temel, kontrollü elektrik mavisi ve altın vurgu, net tipografi, iyi boşluk, güçlü hiyerarşi, yüksek kontrast.
+- Ana menü: gerçek kullanıcı verisine bağlı profil/ilerleme alanı, anlaşılır kategori kartları, düzgün iki sütunlu mobil ızgara, taşma ve üst üste binme olmadan sabit alt gezinme. Küçük telefonlarda da doğru yerleşim.
+- Kategori ve oyun seçim ekranları: her oyuna özgü, net ikon/kapak, kısa açıklama, tutarlı kart ölçüleri ve belirgin başlatma aksiyonu. Sadece ana menüyü güzelleştirip diğer ekranları eski bırakma.
+- Oyun içi ekranlar: Milyoner, Dini İmtihan ve mevcut oyunların mevcut işlevlerini koruyarak görsel bütünlük, okunabilir soru/cevap, doğru/yanlış durumları, jokerler, skor/süre ve oyun sonu ekranlarını düzenle. Bu turda oyun mantığını gereksiz yere yeniden yazma.
+- Animasyonlar kısa, akıcı ve Android GPU dostu olsun. Her dokunuşta aşırı parıltı/animasyon kullanma. Reduce-motion ve düşük performanslı cihazları destekle.
+- Gerçek, özgün veya lisansı açık yüksek kaliteli görsel varlık kullan. SVG/WebP çözünürlüklerini doğru ayarla, eksik dosya bırakma, dış ağdan yüklenen görsele bağımlı olma.
+- Ses: yalnızca osilatörle sahte melodi üretip bunu profesyonel müzik diye sunma. Lisansı açık/özgün kısa menü müziği ve gerçek UI/oyun ses efektleri ekle; ses aç/kapat ve seviye ayarlarını uygula. Uygulama arka plana girince sesi durdur, geri gelince doğru yönet. Ses dosyaları APK içinde offline çalışsın.
+- Android geri tuşu, güvenli alanlar, ekran yönü, dokunma hedefleri, yaşam döngüsü, çevrimdışı kullanım ve performans kontrolü yap.
+
+## Uygulama ve teslim
+1. Her değişiklikten önce ilgili dosyaları ve mevcut davranışı anla. Büyük dosyaları toptan değiştirme.
+2. Değişiklikleri küçük, bütünlüklü gruplar halinde uygula; mevcut çalışan oyunları ve kullanıcı verilerini koru.
+3. PR açma; kullanıcının açık izniyle main'e doğrudan commit et. Her commit açıklayıcı olsun.
+4. JS sözdizimi, HTML inline script, asset dosya yolları, mümkünse headless mobil görünüm ve ilgili oyun akışlarını test et.
+5. Android APK'yı derle, imzayı doğrula, GitHub Release'e yükle. Build yeşil tek başına yeterli değildir; APK dosyasının gerçekten oluştuğunu ve indirme bağlantısını doğrula.
+6. Gerçek Android cihaz testi yapılmadıysa bunu açıkça yaz. Ölçmediğin FPS, ses veya cihaz uyumluluğunu iddia etme.
+7. Önce ana menü + kategori/oyun seçimi + Milyoner/Dini İmtihan deneyimini tutarlı hale getir. Sonra aynı tasarım sistemini diğer oyun ekranlarına yay. Okey/101 oyun mantığını bu turda değiştirme.
+8. Kullanıcıya sadece gerçek değişiklikleri, testleri, eksikleri ve doğrulanmış APK bağlantısını raporla. "Premium oldu" gibi kanıtsız ifadeler kullanma.
+
+Önce uygulanabilir planı belirle, ardından kodla ve test et. Kullanıcıdan rutin terminal/Git/derleme adımı isteme; kendin yap.
