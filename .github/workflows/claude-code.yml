@@ -7,7 +7,7 @@ on:
         description: "Claude Code'a verilecek geliştirme görevi"
         required: true
         type: string
-        default: "ARENA oyunlarını gerçek Android ve mobil tarayıcı kullanımına göre denetle. En kritik oynanabilirlik sorununu düzelt, test et ve taslak PR hazırla."
+        default: "GitHub Issue #22'yi uygula: ana sayfa, tüm kategori ekranları, Okey ve Milyoner arayüzlerini düzelt. Gerçek kod değişikliği yap, test et ve taslak PR hazırla."
 
 permissions:
   contents: write
@@ -50,16 +50,19 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY != '' && secrets.ANTHROPIC_API_KEY || '' }}
           claude_code_oauth_token: ${{ secrets.ANTHROPIC_API_KEY == '' && secrets.CLAUDE_CODE_OAUTH_TOKEN || '' }}
-          claude_args: --max-turns 20
+          claude_args: --max-turns 45
+          show_full_output: true
           prompt: |
-            ARENA için kıdemli Android/web oyun geliştiricisisin.
+            ARENA için kıdemli Android oyun arayüzü geliştiricisisin.
             GÖREV: ${{ inputs.task }}
-            Önce GEMINI.md ve ilgili oyun kaynaklarını oku. Çalışan özellikleri koru.
-            Android telefon ve mobil tarayıcı uyumluluğunu önceliklendir.
-            Gerçek oyun mantığını düzelt; sahte/placeholder çözüm üretme.
-            Sadece bu izole dalda çalış. main dalına push/merge yapma.
+            Öncelik: ana sayfa, bütün kategori ekranları, Okey, Milyoner.
+            Önce GEMINI.md, Issue #22 ve ilgili kaynak dosyalarını oku.
+            Kullanıcının ekran görüntülerindeki kırpılma, aşırı boşluk ve alt menü/toast çakışmasını gider.
+            Okey ve Milyoner'in mevcut oyun kurallarını, kayıtlarını ve akışını bozma.
+            Android telefon ekranlarına göre responsive tasarla; gerçek kod değişikliği yap.
+            Sadece bu izole dalda çalış; main dalına push/merge yapma.
             API anahtarı, Firebase gizlisi veya kullanıcı verisi isteme, okuma ya da çıktıya yazma.
-            Testleri gerçekten çalıştır ve Türkçe kısa sonuç özeti ver.
+            Testleri gerçekten çalıştır. Çalışma sonunda değişen dosyaları ve test sonuçlarını Türkçe özetle.
 
       - name: JavaScript doğrulaması
         run: |
