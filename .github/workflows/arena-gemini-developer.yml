@@ -25,6 +25,8 @@ jobs:
   develop:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    env:
+      GEMINI_CLI_TRUST_WORKSPACE: "true"
     steps:
       - uses: actions/checkout@v4
         with:
