@@ -1,8 +1,10 @@
 name: Claude Dispatch
 
-# Claude Code Action push olayını desteklemediği için görevler manuel workflow_dispatch ile başlatılır.
+# Claude görevleri manuel dispatch veya @claude yorumuyla başlatılır.
 
 on:
+  issue_comment:
+    types: [created]
   workflow_dispatch:
     inputs:
       prompt:
@@ -16,6 +18,7 @@ concurrency:
 
 jobs:
   claude:
+    if: github.event_name != 'issue_comment' || (github.event.issue.pull_request && contains(github.event.comment.body, '@claude'))
     runs-on: ubuntu-latest
     timeout-minutes: 35
     permissions:
@@ -34,7 +37,7 @@ jobs:
       - name: Prepare task prompt
         id: task
         env:
-          MANUAL_PROMPT: ${{ inputs.prompt }}
+          MANUAL_PROMPT: ${{ inputs.prompt || github.event.comment.body }}
         shell: bash
         run: |
           if [ -n "$MANUAL_PROMPT" ]; then
