@@ -141,17 +141,14 @@ function soruSesDurdur(){soruSesToken++;try{if(cevapRecognition){cevapRecognitio
 async function soruSesOku(){
  if(!soruSesAcik||!lv||!lv[soru]||$("oyun").classList.contains("hidden"))return;
  const token=++soruSesToken,q=lv[soru],letters=["A","B","C","D"];
- if(window.ArenaTTS&&typeof window.ArenaTTS.speakParts==="function"){try{await window.ArenaTTS.speakParts(q[0],[]);if(token!==soruSesToken)window.ArenaTTS.stop();return;}catch(e){}}
+ if(window.ArenaTTS&&typeof window.ArenaTTS.speakParts==="function"){try{await window.ArenaTTS.speakParts(q[0],[],"male");if(token!==soruSesToken)window.ArenaTTS.stop();return;}catch(e){}}
  if(!("speechSynthesis"in window)||!("SpeechSynthesisUtterance"in window))return;
  try{
-  window.speechSynthesis.cancel();const voices=window.speechSynthesis.getVoices()||[],tr=voices.find(v=>/^tr([-_]|$)/i.test(v.lang));
-  const say=text=>new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang="tr-TR";u.rate=.80;u.pitch=1;u.volume=1;if(tr)u.voice=tr;u.onend=resolve;u.onerror=resolve;window.speechSynthesis.speak(u);});
+  window.speechSynthesis.cancel();const voices=window.speechSynthesis.getVoices()||[],tr=voices.filter(v=>/^tr([-_]|$)/i.test(v.lang)).sort((a,b)=>(/male|erkek|man|baritone|ahmet|mehmet|yusuf|burak/i.test(b.name+" "+b.voiceURI)?1:0)-(/male|erkek|man|baritone|ahmet|mehmet|yusuf|burak/i.test(a.name+" "+a.voiceURI)?1:0))[0];
+  const say=text=>new Promise(resolve=>{const u=new SpeechSynthesisUtterance(text);u.lang="tr-TR";u.rate=.88;u.pitch=.88;u.volume=1;if(tr)u.voice=tr;u.onend=resolve;u.onerror=resolve;window.speechSynthesis.speak(u);});
   await say("Soru. "+q[0]);if(token!==soruSesToken)return;
   
  }catch(e){}
-}
-if(window.ArenaTTS){try{await window.ArenaTTS.speak(metin);if(token!==soruSesToken)window.ArenaTTS.stop();return;}catch(e){}}
-if(!("speechSynthesis"in window)||!("SpeechSynthesisUtterance"in window))return;try{window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(metin);u.lang="tr-TR";u.rate=.88;u.pitch=1;u.volume=1;const v=window.speechSynthesis.getVoices()||[],tr=v.find(x=>/^tr([-_]|$)/i.test(x.lang));if(tr)u.voice=tr;window.speechSynthesis.speak(u);}catch(e){}
 }
 
 
