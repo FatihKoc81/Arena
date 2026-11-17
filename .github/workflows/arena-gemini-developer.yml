@@ -1,0 +1,89 @@
+name: ARENA Gemini Developer + GPT Review
+
+on:
+  push:
+    branches: [ main ]
+    paths: [ '.github/workflows/arena-gemini-developer.yml' ]
+  workflow_dispatch:
+    inputs:
+      task:
+        description: "Gemini'ye verilecek görev"
+        required: true
+        type: string
+        default: "GitHub Issue #22'yi uygula. Ana sayfa, tüm kategori ekranları, Okey ve Milyoner arayüzlerini profesyonel şekilde yenile. Android mobil uyumluluğunu test et ve PR hazırla."
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: read
+
+concurrency:
+  group: arena-gemini-developer-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  develop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Gemini için izole dal oluştur
+        run: |
+          git config user.name "Gemini Project Lead"
+          git config user.email "gemini-project-lead@users.noreply.github.com"
+          BRANCH="ai/arena-gemini-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          git switch -c "$BRANCH"
+          echo "AI_BRANCH=$BRANCH" >> "$GITHUB_ENV"
+
+      - name: Gemini gerçek kaynakları geliştirir
+        uses: google-github-actions/run-gemini-cli@v0
+        with:
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          gemini_cli_version: latest
+          gemini_model: gemini-3.1-flash-lite
+          prompt: |
+            ARENA Android APK için kıdemli oyun arayüzü ve frontend geliştiricisisin.
+            Önce GEMINI.md ve GitHub Issue #22'yi oku.
+            GÖREV: ${{ inputs.task || 'Issue #22: ana sayfa, kategori ekranları, Okey ve Milyoner arayüzlerini geliştir.' }}
+            Gemini birincil kod geliştiricidir. GPT bağımsız denetçi olacaktır.
+            Yalnız Android APK kapsamı. Ayrı web/PWA/masaüstü geliştirmesi yapma.
+            Kullanıcının ekran görüntülerindeki ana sayfa/kategori kartı sorunlarını düzelt: metin kırpılması, gereksiz boşluk, kart ölçüleri, toast-alt menü çakışması, güvenli alanlar.
+            Okey ve Milyoner ekranlarını telefon portre/yatay boyutlarına göre düzenle; oyun kurallarını, kayıt/progress ve navigasyonu bozma.
+            Gerçek kaynak dosyalarını düzenle; placeholder veya yalnız rapor üretme.
+            360x800, 384x854, 432x960 CSS px için responsive kontroller yap. Mevcut oyun doğrulama komutlarını çalıştır.
+            Sadece bu izole dalda çalış. main dalına push/merge yapma, release yayınlama, secret veya imza ayarlarını değiştirme.
+            İş sonunda Türkçe olarak değişen dosyaları, testleri, test edilmeyen alanları ve bilinen riskleri yaz.
+
+      - name: JavaScript doğrulaması
+        run: |
+          set -euo pipefail
+          find . -type f -name '*.js' -not -path './node_modules/*' -not -path './.git/*' -print0 | while IFS= read -r -d '' file; do
+            node --check "$file"
+          done
+          git diff --check
+
+      - name: Değişiklikleri PR olarak gönder
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git add -A
+          git reset -- .github/workflows
+          if git diff --cached --quiet; then
+            echo "Gemini kaynak değişikliği üretmedi; PR açılmadı."
+            exit 0
+          fi
+          git diff --cached --check
+          git commit -m "Gemini: implement ARENA UI and game improvements"
+          git push --set-upstream origin "$AI_BRANCH"
+          gh pr create --repo "$GITHUB_REPOSITORY" --base main --head "$AI_BRANCH" \
+            --title "[Gemini] ARENA ana sayfa, kategoriler, Okey ve Milyoner" \
+            --body "Gemini tarafından hazırlanmıştır. JavaScript doğrulaması çalıştırıldı. GPT bağımsız incelemesi için PR açıldı; otomatik birleştirme yapılmaz."
