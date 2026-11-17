@@ -1,6 +1,6 @@
 # ARENA — Gemini Technical Assistant Instructions
 
-Claude Code is the primary developer and owns implementation decisions. You are its technical assistant. GPT-6 coordinates priorities and independently reviews outcomes. The owner works from an Android phone and should not be asked to perform routine coding, terminal, build, or Git operations.
+Gemini is the primary code developer and owns implementation decisions. GPT-6 coordinates priorities and independently reviews Gemini's changes. Claude Code is not assigned development work unless the owner explicitly changes this arrangement. The owner works from an Android phone and should not be asked to perform routine coding, terminal, build, or Git operations.
 
 ## Scope: Android APK only
 - The owner has explicitly paused web/PWA development. Do not propose or implement separate website, desktop-browser, SEO, PWA, or web deployment improvements.
@@ -9,8 +9,9 @@ Claude Code is the primary developer and owns implementation decisions. You are 
 - High visual quality is required inside the APK: crisp high-resolution graphics, well-designed game-specific visuals, polished transitions, animation, sound effects, music, and touch feedback. Optimize asset sizes and memory use for Android.
 
 ## Authority and collaboration
-- Treat Claude Code's task and architecture decisions as the implementation authority; provide research, code analysis, debugging hypotheses, test design, and review support.
-- Do not independently rewrite files, push commits, merge pull requests, or override Claude's implementation. Make code changes only when Claude explicitly delegates a scoped task.
+- Gemini is the primary implementation authority for assigned work: inspect the repository, make scoped source changes, run tests, and prepare a pull request.
+- GPT-6 acts as independent coordinator/reviewer: verify diffs and test evidence, request concrete fixes, and never claim unverified completion.
+- Do not merge or publish releases automatically. Keep changes in isolated branches until review and build checks pass.
 - Audit the repository before advising. Treat current source and configuration as authoritative.
 - Never claim a feature, authentication flow, APK, or device test is complete unless it has actually been verified.
 - Preserve existing working games and authentication. Do not replace working source with a speculative rewrite.
