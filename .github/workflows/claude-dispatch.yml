@@ -1,13 +1,8 @@
 name: Claude Dispatch
 
-# Claude görevleri CLAUDE_TASK.md dosyasına yazıldığında main push'u ile otomatik başlar.
-# İsteğe bağlı manuel workflow_dispatch de korunur.
+# Claude Code Action push olayını desteklemediği için görevler manuel workflow_dispatch ile başlatılır.
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "CLAUDE_TASK.md"
   workflow_dispatch:
     inputs:
       prompt:
